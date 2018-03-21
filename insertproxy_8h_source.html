@@ -101,7 +101,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;modelutilities_global.h&quot;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;QAbstractProxyModel&gt;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;QVariant&gt;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="keyword">class </span><a class="code" href="class_insert_proxy_private.html">InsertProxyPrivate</a>;</div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="keyword">class </span>InsertProxyPrivate;</div>
 <div class="line"><a name="l00008"></a><span class="lineno"><a class="line" href="class_insert_proxy.html">    8</a></span>&#160;<span class="keyword">class </span>MODELUTILITIES_EXPORT <a class="code" href="class_insert_proxy.html">InsertProxy</a> : <span class="keyword">public</span>  QAbstractProxyModel</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;{</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    Q_OBJECT</div>
@@ -161,16 +161,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    virtual <span class="keywordtype">bool</span> validColumn() const;</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    virtual Qt::ItemFlags flagForExtra(<span class="keywordtype">bool</span> isRow, <span class="keywordtype">int</span> section) const;</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;private:</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <a class="code" href="class_insert_proxy_private.html">InsertProxyPrivate</a>* m_dptr;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    InsertProxyPrivate* m_dptr;</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;};</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;Q_DECLARE_OPERATORS_FOR_FLAGS(<a class="code" href="class_insert_proxy.html">InsertProxy</a>::InsertDirections)</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#endif // INSERTPROXY_H</span></div>
-<div class="ttc" id="class_insert_proxy_private_html"><div class="ttname"><a href="class_insert_proxy_private.html">InsertProxyPrivate</a></div><div class="ttdef"><b>Definition:</b> insertproxy.cpp:8</div></div>
 <div class="ttc" id="class_insert_proxy_html"><div class="ttname"><a href="class_insert_proxy.html">InsertProxy</a></div><div class="ttdoc">This proxy model provides an extra row and column to handle user insertions. </div><div class="ttdef"><b>Definition:</b> insertproxy.h:8</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 21 2018 10:40:30 for Qt Model Utilities by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 21 2018 14:05:01 for Qt Model Utilities by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>
