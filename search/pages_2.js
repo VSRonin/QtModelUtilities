@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['qt_20model_20utilities',['Qt Model Utilities',['../md__r_e_a_d_m_e__role__mask__proxy__model.html',1,'']]]
+  ['role_20mask_20proxy_20model',['Role Mask Proxy Model',['../md__r_e_a_d_m_e__role__mask__proxy__model.html',1,'']]]
 ];
