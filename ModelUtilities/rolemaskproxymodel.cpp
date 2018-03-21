@@ -1,22 +1,6 @@
 #include "rolemaskproxymodel.h"
-#include <QPersistentModelIndex>
-#include <QHash>
-#include <QSet>
+#include "private/rolemaskproxymodel_p.h"
 #include <QVector>
-#include <functional>
-class RoleMaskProxyModelPrivate{
-    Q_DECLARE_PUBLIC(RoleMaskProxyModel)
-    RoleMaskProxyModel* q_ptr;
-    RoleMaskProxyModelPrivate(RoleMaskProxyModel* q);
-    QSet<int> m_maskedRoles;
-    QHash<QPersistentModelIndex, QHash<int, QVariant> > m_maskedData;
-    bool m_transparentIfEmpty;
-    bool m_mergeDisplayEdit;
-    void clearUnusedMaskedRoles(const QSet<int>& roles);
-    bool removeRole(const QPersistentModelIndex& idx, int role);
-    bool removeRole(const QHash<QPersistentModelIndex, QHash<int, QVariant> >::iterator& idxIter, int role);
-    void signalAllChanged(const QVector<int>& roles = QVector<int>(), const QModelIndex& parent = QModelIndex());
-};
 
 RoleMaskProxyModelPrivate::RoleMaskProxyModelPrivate(RoleMaskProxyModel* q)
     :q_ptr(q)
