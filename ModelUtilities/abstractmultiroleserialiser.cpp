@@ -13,21 +13,6 @@ AbstractMultiRoleSerialiserPrivate::AbstractMultiRoleSerialiserPrivate(AbstractM
     , m_rolesToSave(AbstractMultiRoleSerialiser::modelDefaultRoles())
 {}
 
-#ifdef Q_COMPILER_RVALUE_REFS
-/*!
-Creates a serialiser moving \a other.
-*/
-AbstractMultiRoleSerialiser::AbstractMultiRoleSerialiser(AbstractMultiRoleSerialiser&& other)
-    :AbstractModelSerialiser(static_cast<AbstractModelSerialiser&&>(other))
-{}
-
-//! Move assignment
-AbstractMultiRoleSerialiser& AbstractMultiRoleSerialiser::operator=(AbstractMultiRoleSerialiser&& other)
-{
-    AbstractModelSerialiser::operator=(static_cast<AbstractModelSerialiser&&>(other));
-    return *this;
-}
-#endif // Q_COMPILER_RVALUE_REFS
 /*!
 Constructs a serialiser operating over \a model
 
@@ -54,32 +39,11 @@ AbstractMultiRoleSerialiser::AbstractMultiRoleSerialiser(const QAbstractItemMode
 AbstractMultiRoleSerialiser::AbstractMultiRoleSerialiser(AbstractMultiRoleSerialiserPrivate& d)
     :AbstractModelSerialiser(d)
 {}
-/*!
-Creates a copy of \a other.
-*/
-AbstractMultiRoleSerialiser::AbstractMultiRoleSerialiser(const AbstractMultiRoleSerialiser& other)
-    : AbstractModelSerialiser(*new AbstractMultiRoleSerialiserPrivate(this))
-{
-    operator=(other);
-}
 
 /*!
 Destroys the object.
 */
 AbstractMultiRoleSerialiser::~AbstractMultiRoleSerialiser() = default;
-/*!
-Assigns \a other to this object.
-*/
-AbstractMultiRoleSerialiser& AbstractMultiRoleSerialiser::operator=(const AbstractMultiRoleSerialiser& other)
-{
-    if (!d_ptr)
-        d_ptr = new AbstractMultiRoleSerialiserPrivate(this);
-    Q_D(AbstractMultiRoleSerialiser);
-    Q_ASSERT_X(other.d_func(), "AbstractMultiRoleSerialiser", "Trying to access data on moved object");
-    d->m_rolesToSave = other.d_func()->m_rolesToSave;
-    AbstractModelSerialiser::operator=(other);
-    return *this;
-}
 /*!
 \property AbstractSingleRoleSerialiser::rolesToSave
 \brief the roles that will be serialised
@@ -93,7 +57,7 @@ by default this property is set to all non obsolete Qt::ItemDataRole values
 const QList<int>& AbstractMultiRoleSerialiser::rolesToSave() const
 {
     Q_D(const AbstractMultiRoleSerialiser);
-    Q_ASSERT_X(d, "AbstractMultiRoleSerialiser", "Trying to access data on moved object");
+    
     return d->m_rolesToSave;
 }
 /*!
@@ -102,7 +66,7 @@ const QList<int>& AbstractMultiRoleSerialiser::rolesToSave() const
 void AbstractMultiRoleSerialiser::setRoleToSave(const QList<int>& val)
 {
     Q_D(AbstractMultiRoleSerialiser);
-    Q_ASSERT_X(d, "AbstractMultiRoleSerialiser", "Trying to access data on moved object");
+    
     d->m_rolesToSave = val;
 }
 /*!
@@ -111,7 +75,7 @@ void AbstractMultiRoleSerialiser::setRoleToSave(const QList<int>& val)
 void AbstractMultiRoleSerialiser::addRoleToSave(int role)
 {
     Q_D(AbstractMultiRoleSerialiser);
-    Q_ASSERT_X(d, "AbstractMultiRoleSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_rolesToSave.contains(role))
         d->m_rolesToSave.append(role);
 }
@@ -121,7 +85,7 @@ void AbstractMultiRoleSerialiser::addRoleToSave(int role)
 void AbstractMultiRoleSerialiser::removeRoleToSave(int role)
 {
     Q_D(AbstractMultiRoleSerialiser);
-    Q_ASSERT_X(d, "AbstractMultiRoleSerialiser", "Trying to access data on moved object");
+    
     d->m_rolesToSave.removeAll(role);
 }
 /*!
@@ -130,7 +94,7 @@ void AbstractMultiRoleSerialiser::removeRoleToSave(int role)
 void AbstractMultiRoleSerialiser::clearRoleToSave()
 {
     Q_D(AbstractMultiRoleSerialiser);
-    Q_ASSERT_X(d, "AbstractMultiRoleSerialiser", "Trying to access data on moved object");
+    
     d->m_rolesToSave.clear();
 }
 /*!
@@ -141,7 +105,7 @@ fills the list fo roles to save with all non obsolete Qt::ItemDataRole values
 void AbstractMultiRoleSerialiser::resetRoleToSave()
 {
     Q_D(AbstractMultiRoleSerialiser);
-    Q_ASSERT_X(d, "AbstractMultiRoleSerialiser", "Trying to access data on moved object");
+    
     d->m_rolesToSave = AbstractMultiRoleSerialiser::modelDefaultRoles();
 }
 /*!

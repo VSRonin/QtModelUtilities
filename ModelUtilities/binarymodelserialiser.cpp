@@ -183,7 +183,7 @@ bool BinaryModelSerialiser::saveModel(QIODevice* destination) const
     if (!destination->isWritable())
         return false;
     Q_D(const BinaryModelSerialiser);
-    Q_ASSERT_X(d, "BinaryModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QDataStream witer(destination);
@@ -198,7 +198,7 @@ bool BinaryModelSerialiser::saveModel(QByteArray* destination) const
     if (!destination)
         return false;
     Q_D(const BinaryModelSerialiser);
-    Q_ASSERT_X(d, "BinaryModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QDataStream witer(destination, QIODevice::WriteOnly);
@@ -219,7 +219,7 @@ bool BinaryModelSerialiser::loadModel(QIODevice* source)
     if (!source->isReadable())
         return false;
     Q_D(BinaryModelSerialiser);
-    Q_ASSERT_X(d, "BinaryModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QDataStream reader(source);
@@ -231,7 +231,7 @@ bool BinaryModelSerialiser::loadModel(QIODevice* source)
 bool BinaryModelSerialiser::loadModel(const QByteArray& source)
 {
     Q_D(BinaryModelSerialiser);
-    Q_ASSERT_X(d, "BinaryModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QDataStream reader(source);
@@ -242,17 +242,7 @@ bool BinaryModelSerialiser::loadModel(const QByteArray& source)
 }
 
 
-#ifdef Q_COMPILER_RVALUE_REFS
-BinaryModelSerialiser::BinaryModelSerialiser(BinaryModelSerialiser&& other)
-    :AbstractMultiRoleSerialiser(static_cast<AbstractMultiRoleSerialiser&&>(other))
-{}
 
-BinaryModelSerialiser& BinaryModelSerialiser::operator=(BinaryModelSerialiser&& other)
-{
-    AbstractMultiRoleSerialiser::operator=(static_cast<AbstractMultiRoleSerialiser&&>(other)); return *this;
-}
-
-#endif // Q_COMPILER_RVALUE_REFS
 BinaryModelSerialiser::BinaryModelSerialiser(QAbstractItemModel* model)
     : AbstractMultiRoleSerialiser(*new BinaryModelSerialiserPrivate(this))
 {
@@ -269,17 +259,9 @@ BinaryModelSerialiser::BinaryModelSerialiser(BinaryModelSerialiserPrivate& d)
     :AbstractMultiRoleSerialiser(d)
 {}
 
-BinaryModelSerialiser::BinaryModelSerialiser(const BinaryModelSerialiser& other)
-    : AbstractMultiRoleSerialiser(*new BinaryModelSerialiserPrivate(this))
-{
-    operator=(other);
-}
+
 BinaryModelSerialiser::~BinaryModelSerialiser() = default;
-BinaryModelSerialiser& BinaryModelSerialiser::operator=(const BinaryModelSerialiser& other)
-{
-    AbstractMultiRoleSerialiser::operator=(other);
-    return *this;
-}
+
 
 
 #ifdef MS_DECLARE_STREAM_OPERATORS

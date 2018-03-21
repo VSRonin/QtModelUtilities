@@ -247,14 +247,14 @@ bool XmlModelSerialiserPrivate::readXml(QXmlStreamReader& reader)
 bool XmlModelSerialiser::printStartDocument() const
 {
     Q_D(const XmlModelSerialiser);
-    Q_ASSERT_X(d, "XmlModelSerialiser", "Trying to access data on moved object");
+    
     return d->m_printStartDocument;
 }
 
 void XmlModelSerialiser::setPrintStartDocument(bool val)
 {
     Q_D(XmlModelSerialiser);
-    Q_ASSERT_X(d, "XmlModelSerialiser", "Trying to access data on moved object");
+    
     d->m_printStartDocument = val;
 }
 
@@ -264,7 +264,7 @@ bool XmlModelSerialiser::saveModel(QString* destination) const
     if (!destination)
         return false;
     Q_D(const XmlModelSerialiser);
-    Q_ASSERT_X(d, "XmlModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QXmlStreamWriter witer(destination);
@@ -282,7 +282,7 @@ bool XmlModelSerialiser::saveModel(QIODevice* destination) const
     if (!destination->isWritable())
         return false;
     Q_D(const XmlModelSerialiser);
-    Q_ASSERT_X(d, "XmlModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QXmlStreamWriter witer(destination);
@@ -294,7 +294,7 @@ bool XmlModelSerialiser::saveModel(QByteArray* destination) const
     if (!destination)
         return false;
     Q_D(const XmlModelSerialiser);
-    Q_ASSERT_X(d, "XmlModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QXmlStreamWriter witer(destination);
@@ -312,7 +312,7 @@ bool XmlModelSerialiser::loadModel(QIODevice* source)
     if (!source->isReadable())
         return false;
     Q_D(XmlModelSerialiser);
-    Q_ASSERT_X(d, "XmlModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QXmlStreamReader reader(source);
@@ -321,7 +321,7 @@ bool XmlModelSerialiser::loadModel(QIODevice* source)
 bool XmlModelSerialiser::loadModel(const QByteArray& source)
 {
     Q_D(XmlModelSerialiser);
-    Q_ASSERT_X(d, "XmlModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QXmlStreamReader reader(source);
@@ -332,24 +332,11 @@ bool XmlModelSerialiser::loadModel(QString* source)
     if (!source)
         return false;
     Q_D(XmlModelSerialiser);
-    Q_ASSERT_X(d, "XmlModelSerialiser", "Trying to access data on moved object");
+    
     QXmlStreamReader reader(*source);
     return d->readXml(reader);
 }
 
-#ifdef Q_COMPILER_RVALUE_REFS
-XmlModelSerialiser::XmlModelSerialiser(XmlModelSerialiser&& other)
-    :AbstractMultiRoleSerialiser(static_cast<AbstractMultiRoleSerialiser&&>(other))
-{}
-
-XmlModelSerialiser& XmlModelSerialiser::operator=(XmlModelSerialiser&& other)
-{
-    AbstractMultiRoleSerialiser::operator=(static_cast<AbstractMultiRoleSerialiser&&>(other)); 
-    return *this;
-}
-
-
-#endif // Q_COMPILER_RVALUE_REFS
 XmlModelSerialiser::XmlModelSerialiser(QAbstractItemModel* model)
     : AbstractMultiRoleSerialiser(*new XmlModelSerialiserPrivate(this))
 {
@@ -366,23 +353,9 @@ XmlModelSerialiser::XmlModelSerialiser(XmlModelSerialiserPrivate& d)
     :AbstractMultiRoleSerialiser(d)
 {}
 
-XmlModelSerialiser::XmlModelSerialiser(const XmlModelSerialiser& other)
-    : AbstractMultiRoleSerialiser(*new XmlModelSerialiserPrivate(this))
-{
-    operator=(other);
-}
+
 XmlModelSerialiser::~XmlModelSerialiser() = default;
 
-XmlModelSerialiser& XmlModelSerialiser::operator=(const XmlModelSerialiser& other)
-{
-    if (!d_ptr)
-        d_ptr = new XmlModelSerialiserPrivate(this);
-    Q_D(XmlModelSerialiser);
-    Q_ASSERT_X(other.d_func(), "XmlModelSerialiser", "Trying to access data on moved object");
-    AbstractMultiRoleSerialiser::operator=(other);
-    d->m_printStartDocument = other.d_func()->m_printStartDocument;
-    return *this;
-}
 
 #ifdef MS_DECLARE_STREAM_OPERATORS
 

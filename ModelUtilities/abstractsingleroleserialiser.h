@@ -10,16 +10,11 @@ class MODELUTILITIES_EXPORT AbstractSingleRoleSerialiser : public AbstractModelS
     Q_GADGET
     Q_PROPERTY(int roleToSave READ roleToSave WRITE setRoleToSave)
     Q_DECLARE_PRIVATE(AbstractSingleRoleSerialiser)
+    Q_DISABLE_COPY(AbstractSingleRoleSerialiser)
 public:
     AbstractSingleRoleSerialiser(QAbstractItemModel* model = Q_NULLPTR);
     AbstractSingleRoleSerialiser(const QAbstractItemModel* model);
-    AbstractSingleRoleSerialiser(const AbstractSingleRoleSerialiser& other);
-    AbstractSingleRoleSerialiser& operator=(const AbstractSingleRoleSerialiser& other);
-#ifdef Q_COMPILER_RVALUE_REFS
-    AbstractSingleRoleSerialiser(AbstractSingleRoleSerialiser&& other) Q_DECL_NOEXCEPT;
-    AbstractSingleRoleSerialiser& operator=(AbstractSingleRoleSerialiser&& other);
-#endif // Q_COMPILER_RVALUE_REFS
-    virtual ~AbstractSingleRoleSerialiser() Q_DECL_OVERRIDE = 0;
+    ~AbstractSingleRoleSerialiser() = 0;
     int roleToSave() const;
     void setRoleToSave(int val);
 protected:

@@ -184,49 +184,7 @@ AbstractModelSerialiser::AbstractModelSerialiser(const QAbstractItemModel* model
 AbstractModelSerialiser::AbstractModelSerialiser(AbstractModelSerialiserPrivate& d)
     :d_ptr(&d)
 {}
-/*!
-    Creates a copy of \a other.
-*/
-AbstractModelSerialiser::AbstractModelSerialiser(const AbstractModelSerialiser& other)
-    : d_ptr(new AbstractModelSerialiserPrivate(this))
-{
-    operator=(other);
-}
 
-#ifdef Q_COMPILER_RVALUE_REFS
-/*!
-    Creates a serialiser moving \a other.
-*/
-AbstractModelSerialiser::AbstractModelSerialiser(AbstractModelSerialiser&& other)
-    : d_ptr(other.d_ptr)
-{
-    other.d_ptr = Q_NULLPTR;
-    if (d_ptr)
-        d_ptr->q_ptr = this;
-}
-
-AbstractModelSerialiser& AbstractModelSerialiser::operator=(AbstractModelSerialiser&& other)
-{
-    std::swap(d_ptr, other.d_ptr);
-    d_ptr->q_ptr = this;
-    return *this;
-}
-
-#endif // Q_COMPILER_RVALUE_REFS
-
-/*!
-    Assigns \a other to this object.
-*/
-AbstractModelSerialiser& AbstractModelSerialiser::operator=(const AbstractModelSerialiser& other)
-{
-    if (!d_ptr)
-        d_ptr = new AbstractModelSerialiserPrivate(this);
-    Q_D(AbstractModelSerialiser);
-    Q_ASSERT_X(other.d_func(), "AbstractModelSerialiser", "Trying to access data on moved object");
-    d->m_model = other.d_func()->m_model;
-    d->m_constModel = other.d_func()->m_constModel;
-    return *this;
-}
 /*!
     Destroys the object.
 */
@@ -247,7 +205,7 @@ AbstractModelSerialiser::~AbstractModelSerialiser()
 QAbstractItemModel* AbstractModelSerialiser::model() const
 {
     Q_D(const AbstractModelSerialiser);
-    Q_ASSERT_X(d, "AbstractModelSerialiser", "Trying to access data on moved object");
+    
     return d->m_model;
 }
 
@@ -259,7 +217,7 @@ QAbstractItemModel* AbstractModelSerialiser::model() const
 const QAbstractItemModel* AbstractModelSerialiser::constModel() const
 {
     Q_D(const AbstractModelSerialiser);
-    Q_ASSERT_X(d, "AbstractModelSerialiser", "Trying to access data on moved object");
+    
     return d->m_constModel;
 }
 
@@ -269,7 +227,7 @@ const QAbstractItemModel* AbstractModelSerialiser::constModel() const
 void AbstractModelSerialiser::setModel(QAbstractItemModel* val)
 {
     Q_D(AbstractModelSerialiser);
-    Q_ASSERT_X(d, "AbstractModelSerialiser", "Trying to access data on moved object");
+    
     d->m_model = val;
     d->m_constModel = val;
 }
@@ -282,7 +240,7 @@ void AbstractModelSerialiser::setModel(QAbstractItemModel* val)
 void AbstractModelSerialiser::setModel(const QAbstractItemModel* val)
 {
     Q_D(AbstractModelSerialiser);
-    Q_ASSERT_X(d, "AbstractModelSerialiser", "Trying to access data on moved object");
+    
     d->m_model = Q_NULLPTR;
     d->m_constModel = val;
 }

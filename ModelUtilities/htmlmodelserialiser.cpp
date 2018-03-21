@@ -292,19 +292,7 @@ QVariant HtmlModelSerialiserPrivate::readHtmlVariant(QXmlStreamReader& reader, i
     return loadVariant(valType, reader.readElementText());
 }
 
-#ifdef Q_COMPILER_RVALUE_REFS
-HtmlModelSerialiser::HtmlModelSerialiser(HtmlModelSerialiser&& other)
-    : AbstractMultiRoleSerialiser(static_cast<AbstractMultiRoleSerialiser&&>(other))
-{}
 
-HtmlModelSerialiser& HtmlModelSerialiser::operator=(HtmlModelSerialiser&& other)
-{
-    AbstractMultiRoleSerialiser::operator=(static_cast<AbstractMultiRoleSerialiser&&>(other)); 
-    return *this;
-}
-
-
-#endif // Q_COMPILER_RVALUE_REFS
 HtmlModelSerialiser::HtmlModelSerialiser(QAbstractItemModel* model)
     : AbstractMultiRoleSerialiser(*new HtmlModelSerialiserPrivate(this))
 {
@@ -320,35 +308,21 @@ HtmlModelSerialiser::HtmlModelSerialiser(HtmlModelSerialiserPrivate& d)
     :AbstractMultiRoleSerialiser(d)
 {}
 
-HtmlModelSerialiser::HtmlModelSerialiser(const HtmlModelSerialiser& other)
-    : AbstractMultiRoleSerialiser(*new HtmlModelSerialiserPrivate(this))
-{
-    operator=(other);
-}
+
 HtmlModelSerialiser::~HtmlModelSerialiser() = default;
 
-HtmlModelSerialiser& HtmlModelSerialiser::operator=(const HtmlModelSerialiser& other)
-{
-    if (!d_ptr)
-        d_ptr = new HtmlModelSerialiserPrivate(this);
-    Q_D(HtmlModelSerialiser);
-    Q_ASSERT_X(other.d_func(), "HtmlModelSerialiser", "Trying to access data on moved object");
-    AbstractMultiRoleSerialiser::operator=(other);
-    d->m_printStartDocument = other.d_func()->m_printStartDocument;
-    return *this;
-}
 
 bool HtmlModelSerialiser::printStartDocument() const
 {
     Q_D(const HtmlModelSerialiser);
-    Q_ASSERT_X(d, "HtmlModelSerialiser", "Trying to access data on moved object");
+    
     return d->m_printStartDocument;
 }
 
 void HtmlModelSerialiser::setPrintStartDocument(bool val)
 {
     Q_D(HtmlModelSerialiser);
-    Q_ASSERT_X(d, "HtmlModelSerialiser", "Trying to access data on moved object");
+    
     d->m_printStartDocument = val;
 }
 
@@ -358,7 +332,7 @@ bool HtmlModelSerialiser::saveModel(QString* destination) const
     if (!destination)
         return false;
     Q_D(const HtmlModelSerialiser);
-    Q_ASSERT_X(d, "HtmlModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QXmlStreamWriter witer(destination);
@@ -376,7 +350,7 @@ bool HtmlModelSerialiser::saveModel(QIODevice* destination) const
     if (!destination->isWritable())
         return false;
     Q_D(const HtmlModelSerialiser);
-    Q_ASSERT_X(d, "HtmlModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QXmlStreamWriter witer(destination);
@@ -388,7 +362,7 @@ bool HtmlModelSerialiser::saveModel(QByteArray* destination) const
     if (!destination)
         return false;
     Q_D(const HtmlModelSerialiser);
-    Q_ASSERT_X(d, "HtmlModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QXmlStreamWriter witer(destination);
@@ -406,7 +380,7 @@ bool HtmlModelSerialiser::loadModel(QIODevice* source)
     if (!source->isReadable())
         return false;
     Q_D(HtmlModelSerialiser);
-    Q_ASSERT_X(d, "HtmlModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QXmlStreamReader reader(source);
@@ -415,7 +389,7 @@ bool HtmlModelSerialiser::loadModel(QIODevice* source)
 bool HtmlModelSerialiser::loadModel(const QByteArray& source)
 {
     Q_D(HtmlModelSerialiser);
-    Q_ASSERT_X(d, "HtmlModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QXmlStreamReader reader(source);
@@ -426,7 +400,7 @@ bool HtmlModelSerialiser::loadModel(QString* source)
     if (!source)
         return false;
     Q_D(HtmlModelSerialiser);
-    Q_ASSERT_X(d, "HtmlModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QXmlStreamReader reader(*source);

@@ -12,15 +12,10 @@ class MODELUTILITIES_EXPORT AbstractModelSerialiser
     Q_PROPERTY(QAbstractItemModel* model READ model WRITE setModel)
     Q_PROPERTY(const QAbstractItemModel* constModel READ constModel WRITE setModel)
     Q_DECLARE_PRIVATE(AbstractModelSerialiser)
+    Q_DISABLE_COPY(AbstractModelSerialiser)
 public:
     AbstractModelSerialiser(QAbstractItemModel* model = Q_NULLPTR);
     AbstractModelSerialiser(const QAbstractItemModel* model);
-    AbstractModelSerialiser(const AbstractModelSerialiser& other);
-    AbstractModelSerialiser& operator=(const AbstractModelSerialiser& other);
-#ifdef Q_COMPILER_RVALUE_REFS
-    AbstractModelSerialiser(AbstractModelSerialiser&& other) Q_DECL_NOEXCEPT;
-    AbstractModelSerialiser& operator=(AbstractModelSerialiser&& other);
-#endif // Q_COMPILER_RVALUE_REFS
     virtual ~AbstractModelSerialiser() = 0;
     virtual QAbstractItemModel* model() const;
     virtual const QAbstractItemModel* constModel() const;

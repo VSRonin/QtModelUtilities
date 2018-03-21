@@ -159,14 +159,14 @@ bool CsvModelSerialiserPrivate::readCsv(QTextStream& reader)
 const QString& CsvModelSerialiser::csvSeparator() const
 {
     Q_D(const CsvModelSerialiser);
-    Q_ASSERT_X(d, "CsvModelSerialiser", "Trying to access data on moved object");
+    
     return d->m_csvSeparator;
 }
 
 void CsvModelSerialiser::setCsvSeparator(const QString& val)
 {
     Q_D(CsvModelSerialiser);
-    Q_ASSERT_X(d, "CsvModelSerialiser", "Trying to access data on moved object");
+    
     d->m_csvSeparator = val;
 }
 
@@ -174,44 +174,32 @@ void CsvModelSerialiser::setCsvSeparator(const QString& val)
 bool CsvModelSerialiser::firstRowIsHeader()
 {
     Q_D(const CsvModelSerialiser);
-    Q_ASSERT_X(d, "CsvModelSerialiser", "Trying to access data on moved object");
+    
     return d->m_firstRowIsHeader;
 }
 
 bool CsvModelSerialiser::firstColumnIsHeader()
 {
     Q_D(const CsvModelSerialiser);
-    Q_ASSERT_X(d, "CsvModelSerialiser", "Trying to access data on moved object");
+    
     return d->m_firstColumnIsHeader;
 }
 
 void CsvModelSerialiser::setFirstRowIsHeader(bool val)
 {
     Q_D(CsvModelSerialiser);
-    Q_ASSERT_X(d, "CsvModelSerialiser", "Trying to access data on moved object");
+    
     d->m_firstRowIsHeader = val;
 }
 
 void CsvModelSerialiser::setFirstColumnIsHeader(bool val)
 {
     Q_D(CsvModelSerialiser);
-    Q_ASSERT_X(d, "CsvModelSerialiser", "Trying to access data on moved object");
+    
     d->m_firstColumnIsHeader = val;
 }
 
-#ifdef Q_COMPILER_RVALUE_REFS
-CsvModelSerialiser::CsvModelSerialiser(CsvModelSerialiser&& other)
-    :AbstractSingleRoleSerialiser(static_cast<AbstractSingleRoleSerialiser&&>(other))
-{}
 
-CsvModelSerialiser& CsvModelSerialiser::operator=(CsvModelSerialiser&& other)
-{
-    AbstractSingleRoleSerialiser::operator=(static_cast<AbstractSingleRoleSerialiser&&>(other));
-    return *this;
-}
-
-
-#endif // Q_COMPILER_RVALUE_REFS
 CsvModelSerialiser::CsvModelSerialiser(QAbstractItemModel* model)
     : AbstractSingleRoleSerialiser(*new CsvModelSerialiserPrivate(this))
 {
@@ -227,23 +215,10 @@ CsvModelSerialiser::CsvModelSerialiser(CsvModelSerialiserPrivate& d)
     :AbstractSingleRoleSerialiser(d)
 {}
 
-CsvModelSerialiser::CsvModelSerialiser(const CsvModelSerialiser& other)
-    : AbstractSingleRoleSerialiser(*new CsvModelSerialiserPrivate(this))
-{
-    operator=(other);
-}
+
 CsvModelSerialiser::~CsvModelSerialiser() = default;
 
-CsvModelSerialiser& CsvModelSerialiser::operator=(const CsvModelSerialiser& other)
-{
-    if (!d_ptr)
-        d_ptr = new CsvModelSerialiserPrivate(this);
-    Q_D(CsvModelSerialiser);
-    Q_ASSERT_X(other.d_func(), "CsvModelSerialiser", "Trying to access data on moved object");
-    AbstractSingleRoleSerialiser::operator=(other);
-    d->m_csvSeparator = other.d_func()->m_csvSeparator;
-    return *this;
-}
+
 
 
 bool CsvModelSerialiser::saveModel(QString* destination) const
@@ -251,7 +226,7 @@ bool CsvModelSerialiser::saveModel(QString* destination) const
     if (!destination)
         return false;
     Q_D(const CsvModelSerialiser);
-    Q_ASSERT_X(d, "CsvModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QTextStream witer(destination, QIODevice::WriteOnly | QIODevice::Text);
@@ -269,7 +244,7 @@ bool CsvModelSerialiser::saveModel(QIODevice* destination) const
     if (!destination->isWritable())
         return false;
     Q_D(const CsvModelSerialiser);
-    Q_ASSERT_X(d, "CsvModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     destination->setTextModeEnabled(true);
@@ -282,7 +257,7 @@ bool CsvModelSerialiser::saveModel(QByteArray* destination) const
     if (!destination)
         return false;
     Q_D(const CsvModelSerialiser);
-    Q_ASSERT_X(d, "CsvModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QTextStream witer(destination, QIODevice::WriteOnly | QIODevice::Text);
@@ -300,7 +275,7 @@ bool CsvModelSerialiser::loadModel(QIODevice* source)
     if (!source->isReadable())
         return false;
     Q_D(CsvModelSerialiser);
-    Q_ASSERT_X(d, "CsvModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     source->setTextModeEnabled(true);
@@ -310,7 +285,7 @@ bool CsvModelSerialiser::loadModel(QIODevice* source)
 bool CsvModelSerialiser::loadModel(const QByteArray& source)
 {
     Q_D(CsvModelSerialiser);
-    Q_ASSERT_X(d, "CsvModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QTextStream reader(source, QIODevice::ReadOnly | QIODevice::Text);
@@ -321,7 +296,7 @@ bool CsvModelSerialiser::loadModel(QString* source)
     if (!source)
         return false;
     Q_D(CsvModelSerialiser);
-    Q_ASSERT_X(d, "CsvModelSerialiser", "Trying to access data on moved object");
+    
     if (!d->m_model)
         return false;
     QTextStream reader(source, QIODevice::ReadOnly | QIODevice::Text);
