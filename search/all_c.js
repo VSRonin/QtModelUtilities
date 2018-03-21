@@ -1,12 +1,11 @@
 var searchData=
 [
-  ['separateeditdisplay',['separateEditDisplay',['../class_insert_proxy.html#a29c93d3cc5439fb7f61c3f4ccd0142d3',1,'InsertProxy']]],
-  ['setdata',['setData',['../class_insert_proxy.html#a6d8e30b5434dade591c096fce1283e51',1,'InsertProxy']]],
-  ['setdataforcorner',['setDataForCorner',['../class_insert_proxy.html#a31bc0b068c70f7481e3ee6a0073de953',1,'InsertProxy']]],
-  ['setheaderdata',['setHeaderData',['../class_insert_proxy.html#a560106b47a32b7b9b1e674c22275f8ba',1,'InsertProxy']]],
-  ['setitemdata',['setItemData',['../class_insert_proxy.html#a023f01d9899d873c812456e1a2ce420d',1,'InsertProxy']]],
-  ['setmodel',['setModel',['../class_abstract_model_serialiser.html#a84e44c2083cf016adc4dc4613b2c05ca',1,'AbstractModelSerialiser::setModel(QAbstractItemModel *val)'],['../class_abstract_model_serialiser.html#a89da8bcd0df9c2f22916e1692542d345',1,'AbstractModelSerialiser::setModel(const QAbstractItemModel *val)']]],
-  ['setroletosave',['setRoleToSave',['../class_abstract_multi_role_serialiser.html#abc60037f799bc611db1897a97b711750',1,'AbstractMultiRoleSerialiser::setRoleToSave()'],['../class_abstract_single_role_serialiser.html#a4a964880eb16c5352eb424d51361103c',1,'AbstractSingleRoleSerialiser::setRoleToSave()']]],
-  ['setsourcemodel',['setSourceModel',['../class_insert_proxy.html#ac2e9060fce23c6c3e7ddc931e23ee047',1,'InsertProxy']]],
-  ['sort',['sort',['../class_insert_proxy.html#a9bf2f45e093febe06a09af4d5d2e5e29',1,'InsertProxy']]]
+  ['removecolumns',['removeColumns',['../class_insert_proxy.html#ae8c8e1118e02e4d0401b8e82135e0dc0',1,'InsertProxy']]],
+  ['removeroletosave',['removeRoleToSave',['../class_abstract_multi_role_serialiser.html#aad97dbf5dc90abe927763723f92d1649',1,'AbstractMultiRoleSerialiser']]],
+  ['removerows',['removeRows',['../class_insert_proxy.html#a3965dffa9b636b485022a620f673cbb9',1,'InsertProxy']]],
+  ['resetroletosave',['resetRoleToSave',['../class_abstract_multi_role_serialiser.html#a0c614624cde929ec6c9e50ae8bf9c209',1,'AbstractMultiRoleSerialiser']]],
+  ['rolemaskproxymodel',['RoleMaskProxyModel',['../class_role_mask_proxy_model.html',1,'']]],
+  ['rolestosave',['rolesToSave',['../class_abstract_multi_role_serialiser.html#ad17b8409ea175253572741a543734bae',1,'AbstractMultiRoleSerialiser']]],
+  ['roletosave',['roleToSave',['../class_abstract_single_role_serialiser.html#a77992b7cbf8981a659bf5d984cd0925a',1,'AbstractSingleRoleSerialiser']]],
+  ['rowcount',['rowCount',['../class_insert_proxy.html#aea4d665ac0fc61524b36f17e4773b844',1,'InsertProxy']]]
 ];
