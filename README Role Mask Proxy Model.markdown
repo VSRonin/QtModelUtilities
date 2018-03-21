@@ -1,4 +1,4 @@
-# Qt Model Utilities
+# Role Mask Proxy Model
 
 This proxy will act as a mask on top of the source model to intercept data.
 
