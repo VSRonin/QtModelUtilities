@@ -1,26 +1,3 @@
-/**********************************************************************************\
-
-Copyright 2018 Luca Beldi
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS
-OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-\**********************************************************************************/
-
 
 #include "insertproxy.h"
 #include <functional>
@@ -581,6 +558,7 @@ QModelIndex InsertProxy::mapToSource(const QModelIndex &proxyIndex) const
 
 /*!
 \property InsertProxy::insertDirection
+\accessors %insertDirection(), setInsertDirection()
 \brief This property determines if the extra row, column or both are displayed
 */
 InsertProxy::InsertDirections InsertProxy::insertDirection() const
@@ -828,14 +806,17 @@ void InsertProxy::commitColumn()
     Q_D(InsertProxy);
     d->commitColumn();
 }
+
 /*!
 \property InsertProxy::separateEditDisplay
+\accessors %separateEditDisplay(), setSeparateEditDisplay()
 \brief This property determines if the Qt::DisplayRole and Qt::EditRole should be merged in the extra row/column
 \details By default the two roles are one and the same you can use this property to separate them.
 If there's any data in the role when you set this property to true it will be duplicated for both roles.
 If there is data both in Qt::DisplayRole and Qt::EditRole when you set this property to false Qt::DisplayRole will prevail.
 This property only affects the extra row/column. Data in the source model is not affected.
 */
+
 bool InsertProxy::separateEditDisplay() const
 {
     Q_D(const InsertProxy);
@@ -903,7 +884,6 @@ bool InsertProxy::validColumn() const
     }
     return false;
 }
-
 
 
 /*!

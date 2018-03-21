@@ -1,26 +1,3 @@
-/**********************************************************************************\
-
-Copyright 2018 Luca Beldi
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS
-OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-\**********************************************************************************/
-
 
 #ifndef INSERTPROXY_H
 #define INSERTPROXY_H
@@ -70,16 +47,18 @@ public:
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) Q_DECL_OVERRIDE;
     InsertDirections insertDirection() const;
     void setInsertDirection(const InsertDirections& direction);
-    Q_SIGNAL void insertDirectionChanged(const InsertDirections& direction);
     virtual QVariant dataForCorner(int role = Qt::DisplayRole) const;
     virtual void setDataForCorner(const QVariant& value, int role = Qt::DisplayRole);
-    Q_SIGNAL void dataForCornerChanged(int role);
-    Q_SLOT void commitRow();
-    Q_SLOT void commitColumn();
-    Q_SIGNAL void extraDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
     bool separateEditDisplay() const;
     void setSeparateEditDisplay(bool val);
-    Q_SIGNAL void separateEditDisplayChanged(bool separate);
+public Q_SLOTS:
+    void commitRow();
+    void commitColumn();
+Q_SIGNALS:
+    void dataForCornerChanged(int role);
+    void extraDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
+    void separateEditDisplayChanged(bool separate);
+    void insertDirectionChanged(const InsertDirections& direction);
 protected:
     virtual bool validRow() const;
     virtual bool validColumn() const;
