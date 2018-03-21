@@ -1,14 +1,14 @@
 #ifndef insertproxy_p_h__
 #define insertproxy_p_h__
-#include "insertproxy.h"
+#include "insertproxymodel.h"
 #include <QHash>
 
-class InsertProxyPrivate
+class InsertProxyModelPrivate
 {
-    Q_DECLARE_PUBLIC(InsertProxy)
-    Q_DISABLE_COPY(InsertProxyPrivate)
-    InsertProxyPrivate(InsertProxy* q);
-    InsertProxy::InsertDirections m_insertDirection;
+    Q_DECLARE_PUBLIC(InsertProxyModel)
+    Q_DISABLE_COPY(InsertProxyModelPrivate)
+    InsertProxyModelPrivate(InsertProxyModel* q);
+    InsertProxyModel::InsertDirections m_insertDirection;
     QList<QHash<int, QVariant> > m_extraData[2];
     QHash<int, QVariant> m_extraHeaderData[2];
     QHash<int, QVariant> m_dataForCorner;
@@ -28,6 +28,6 @@ class InsertProxyPrivate
     void onInserted(bool isRow, const QModelIndex &parent, int first, int last);
     void onMoved(bool isRow, const QModelIndex &parent, int start, int end, const QModelIndex &destination, int destIdx);
     void onRemoved(bool isRow, const QModelIndex &parent, int first, int last);
-    InsertProxy* q_ptr;
+    InsertProxyModel* q_ptr;
 };
 #endif // insertproxy_p_h__

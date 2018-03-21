@@ -4,14 +4,14 @@
 #include "modelutilities_global.h"
 #include <QAbstractProxyModel>
 #include <QVariant>
-class InsertProxyPrivate;
-class MODELUTILITIES_EXPORT InsertProxy : public  QAbstractProxyModel
+class InsertProxyModelPrivate;
+class MODELUTILITIES_EXPORT InsertProxyModel : public  QAbstractProxyModel
 {
     Q_OBJECT
     Q_PROPERTY(InsertDirections insertDirection READ insertDirection WRITE setInsertDirection NOTIFY insertDirectionChanged)
     Q_PROPERTY(bool separateEditDisplay READ separateEditDisplay WRITE setSeparateEditDisplay NOTIFY separateEditDisplayChanged)
-    Q_DISABLE_COPY(InsertProxy)
-    Q_DECLARE_PRIVATE_D(m_dptr, InsertProxy)
+    Q_DISABLE_COPY(InsertProxyModel)
+    Q_DECLARE_PRIVATE_D(m_dptr, InsertProxyModel)
 public:
     enum InsertDirection
     {
@@ -21,8 +21,8 @@ public:
     };
     Q_DECLARE_FLAGS(InsertDirections, InsertDirection)
     Q_FLAG(InsertDirections)
-    explicit InsertProxy(QObject* parent = Q_NULLPTR);
-    ~InsertProxy();
+    explicit InsertProxyModel(QObject* parent = Q_NULLPTR);
+    ~InsertProxyModel();
     void setSourceModel(QAbstractItemModel* newSourceModel) Q_DECL_OVERRIDE;
     QModelIndex buddy(const QModelIndex &index) const Q_DECL_OVERRIDE;
     bool hasChildren(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
@@ -64,7 +64,7 @@ protected:
     virtual bool validColumn() const;
     virtual Qt::ItemFlags flagForExtra(bool isRow, int section) const;
 private:
-    InsertProxyPrivate* m_dptr;
+    InsertProxyModelPrivate* m_dptr;
 };
-Q_DECLARE_OPERATORS_FOR_FLAGS(InsertProxy::InsertDirections)
+Q_DECLARE_OPERATORS_FOR_FLAGS(InsertProxyModel::InsertDirections)
 #endif // INSERTPROXY_H
