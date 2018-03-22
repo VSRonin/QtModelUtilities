@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="RoleMaskProxyModel">
+      <UniqueIdentifier>{1d68ea41-7730-408a-8729-1f5746d531d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="InsertProxyModel">
+      <UniqueIdentifier>{e41ae084-d289-4e73-8a38-e2a02ac54886}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ModelSerialisation">
+      <UniqueIdentifier>{e1cae15f-e028-4429-8a53-7f9e0132f134}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ModelSerialisation\Headers">
+      <UniqueIdentifier>{71f64133-f7b2-4707-9d57-d201fbd12234}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ModelSerialisation\Sources">
+      <UniqueIdentifier>{cb91afa0-e357-46ba-ba2b-421cd9dacdc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ModelSerialisation\Headers\private">
+      <UniqueIdentifier>{71030ae6-9cc7-41aa-b0b6-f7bae6573b51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Globals">
+      <UniqueIdentifier>{eab2adf1-6ce0-444c-85c3-489b07788746}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="private\abstractmodelserialiser_p.h">
+      <Filter>ModelSerialisation\Headers\private</Filter>
+    </ClInclude>
+    <ClInclude Include="private\abstractmultiroleserialiser_p.h">
+      <Filter>ModelSerialisation\Headers\private</Filter>
+    </ClInclude>
+    <ClInclude Include="private\abstractsingleroleserialiser_p.h">
+      <Filter>ModelSerialisation\Headers\private</Filter>
+    </ClInclude>
+    <ClInclude Include="private\binarymodelserialiser_p.h">
+      <Filter>ModelSerialisation\Headers\private</Filter>
+    </ClInclude>
+    <ClInclude Include="private\csvmodelserialiser_p.h">
+      <Filter>ModelSerialisation\Headers\private</Filter>
+    </ClInclude>
+    <ClInclude Include="private\htmlmodelserialiser_p.h">
+      <Filter>ModelSerialisation\Headers\private</Filter>
+    </ClInclude>
+    <ClInclude Include="private\jsonmodelserialiser_p.h">
+      <Filter>ModelSerialisation\Headers\private</Filter>
+    </ClInclude>
+    <ClInclude Include="private\xmlmodelserialiser_p.h">
+      <Filter>ModelSerialisation\Headers\private</Filter>
+    </ClInclude>
+    <ClInclude Include="modelutilities_global.h">
+      <Filter>Globals</Filter>
+    </ClInclude>
+    <ClInclude Include="private\rolemaskproxymodel_p.h">
+      <Filter>RoleMaskProxyModel</Filter>
+    </ClInclude>
+    <ClInclude Include="private\insertproxymodel_p.h">
+      <Filter>InsertProxyModel</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="rolemaskproxymodel.cpp">
+      <Filter>RoleMaskProxyModel</Filter>
+    </ClCompile>
+    <ClCompile Include="abstractmodelserialiser.cpp">
+      <Filter>ModelSerialisation\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="abstractmultiroleserialiser.cpp">
+      <Filter>ModelSerialisation\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="abstractsingleroleserialiser.cpp">
+      <Filter>ModelSerialisation\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="binarymodelserialiser.cpp">
+      <Filter>ModelSerialisation\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="csvmodelserialiser.cpp">
+      <Filter>ModelSerialisation\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="htmlmodelserialiser.cpp">
+      <Filter>ModelSerialisation\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="jsonmodelserialiser.cpp">
+      <Filter>ModelSerialisation\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="xmlmodelserialiser.cpp">
+      <Filter>ModelSerialisation\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="insertproxymodel.cpp">
+      <Filter>InsertProxyModel</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="rolemaskproxymodel.h">
+      <Filter>RoleMaskProxyModel</Filter>
+    </QtMoc>
+    <QtMoc Include="abstractmodelserialiser.h">
+      <Filter>ModelSerialisation\Headers</Filter>
+    </QtMoc>
+    <QtMoc Include="abstractmultiroleserialiser.h">
+      <Filter>ModelSerialisation\Headers</Filter>
+    </QtMoc>
+    <QtMoc Include="abstractsingleroleserialiser.h">
+      <Filter>ModelSerialisation\Headers</Filter>
+    </QtMoc>
+    <QtMoc Include="binarymodelserialiser.h">
+      <Filter>ModelSerialisation\Headers</Filter>
+    </QtMoc>
+    <QtMoc Include="csvmodelserialiser.h">
+      <Filter>ModelSerialisation\Headers</Filter>
+    </QtMoc>
+    <QtMoc Include="htmlmodelserialiser.h">
+      <Filter>ModelSerialisation\Headers</Filter>
+    </QtMoc>
+    <QtMoc Include="jsonmodelserialiser.h">
+      <Filter>ModelSerialisation\Headers</Filter>
+    </QtMoc>
+    <QtMoc Include="xmlmodelserialiser.h">
+      <Filter>ModelSerialisation\Headers</Filter>
+    </QtMoc>
+    <QtMoc Include="insertproxymodel.h">
+      <Filter>InsertProxyModel</Filter>
+    </QtMoc>
+  </ItemGroup>
+</Project>
