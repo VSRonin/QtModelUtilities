@@ -126,7 +126,7 @@ build_script:
     %MAKEBUILDER%)
 
 test_script:
-- cd build/%TESTOUTPUTFOLDER%/bin
+- cd %TESTOUTPUTFOLDER%/bin
 - set PATH=../lib;%PATH%
 - for /r "." %a in (*.exe) do %~fa
 
