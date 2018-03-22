@@ -5,135 +5,6 @@ version: '0.0.1.{build}'
 
 environment:
   matrix:
-  - QT5: C:\Qt\5.10.1\msvc2015_64
-    COMPILER: C:\
-    use_cmake: "false"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "true"
-    use_static: "true"
-  - QT5: C:\Qt\5.10.1\msvc2015_64
-    COMPILER: C:\
-    use_cmake: "true"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "true"
-    use_static: "true"
-  - QT5: C:\Qt\5.10.1\msvc2015_64
-    COMPILER: C:\
-    use_cmake: "false"
-    use_mingw: "false"
-    use_gui: "false"
-    use_widgets: "false"
-    use_static: "true"
-  - QT5: C:\Qt\5.10.1\msvc2015_64
-    COMPILER: C:\
-    use_cmake: "true"
-    use_mingw: "false"
-    use_gui: "false"
-    use_widgets: "false"
-    use_static: "true"
-  - QT5: C:\Qt\5.10.1\msvc2015_64
-    COMPILER: C:\
-    use_cmake: "false"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "false"
-    use_static: "true"
-  - QT5: C:\Qt\5.10.1\msvc2015_64
-    COMPILER: C:\
-    use_cmake: "true"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "false"
-    use_static: "true"
-  - QT5: C:\Qt\5.10.1\msvc2015_64
-    COMPILER: C:\
-    use_cmake: "false"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "true"
-    use_static: "false"
-  - QT5: C:\Qt\5.10.1\msvc2015_64
-    COMPILER: C:\
-    use_cmake: "true"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "true"
-    use_static: "false"
-  - QT5: C:\Qt\5.10.1\msvc2015_64
-    COMPILER: C:\
-    use_cmake: "false"
-    use_mingw: "false"
-    use_gui: "false"
-    use_widgets: "false"
-    use_static: "false"
-  - QT5: C:\Qt\5.10.1\msvc2015_64
-    COMPILER: C:\
-    use_cmake: "true"
-    use_mingw: "false"
-    use_gui: "false"
-    use_widgets: "false"
-    use_static: "false"
-  - QT5: C:\Qt\5.10.1\msvc2015_64
-    COMPILER: C:\
-    use_cmake: "false"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "false"
-    use_static: "false"
-  - QT5: C:\Qt\5.10.1\msvc2015_64
-    COMPILER: C:\
-    use_cmake: "true"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "false"
-    use_static: "false"
-    
-    
-  - QT5: C:\Qt\5.10.1\msvc2015
-    COMPILER: C:\
-    use_cmake: "false"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "true"
-  - QT5: C:\Qt\5.10.1\msvc2015
-    COMPILER: C:\
-    use_cmake: "true"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "true"
-  - QT5: C:\Qt\5.10.1\msvc2015
-    COMPILER: C:\
-    use_cmake: "false"
-    use_mingw: "false"
-    use_gui: "false"
-    use_widgets: "false"
-  - QT5: C:\Qt\5.10.1\msvc2015
-    COMPILER: C:\
-    use_cmake: "true"
-    use_mingw: "false"
-    use_gui: "false"
-    use_widgets: "false"
-  - QT5: C:\Qt\5.10.1\msvc2015
-    COMPILER: C:\
-    use_cmake: "false"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "false"
-  - QT5: C:\Qt\5.10.1\msvc2015
-    COMPILER: C:\
-    use_cmake: "true"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "false"
-  - QT5: C:\Qt\5.10.1\msvc2015
-    COMPILER: C:\
-    use_cmake: "false"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "true"
-    use_static: "true"
   - QT5: C:\Qt\5.10.1\msvc2015
     COMPILER: C:\
     use_cmake: "true"
@@ -141,76 +12,6 @@ environment:
     use_gui: "true"
     use_widgets: "true"
     use_static: "true"
-  - QT5: C:\Qt\5.10.1\msvc2015
-    COMPILER: C:\
-    use_cmake: "false"
-    use_mingw: "false"
-    use_gui: "false"
-    use_widgets: "false"
-    use_static: "true"
-  - QT5: C:\Qt\5.10.1\msvc2015
-    COMPILER: C:\
-    use_cmake: "true"
-    use_mingw: "false"
-    use_gui: "false"
-    use_widgets: "false"
-    use_static: "true"
-  - QT5: C:\Qt\5.10.1\msvc2015
-    COMPILER: C:\
-    use_cmake: "false"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "false"
-    use_static: "true"
-  - QT5: C:\Qt\5.10.1\msvc2015
-    COMPILER: C:\
-    use_cmake: "true"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "false"
-    use_static: "true"
-  - QT5: C:\Qt\5.10.1\msvc2015
-    COMPILER: C:\
-    use_cmake: "false"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "true"
-    use_static: "false"
-  - QT5: C:\Qt\5.10.1\msvc2015
-    COMPILER: C:\
-    use_cmake: "true"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "true"
-    use_static: "false"
-  - QT5: C:\Qt\5.10.1\msvc2015
-    COMPILER: C:\
-    use_cmake: "false"
-    use_mingw: "false"
-    use_gui: "false"
-    use_widgets: "false"
-    use_static: "false"
-  - QT5: C:\Qt\5.10.1\msvc2015
-    COMPILER: C:\
-    use_cmake: "true"
-    use_mingw: "false"
-    use_gui: "false"
-    use_widgets: "false"
-    use_static: "false"
-  - QT5: C:\Qt\5.10.1\msvc2015
-    COMPILER: C:\
-    use_cmake: "false"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "false"
-    use_static: "false"
-  - QT5: C:\Qt\5.10.1\msvc2015
-    COMPILER: C:\
-    use_cmake: "true"
-    use_mingw: "false"
-    use_gui: "true"
-    use_widgets: "false"
-    use_static: "false"
 
 
 #matrix:
@@ -218,10 +19,10 @@ environment:
 
 before_build:
 - if [%use_mingw%]==[true] (
-    - set PATH=%COMPILER%\bin;%QT5%\bin;%PATH%
+    set PATH=%COMPILER%\bin;%QT5%\bin;%PATH%
   )
   else (
-    - set PATH=%QT5%\bin;%PATH%
+    set PATH=%QT5%\bin;%PATH%
   )
 
 build_script:
@@ -231,7 +32,7 @@ build_script:
 
 # build library and tests
 - if [%use_mingw%]==[true] (
-    cmake --version &&
+    - cmake --version &&
     cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release .. &&
     make &&
     dir /s &&

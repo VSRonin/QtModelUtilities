@@ -2,6 +2,13 @@
 
 This library is a collection of utilities for Qt's Model/View framework.
 
+### Status
+#### Master
+[![Build status](https://ci.appveyor.com/api/projects/status/7ytrf2h8r6gp22if/branch/master?svg=true)](https://ci.appveyor.com/project/VSRonin/qtmodelutilities/branch/master)
+
+#### Dev
+[![Build status](https://ci.appveyor.com/api/projects/status/7ytrf2h8r6gp22if/branch/dev?svg=true)](https://ci.appveyor.com/project/VSRonin/qtmodelutilities/branch/dev)
+
 ### Contents
 
 + [Role Mask Proxy Model](https://vsronin.github.io/QtModelUtilities/md__r_e_a_d_m_e__role__mask__proxy__model.html): A proxy that will act as a mask on top of the source model to intercept data.

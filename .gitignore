@@ -1,4 +1,5 @@
 /[Dd]ocs/*/*
+/[Dd]ocs/*/
 /[Bb]uild/*
 #ignore thumbnails created by windows
 Thumbs.db
