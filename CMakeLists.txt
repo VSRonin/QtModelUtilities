@@ -56,11 +56,6 @@ if(modelutilities_IS64BITS)
 else()
     set(modelutilities_PlatformDir "x86")
 endif()
-if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-    set(modelutilities_ConfigDir "debug")
-else()
-    set(modelutilities_ConfigDir "release")
-endif()
 if(BUILD_STATIC_LIBS)
     add_library(modelutilities STATIC ${modelutilities_SRCS})
 else()
@@ -72,9 +67,9 @@ set_target_properties(modelutilities PROPERTIES
     VERSION ${modelutilities_VERSION}
     SOVERSION 0
     EXPORT_NAME "ModelUtilities"
-    ARCHIVE_OUTPUT_DIRECTORY "${modelutilities_PlatformDir}/${modelutilities_ConfigDir}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${modelutilities_PlatformDir}/${modelutilities_ConfigDir}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${modelutilities_PlatformDir}/${modelutilities_ConfigDir}/bin"
+    ARCHIVE_OUTPUT_DIRECTORY "${modelutilities_PlatformDir}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${modelutilities_PlatformDir}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${modelutilities_PlatformDir}/bin"
 )
 
 

@@ -19,6 +19,13 @@ environment:
 
 before_build:
 - set PATH=%QT5%\bin;%PATH%
+- if %use_static%==true (set USESTATIC=ON) else (set USESTATIC=OFF)
+- if %use_gui%==true (set USEGUI=OFF) else (set USEGUI=ON)
+- if %use_widgets%==true (set USEWIDGETS=OFF) else (set USEWIDGETS=ON)
+- if %use_mingw%==true (set CMAKEGENERATOR="MinGW Makefiles") else (set CMAKEGENERATOR="NMake Makefiles")
+- if %use_mingw%==true (set MAKEBUILDER=mingw32-make) else (set MAKEBUILDER=nmake)
+
+
 #- if [%use_mingw%]==[true] (
 #    set PATH=%COMPILER%\bin;%QT5%\bin;%PATH%
 #  )
@@ -29,55 +36,11 @@ before_build:
 build_script:
 - mkdir .\build
 - cd .\build
-
-
-# build library and tests
-- if [%use_mingw%]==[true] (
+- if %use_cmake%==true (
     - cmake --version &&
-    cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release .. &&
-    make &&
-    dir /s &&
-    cd .\tests)
-  else (
-    - if [%use_cmake%]==[true] (
-        - if [%use_static%]==[true] (
-            - if [%use_gui%]==[true] (
-                - if [%use_widgets%]==[true] (
-                    - cmake --version &&
-                    cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_STATIC_LIBS=ON ../ &&
-                    nmake &&
-                    cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_STATIC_LIBS=ON ../ &&
-                    nmake)
-                else (
-                    - cmake --version &&
-                    cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DNO_WIDGETS=ON -DBUILD_STATIC_LIBS=ON ../ &&
-                    nmake &&
-                    cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DNO_WIDGETS=ON -DBUILD_STATIC_LIBS=ON ../ &&
-                    nmake))
-            else (
-                - cmake --version &&
-                cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DNO_GUI=ON -DBUILD_STATIC_LIBS=ON ../ &&
-                nmake &&
-                cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DNO_GUI=ON -DBUILD_STATIC_LIBS=ON ../ &&
-                nmake))
-        else (
-            - if [%use_gui%]==[true] (
-                - if [%use_widgets%]==[true] (
-                    - cmake --version &&
-                    cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_STATIC_LIBS=OFF ../ &&
-                    nmake &&
-                    cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_STATIC_LIBS=OFF ../ &&
-                    nmake)
-                else (
-                    - cmake --version &&
-                    cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DNO_WIDGETS=ON -DBUILD_STATIC_LIBS=OFF ../ &&
-                    nmake &&
-                    cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DNO_WIDGETS=ON -DBUILD_STATIC_LIBS=OFF ../ &&
-                    nmake))
-            else (
-                - cmake --version &&
-                cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DNO_GUI=ON -DBUILD_STATIC_LIBS=OFF ../ &&
-                nmake &&
-                cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DNO_GUI=ON -DBUILD_STATIC_LIBS=OFF ../ &&
-                nmake))))
+    cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_STATIC_LIBS=%USESTATIC% -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
+    %MAKEBUILDER% &&
+    cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=ON ../ &&
+    %MAKEBUILDER%
+)
 # TODO Implement msbuild
