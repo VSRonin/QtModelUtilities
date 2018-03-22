@@ -128,5 +128,5 @@ build_script:
 test_script:
 - cd %TESTOUTPUTFOLDER%/bin
 - set PATH=../lib;%PATH%
-- for /r "." %a in (*.exe) do %~fa
+- for /r "." %a in (*.exe) do "%a"
 
