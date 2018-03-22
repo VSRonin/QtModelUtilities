@@ -1,3 +1,4 @@
+/*
 #ifndef jsonmodelserialiser_h__
 #define jsonmodelserialiser_h__
 
@@ -25,4 +26,4 @@ public:
 protected:
     JsonModelSerialiser(JsonModelSerialiserPrivate& d);
 };
-#endif // jsonmodelserialiser_h__
+#endif // jsonmodelserialiser_h__*/
