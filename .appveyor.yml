@@ -37,7 +37,7 @@ build_script:
 - mkdir .\build
 - cd .\build
 - if %use_cmake%==true (
-    - cmake --version &&
+    cmake --version &&
     cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_STATIC_LIBS=%USESTATIC% -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
     %MAKEBUILDER% &&
     cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=ON ../ &&
