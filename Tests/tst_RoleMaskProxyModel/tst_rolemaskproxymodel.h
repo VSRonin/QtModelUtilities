@@ -5,6 +5,6 @@
 class tst_RoleMaskProxyModel :public QObject{
     Q_OBJECT
 private Q_SLOTS:
-    void testBackGroundStringListModel();
+    void testUseRoleStringListModel();
 };
 #endif // tst_rolemaskproxymodel_h__

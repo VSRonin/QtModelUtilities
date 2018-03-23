@@ -19,17 +19,14 @@ else()
         set(tst_RoleMaskProxyModel_COMPILE_DEFINE ${tst_RoleMaskProxyModel_COMPILE_DEFINE} ${Qt5Widgets_COMPILE_DEFINITIONS})
     endif()
 endif()
-include_directories(../../src ${Qt5Test_INCLUDE_DIRS} ${tst_RoleMaskProxyModel_OPTIONAL_INCLUDE})
 set(tst_RoleMaskProxyModel_SRCS
     main.cpp
     tst_rolemaskproxymodel.cpp
 )
 add_executable(tst_RoleMaskProxyModel ${tst_RoleMaskProxyModel_SRCS})
+target_include_directories(tst_RoleMaskProxyModel PRIVATE ../../src ${Qt5Test_INCLUDE_DIRS} ${tst_RoleMaskProxyModel_OPTIONAL_INCLUDE})
 target_link_libraries(tst_RoleMaskProxyModel PRIVATE modelutilities ${Qt5Test_LIBRARIES} ${tst_RoleMaskProxyModel_OPTIONAL_LIBS})
 target_compile_definitions(tst_RoleMaskProxyModel PRIVATE ${tst_RoleMaskProxyModel_DEFINE})
-#if(BUILD_STATIC_LIBS)
-#    target_compile_definitions(tst_RoleMaskProxyModel PRIVATE MODELUTILITIES_STATIC)
-#endif()
 set_target_properties(tst_RoleMaskProxyModel PROPERTIES 
     VERSION "1.0"
     SOVERSION 1
