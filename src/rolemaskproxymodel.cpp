@@ -1,13 +1,35 @@
 #include "rolemaskproxymodel.h"
 #include "private/rolemaskproxymodel_p.h"
 #include <QVector>
-
+#include <functional>
 RoleMaskProxyModelPrivate::RoleMaskProxyModelPrivate(RoleMaskProxyModel* q)
     :q_ptr(q)
     , m_transparentIfEmpty(true)
     , m_mergeDisplayEdit(false)
 {
     Q_ASSERT(q_ptr);
+}
+void RoleMaskProxyModelPrivate::interceptDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
+{
+    Q_Q(RoleMaskProxyModel);
+    Q_ASSERT(topLeft.isValid() ? topLeft.model() == q->sourceModel() : true);
+    Q_ASSERT(bottomRight.isValid() ? bottomRight.model() == q->sourceModel() : true);
+    if (roles.isEmpty()) {
+        q->dataChanged(q->mapFromSource(topLeft), q->mapFromSource(bottomRight), roles);
+        return;
+    }
+    QVector<int> filteredRoles;
+    filteredRoles.reserve(roles.size());
+    for (int singleRole : roles){
+        if(m_maskedRoles.contains(singleRole))
+            continue;
+        if (m_mergeDisplayEdit && singleRole == Qt::EditRole && m_maskedRoles.contains(Qt::DisplayRole))
+            continue;
+        filteredRoles << singleRole;
+    }
+    if (filteredRoles.isEmpty())
+        return;
+    q->dataChanged(q->mapFromSource(topLeft), q->mapFromSource(bottomRight), filteredRoles);
 }
 
 void RoleMaskProxyModelPrivate::clearUnusedMaskedRoles(const QSet<int>& newRoles)
@@ -16,10 +38,10 @@ void RoleMaskProxyModelPrivate::clearUnusedMaskedRoles(const QSet<int>& newRoles
         m_maskedData.clear();
         return;
     }
-    const QHash<QPersistentModelIndex, QHash<int, QVariant> >::iterator idxEnd = m_maskedData.end();
-    for (QHash<QPersistentModelIndex, QHash<int, QVariant> >::iterator idxIter = m_maskedData.begin(); idxIter != idxEnd;) {
-        const QHash<int, QVariant>::iterator roleEnd = idxIter->end();
-        for (QHash<int, QVariant>::iterator roleIter = idxIter->begin(); roleIter != roleEnd;){
+    const auto idxEnd = m_maskedData.end();
+    for (auto idxIter = m_maskedData.begin(); idxIter != idxEnd;) {
+        const auto roleEnd = idxIter->end();
+        for (auto roleIter = idxIter->begin(); roleIter != roleEnd;) {
             if (!newRoles.contains(roleIter.key()))
                 roleIter = idxIter->erase(roleIter);
             else
@@ -34,7 +56,7 @@ void RoleMaskProxyModelPrivate::clearUnusedMaskedRoles(const QSet<int>& newRoles
 
 bool RoleMaskProxyModelPrivate::removeRole(const QPersistentModelIndex& idx, int role)
 {
-    const QHash<QPersistentModelIndex, QHash<int, QVariant> >::iterator idxIter = m_maskedData.find(idx);
+    const auto idxIter = m_maskedData.find(idx);
     return removeRole(idxIter, role);
 }
 
@@ -138,11 +160,17 @@ void RoleMaskProxyModel::removeMaskedRole(int role)
 void RoleMaskProxyModel::setSourceModel(QAbstractItemModel *sourceMdl)
 {
     Q_D(RoleMaskProxyModel);
-    if (sourceMdl != sourceModel()) {
-        d->m_maskedData.clear();
-    }
+    if (sourceMdl == sourceModel())
+        return; 
+    d->m_maskedData.clear();
+    if (sourceModel())
+        Q_ASSUME(QObject::disconnect(d->m_sourceDataChangedConnection));
     QIdentityProxyModel::setSourceModel(sourceMdl);
-
+    if (sourceModel()) {
+        Q_ASSUME(sourceModel()->disconnect(SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)), this));
+        using namespace std::placeholders;
+        d->m_sourceDataChangedConnection = connect(sourceModel(), &QAbstractItemModel::dataChanged, this, std::bind(&RoleMaskProxyModelPrivate::interceptDataChanged, d, _1, _2, _3));
+    }
 }
 
 QVariant RoleMaskProxyModel::data(const QModelIndex &proxyIndex, int role) const
@@ -176,7 +204,7 @@ bool RoleMaskProxyModel::setData(const QModelIndex &proxyIndex, const QVariant &
         role = Qt::DisplayRole;
     const QModelIndex sourceIndex = mapToSource(proxyIndex);
     Q_ASSERT(sourceIndex.isValid());
-    QHash<QPersistentModelIndex, QHash<int, QVariant> >::iterator idxIter = d->m_maskedData.find(sourceIndex);
+    auto idxIter = d->m_maskedData.find(sourceIndex);
     if (idxIter == d->m_maskedData.end()){
         if (!value.isValid()) {
             return true;
@@ -193,7 +221,7 @@ bool RoleMaskProxyModel::setData(const QModelIndex &proxyIndex, const QVariant &
             dataChanged(proxyIndex, proxyIndex, QVector<int>(1, role));
         return true;
     }
-    const QHash<int, QVariant>::iterator roleIter = idxIter->find(role);
+    const auto roleIter = idxIter->find(role);
     if (roleIter == idxIter->end()) 
         idxIter->insert(role, value);
     else if (roleIter.value() != value)
@@ -233,8 +261,8 @@ void RoleMaskProxyModel::setMergeDisplayEdit(bool val)
         QVector<int> changedRoles(2, Qt::EditRole);
         changedRoles[0] = Qt::DisplayRole;
         d->m_mergeDisplayEdit=val;
-        const QHash<QPersistentModelIndex, QHash<int, QVariant> >::iterator idxEnd = d->m_maskedData.end();
-        for (QHash<QPersistentModelIndex, QHash<int, QVariant> >::iterator idxIter = d->m_maskedData.begin(); idxIter != idxEnd; ++idxIter){
+        const auto idxEnd = d->m_maskedData.end();
+        for (auto idxIter = d->m_maskedData.begin(); idxIter != idxEnd; ++idxIter) {
             if (val){
                 if (idxIter->contains(Qt::DisplayRole)) {
                     idxIter->remove(Qt::EditRole);

@@ -3,6 +3,7 @@
 #include <QPersistentModelIndex>
 #include <QHash>
 #include <QSet>
+#include <QMetaObject>
 #include "rolemaskproxymodel.h"
 class RoleMaskProxyModelPrivate
 {
@@ -13,9 +14,12 @@ class RoleMaskProxyModelPrivate
     QHash<QPersistentModelIndex, QHash<int, QVariant> > m_maskedData;
     bool m_transparentIfEmpty;
     bool m_mergeDisplayEdit;
+    QMetaObject::Connection m_sourceDataChangedConnection;
     void clearUnusedMaskedRoles(const QSet<int>& roles);
     bool removeRole(const QPersistentModelIndex& idx, int role);
     bool removeRole(const QHash<QPersistentModelIndex, QHash<int, QVariant> >::iterator& idxIter, int role);
     void signalAllChanged(const QVector<int>& roles = QVector<int>(), const QModelIndex& parent = QModelIndex());
+    void interceptDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
 };
+
 #endif // rolemaskproxymodel_p_h__
