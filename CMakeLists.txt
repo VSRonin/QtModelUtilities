@@ -34,11 +34,9 @@ else()
     endif()
 endif()
 if(BUILD_STATIC_LIBS)
-    #add_definitions("-DMODELUTILITIES_STATIC")
     set(CMAKE_STATIC_LIBRARY_SUFFIX "_static${CMAKE_STATIC_LIBRARY_SUFFIX}")
 endif()
 set(modelutilities_COMPILE_DEFINE ${modelutilities_COMPILE_DEFINE} MODELUTILITIES_LIB)
-include_directories(${Qt5Core_INCLUDE_DIRS} ${modelutilities_OPTIONAL_INCLUDE})
 set(modelutilities_SRCS
     src/abstractmodelserialiser.cpp
     src/abstractmultiroleserialiser.cpp
@@ -67,6 +65,7 @@ if(BUILD_STATIC_LIBS)
 else()
     add_library(modelutilities SHARED ${modelutilities_SRCS})
 endif()
+target_include_directories(modelutilities PRIVATE ${Qt5Core_INCLUDE_DIRS} ${modelutilities_OPTIONAL_INCLUDE})
 target_link_libraries(modelutilities PRIVATE ${Qt5Core_LIBRARIES} ${modelutilities_OPTIONAL_LIBS})
 target_compile_definitions(modelutilities PRIVATE ${modelutilities_COMPILE_DEFINE})
 set_target_properties(modelutilities PROPERTIES 

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 cmake_policy(SET CMP0048 NEW)
 set(CMAKE_AUTOMOC ON)
-project(tst_RoleMaskProxyModel VERSION "1.0")
+project(tst_RoleMaskProxyModel VERSION "1.0") 
 set(REQUIRED_QT_VERSION 5.0.0)
 find_package(Qt5Test ${REQUIRED_QT_VERSION} REQUIRED)
 message(STATUS "Found Qt Test ${Qt5Test_VERSION}")
