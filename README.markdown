@@ -42,3 +42,7 @@ Docs can, alternatively, be built using Doxygen and the DoxygenConfig.doxyfile f
 + Qt 5.*
 + A C++11 compatible compiler
 + Doxygen (optional to build documentation)
+
+### Contributing
+
+Contributions welcome, just submit a pull request on the [project's GitHub page](https://github.com/VSRonin/QtModelUtilities)

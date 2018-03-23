@@ -27,6 +27,9 @@
     <Filter Include="Globals">
       <UniqueIdentifier>{eab2adf1-6ce0-444c-85c3-489b07788746}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Readmes">
+      <UniqueIdentifier>{1315370a-295b-450e-b761-0862a1586532}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="private\abstractmodelserialiser_p.h">
@@ -126,5 +129,22 @@
     <QtMoc Include="insertproxymodel.h">
       <Filter>InsertProxyModel</Filter>
     </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README Insert Proxy Model.markdown">
+      <Filter>Readmes</Filter>
+    </None>
+    <None Include="..\README Model Serialisation.markdown">
+      <Filter>Readmes</Filter>
+    </None>
+    <None Include="..\README Role Mask Proxy Model.markdown">
+      <Filter>Readmes</Filter>
+    </None>
+    <None Include="..\README.markdown">
+      <Filter>Readmes</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\CMakeLists.txt" />
   </ItemGroup>
 </Project>
