@@ -18,8 +18,10 @@ private Q_SLOTS:
     void testInsertColumn();
     void testInsertColumn_data();
     void testNullModel();
+    void testSignals_data();
+    void testSignals();
 private:
-    void testUseRoleMaskRecurse(const int magicNumber, const QAbstractItemModel* const baseModel, const RoleMaskProxyModel* const proxyModel, const QModelIndexList& magicNumerIndexes, const QModelIndex& sourceParent = QModelIndex(), const QModelIndex& proxyParent = QModelIndex());
-    std::array<QAbstractItemModel*, 3> m_models;
+    void testUseRoleMaskRecurse(const int magicNumber, const QAbstractItemModel* const baseModel, const RoleMaskProxyModel* const proxyModel, const QModelIndexList& magicNumerIndexes, const bool userRoleEditable, const QModelIndex& sourceParent = QModelIndex(), const QModelIndex& proxyParent = QModelIndex());
+    QList<QAbstractItemModel*> m_models;
 };
 #endif // tst_rolemaskproxymodel_h__
