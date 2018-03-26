@@ -137,8 +137,8 @@ test_script:
     echo $outputFileName;
     echo $testArgs;
     echo $destinationUrl;
-    echo $inputData
+    echo $inputData;
     Start-Process $_.Fullname -ArgumentList $testArgs; 
-    curl -i -X POST -H "Content-Type: multipart/form-data" -F $inputData $tstdesUrl;
+    #curl -i -X POST -H "Content-Type: multipart/form-data" -F $inputData $tstdesUrl;
     };
 
