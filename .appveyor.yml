@@ -132,11 +132,13 @@ test_script:
 - ps: Get-ChildItem -Filter *.exe | Foreach { 
     $outputFileName = $_.BaseName + "_result.xml";
     $testArgs = "-o " + $outputFileName ",xunitxml";
-    $destinationUrl = "https://ci.appveyor.com/api/testresults/junit/" + $Env:APPVEYOR_JOB_ID;
+    $tstdesUrl = "https://ci.appveyor.com/api/testresults/junit/" + $Env:APPVEYOR_JOB_ID;
+    $inputData = "data=@" + $outputFileName
     echo $outputFileName;
     echo $testArgs;
     echo $destinationUrl;
+    echo $inputData
     Start-Process $_.Fullname -ArgumentList $testArgs; 
-    curl -i -X POST -H "Content-Type: multipart/form-data" -F "data=@$outputFileName" $destinationUrl;
+    curl -i -X POST -H "Content-Type: multipart/form-data" -F $inputData $tstdesUrl;
     };
 
