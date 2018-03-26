@@ -134,10 +134,7 @@ test_script:
         $inputData = "data=@" + $outputFileName;
         $testArgs = "-o " + $outputFileName + ",xunitxml";
         $tstdesUrl = "https://ci.appveyor.com/api/testresults/junit/" + $Env:APPVEYOR_JOB_ID;
-        echo $outputFileName;
-        echo $testArgs;
-        echo $tstdesUrl;
-        echo $inputData;
-        Start-Process $_.Fullname -ArgumentList $testArgs; 
+        Start-Process $_.Fullname -ArgumentList $testArgs;
+        curl -i -X POST -H "Content-Type: multipart/form-data" -F $inputData $tstdesUrl;
     };
 
