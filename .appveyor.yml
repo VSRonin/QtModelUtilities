@@ -129,7 +129,7 @@ test_script:
 - If NOT exist "%TESTOUTPUTFOLDER%/bin" (appveyor exit)
 - cd %TESTOUTPUTFOLDER%/bin
 - set PATH=../lib;%PATH%
-- for %%a in (*.exe) do %%a -xunitxml >> testsResults.xml
+- for %%a in (*.exe) do (%%a -xunitxml >> testsResults.xml & exit 0)
 
 on_finish:
 - dir
