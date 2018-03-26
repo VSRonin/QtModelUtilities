@@ -130,6 +130,8 @@ test_script:
 - cd %TESTOUTPUTFOLDER%/bin
 - set PATH=../lib;%PATH%
 - ps: Get-ChildItem -Filter *.exe | Foreach { 
-        Start-Process $_.Fullname; 
+        $outputFileName = $_.BaseName + "_result.xml";
+        $testArgs = "-o " + $outputFileName + ",xunitxml";
+        Start-Process $_.Fullname -ArgumentList $testArgs; 
     };
 
