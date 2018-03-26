@@ -130,7 +130,7 @@ test_script:
 - cd %TESTOUTPUTFOLDER%/bin
 - set PATH=../lib;%PATH%
 - set FailedTestsCount = 0
-- for %%a in (*.exe) do (set FailedTestsCount = %FailedTestsCount% + (%%a -xunitxml >> testsResults.xml))
+- for %%a in (*.exe) do (set FailedTestsCount = %FailedTestsCount% + %%a -xunitxml >> testsResults.xml)
 - if %FailedTestsCount% (exit 1)
 
 on_finish:
