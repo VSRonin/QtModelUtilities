@@ -131,6 +131,8 @@ test_script:
 - set PATH=../lib;%PATH%
 - set FailedTestsCount=0
 - for %%a in (*.exe) do (%%a -xunitxml >> testsResults.xml & set /a FailedTestsCount=%FailedTestsCount% + %ERRORLEVEL%)
+- echo on
+- echo %FailedTestsCount%
 - if %FailedTestsCount% GTR 0 (exit 1) else (appveyor exit)
 
 on_finish:
