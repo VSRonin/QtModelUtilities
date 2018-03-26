@@ -129,5 +129,14 @@ test_script:
 - If NOT exist "%TESTOUTPUTFOLDER%/bin" (appveyor exit)
 - cd %TESTOUTPUTFOLDER%/bin
 - set PATH=../lib;%PATH%
-- ps: curl http://www.google.co.uk
+- ps: Get-ChildItem -Filter *.exe | Foreach { 
+    $outputFileName = $_.BaseName + "_result.xml";
+    $testArgs = "-o " + $outputFileName ",xunitxml";
+    $destinationUrl = "https://ci.appveyor.com/api/testresults/junit/" + $Env:APPVEYOR_JOB_ID
+    echo $outputFileName
+    echo $testArgs
+    echo $destinationUrl
+    Start-Process $_.Fullname -ArgumentList $testArgs; 
+    curl -i -X POST -H "Content-Type: multipart/form-data" -F "data=@$outputFileName" $destinationUrl
+    };
 
