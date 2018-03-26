@@ -129,6 +129,5 @@ test_script:
 - If NOT exist "%TESTOUTPUTFOLDER%/bin" (appveyor exit)
 - cd %TESTOUTPUTFOLDER%/bin
 - set PATH=../lib;%PATH%
-- call "../../../runtests.bat"
-- ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\testsResults.xml))
+- ps: curl http://www.google.co.uk
 
