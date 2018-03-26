@@ -183,7 +183,7 @@ void tst_RoleMaskProxyModel::testNullModel()
     QVERIFY(!proxyModel.index(0, 0).data(Qt::UserRole).isValid());
 }
 
-void tst_RoleMaskProxyModel::testSignals_data()
+void tst_RoleMaskProxyModel::testDataChangeSignals_data()
 {
     QTest::addColumn<QAbstractItemModel*>("baseModel");
     QTest::addColumn<bool>("implementsRoles");
@@ -193,11 +193,13 @@ void tst_RoleMaskProxyModel::testSignals_data()
     QTest::newRow("Tree") << m_models.at(2) << bool(QT_VERSION >= QT_VERSION_CHECK(5, 11, 0));
 }
 
-void tst_RoleMaskProxyModel::testSignals()
+void tst_RoleMaskProxyModel::testDataChangeSignals()
 {
     QFETCH(QAbstractItemModel* const, baseModel);
     QFETCH(const bool, implementsRoles);
     RoleMaskProxyModel proxyModel;
+    proxyModel.setTransparentIfEmpty(true);
+    proxyModel.setMergeDisplayEdit(true);
     proxyModel.addMaskedRole(Qt::UserRole);
     proxyModel.setSourceModel(baseModel);
     QSignalSpy baseDataChangeSpy(baseModel, &QAbstractItemModel::dataChanged);
@@ -206,28 +208,47 @@ void tst_RoleMaskProxyModel::testSignals()
     connect(&proxyModel, &QAbstractItemModel::dataChanged, [&timesFired](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)->void {
         ++timesFired;
     });
-    int proxyCount = 0;
-    int baseCount = 0;
     const QModelIndex proxyDataIdx = proxyModel.index(0, 0);
     const QModelIndex baseDataIdx = baseModel->index(0, 0);
     QVERIFY(proxyModel.setData(proxyDataIdx, 1, Qt::UserRole));
-    QCOMPARE(baseDataChangeSpy.count(), baseCount);
-    QCOMPARE(proxyDataChangeSpy.count(), ++proxyCount);
-    const QList<QVariant> arguments = proxyDataChangeSpy.first();
+    QCOMPARE(baseDataChangeSpy.count(), 0);
+    QCOMPARE(proxyDataChangeSpy.count(), 1);
+    const QList<QVariant> arguments = proxyDataChangeSpy.takeFirst();
     QCOMPARE(arguments.at(0).value<QModelIndex>(), proxyDataIdx);
     QCOMPARE(arguments.at(1).value<QModelIndex>(), proxyDataIdx);
-    QCOMPARE(arguments.at(2).value<QVector<int> >().size(), 1);
-    QCOMPARE(arguments.at(2).value<QVector<int> >().first(), int(Qt::UserRole));
+    QVector<int> rolesVector = arguments.at(2).value<QVector<int> >();
+    QCOMPARE(rolesVector.size(), 1);
+    QCOMPARE(rolesVector.first(), int(Qt::UserRole));
     if (baseModel->setData(baseDataIdx, 1, Qt::UserRole)) {
-        QCOMPARE(baseDataChangeSpy.count(), ++baseCount);
+        QCOMPARE(baseDataChangeSpy.count(), 1);
+        baseDataChangeSpy.clear();
         if (implementsRoles)
-            QCOMPARE(proxyDataChangeSpy.count(), proxyCount);
+            QCOMPARE(proxyDataChangeSpy.count(), 0);
         else
-            QCOMPARE(proxyDataChangeSpy.count(), ++proxyCount);
+            QCOMPARE(proxyDataChangeSpy.count(), 1);
+        proxyDataChangeSpy.clear();
     }
-    
-    // force failure
-    QVERIFY(false);
+    QVERIFY(proxyModel.setData(proxyDataIdx, 5, Qt::EditRole));
+    QCOMPARE(baseDataChangeSpy.count(), 0);
+    QCOMPARE(proxyDataChangeSpy.count(), 1);
+    const QList<QVariant> arguments = proxyDataChangeSpy.takeFirst();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(), proxyDataIdx);
+    QCOMPARE(arguments.at(1).value<QModelIndex>(), proxyDataIdx);
+    QVector<int> rolesVector = arguments.at(2).value<QVector<int> >();
+    QCOMPARE(rolesVector.size(), 2);
+    QVERIFY(rolesVector.contains(Qt::DisplayRole));
+    QVERIFY(rolesVector.contains(Qt::EditRole));
+    if (baseModel->setData(baseDataIdx, 6, Qt::EditRole)){
+        QCOMPARE(baseDataChangeSpy.count(), 1);
+        baseDataChangeSpy.clear();
+        QCOMPARE(proxyDataChangeSpy.count(), implementsRoles ? 0:1);
+        proxyDataChangeSpy.clear();
+    }
+    proxyModel.setTransparentIfEmpty(false);
+    QCOMPARE(baseDataChangeSpy.count(), 0);
+    QCOMPARE(proxyDataChangeSpy.count(), 1);
+    proxyDataChangeSpy.clear();
+
 }
 
 void tst_RoleMaskProxyModel::testUseRoleMaskRecurse(const int magicNumber, const QAbstractItemModel* const baseModel, const RoleMaskProxyModel* const proxyModel, const QModelIndexList& magicNumerIndexes, const bool userRoleEditable, const QModelIndex& srcParent, const QModelIndex& prxParent)

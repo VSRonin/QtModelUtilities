@@ -5,7 +5,7 @@
 RoleMaskProxyModelPrivate::RoleMaskProxyModelPrivate(RoleMaskProxyModel* q)
     :q_ptr(q)
     , m_transparentIfEmpty(true)
-    , m_mergeDisplayEdit(false)
+    , m_mergeDisplayEdit(true)
 {
     Q_ASSERT(q_ptr);
 }
@@ -21,11 +21,26 @@ void RoleMaskProxyModelPrivate::interceptDataChanged(const QModelIndex& topLeft,
     QVector<int> filteredRoles;
     filteredRoles.reserve(roles.size());
     for (int singleRole : roles){
-        if(m_maskedRoles.contains(singleRole))
-            continue;
-        if (m_mergeDisplayEdit && singleRole == Qt::EditRole && m_maskedRoles.contains(Qt::DisplayRole))
-            continue;
+        if (m_mergeDisplayEdit && singleRole == Qt::EditRole)
+            singleRole = Qt::DisplayRole;
+        if(m_maskedRoles.contains(singleRole)){
+            if(m_transparentIfEmpty){
+                bool allOpaque = true;
+                for (int i = topLeft.row(); allOpaque && i <= bottomRight.row(); ++i) {
+                    for (int j = topLeft.column(); allOpaque &&j <= bottomRight.column(); ++j) {
+                        allOpaque = m_maskedData.value(q->sourceModel()->index(i, j, topLeft.parent())).value(singleRole).isValid();
+                    }
+                }
+                if (allOpaque)
+                    continue;
+            }
+            else {
+                continue;
+            }
+        }
         filteredRoles << singleRole;
+        if (m_mergeDisplayEdit && singleRole == Qt::DisplayRole)
+            filteredRoles << Qt::EditRole;
     }
     if (filteredRoles.isEmpty())
         return;
