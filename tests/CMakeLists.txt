@@ -1,1 +1,2 @@
 add_subdirectory(tst_RoleMaskProxyModel)
+add_subdirectory(tst_InsertProxyModel)
