@@ -129,10 +129,10 @@ test_script:
 - If NOT exist "%TESTOUTPUTFOLDER%/bin" (appveyor exit)
 - cd %TESTOUTPUTFOLDER%/bin
 - set PATH=../lib;%PATH%
-- set FailedTestsCount = 0
-- for %%a in (*.exe) do (set FailedTestsCount = %FailedTestsCount% + %%a -xunitxml >> testsResults.xml)
-- if %FailedTestsCount% gtr 0 exit 1
+- set FailedTestsCount=0
+- for %%a in (*.exe) do (%%a -xunitxml >> testsResults.xml & set /a FailedTestsCount=%FailedTestsCount% + %ERRORLEVEL%)
+- if %FailedTestsCount%==0 appveyor exit 
+- exit 1
 
 on_finish:
-- dir
 - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\testsResults.xml))
