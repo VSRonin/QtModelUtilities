@@ -134,5 +134,6 @@ test_script:
         $testArgs = "-xunitxml";
         $curlArgs = "-i -k -X POST -H `"Content-Type: multipart/form-data`" -F `"data=@" + $outputFileName + "`" https://ci.appveyor.com/api/testresults/junit/" + $Env:APPVEYOR_JOB_ID;
         Start-Process $_.Fullname -ArgumentList $testArgs -RedirectStandardOutput $outputFileName;
+        Start-Process curl -ArgumentList $curlArgs
     }'
 - dir
