@@ -131,7 +131,7 @@ test_script:
 - set PATH=../lib;%PATH%
 - ps: Get-ChildItem -Filter *.exe | Foreach { 
         $outputFileName = $_.BaseName + "_result.xml";
-        $inputData = "data=@" + $outputFileName
+        $inputData = "data=@" + $outputFileName;
         $tstdesUrl = "https://ci.appveyor.com/api/testresults/junit/" + $Env:APPVEYOR_JOB_ID;
         echo $outputFileName;
         echo $testArgs;
