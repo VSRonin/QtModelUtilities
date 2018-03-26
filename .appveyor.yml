@@ -130,5 +130,4 @@ test_script:
 - cd %TESTOUTPUTFOLDER%/bin
 - set PATH=../lib;%PATH%
 - for %%a in (*.exe) do %%a -xunitxml >> testsResults.xml
-- dir
 - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\testsResults.xml))

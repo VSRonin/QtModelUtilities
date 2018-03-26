@@ -225,6 +225,9 @@ void tst_RoleMaskProxyModel::testSignals()
         else
             QCOMPARE(proxyDataChangeSpy.count(), ++proxyCount);
     }
+    
+    // force failure
+    QVERIFY(false);
 }
 
 void tst_RoleMaskProxyModel::testUseRoleMaskRecurse(const int magicNumber, const QAbstractItemModel* const baseModel, const RoleMaskProxyModel* const proxyModel, const QModelIndexList& magicNumerIndexes, const bool userRoleEditable, const QModelIndex& srcParent, const QModelIndex& prxParent)

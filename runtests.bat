@@ -1,1 +1,0 @@
-for %%a in (*.exe) do %%a -xunitxml > testsResults.xml
