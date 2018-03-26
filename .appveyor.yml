@@ -135,6 +135,7 @@ test_script:
         $curlArgs = "-i -k -X POST -H `"Content-Type: multipart/form-data`" -F `"data=@" + $outputFileName + "`" " + "https://ci.appveyor.com/api/testresults/junit/" + $Env:APPVEYOR_JOB_ID;
         echo $curlArgs
         Start-Process $_.Fullname -ArgumentList $testArgs;
+        dir
         Start-Process curl -ArgumentList "http://www.google.co.uk";
     }'
 
