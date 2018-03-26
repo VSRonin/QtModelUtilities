@@ -1,2 +1,5 @@
+if(CMAKE_BUILD_TYPE MATCHES DEBUG)
+    set(CMAKE_EXECUTABLE_SUFFIX "_debug${CMAKE_EXECUTABLE_SUFFIX}")
+endif()
 add_subdirectory(tst_RoleMaskProxyModel)
 add_subdirectory(tst_InsertProxyModel)
