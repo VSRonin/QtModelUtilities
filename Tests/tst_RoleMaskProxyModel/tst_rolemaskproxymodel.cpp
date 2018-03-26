@@ -3,6 +3,8 @@
 #include <rolemaskproxymodel.h>
 #include <QStandardItemModel>
 #include <QSignalSpy>
+#include <QList>
+#include <QVariant>
 #include "tst_rolemaskproxymodel.h"
 void tst_RoleMaskProxyModel::initTestCase()
 {
@@ -213,7 +215,7 @@ void tst_RoleMaskProxyModel::testDataChangeSignals()
     QVERIFY(proxyModel.setData(proxyDataIdx, 1, Qt::UserRole));
     QCOMPARE(baseDataChangeSpy.count(), 0);
     QCOMPARE(proxyDataChangeSpy.count(), 1);
-    const QList<QVariant> arguments = proxyDataChangeSpy.takeFirst();
+    QList<QVariant> arguments = proxyDataChangeSpy.takeFirst();
     QCOMPARE(arguments.at(0).value<QModelIndex>(), proxyDataIdx);
     QCOMPARE(arguments.at(1).value<QModelIndex>(), proxyDataIdx);
     QVector<int> rolesVector = arguments.at(2).value<QVector<int> >();
@@ -231,10 +233,10 @@ void tst_RoleMaskProxyModel::testDataChangeSignals()
     QVERIFY(proxyModel.setData(proxyDataIdx, 5, Qt::EditRole));
     QCOMPARE(baseDataChangeSpy.count(), 0);
     QCOMPARE(proxyDataChangeSpy.count(), 1);
-    const QList<QVariant> arguments = proxyDataChangeSpy.takeFirst();
+    arguments = proxyDataChangeSpy.takeFirst();
     QCOMPARE(arguments.at(0).value<QModelIndex>(), proxyDataIdx);
     QCOMPARE(arguments.at(1).value<QModelIndex>(), proxyDataIdx);
-    QVector<int> rolesVector = arguments.at(2).value<QVector<int> >();
+    rolesVector = arguments.at(2).value<QVector<int> >();
     QCOMPARE(rolesVector.size(), 2);
     QVERIFY(rolesVector.contains(Qt::DisplayRole));
     QVERIFY(rolesVector.contains(Qt::EditRole));
