@@ -135,5 +135,5 @@ test_script:
         $outputPath = ".\" + $outputFileName;
         $testArgs = "-xunitxml";
         Start-Process $_.Fullname -ArgumentList $testArgs -RedirectStandardOutput $outputFileName;
-        $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $outputPath);
+        $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $outputPath));
     }
