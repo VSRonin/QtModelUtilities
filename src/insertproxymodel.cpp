@@ -860,7 +860,7 @@ bool InsertProxyModel::validColumn() const
 
 
 /*!
-\class InsertProxy
+\class InsertProxyModel
 \brief This proxy model provides an extra row and column to handle user insertions
 \details This proxy will add an extra row, column or both to allow users to insert new sections with a familiar interface.
 

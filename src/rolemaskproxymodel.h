@@ -3,6 +3,7 @@
 #include "modelutilities_global.h"
 #include <QIdentityProxyModel>
 #include <QList>
+#include <QSet>
 class RoleMaskProxyModelPrivate;
 class MODELUTILITIES_EXPORT RoleMaskProxyModel : public QIdentityProxyModel
 {
@@ -18,7 +19,6 @@ public:
     QList<int> maskedRoles() const;
     void setMaskedRoles(const QList<int>& roles);
     void clearMaskedRoles();
-    Q_SIGNAL void maskedRolesChanged();
     void addMaskedRole(int role);
     void removeMaskedRole(int role);
     void setSourceModel(QAbstractItemModel *sourceModel) Q_DECL_OVERRIDE;
@@ -26,10 +26,14 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) Q_DECL_OVERRIDE;
     bool transparentIfEmpty() const;
     void setTransparentIfEmpty(bool val);
-    Q_SIGNAL void transparentIfEmptyChanged(bool val);
     bool mergeDisplayEdit() const;
     void setMergeDisplayEdit(bool val);
-    Q_SIGNAL void mergeDisplayEditChanged(bool val);
+Q_SIGNALS:
+    void mergeDisplayEditChanged(bool val);
+    void transparentIfEmptyChanged(bool val);
+    void maskedRolesChanged();
+protected:
+    const QSet<int>& maskedRolesSets() const;
 private:
     RoleMaskProxyModelPrivate* d_ptr;
 };

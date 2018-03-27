@@ -230,6 +230,9 @@ void tst_RoleMaskProxyModel::testDataChangeSignals()
             QCOMPARE(proxyDataChangeSpy.count(), 1);
         proxyDataChangeSpy.clear();
     }
+    proxyModel.addMaskedRole(Qt::EditRole);
+    proxyDataChangeSpy.clear();
+    baseDataChangeSpy.clear();
     QVERIFY(proxyModel.setData(proxyDataIdx, 5, Qt::EditRole));
     QCOMPARE(baseDataChangeSpy.count(), 0);
     QCOMPARE(proxyDataChangeSpy.count(), 1);
@@ -248,9 +251,24 @@ void tst_RoleMaskProxyModel::testDataChangeSignals()
     }
     proxyModel.setTransparentIfEmpty(false);
     QCOMPARE(baseDataChangeSpy.count(), 0);
-    QCOMPARE(proxyDataChangeSpy.count(), 1);
+    QCOMPARE(proxyDataChangeSpy.count(), 1 + countChildren(baseModel));
     proxyDataChangeSpy.clear();
 
+}
+
+int tst_RoleMaskProxyModel::countChildren(const QAbstractItemModel* const baseModel, const QModelIndex& parIdx)
+{
+    const int rowCnt = baseModel->rowCount(parIdx);
+    const int colCnt = baseModel->columnCount(parIdx);
+    int result = 0;
+    for (int i = 0; i < rowCnt; ++i) {
+        for (int j = 0; j < colCnt; ++j) {
+            const QModelIndex tempIdx = baseModel->index(i, j, parIdx);
+            if (baseModel->hasChildren(tempIdx))
+                result += 1 + countChildren(baseModel, tempIdx);
+        }
+    }
+    return result;
 }
 
 void tst_RoleMaskProxyModel::testUseRoleMaskRecurse(const int magicNumber, const QAbstractItemModel* const baseModel, const RoleMaskProxyModel* const proxyModel, const QModelIndexList& magicNumerIndexes, const bool userRoleEditable, const QModelIndex& srcParent, const QModelIndex& prxParent)
