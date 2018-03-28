@@ -139,7 +139,7 @@ test_script:
     $totalTime = 0;
     $XmlDocument = $null;
     $crashMessage = $null;
-    if(1=1){
+    if(1 -eq 1){
     Get-ChildItem ".\" -Filter "*_tstres.xml" | Foreach-Object {
     $currentFilePath = $_.FullName;
     $localPass = 0;
