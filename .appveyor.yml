@@ -130,7 +130,7 @@ test_script:
 - cd %TESTOUTPUTFOLDER%/bin
 - set PATH=../lib;%PATH%
 - for %%a in (*.exe) do (%%a -xml >> %%a_tstres.xml & set preventFail = 1)
-- ps: $xmlOut = new-object System.Xml.XmlDocument;
+- ps: '$xmlOut = new-object System.Xml.XmlDocument;
     $xmlOut.AppendChild($xmlOut.CreateXmlDeclaration("1.0","UTF-8",$null));
     $rootXmlOut = $xmlOut.CreateElement("testsuites");
     $xmlOut.AppendChild($rootXmlOut);
@@ -240,7 +240,7 @@ test_script:
     $xmlOut.save($pwd.Path + "\testResults.xml");
     if($totalError+$totalFail -gt 0){
         throw
-    }
+    }'
 
 on_finish:
 - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\testsResults.xml))
