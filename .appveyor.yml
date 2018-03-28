@@ -116,7 +116,7 @@ before_build:
 - if %platform%==x86 (set TESTOUTPUTFOLDER=x86) else (set TESTOUTPUTFOLDER=x64)
 
 build_script:
-- mkdir .\build
+- mkdir .\build 
 - cd .\build
 - if %use_cmake%==true (
     cmake --version &&
