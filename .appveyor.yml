@@ -130,7 +130,18 @@ test_script:
 - cd %TESTOUTPUTFOLDER%/bin
 - set PATH=../lib;%PATH%
 - for %%a in (*.exe) do (%%a -xml >> %%a_tstres.xml & set preventFail = 1)
-- ps: 'Get-ChildItem ".\" -Filter "*_tstres.xml" | Foreach-Object {
+- ps: '$xmlOut = new-object System.Xml.XmlDocument;
+    $xmlOut.AppendChild($xmlOut.CreateXmlDeclaration("1.0","UTF-8",$null));
+    $rootXmlOut = $xmlOut.CreateElement("testsuites");
+    $xmlOut.AppendChild($rootXmlOut);
+    $totalPass = 0;
+    $totalFail = 0;
+    $totalError = 0;
+    $totalSkip = 0;
+    $totalTime = 0;
+    $XmlDocument = $null;
+    $crashMessage = $null;
+    Get-ChildItem ".\" -Filter "*_tstres.xml" | Foreach-Object {
     $currentFilePath = $_.FullName;
     $currentFilePath;
     }'
