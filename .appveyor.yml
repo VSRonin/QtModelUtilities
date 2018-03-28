@@ -143,7 +143,36 @@ test_script:
     $crashMessage = $null;
     Get-ChildItem ".\" -Filter "*_tstres.xml" | Foreach-Object {
     $currentFilePath = $_.FullName;
+    $localPass = 0;
+    $localFail = 0;
+    $localError = 0;
+    $localSkip = 0;
+    $localTime = 0;
     $currentFilePath;
+    [xml]$XmlDocument = (Get-Content -Path $currentFilePath) -as [xml];
+    $testSuiteXmlOut = $rootXmlOut.AppendChild($xmlOut.CreateElement("testsuite"));
+    $testClassName = $XmlDocument.TestCase.name;
+    $testSuiteXmlOut.SetAttribute("name",$testClassName);
+    $testSuitePropertiesXmlOut = $testSuiteXmlOut.AppendChild($xmlOut.CreateElement("properties"));
+    $testSuitePropertiesPropertyXmlOut = $testSuitePropertiesXmlOut.AppendChild($xmlOut.CreateElement("property"));
+    $testSuitePropertiesPropertyXmlOut.SetAttribute("name","QtVersion");
+    $testSuitePropertiesPropertyXmlOut.SetAttribute("value",[Security.SecurityElement]::Escape($XmlDocument.TestCase.Environment.QtVersion));
+    $testSuitePropertiesPropertyXmlOut = $testSuitePropertiesXmlOut.AppendChild($xmlOut.CreateElement("property"));
+    $testSuitePropertiesPropertyXmlOut.SetAttribute("name","QtBuild");
+    $testSuitePropertiesPropertyXmlOut.SetAttribute("value",[Security.SecurityElement]::Escape($XmlDocument.TestCase.Environment.QtBuild));
+    $testSuitePropertiesPropertyXmlOut = $testSuitePropertiesXmlOut.AppendChild($xmlOut.CreateElement("property"));
+    $testSuitePropertiesPropertyXmlOut.SetAttribute("name","QTestVersion");
+    $testSuitePropertiesPropertyXmlOut.SetAttribute("value",[Security.SecurityElement]::Escape($XmlDocument.TestCase.Environment.QTestVersion));
+    $testSuiteXmlOut.SetAttribute("time",$localTime/1000);
+    $testSuiteXmlOut.SetAttribute("skipped",$localSkip);
+    $testSuiteXmlOut.SetAttribute("tests",$localSkip+$localFail+$localError+$localPass);
+    $testSuiteXmlOut.SetAttribute("failures",$localFail);
+    $testSuiteXmlOut.SetAttribute("errors",$localError);
+    $totalTime = $totalTime + $localTime;
+    $totalSkip = $totalSkip + $localSkip;
+    $totalError = $totalError + $localError;
+    $totalFail = $totalFail + $localFail;
+    $totalPass = $totalPass + $localPass;
     }'
 
 on_finish:
