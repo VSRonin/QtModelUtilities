@@ -121,8 +121,6 @@ build_script:
 - if %use_cmake%==true (
     cmake --version &&
     cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_STATIC_LIBS=%USESTATIC% -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
-#    %MAKEBUILDER% &&
-#    cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
     %MAKEBUILDER%)
 
 test_script:
@@ -181,6 +179,3 @@ test_script:
     if($totalError+$totalFail -gt 0){
     throw;
     }'
-
-#on_finish:
-#- ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\testsResults.xml))
