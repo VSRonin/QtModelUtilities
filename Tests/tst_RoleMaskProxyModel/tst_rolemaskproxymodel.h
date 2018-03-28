@@ -20,11 +20,6 @@ private Q_SLOTS:
     void testNullModel();
     void testDataChangeSignals_data();
     void testDataChangeSignals();
-    void testBenchMark();
-    void testConsole();
-    void testSkip();
-    void testFail();
-    void testGit();
 private:
     int countChildren(const QAbstractItemModel* const baseModel, const QModelIndex& parIdx = QModelIndex());
     void testUseRoleMaskRecurse(const int magicNumber, const QAbstractItemModel* const baseModel, const RoleMaskProxyModel* const proxyModel, const QModelIndexList& magicNumerIndexes, const bool userRoleEditable, const QModelIndex& sourceParent = QModelIndex(), const QModelIndex& proxyParent = QModelIndex());
