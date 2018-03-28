@@ -139,6 +139,7 @@ test_script:
     $totalTime = 0;
     $XmlDocument = $null;
     $crashMessage = $null;
+    if(1=1){
     Get-ChildItem ".\" -Filter "*_tstres.xml" | Foreach-Object {
     $currentFilePath = $_.FullName;
     $localPass = 0;
@@ -147,7 +148,7 @@ test_script:
     $localSkip = 0;
     $localTime = 0;
     $currentFilePath;
-     if([bool]((Get-Content -Path $currentFilePath) -as [xml])){
+    if([bool]((Get-Content -Path $currentFilePath) -as [xml])){
         [xml]$XmlDocument = (Get-Content -Path $currentFilePath) -as [xml];
     }
     else{
@@ -233,4 +234,5 @@ test_script:
     $totalFail = $totalFail + $localFail;
     $totalPass = $totalPass + $localPass;
     }
-    $rootXmlOut.SetAttribute("time",$totalTime/1000);'
+    $rootXmlOut.SetAttribute("time",$totalTime/1000);
+    }'
