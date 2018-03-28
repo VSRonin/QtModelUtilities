@@ -215,6 +215,13 @@ test_script:
             }
         }
     }
+    if($localError -eq 1){
+        $testSuitetestcaseXmlOut = $testSuiteXmlOut.AppendChild($xmlOut.CreateElement("testcase"));
+        $testSuitetestcaseXmlOut.SetAttribute("name","SystemError");
+        $testSuitetestcaseXmlOut.SetAttribute("classname",$testClassName);
+        $testSuitetestcaseErrorXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("error"));
+        $testSuitetestcaseErrorXmlOut.SetAttribute("message",[Security.SecurityElement]::Escape($crashMessage));
+    }
     $testSuiteXmlOut.SetAttribute("time",$localTime/1000);
     $testSuiteXmlOut.SetAttribute("skipped",$localSkip);
     $testSuiteXmlOut.SetAttribute("tests",$localSkip+$localFail+$localError+$localPass);
@@ -225,4 +232,5 @@ test_script:
     $totalError = $totalError + $localError;
     $totalFail = $totalFail + $localFail;
     $totalPass = $totalPass + $localPass;
-    }'
+    }
+    $rootXmlOut.SetAttribute("time",$totalTime/1000);'
