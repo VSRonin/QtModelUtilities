@@ -53,7 +53,7 @@
     <QtMsBuild>$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\tests\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
@@ -104,12 +104,12 @@
     <QtMoc Include="tst_insertproxymodel.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\ModelUtilities.vcxproj">
-      <Project>{c59b6783-9ba6-45ba-8995-883a5cab471b}</Project>
-    </ProjectReference>
+    <Text Include="CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="CMakeLists.txt" />
+    <ProjectReference Include="..\..\src\ModelUtilities.vcxproj">
+      <Project>{c59b6783-9ba6-45ba-8995-883a5cab471b}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

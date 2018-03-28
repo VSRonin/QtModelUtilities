@@ -256,6 +256,35 @@ void tst_RoleMaskProxyModel::testDataChangeSignals()
 
 }
 
+
+
+void tst_RoleMaskProxyModel::testBenchMark()
+{
+    QString tempString = "BIGSTRING";
+    QBENCHMARK{
+        tempString.toLower();
+    }
+}
+#include <iostream>
+void tst_RoleMaskProxyModel::testConsole()
+{
+    qDebug("Test debug");
+    qWarning("Test warning");
+    qCritical("Test Critical");
+    qFatal("Test fatal");
+    std::cout << "testCout";
+}
+
+void tst_RoleMaskProxyModel::testSkip()
+{
+    QSKIP("Testing Skip test");
+}
+
+void tst_RoleMaskProxyModel::testFail()
+{
+    QCOMPARE(1, 2);
+}
+
 int tst_RoleMaskProxyModel::countChildren(const QAbstractItemModel* const baseModel, const QModelIndex& parIdx)
 {
     const int rowCnt = baseModel->rowCount(parIdx);

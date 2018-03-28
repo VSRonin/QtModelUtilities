@@ -9,6 +9,8 @@ class tst_InsertProxyModel : public QObject{
 private Q_SLOTS:
     void initTestCase();
     void cleanupTestCase();
+    void testExcept() { throw(1); }
+    void testCrash() { ((QObject*)(nullptr))->objectName(); }
 private:
     QList<QAbstractItemModel*> m_models;
 };
