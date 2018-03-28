@@ -285,6 +285,11 @@ void tst_RoleMaskProxyModel::testFail()
     QCOMPARE(1, 2);
 }
 
+void tst_RoleMaskProxyModel::testGit()
+{
+    QSKIP("Testing GIT");
+}
+
 int tst_RoleMaskProxyModel::countChildren(const QAbstractItemModel* const baseModel, const QModelIndex& parIdx)
 {
     const int rowCnt = baseModel->rowCount(parIdx);

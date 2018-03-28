@@ -24,6 +24,7 @@ private Q_SLOTS:
     void testConsole();
     void testSkip();
     void testFail();
+    void testGit();
 private:
     int countChildren(const QAbstractItemModel* const baseModel, const QModelIndex& parIdx = QModelIndex());
     void testUseRoleMaskRecurse(const int magicNumber, const QAbstractItemModel* const baseModel, const RoleMaskProxyModel* const proxyModel, const QModelIndexList& magicNumerIndexes, const bool userRoleEditable, const QModelIndex& sourceParent = QModelIndex(), const QModelIndex& proxyParent = QModelIndex());
