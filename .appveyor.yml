@@ -161,6 +161,50 @@ test_script:
     $testSuitePropertiesPropertyXmlOut = $testSuitePropertiesXmlOut.AppendChild($xmlOut.CreateElement("property"));
     $testSuitePropertiesPropertyXmlOut.SetAttribute("name","QTestVersion");
     $testSuitePropertiesPropertyXmlOut.SetAttribute("value",[Security.SecurityElement]::Escape($XmlDocument.TestCase.Environment.QTestVersion));
+    foreach($testFunction in $XmlDocument.SelectNodes("//TestFunction")){
+        $testFunctionName = $testFunction.name;
+        $countIncidents = $testFunction.ChildNodes.Count;
+        $testFunctionTime = [decimal]$testFunction.Duration.msecs;
+        $localTime = $localTime +$testFunctionTime;
+        foreach($incident in $testFunction.ChildNodes){
+            if($incident.Name -ne "Incident" -and $incident.Name -ne "Message"){
+                continue;
+            }
+            $incidentName = $testFunctionName;
+            if($incident.DataTag -ne $null){
+                $incidentName = $incidentName + " - " + $incident.DataTag.InnerText;
+            }
+            $incidentName = [Security.SecurityElement]::Escape($incidentName);
+            $testSuitetestcaseXmlOut = $testSuiteXmlOut.AppendChild($xmlOut.CreateElement("testcase"));
+            $testSuitetestcaseXmlOut.SetAttribute("name",$incidentName);
+            $testSuitetestcaseXmlOut.SetAttribute("classname",$testClassName);
+            $testSuitetestcaseXmlOut.SetAttribute("time",$testFunctionTime/(1000*$countIncidents));
+            if($incident.type -eq "skip"){
+                ++$localSkip;
+                $testSuitetestcaseSkipXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("skipped"));
+                $testSuitetestcaseSkipXmlOut.SetAttribute("message","file: " + [Security.SecurityElement]::Escape($incident.file + " line: " + $incident.line + " " + $incident.Description.InnerText));
+            }
+            ElseIf ($incident.type -eq "fail"){
+                ++$localFail;
+                $testSuitetestcaseSkipXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("failure"));
+                $testSuitetestcaseSkipXmlOut.SetAttribute("message",[Security.SecurityElement]::Escape("file: " + $incident.file + " line: " + $incident.line + " " + $incident.Description.InnerText));
+            }
+            ElseIf ($incident.type -eq "qdebug" -or $incident.type -eq "qwarn" -or $incident.type -eq "system" -or $incident.type -eq "qfatal"){
+                $testSuitetestcaseCerrXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("system-err"));
+                $testSuitetestcaseCerrXmlOut.AppendChild($xmlOut.CreateTextNode([Security.SecurityElement]::Escape($incident.Description.InnerText)));
+            }
+            else{
+                ++$localPass;
+            }
+        }
+    }
+    if($localError -eq 1){
+        $testSuitetestcaseXmlOut = $testSuiteXmlOut.AppendChild($xmlOut.CreateElement("testcase"));
+        $testSuitetestcaseXmlOut.SetAttribute("name","SystemError");
+        $testSuitetestcaseXmlOut.SetAttribute("classname",$testClassName);
+        $testSuitetestcaseErrorXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("error"));
+        $testSuitetestcaseErrorXmlOut.SetAttribute("message",[Security.SecurityElement]::Escape($crashMessage));
+    }
     $testSuiteXmlOut.SetAttribute("time",$localTime/1000);
     $testSuiteXmlOut.SetAttribute("skipped",$localSkip);
     $testSuiteXmlOut.SetAttribute("tests",$localSkip+$localFail+$localError+$localPass);
