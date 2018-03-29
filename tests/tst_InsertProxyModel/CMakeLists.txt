@@ -24,12 +24,13 @@ set(tst_InsertProxyModel_LIBS ${tst_InsertProxyModel_LIBS} ${Qt5Gui_LIBRARIES})
 set(tst_InsertProxyModel_INCLUDE ${tst_InsertProxyModel_INCLUDE} ${Qt5Gui_INCLUDE_DIRS})
 set(tst_InsertProxyModel_COMPILE_DEFINE ${tst_InsertProxyModel_COMPILE_DEFINE} ${Qt5Gui_COMPILE_DEFINITIONS})
 endif()
+set(tst_InsertProxyModel_INCLUDE ${tst_InsertProxyModel_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR})
 set(tst_InsertProxyModel_SRCS
     main.cpp
     tst_InsertProxyModel.cpp
 )
 add_executable(tst_InsertProxyModel ${tst_InsertProxyModel_SRCS})
-target_include_directories(tst_InsertProxyModel PRIVATE ../../src ${tst_InsertProxyModel_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(tst_InsertProxyModel PRIVATE ../../src ${tst_InsertProxyModel_INCLUDE})
 target_link_libraries(tst_InsertProxyModel PRIVATE modelutilities ${tst_InsertProxyModel_LIBS})
 target_compile_definitions(tst_InsertProxyModel PRIVATE ${tst_InsertProxyModel_DEFINE})
 set_target_properties(tst_InsertProxyModel PROPERTIES 

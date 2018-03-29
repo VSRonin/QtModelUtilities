@@ -23,12 +23,13 @@ set(tst_RoleMaskProxyModel_LIBS ${tst_RoleMaskProxyModel_LIBS} ${Qt5Gui_LIBRARIE
 set(tst_RoleMaskProxyModel_INCLUDE ${tst_RoleMaskProxyModel_INCLUDE} ${Qt5Gui_INCLUDE_DIRS})
 set(tst_RoleMaskProxyModel_COMPILE_DEFINE ${tst_RoleMaskProxyModel_COMPILE_DEFINE} ${Qt5Gui_COMPILE_DEFINITIONS})
 endif()
+set(tst_RoleMaskProxyModel_INCLUDE ${tst_RoleMaskProxyModel_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR})
 set(tst_RoleMaskProxyModel_SRCS
     main.cpp
     tst_rolemaskproxymodel.cpp
 )
 add_executable(tst_RoleMaskProxyModel ${tst_RoleMaskProxyModel_SRCS})
-target_include_directories(tst_RoleMaskProxyModel PRIVATE ../../src ${tst_RoleMaskProxyModel_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(tst_RoleMaskProxyModel PRIVATE ../../src ${tst_RoleMaskProxyModel_INCLUDE})
 target_link_libraries(tst_RoleMaskProxyModel PRIVATE modelutilities ${tst_RoleMaskProxyModel_LIBS})
 target_compile_definitions(tst_RoleMaskProxyModel PRIVATE ${tst_RoleMaskProxyModel_DEFINE})
 set_target_properties(tst_RoleMaskProxyModel PROPERTIES 
