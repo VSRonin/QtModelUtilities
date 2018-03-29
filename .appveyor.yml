@@ -47,6 +47,24 @@ test_script:
     $totalTime = 0;
     $XmlDocument = $null;
     $crashMessage = $null;
+    Get-ChildItem ".\" -Filter "*_tstres.xml" | Foreach-Object {
+        $localPass = 0;
+        $localFail = 0;
+        $localError = 0;
+        $localSkip = 0;
+        $localTime = 0;
+        $currentFilePath = $_.FullName;
+        $testSuiteXmlOut.SetAttribute("time",$localTime/1000);
+        $testSuiteXmlOut.SetAttribute("skipped",$localSkip);
+        $testSuiteXmlOut.SetAttribute("tests",$localSkip+$localFail+$localError+$localPass);
+        $testSuiteXmlOut.SetAttribute("failures",$localFail);
+        $testSuiteXmlOut.SetAttribute("errors",$localError);
+        $totalTime = $totalTime + $localTime;
+        $totalSkip = $totalSkip + $localSkip;
+        $totalError = $totalError + $localError;
+        $totalFail = $totalFail + $localFail;
+        $totalPass = $totalPass + $localPass;
+    };
     $rootXmlOut.SetAttribute("time",$totalTime/1000);
     $rootXmlOut.SetAttribute("failures",$totalFail);
     $rootXmlOut.SetAttribute("errors",$totalError);
