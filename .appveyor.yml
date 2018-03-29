@@ -143,7 +143,7 @@ before_build:
 - if %use_widgets%==true (set USEWIDGETS=OFF) else (set USEWIDGETS=ON)
 - if %use_mingw%==true (set CMAKEGENERATOR="MinGW Makefiles") else (set CMAKEGENERATOR="NMake Makefiles")
 - if %use_mingw%==true (set MAKEBUILDER=mingw32-make) else (set MAKEBUILDER=nmake)
-- if %use_mingw%==true set PATH=%PATH:C:\Program Files\Git\usr\bin\;=%
+- if %use_mingw%==true set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
 - echo %PATH%
 - if %platform%==x86 (set TESTOUTPUTFOLDER=x86) else (set TESTOUTPUTFOLDER=x64)
 
