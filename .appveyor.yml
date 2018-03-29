@@ -29,9 +29,13 @@ build_script:
 - cd .\build
 - cmake --version &&
     cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_STATIC_LIBS=%USESTATIC% -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
-    %MAKEBUILDER% &&
-    cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
     %MAKEBUILDER%
     
+test_script:
+- If NOT exist "%TESTOUTPUTFOLDER%/bin" (appveyor exit)
+- cd %TESTOUTPUTFOLDER%/bin
+- set PATH=../lib;%PATH%
+- for %%a in (*.exe) do (%%a -xml > %%a_tstres.xml & set preventFail = 1)
+
 on_finish:
 - ps: if (Test-Path ".\testResults.xml") {(new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\testResults.xml));}
