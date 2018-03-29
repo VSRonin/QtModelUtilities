@@ -48,10 +48,3 @@ void tst_InsertProxyModel::cleanupTestCase()
     while (!m_models.isEmpty())
         m_models.takeLast()->deleteLater();
 }
-
-void tst_InsertProxyModel::testBenchMark()
-{
-    QBENCHMARK{
-        QStringLiteral("lohvbhjvbBIDBVHAFBVHbhjgdvcjghBVSBFDBa").toUpper();
-    }
-}

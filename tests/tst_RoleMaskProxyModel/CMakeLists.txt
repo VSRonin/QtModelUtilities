@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.0)
-
+cmake_minimum_required(VERSION 3.1)
+set (CMAKE_CXX_STANDARD 11)
 cmake_policy(SET CMP0048 NEW)
 set(CMAKE_AUTOMOC ON)
 project(tst_RoleMaskProxyModel VERSION "1.0") 

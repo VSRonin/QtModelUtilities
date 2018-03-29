@@ -3,11 +3,9 @@
 This library is a collection of utilities for Qt's Model/View framework.
 
 ### Status
-#### Master
-[![Build status](https://ci.appveyor.com/api/projects/status/7ytrf2h8r6gp22if/branch/master?svg=true)](https://ci.appveyor.com/project/VSRonin/qtmodelutilities/branch/master)
+**master**: [![Build status](https://ci.appveyor.com/api/projects/status/3x8h2laxlbh9wc7c/branch/master?svg=true)](https://ci.appveyor.com/project/VSRonin/qtmodelutilities/branch/master)
+**dev**: [![Build status](https://ci.appveyor.com/api/projects/status/3x8h2laxlbh9wc7c/branch/dev?svg=true)](https://ci.appveyor.com/project/VSRonin/qtmodelutilities/branch/dev)
 
-#### Dev
-[![Build status](https://ci.appveyor.com/api/projects/status/7ytrf2h8r6gp22if/branch/dev?svg=true)](https://ci.appveyor.com/project/VSRonin/qtmodelutilities/branch/dev)
 
 ### Contents
 
@@ -17,7 +15,7 @@ This library is a collection of utilities for Qt's Model/View framework.
 
 ### Installation
 
-TODO: decide the build system used. Currently considering CMake and msbuild
+TODO: decide the build system used. Currently considering CMake
 
 ### Usage
 
