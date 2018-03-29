@@ -133,10 +133,7 @@ matrix:
   fast_finish: true
 
 before_build:
-- set PATH=%QT5%\bin;%PATH%
-- echo on
-- echo %PATH%
-- if not %use_mingw%==true set PATH=%COMPILER%\bin;%QT5%\bin;%PATH%
+- set PATH=%COMPILER%\bin;%QT5%\bin;%PATH%
 - if not %use_mingw%==true call "%COMPILER%\vcvarsall.bat" %platform%
 - if %use_static%==true (set USESTATIC=ON) else (set USESTATIC=OFF)
 - if %use_gui%==true (set USEGUI=OFF) else (set USEGUI=ON)
@@ -144,7 +141,6 @@ before_build:
 - if %use_mingw%==true (set CMAKEGENERATOR="MinGW Makefiles") else (set CMAKEGENERATOR="NMake Makefiles")
 - if %use_mingw%==true (set MAKEBUILDER=mingw32-make) else (set MAKEBUILDER=nmake)
 - if %use_mingw%==true set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
-- echo %PATH%
 - if %platform%==x86 (set TESTOUTPUTFOLDER=x86) else (set TESTOUTPUTFOLDER=x64)
 
 build_script:
