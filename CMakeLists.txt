@@ -1,6 +1,7 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.3)
 set(modelutilities_VERSION "0.0.1")
 cmake_policy(SET CMP0048 NEW)
+cmake_policy(SET CMP0057 NEW)
 set (CMAKE_CXX_STANDARD 11)
 set(CMAKE_AUTOMOC ON)
 project(ModelUtilitiesLib VERSION ${modelutilities_VERSION})
