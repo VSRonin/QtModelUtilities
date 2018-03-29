@@ -17,7 +17,7 @@ option(BUILD_INSERTPROXY "Enables or disables the build of Insert Proxy Model" O
 find_package(Qt5Core ${REQUIRED_QT_VERSION} REQUIRED)
 find_package(Qt5Gui ${REQUIRED_QT_VERSION})
 find_package(Qt5Widgets ${REQUIRED_QT_VERSION})
-find_package(Doxygen REQUIRED dot OPTIONAL_COMPONENTS mscgen dia)
+find_package(Doxygen dot OPTIONAL_COMPONENTS mscgen dia)
 message(STATUS "Found Qt Core ${Qt5Core_VERSION}")
 if(NOT Qt5Gui_FOUND)
     set(NO_GUI ON)
