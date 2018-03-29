@@ -65,11 +65,11 @@ endif()
 set(modelutilities_COMPILE_DEFINE ${modelutilities_COMPILE_DEFINE} MODELUTILITIES_LIB)
 if(BUILD_ROLEMASKPROXY)
     set(modelutilities_SRCS src/rolemaskproxymodel.cpp ${modelutilities_SRCS})
-    set(modelutilities_INCLUDE src/rolemaskproxymodel.h src/includes/RoleMaskProxyModel ${modelutilities_INCLUDE})
+    set(modelutilities_INSTALL_INCLUDE src/rolemaskproxymodel.h src/includes/RoleMaskProxyModel ${modelutilities_INSTALL_INCLUDE})
 endif()
 if(BUILD_INSERTPROXY)
     set(modelutilities_SRCS src/insertproxymodel.cpp ${modelutilities_SRCS})
-    set(modelutilities_INCLUDE src/insertproxymodel.h src/includes/InsertProxyModel ${modelutilities_INCLUDE})
+    set(modelutilities_INSTALL_INCLUDE src/insertproxymodel.h src/includes/InsertProxyModel ${modelutilities_INSTALL_INCLUDE})
 endif()
 if(BUILD_MODELSERIALISATION)
     set(modelutilities_SRCS
@@ -83,7 +83,7 @@ if(BUILD_MODELSERIALISATION)
         src/xmlmodelserialiser.cpp
         ${modelutilities_SRCS}
     )
-    set(modelutilities_INCLUDE 
+    set(modelutilities_INSTALL_INCLUDE 
         src/abstractmodelserialiser.h
         src/abstractmultiroleserialiser.h
         src/abstractsingleroleserialiser.h
@@ -98,7 +98,7 @@ if(BUILD_MODELSERIALISATION)
         src/includes/JsonModelSerialiser
         src/includes/ModelSerialisers
         src/includes/XmlModelSerialiser
-        ${modelutilities_INCLUDE}
+        ${modelutilities_INSTALL_INCLUDE}
     )
 endif()
 if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "4")
@@ -117,7 +117,7 @@ if(BUILD_STATIC_LIBS)
 else()
     add_library(modelutilities SHARED ${modelutilities_SRCS})
 endif()
-install(FILES ${modelutilities_INCLUDE} DESTINATION include COMPONENT headers)
+install(FILES ${modelutilities_INSTALL_INCLUDE} DESTINATION include COMPONENT headers)
 install(TARGETS modelutilities
     RUNTIME DESTINATION bin COMPONENT library
     LIBRARY DESTINATION lib COMPONENT library
