@@ -1,4 +1,13 @@
 cmake_minimum_required(VERSION 3.3)
+if(POLICY CMP0025)
+  cmake_policy(SET CMP0025 NEW)
+endif()
+if(POLICY CMP0048)
+    cmake_policy(SET CMP0048 NEW)
+endif()
+if(POLICY CMP0057)
+    cmake_policy(SET CMP0057 NEW)
+endif()
 set (CMAKE_CXX_STANDARD 11)
 cmake_policy(SET CMP0048 NEW)
 set(CMAKE_AUTOMOC ON)
@@ -20,7 +29,7 @@ set(tst_InsertProxyModel_SRCS
     tst_InsertProxyModel.cpp
 )
 add_executable(tst_InsertProxyModel ${tst_InsertProxyModel_SRCS})
-target_include_directories(tst_InsertProxyModel PRIVATE ../../src ${tst_InsertProxyModel_INCLUDE})
+target_include_directories(tst_InsertProxyModel PRIVATE ../../src ${tst_InsertProxyModel_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(tst_InsertProxyModel PRIVATE modelutilities ${tst_InsertProxyModel_LIBS})
 target_compile_definitions(tst_InsertProxyModel PRIVATE ${tst_InsertProxyModel_DEFINE})
 set_target_properties(tst_InsertProxyModel PROPERTIES 

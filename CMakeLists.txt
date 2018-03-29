@@ -1,7 +1,14 @@
 cmake_minimum_required(VERSION 3.3)
 set(modelutilities_VERSION "0.0.1")
-cmake_policy(SET CMP0048 NEW)
-cmake_policy(SET CMP0057 NEW)
+if(POLICY CMP0025)
+  cmake_policy(SET CMP0025 NEW)
+endif()
+if(POLICY CMP0048)
+    cmake_policy(SET CMP0048 NEW)
+endif()
+if(POLICY CMP0057)
+    cmake_policy(SET CMP0057 NEW)
+endif()
 set (CMAKE_CXX_STANDARD 11)
 set(CMAKE_AUTOMOC ON)
 project(ModelUtilitiesLib VERSION ${modelutilities_VERSION})
@@ -112,7 +119,7 @@ install(TARGETS modelutilities
     LIBRARY DESTINATION lib COMPONENT library
     ARCHIVE DESTINATION lib COMPONENT library
 )
-target_include_directories(modelutilities PRIVATE ${Qt5Core_INCLUDE_DIRS} ${modelutilities_OPTIONAL_INCLUDE})
+target_include_directories(modelutilities PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${Qt5Core_INCLUDE_DIRS} ${modelutilities_OPTIONAL_INCLUDE})
 target_link_libraries(modelutilities PRIVATE ${Qt5Core_LIBRARIES} ${modelutilities_OPTIONAL_LIBS})
 target_compile_definitions(modelutilities PRIVATE ${modelutilities_COMPILE_DEFINE})
 set_target_properties(modelutilities PROPERTIES 
