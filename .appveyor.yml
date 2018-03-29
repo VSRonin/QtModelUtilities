@@ -2,48 +2,6 @@ version: '0.0.1.{build}'
 
 environment:
   matrix:
-  - QT5: C:\Qt\5.10.1\mingw53_32
-    COMPILER: C:\MinGW
-    platform: x86
-    use_mingw: "true"
-    use_gui: "true"
-    use_widgets: "true"
-    use_static: "true"
-  - QT5: C:\Qt\5.10.1\mingw53_32
-    COMPILER: C:\MinGW
-    platform: x86
-    use_mingw: "true"
-    use_gui: "true"
-    use_widgets: "true"
-    use_static: "false"
-  - QT5: C:\Qt\5.10.1\mingw53_32
-    COMPILER: C:\MinGW
-    platform: x86
-    use_mingw: "true"
-    use_gui: "true"
-    use_widgets: "false"
-    use_static: "true"
-  - QT5: C:\Qt\5.10.1\mingw53_32
-    COMPILER: C:\MinGW
-    platform: x86
-    use_mingw: "true"
-    use_gui: "true"
-    use_widgets: "false"
-    use_static: "false"
-  - QT5: C:\Qt\5.10.1\mingw53_32
-    COMPILER: C:\MinGW
-    platform: x86
-    use_mingw: "true"
-    use_gui: "false"
-    use_widgets: "false"
-    use_static: "true"
-  - QT5: C:\Qt\5.10.1\mingw53_32
-    COMPILER: C:\MinGW
-    platform: x86
-    use_mingw: "true"
-    use_gui: "false"
-    use_widgets: "false"
-    use_static: "false"
   - QT5: C:\Qt\5.10.1\msvc2015
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
@@ -128,6 +86,49 @@ environment:
     use_gui: "false"
     use_widgets: "false"
     use_static: "false"
+  - QT5: C:\Qt\5.10.1\mingw53_32
+    COMPILER: C:\MinGW
+    platform: x86
+    use_mingw: "true"
+    use_gui: "true"
+    use_widgets: "true"
+    use_static: "true"
+  - QT5: C:\Qt\5.10.1\mingw53_32
+    COMPILER: C:\MinGW
+    platform: x86
+    use_mingw: "true"
+    use_gui: "true"
+    use_widgets: "true"
+    use_static: "false"
+  - QT5: C:\Qt\5.10.1\mingw53_32
+    COMPILER: C:\MinGW
+    platform: x86
+    use_mingw: "true"
+    use_gui: "true"
+    use_widgets: "false"
+    use_static: "true"
+  - QT5: C:\Qt\5.10.1\mingw53_32
+    COMPILER: C:\MinGW
+    platform: x86
+    use_mingw: "true"
+    use_gui: "true"
+    use_widgets: "false"
+    use_static: "false"
+  - QT5: C:\Qt\5.10.1\mingw53_32
+    COMPILER: C:\MinGW
+    platform: x86
+    use_mingw: "true"
+    use_gui: "false"
+    use_widgets: "false"
+    use_static: "true"
+  - QT5: C:\Qt\5.10.1\mingw53_32
+    COMPILER: C:\MinGW
+    platform: x86
+    use_mingw: "true"
+    use_gui: "false"
+    use_widgets: "false"
+    use_static: "false"
+  
 
 matrix:
   fast_finish: true
