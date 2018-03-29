@@ -54,6 +54,24 @@ test_script:
         $localSkip = 0;
         $localTime = 0;
         $currentFilePath = $_.FullName;
+        if([bool]((Get-Content -Path $currentFilePath) -as [xml])){
+            [xml]$XmlDocument = (Get-Content -Path $currentFilePath) -as [xml];
+        }
+        else{
+            $rawFilecontent = [IO.File]::ReadAllText($currentFilePath);
+            $rawFileMatch = [regex]::match($rawFilecontent,"(?s)(.+<\/TestCase>)(.*)");
+            if($rawFileMatch.Success){
+                if(-Not [bool](($rawFileMatch.captures.groups[1].value) -as [xml])){
+                    continue;
+                }
+                [xml]$XmlDocument = ($rawFileMatch.captures.groups[1].value) -as [xml];
+                $crashMessage = $rawFileMatch.captures.groups[2].value;
+                $localError = 1;
+            }
+            else{
+                continue;
+            }
+        }
         $testSuiteXmlOut = $rootXmlOut.AppendChild($xmlOut.CreateElement("testsuite"));
         $testClassName = $XmlDocument.TestCase.name;
         $testSuiteXmlOut.SetAttribute("name",$testClassName);
