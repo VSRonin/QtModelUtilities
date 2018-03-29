@@ -1,11 +1,14 @@
 #include "tst_insertproxymodel.h"
 #include <QStringListModel>
 #include <insertproxymodel.h>
+#ifdef QT_GUI_LIB
 #include <QStandardItemModel>
+#endif
+#include <QtTest/QTest>
 void tst_InsertProxyModel::initTestCase()
 {
     m_models.append(new QStringListModel(QStringList() << QStringLiteral("1") << QStringLiteral("2") << QStringLiteral("3") << QStringLiteral("4") << QStringLiteral("5"), this));
-
+#ifdef QT_GUI_LIB
     m_models.append(new QStandardItemModel(this));
     m_models.last()->insertRows(0, 5);
     m_models.last()->insertColumns(0, 3);
@@ -37,10 +40,18 @@ void tst_InsertProxyModel::initTestCase()
             }
         }
     }
+#endif
 }
 
 void tst_InsertProxyModel::cleanupTestCase()
 {
     while (!m_models.isEmpty())
         m_models.takeLast()->deleteLater();
+}
+
+void tst_InsertProxyModel::testBenchMark()
+{
+    QBENCHMARK{
+        QStringLiteral("lohvbhjvbBIDBVHAFBVHbhjgdvcjghBVSBFDBa").toUpper();
+    }
 }

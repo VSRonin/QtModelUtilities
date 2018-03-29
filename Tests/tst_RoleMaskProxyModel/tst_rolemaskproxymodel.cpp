@@ -1,7 +1,9 @@
 #include <QtTest/QTest>
 #include <QStringListModel>
 #include <rolemaskproxymodel.h>
+#ifdef QT_GUI_LIB
 #include <QStandardItemModel>
+#endif
 #include <QSignalSpy>
 #include <QList>
 #include <QVariant>
@@ -9,7 +11,7 @@
 void tst_RoleMaskProxyModel::initTestCase()
 {
     m_models.append(new QStringListModel(QStringList() << QStringLiteral("1") << QStringLiteral("2") << QStringLiteral("3") << QStringLiteral("4") << QStringLiteral("5"),this));
-
+#ifdef QT_GUI_LIB
     m_models.append(new QStandardItemModel(this));
     m_models.last()->insertRows(0, 5);
     m_models.last()->insertColumns(0, 3);
@@ -17,7 +19,7 @@ void tst_RoleMaskProxyModel::initTestCase()
         for (int j = 0; j < m_models.last()->columnCount(); ++j) {
             m_models.last()->setData(m_models.last()->index(i, j), QStringLiteral("%1,%2").arg(i).arg(j), Qt::EditRole);
             m_models.last()->setData(m_models.last()->index(i, j), i, Qt::UserRole);
-            m_models.last()->setData(m_models.last()->index(i, j), j, Qt::UserRole+1);
+            m_models.last()->setData(m_models.last()->index(i, j), j, Qt::UserRole + 1);
         }
     }
 
@@ -41,6 +43,7 @@ void tst_RoleMaskProxyModel::initTestCase()
             }
         }
     }
+#endif // QT_GUI_LIB
 }
 
 void tst_RoleMaskProxyModel::cleanupTestCase()
@@ -71,8 +74,10 @@ void tst_RoleMaskProxyModel::testUseRoleMask_data()
     QTest::addColumn<QModelIndexList>("magicNumerIndexes");
     QTest::addColumn<bool>("userRoleEditable");
     QTest::newRow("QStringListModel") << m_models.at(0) << QModelIndexList({ m_models.at(0)->index(0, 0) }) << false;
+#ifdef QT_GUI_LIB
     QTest::newRow("QStandadItemModel Table") << m_models.at(1) << QModelIndexList({ m_models.at(1)->index(1, 0), m_models.at(1)->index(0, 1) }) << true;
     QTest::newRow("QStandadItemModel Tree") << m_models.at(2) << QModelIndexList({ m_models.at(2)->index(1, 0), m_models.at(2)->index(0, 1), m_models.at(2)->index(0, 1, m_models.at(2)->index(0, 0)) }) << true;
+#endif
 }
 
 void tst_RoleMaskProxyModel::testInsertRow()
@@ -106,25 +111,29 @@ void tst_RoleMaskProxyModel::testInsertRow_data()
     QTest::addColumn<int>("insertIndex");
     QTest::addColumn<QModelIndex>("parentIndex");
     QTest::newRow("List Insert Begin") << m_models.at(0) << 0 << QModelIndex();
+#ifdef QT_GUI_LIB
     QTest::newRow("Table Insert Begin") << m_models.at(1) << 0 << QModelIndex();
     QTest::newRow("Tree Insert Begin") << m_models.at(2) << 0 << QModelIndex();
-
+#endif
     QTest::newRow("List Insert End") << m_models.at(0) << m_models.at(0)->rowCount() << QModelIndex();
+#ifdef QT_GUI_LIB
     QTest::newRow("Table Insert End") << m_models.at(1) << m_models.at(1)->rowCount() << QModelIndex();
     QTest::newRow("Tree Insert End") << m_models.at(2) << m_models.at(2)->rowCount() << QModelIndex();
-
+#endif
     QTest::newRow("List Insert Middle") << m_models.at(0) << 2 << QModelIndex();
+#ifdef QT_GUI_LIB
     QTest::newRow("Table Insert Middle") << m_models.at(1) << 2 << QModelIndex();
     QTest::newRow("Tree Insert Middle") << m_models.at(2) << 2 << QModelIndex();
 
     QTest::newRow("Tree Insert Begin Child") << m_models.at(2) << 0 << m_models.at(2)->index(0, 0);
     QTest::newRow("Tree Insert Middle Child") << m_models.at(2) << 2 << m_models.at(2)->index(0, 0);
     QTest::newRow("Tree Insert End Child") << m_models.at(2) << m_models.at(2)->rowCount(m_models.at(2)->index(0, 0)) << m_models.at(2)->index(0, 0);
-
+#endif
 }
 
 void tst_RoleMaskProxyModel::testInsertColumn()
 {
+#ifdef QT_GUI_LIB
     QFETCH(QAbstractItemModel* const, baseModel);
     QFETCH(const int, insertIndex);
     QFETCH(const QModelIndex, parentIndex);
@@ -146,11 +155,14 @@ void tst_RoleMaskProxyModel::testInsertColumn()
             QCOMPARE(proxyModel.index(0, i, proxyParent).data(Qt::UserRole).toInt(), magicNumber + i);
     }
     QVERIFY(baseModel->removeColumn(insertIndex, parentIndex));
-
+#else
+    QSKIP("This test requires the Qt GUI module");
+#endif
 }
 
 void tst_RoleMaskProxyModel::testInsertColumn_data()
 {
+#ifdef QT_GUI_LIB
     QTest::addColumn<QAbstractItemModel*>("baseModel");
     QTest::addColumn<int>("insertIndex");
     QTest::addColumn<QModelIndex>("parentIndex");
@@ -166,6 +178,7 @@ void tst_RoleMaskProxyModel::testInsertColumn_data()
     QTest::newRow("Tree Insert Begin Child") << m_models.at(2) << 0 << m_models.at(2)->index(0, 0);
     QTest::newRow("Tree Insert Middle Child") << m_models.at(2) << 2 << m_models.at(2)->index(0, 0);
     QTest::newRow("Tree Insert End Child") << m_models.at(2) << m_models.at(2)->columnCount(m_models.at(2)->index(0, 0)) << m_models.at(2)->index(0, 0);
+#endif
 }
 
 void tst_RoleMaskProxyModel::testNullModel()
@@ -191,8 +204,10 @@ void tst_RoleMaskProxyModel::testDataChangeSignals_data()
     QTest::addColumn<bool>("implementsRoles");
 
     QTest::newRow("List") << m_models.at(0) << bool(QT_VERSION >= QT_VERSION_CHECK(5, 6, 2));
+#ifdef QT_GUI_LIB
     QTest::newRow("Table") << m_models.at(1) << bool(QT_VERSION >= QT_VERSION_CHECK(5, 11, 0));
     QTest::newRow("Tree") << m_models.at(2) << bool(QT_VERSION >= QT_VERSION_CHECK(5, 11, 0));
+#endif
 }
 
 void tst_RoleMaskProxyModel::testDataChangeSignals()
