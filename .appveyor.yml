@@ -72,6 +72,12 @@ test_script:
         $testSuitePropertiesPropertyXmlOut = $testSuitePropertiesXmlOut.AppendChild($xmlOut.CreateElement("property"));
         $testSuitePropertiesPropertyXmlOut.SetAttribute("name","QTestVersion");
         $testSuitePropertiesPropertyXmlOut.SetAttribute("value",[Security.SecurityElement]::Escape($XmlDocument.TestCase.Environment.QTestVersion));
+        foreach($testFunction in $XmlDocument.SelectNodes("//TestFunction")){
+            $testFunctionName = $testFunction.name;
+            $countIncidents = $testFunction.ChildNodes.Count;
+            $testFunctionTime = [decimal]$testFunction.Duration.msecs;
+            $localTime = $localTime +$testFunctionTime;
+        };
         if($localError -eq 1){
             $testSuitetestcaseXmlOut = $testSuiteXmlOut.AppendChild($xmlOut.CreateElement("testcase"));
             $testSuitetestcaseXmlOut.SetAttribute("name","SystemError");
