@@ -122,7 +122,7 @@ test_script:
                     else{
                         ++$localPass;
                     }
-                }
+                };
             };
         }
         if($localError -eq 1){
@@ -147,4 +147,10 @@ test_script:
     $rootXmlOut.SetAttribute("failures",$totalFail);
     $rootXmlOut.SetAttribute("errors",$totalError);
     $rootXmlOut.SetAttribute("tests",$totalPass);
-    $xmlOut.save($pwd.Path + "\testResults.xml");'
+    $xmlOut.save($pwd.Path + "\testResults.xml");
+    if($totalError+$totalFail -gt 0){
+        throw;
+    }'
+
+on_finish:
+- ps: if (Test-Path ".\testResults.xml") {(new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\testResults.xml));}
