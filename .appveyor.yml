@@ -40,7 +40,59 @@ test_script:
 - cd %TESTOUTPUTFOLDER%/bin
 - set PATH=../lib;%PATH%
 - for %%a in (*.exe) do (%%a -xml > %%a_tstres.xml & set preventFail = 1)
-- ps: 'Get-ChildItem ".\" -Filter "*_tstres.xml" | Foreach-Object {
+- ps: '$xmlOut = new-object System.Xml.XmlDocument;
+    $xmlOut.AppendChild($xmlOut.CreateXmlDeclaration("1.0","UTF-8",$null));
+    $rootXmlOut = $xmlOut.CreateElement("testsuites");
+    $xmlOut.AppendChild($rootXmlOut);
+    $totalPass = 0;
+    $totalFail = 0;
+    $totalError = 0;
+    $totalSkip = 0;
+    $totalTime = 0;
+    $XmlDocument = $null;
+    $crashMessage = $null;
+    Get-ChildItem ".\" -Filter "*_tstres.xml" | Foreach-Object {
+        $localPass = 0;
+        $localFail = 0;
+        $localError = 0;
+        $localSkip = 0;
+        $localTime = 0;
         $currentFilePath = $_.FullName;
         [xml]$XmlDocument = (Get-Content -Path $currentFilePath) -as [xml];
-        };'
+        $testSuiteXmlOut = $rootXmlOut.AppendChild($xmlOut.CreateElement("testsuite"));
+        $testClassName = $XmlDocument.TestCase.name;
+        $testSuiteXmlOut.SetAttribute("name",$testClassName);
+        $testSuitePropertiesXmlOut = $testSuiteXmlOut.AppendChild($xmlOut.CreateElement("properties"));
+        $testSuitePropertiesPropertyXmlOut = $testSuitePropertiesXmlOut.AppendChild($xmlOut.CreateElement("property"));
+        $testSuitePropertiesPropertyXmlOut.SetAttribute("name","QtVersion");
+        $testSuitePropertiesPropertyXmlOut.SetAttribute("value",[Security.SecurityElement]::Escape($XmlDocument.TestCase.Environment.QtVersion));
+        $testSuitePropertiesPropertyXmlOut = $testSuitePropertiesXmlOut.AppendChild($xmlOut.CreateElement("property"));
+        $testSuitePropertiesPropertyXmlOut.SetAttribute("name","QtBuild");
+        $testSuitePropertiesPropertyXmlOut.SetAttribute("value",[Security.SecurityElement]::Escape($XmlDocument.TestCase.Environment.QtBuild));
+        $testSuitePropertiesPropertyXmlOut = $testSuitePropertiesXmlOut.AppendChild($xmlOut.CreateElement("property"));
+        $testSuitePropertiesPropertyXmlOut.SetAttribute("name","QTestVersion");
+        $testSuitePropertiesPropertyXmlOut.SetAttribute("value",[Security.SecurityElement]::Escape($XmlDocument.TestCase.Environment.QTestVersion));
+        if($localError -eq 1){
+            $testSuitetestcaseXmlOut = $testSuiteXmlOut.AppendChild($xmlOut.CreateElement("testcase"));
+            $testSuitetestcaseXmlOut.SetAttribute("name","SystemError");
+            $testSuitetestcaseXmlOut.SetAttribute("classname",$testClassName);
+            $testSuitetestcaseErrorXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("error"));
+            $testSuitetestcaseErrorXmlOut.SetAttribute("message",[Security.SecurityElement]::Escape($crashMessage));
+        }
+        $testSuiteXmlOut.SetAttribute("time",$localTime/1000);
+        $testSuiteXmlOut.SetAttribute("skipped",$localSkip);
+        $testSuiteXmlOut.SetAttribute("tests",$localSkip+$localFail+$localError+$localPass);
+        $testSuiteXmlOut.SetAttribute("failures",$localFail);
+        $testSuiteXmlOut.SetAttribute("errors",$localError);
+        $totalTime = $totalTime + $localTime;
+        $totalSkip = $totalSkip + $localSkip;
+        $totalError = $totalError + $localError;
+        $totalFail = $totalFail + $localFail;
+        $totalPass = $totalPass + $localPass;
+        
+    };
+    $rootXmlOut.SetAttribute("time",$totalTime/1000);
+    $rootXmlOut.SetAttribute("failures",$totalFail);
+    $rootXmlOut.SetAttribute("errors",$totalError);
+    $rootXmlOut.SetAttribute("tests",$totalPass);
+    $xmlOut.save($pwd.Path + "\testResults.xml");'
