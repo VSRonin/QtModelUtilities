@@ -155,10 +155,10 @@ build_script:
 after_build:
 - if %use_mingw%==true set PATH=C:\Program Files\Git\usr\bin;%PATH%
 - if %use_mingw%==true (set archivename=mingw) else (set archivename=msvc2015)
-- if %platform%==x86 (set archivename=%archivename%x86) else (set archivename=%archivename%x64)
+- if %platform%==x86 (set archivename=%archivename%_x86) else (set archivename=%archivename%_x64)
 - if %use_static%==true set archivename=%archivename%_static
 - mkdir modelutilitiesarch
-- if %use_gui%==true if %use_widgets%==true 7z a -tzip ".\modelutilitiesarch\modelutilities_%archivename%_%APPVEYOR_BUILD_NUMBER%.zip" .\installed\*
+- if %use_gui%==true if %use_widgets%==true 7z a -tzip ".\modelutilitiesarch\modelutilities_%archivename%_%APPVEYOR_BUILD_VERSION%.zip" .\installed\*
 
 test_script:
 - If NOT exist "%TESTOUTPUTFOLDER%/bin" (appveyor exit)
