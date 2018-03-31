@@ -32,12 +32,12 @@ build_script:
     %MAKEBUILDER%
 
 after_build:
-- set PATH=%PATH:%COMPILER%\bin;=%
 - if %use_mingw%==true set PATH=C:\Program Files\Git\usr\bin;%PATH%
 
 test_script:
 - If NOT exist "%TESTOUTPUTFOLDER%/bin" (appveyor exit)
 - cd %TESTOUTPUTFOLDER%/bin
+- if %use_mingw%==true set PATH=%COMPILER%\lib;%PATH%
 - set PATH=../lib;%PATH%
 - for %%a in (*.exe) do (%%a -xml > %%a_tstres.xml & set preventFail = 1)
 - ps: '$xmlOut = new-object System.Xml.XmlDocument;
@@ -64,12 +64,17 @@ test_script:
         else{
             $localError = 1;
             $rawFilecontent = [IO.File]::ReadAllText($currentFilePath);
-            $crashMessage = $rawFilecontent;
-            $rawFileMatch = [regex]::match($rawFilecontent,"(?s)(.+<\/TestCase>)(.*)");
-            if($rawFileMatch.Success){
-                if([bool](($rawFileMatch.captures.groups[1].value) -as [xml])){
-                    [xml]$XmlDocument = ($rawFileMatch.captures.groups[1].value) -as [xml];
-                    $crashMessage = $rawFileMatch.captures.groups[2].value;
+            if([string]::IsNullOrEmpty($rawFilecontent){
+                $crashMessage = "Output file is empty: " + $currentFilePath;
+            }
+            else{
+                $crashMessage = $rawFilecontent;
+                $rawFileMatch = [regex]::match($rawFilecontent,"(?s)(.+<\/TestCase>)(.*)");
+                if($rawFileMatch.Success){
+                    if([bool](($rawFileMatch.captures.groups[1].value) -as [xml])){
+                        [xml]$XmlDocument = ($rawFileMatch.captures.groups[1].value) -as [xml];
+                        $crashMessage = $rawFileMatch.captures.groups[2].value;
+                    }
                 }
             }
         }
