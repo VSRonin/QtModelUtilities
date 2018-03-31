@@ -63,5 +63,6 @@ test_script:
         }
         else{
             $rawFilecontent = [IO.File]::ReadAllText($currentFilePath);
+            $rawFileMatch = [regex]::match($rawFilecontent,"(?s)(.+<\/TestCase>)(.*)");
         }
     };'
