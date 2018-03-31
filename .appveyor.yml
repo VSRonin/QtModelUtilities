@@ -147,9 +147,9 @@ build_script:
 - mkdir .\build 
 - cd .\build
 - cmake --version &&
-    cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="C:/modelutilities" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
+    cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
     %MAKEBUILDER% && %MAKEBUILDER% install &&
-    cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="C:/modelutilities" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
+    cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
     %MAKEBUILDER% && %MAKEBUILDER% install
 
 after_build:
@@ -157,8 +157,8 @@ after_build:
 - if %use_mingw%==true (set archivename=mingw) else (set archivename=msvc2015)
 - if %platform%==x86 (set archivename=%archivename%x86) else (set archivename=%archivename%x64)
 - if %use_static%==true set archivename=%archivename%_static
-- mkdir C:\modelutilitiesarch
-- if %use_gui%==true if %use_widgets%==true 7z a "C:\modelutilitiesarch\modelutilities_%archivename%_%APPVEYOR_BUILD_NUMBER%.zip" C:\modelutilities\*
+- mkdir modelutilitiesarch
+- if %use_gui%==true if %use_widgets%==true 7z a -tzip ".\modelutilitiesarch\modelutilities_%archivename%_%APPVEYOR_BUILD_NUMBER%.zip" .\installed\*
 
 test_script:
 - If NOT exist "%TESTOUTPUTFOLDER%/bin" (appveyor exit)
@@ -284,7 +284,7 @@ test_script:
     }'
 
 artifacts:
-- path: 'C:\modelutilitiesarch\*.7z'
+- path: '.\build\modelutilitiesarch\*.zip'
 
 on_finish:
 - ps: if (Test-Path ".\testResults.xml") {(new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\testResults.xml));}
