@@ -64,7 +64,7 @@ test_script:
         else{
             $localError = 1;
             $rawFilecontent = [IO.File]::ReadAllText($currentFilePath);
-            if([string]::IsNullOrEmpty($rawFilecontent){
+            if([string]::IsNullOrEmpty($rawFilecontent)){
                 $crashMessage = "Output file is empty: " + $currentFilePath;
             }
             else{
