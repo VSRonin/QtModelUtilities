@@ -3,7 +3,7 @@ version: '0.0.1.{build}'
 environment:
   matrix:
   - QT5: C:\Qt\5.10.1\mingw53_32
-    COMPILER: C:\MinGW
+    COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
     use_gui: "true"
