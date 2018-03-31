@@ -62,7 +62,15 @@ test_script:
             [xml]$XmlDocument = (Get-Content -Path $currentFilePath) -as [xml];
         }
         else{
+            $localError = 1;
             $rawFilecontent = [IO.File]::ReadAllText($currentFilePath);
+            $crashMessage = $rawFilecontent;
             $rawFileMatch = [regex]::match($rawFilecontent,"(?s)(.+<\/TestCase>)(.*)");
+            if($rawFileMatch.Success){
+                if([bool](($rawFileMatch.captures.groups[1].value) -as [xml])){
+                    [xml]$XmlDocument = ($rawFileMatch.captures.groups[1].value) -as [xml];
+                    $crashMessage = $rawFileMatch.captures.groups[2].value;
+                }
+            }
         }
     };'
