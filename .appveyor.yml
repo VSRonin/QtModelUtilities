@@ -1,145 +1,261 @@
 version: '0.0.1.{build}'
-
+branches:
+  only:
+    - master
+    - dev
+image: Visual Studio 2015
+clone_depth: 1
 environment:
+  global:
+    LatestQtVersion=5.10.1
+    LatestLTSQtVersion=5.9
   matrix:
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\msvc2015
+  - QT5: C:\Qt\%LatestQtVersion%\msvc2015
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "true"
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\msvc2015
+  - QT5: C:\Qt\%LatestQtVersion%\msvc2015
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "false"
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\msvc2015
+  - QT5: C:\Qt\%LatestQtVersion%\msvc2015
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "true"
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\msvc2015
+  - QT5: C:\Qt\%LatestQtVersion%\msvc2015
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "false"
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\msvc2015
+  - QT5: C:\Qt\%LatestQtVersion%\msvc2015
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "true"
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\msvc2015
+  - QT5: C:\Qt\%LatestQtVersion%\msvc2015
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "false"
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\msvc2015_64
+  - QT5: C:\Qt\%LatestQtVersion%\msvc2015_64
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "true"
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\msvc2015_64
+  - QT5: C:\Qt\%LatestQtVersion%\msvc2015_64
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "false"
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\msvc2015_64
+  - QT5: C:\Qt\%LatestQtVersion%\msvc2015_64
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "true"
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\msvc2015_64
+  - QT5: C:\Qt\%LatestQtVersion%\msvc2015_64
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "false"
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\msvc2015_64
+  - QT5: C:\Qt\%LatestQtVersion%\msvc2015_64
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "true"
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\msvc2015_64
+  - QT5: C:\Qt\%LatestQtVersion%\msvc2015_64
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "false"
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\mingw53_32
+  - QT5: C:\Qt\%LatestQtVersion%\mingw53_32
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
     use_gui: "true"
     use_widgets: "true"
     use_static: "true"
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\mingw53_32
+  - QT5: C:\Qt\%LatestQtVersion%\mingw53_32
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
     use_gui: "true"
     use_widgets: "true"
     use_static: "false"
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\mingw53_32
+  - QT5: C:\Qt\%LatestQtVersion%\mingw53_32
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
     use_gui: "true"
     use_widgets: "false"
     use_static: "true"
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\mingw53_32
+  - QT5: C:\Qt\%LatestQtVersion%\mingw53_32
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
     use_gui: "true"
     use_widgets: "false"
     use_static: "false"
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\mingw53_32
+  - QT5: C:\Qt\%LatestQtVersion%\mingw53_32
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
     use_gui: "false"
     use_widgets: "false"
     use_static: "true"
-  - QtVersion: 5.10.1
-    QT5: C:\Qt\%QtVersion%\mingw53_32
+  - QT5: C:\Qt\%LatestQtVersion%\mingw53_32
+    COMPILER: C:\Qt\Tools\mingw530_32
+    platform: x86
+    use_mingw: "true"
+    use_gui: "false"
+    use_widgets: "false"
+    use_static: "false"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\msvc2015
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
+    platform: x86
+    use_mingw: "false"
+    use_gui: "true"
+    use_widgets: "true"
+    use_static: "true"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\msvc2015
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
+    platform: x86
+    use_mingw: "false"
+    use_gui: "true"
+    use_widgets: "true"
+    use_static: "false"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\msvc2015
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
+    platform: x86
+    use_mingw: "false"
+    use_gui: "true"
+    use_widgets: "false"
+    use_static: "true"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\msvc2015
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
+    platform: x86
+    use_mingw: "false"
+    use_gui: "true"
+    use_widgets: "false"
+    use_static: "false"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\msvc2015
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
+    platform: x86
+    use_mingw: "false"
+    use_gui: "false"
+    use_widgets: "false"
+    use_static: "true"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\msvc2015
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
+    platform: x86
+    use_mingw: "false"
+    use_gui: "false"
+    use_widgets: "false"
+    use_static: "false"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\msvc2015_64
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
+    platform: amd64
+    use_mingw: "false"
+    use_gui: "true"
+    use_widgets: "true"
+    use_static: "true"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\msvc2015_64
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
+    platform: amd64
+    use_mingw: "false"
+    use_gui: "true"
+    use_widgets: "true"
+    use_static: "false"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\msvc2015_64
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
+    platform: amd64
+    use_mingw: "false"
+    use_gui: "true"
+    use_widgets: "false"
+    use_static: "true"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\msvc2015_64
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
+    platform: amd64
+    use_mingw: "false"
+    use_gui: "true"
+    use_widgets: "false"
+    use_static: "false"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\msvc2015_64
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
+    platform: amd64
+    use_mingw: "false"
+    use_gui: "false"
+    use_widgets: "false"
+    use_static: "true"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\msvc2015_64
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
+    platform: amd64
+    use_mingw: "false"
+    use_gui: "false"
+    use_widgets: "false"
+    use_static: "false"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\mingw53_32
+    COMPILER: C:\Qt\Tools\mingw530_32
+    platform: x86
+    use_mingw: "true"
+    use_gui: "true"
+    use_widgets: "true"
+    use_static: "true"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\mingw53_32
+    COMPILER: C:\Qt\Tools\mingw530_32
+    platform: x86
+    use_mingw: "true"
+    use_gui: "true"
+    use_widgets: "true"
+    use_static: "false"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\mingw53_32
+    COMPILER: C:\Qt\Tools\mingw530_32
+    platform: x86
+    use_mingw: "true"
+    use_gui: "true"
+    use_widgets: "false"
+    use_static: "true"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\mingw53_32
+    COMPILER: C:\Qt\Tools\mingw530_32
+    platform: x86
+    use_mingw: "true"
+    use_gui: "true"
+    use_widgets: "false"
+    use_static: "false"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\mingw53_32
+    COMPILER: C:\Qt\Tools\mingw530_32
+    platform: x86
+    use_mingw: "true"
+    use_gui: "false"
+    use_widgets: "false"
+    use_static: "true"
+  - QT5: C:\Qt\%LatestLTSQtVersion%\mingw53_32
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
@@ -176,7 +292,7 @@ after_build:
 - if %platform%==x86 (set archivename=%archivename%_x86) else (set archivename=%archivename%_x64)
 - if %use_static%==true set archivename=%archivename%_static
 - mkdir modelutilitiesarch
-- if %use_gui%==true if %use_widgets%==true 7z a -tzip ".\modelutilitiesarch\modelutilities_%archivename%_%APPVEYOR_BUILD_VERSION%.zip" .\installed\*
+- if %use_gui%==true if %use_widgets%==true if %QtVersion%==%LatestLTSQtVersion% 7z a -tzip ".\modelutilitiesarch\modelutilities_%archivename%_%APPVEYOR_BUILD_VERSION%.zip" .\installed\*
 
 test_script:
 - If NOT exist "%TESTOUTPUTFOLDER%/bin" (appveyor exit)
