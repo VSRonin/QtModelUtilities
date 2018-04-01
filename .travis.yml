@@ -23,7 +23,7 @@ matrix:
       - USESTATIC=true USEWIDGETS=true USEGUI=true
 
 before_install:
-  - sudo add-apt-repository ppa:beineri/opt-qt594-trusty -y;
+  - if [ "$TRAVIS_OS_NAME" = "linux"  ]; then sudo add-apt-repository ppa:beineri/opt-qt594-trusty -y; fi
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
       sudo apt-get update -qq;
     else
@@ -31,7 +31,15 @@ before_install:
     fi
 
 install:
-  - sudo apt-get install -qq qt59base; source /opt/qt59/bin/qt59-env.sh;
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+        sudo apt-get install -qq qt59base; source /opt/qt59/bin/qt59-env.sh;
+      else
+        brew install qt59;
+        brew link --force qt59;
+        export QT_NAME="qt@5.9";
+        export HOMEBREW_QT5_VERSION=$(brew list --versions $QT_NAME | rev | cut -d' ' -f1 | rev);
+        sudo ln -s /usr/local/Cellar/$QT_NAME/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs;
+    fi
 
 script:
 - mkdir ./build 
