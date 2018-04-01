@@ -1,0 +1,43 @@
+language: cpp
+
+git:
+  depth: 1
+
+  branches:
+  only:
+  - master
+  - dev
+  - travis
+
+matrix:
+ include:
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=true USEWIDGETS=true USEGUI=true
+  - os: osx
+    compiler: clang
+    env:
+      - USESTATIC=true USEWIDGETS=true USEGUI=true
+
+before_install:
+  - sudo add-apt-repository ppa:beineri/opt-qt594-trusty -y;
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+      sudo apt-get update -qq;
+    else
+      brew update;
+    fi
+
+install:
+  - sudo apt-get install -qq qt59base; source /opt/qt59/bin/qt59-env.sh;
+
+script:
+- mkdir ./build 
+- cd ./build
+- cmake --version &&
+    cmake -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
+    make && sudo make install &&
+    cmake -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
+    make && sudo make install
