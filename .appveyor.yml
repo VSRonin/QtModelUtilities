@@ -7,8 +7,8 @@ image: Visual Studio 2015
 clone_depth: 1
 environment:
   global:
-    LatestQtVersion=5.10.1
-    LatestLTSQtVersion=5.9
+    LatestQtVersion: 5.10.1
+    LatestLTSQtVersion: 5.9
   matrix:
   - QT5: C:\Qt\%LatestQtVersion%\msvc2015
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
