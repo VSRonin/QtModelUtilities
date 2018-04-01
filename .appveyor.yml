@@ -303,5 +303,5 @@ deploy:
   draft: false
   prerelease: false
   on:
-    branch: dev
+    branch: master
     appveyor_repo_tag: true
