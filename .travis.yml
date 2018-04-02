@@ -1,7 +1,7 @@
 language: cpp
 
 git:
-  depth: 1
+  depth: 3
 
 branches:
   only:
@@ -43,7 +43,7 @@ script:
 - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
          QTDIR="/opt/qt59"
       && PATH="$QTDIR/bin:$PATH"
-      && qt56-env.sh
+      && qt59-env.sh
       ;
     else
          QTDIR="/usr/local/opt/qt5"
