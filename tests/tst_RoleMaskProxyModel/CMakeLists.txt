@@ -25,8 +25,8 @@ set(tst_RoleMaskProxyModel_COMPILE_DEFINE ${tst_RoleMaskProxyModel_COMPILE_DEFIN
 endif()
 set(tst_RoleMaskProxyModel_INCLUDE ${tst_RoleMaskProxyModel_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR})
 set(tst_RoleMaskProxyModel_SRCS
-    main.cpp
-    tst_rolemaskproxymodel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/tst_rolemaskproxymodel.cpp
 )
 add_executable(tst_RoleMaskProxyModel ${tst_RoleMaskProxyModel_SRCS})
 target_include_directories(tst_RoleMaskProxyModel PRIVATE ../../src ${tst_RoleMaskProxyModel_INCLUDE})

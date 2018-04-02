@@ -3,7 +3,7 @@ language: cpp
 git:
   depth: 1
 
-  branches:
+branches:
   only:
   - master
   - dev
@@ -22,26 +22,36 @@ matrix:
     env:
       - USESTATIC=true USEWIDGETS=true USEGUI=true
 
-before_install:
-  - if [ "$TRAVIS_OS_NAME" = "linux"  ]; then sudo add-apt-repository ppa:beineri/opt-qt594-trusty -y; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-      sudo apt-get update -qq;
-    else
-      brew update;
-    fi
-
 install:
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-        sudo apt-get install -qq qt59base; source /opt/qt59/bin/qt59-env.sh;
-      else
-        brew install qt59;
-        brew link --force qt59;
-        export QT_NAME="qt@5.9";
-        export HOMEBREW_QT5_VERSION=$(brew list --versions $QT_NAME | rev | cut -d' ' -f1 | rev);
-        sudo ln -s /usr/local/Cellar/$QT_NAME/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs;
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+         lsb_release -a
+      && sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
+      && sudo apt-add-repository -y ppa:beineri/opt-qt59-trusty
+      && sudo apt-get -qq update
+      && sudo apt-get -qq install g++-4.8 libc6-i386 qt59tools qt59svg qt59script
+      && export CXX="g++-4.8"
+      && export CC="gcc-4.8"
+      ;
+    else
+         brew update > /dev/null
+      && brew install qt5
+      && chmod -R 755 /usr/local/opt/qt5/*
+      ;
     fi
 
 script:
+- if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+         QTDIR="/opt/qt59"
+      && PATH="$QTDIR/bin:$PATH"
+      && qt56-env.sh
+      ;
+    else
+         QTDIR="/usr/local/opt/qt5"
+      && PATH="$QTDIR/bin:$PATH"
+      && LDFLAGS=-L$QTDIR/lib
+      && CPPFLAGS=-I$QTDIR/include
+      ;
+    fi
 - mkdir ./build 
 - cd ./build
 - cmake --version &&

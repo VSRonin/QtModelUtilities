@@ -26,8 +26,8 @@ set(tst_InsertProxyModel_COMPILE_DEFINE ${tst_InsertProxyModel_COMPILE_DEFINE} $
 endif()
 set(tst_InsertProxyModel_INCLUDE ${tst_InsertProxyModel_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR})
 set(tst_InsertProxyModel_SRCS
-    main.cpp
-    tst_InsertProxyModel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/tst_InsertProxyModel.cpp
 )
 add_executable(tst_InsertProxyModel ${tst_InsertProxyModel_SRCS})
 target_include_directories(tst_InsertProxyModel PRIVATE ../../src ${tst_InsertProxyModel_INCLUDE})
