@@ -26,7 +26,7 @@ install:
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
          lsb_release -a
       && sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
-      && sudo apt-add-repository -y ppa:beineri/opt-qt59-trusty
+      && sudo apt-add-repository -y ppa:beineri/opt-qt594-trusty
       && sudo apt-get -qq update
       && sudo apt-get -qq install g++-4.8 libc6-i386 qt59tools qt59svg qt59script
       && export CXX="g++-4.8"
