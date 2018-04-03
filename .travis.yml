@@ -10,6 +10,7 @@ branches:
   - travis
 
 matrix:
+ fast_finish: true
  include:
   - os: linux
     dist: trusty
@@ -90,9 +91,12 @@ install:
     fi
 
 before_script:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3 # give xvfb some time to start
+- if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+    "export DISPLAY=:99.0"
+    && "sh -e /etc/init.d/xvfb start"
+    && sleep 3
+    ;
+  fi
 
 script:
 - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
@@ -107,7 +111,8 @@ script:
       && CPPFLAGS=-I$QTDIR/include
       ;
     fi
-- mkdir ./build 
+- ls $QTDIR/bin
+- mkdir ./build
 - cd ./build
 - cmake --version &&
     cmake -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
