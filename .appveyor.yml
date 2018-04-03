@@ -290,18 +290,8 @@ test_script:
         throw;
     }'
 
-after_test:
-- ps: if (Test-Path ".\testResults.xml") {(new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\testResults.xml));}
-
 artifacts:
 - path: '.\build\modelutilitiesarch\*.zip'
 
-deploy:
-  release: modelutilities-v$(appveyor_build_version)
-  provider: GitHub
-  artifact: /.*\.zip/
-  draft: false
-  prerelease: false
-  on:
-    branch: master
-    appveyor_repo_tag: true
+on_finish::
+- ps: if (Test-Path ".\testResults.xml") {(new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\testResults.xml));}
