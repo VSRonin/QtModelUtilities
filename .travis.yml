@@ -103,8 +103,6 @@ script:
          QTDIR="/opt/qt59"
       && PATH="$QTDIR/bin:$PATH"
       && qt59-env.sh
-      && export Qt5Gui_DIR=$QTDIR/lib/cmake/Qt5Gui
-      && export Qt5Widgets_DIR=$QTDIR/lib/cmake/Qt5Widgets
       ;
     else
          QTDIR="/usr/local/opt/qt5"
@@ -114,8 +112,6 @@ script:
       && CPPFLAGS=-I$QTDIR/include
       ;
     fi
-- ls -l -R $QTDIR/bin
-- ls -l -R $QTDIR/lib
 - mkdir ./build
 - cd ./build
 - cmake --version &&
