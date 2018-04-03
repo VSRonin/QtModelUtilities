@@ -192,7 +192,7 @@ bool HtmlModelSerialiserPrivate::readHtmlElement(QXmlStreamReader& source, const
                 cellStarted = false;
             }
             else if (rowStarted && source.name() == QStringLiteral("th")) {
-                if (headCode = Col)
+                if (headCode == Col)
                     ++currentCol;
                 headCode = None;
             }

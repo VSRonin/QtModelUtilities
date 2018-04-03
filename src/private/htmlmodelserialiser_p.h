@@ -3,7 +3,7 @@
 #define htmlmodelserialiser_p_h__
 
 #include "private/abstractmultiroleserialiser_p.h"
-#include "HtmlModelSerialiser.h"
+#include "htmlmodelserialiser.h"
 #include <QModelIndex>
 class QXmlStreamWriter;
 class QXmlStreamReader;
