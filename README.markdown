@@ -23,7 +23,12 @@ TODO: depends on the build system but it's designed to be compiled as either a s
 
 ### Platforms
 
-TODO
+The library should be compatible with all platform supported by Qt, the CI will build and test the following configurations:
+
++ Windows MSVC 2015 32bit
++ Windows MSVC 2015 64bit
++ Windows MinGW 5.3.0 32bit
++ 
 
 ### Examples
 
