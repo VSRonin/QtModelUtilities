@@ -17,61 +17,61 @@ matrix:
     sudo: required
     compiler: gcc
     env:
-      - USESTATIC=true USEWIDGETS=true USEGUI=true
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     env:
-      - USESTATIC=false USEWIDGETS=true USEGUI=true
+      - USESTATIC=OFF NOWIDGETS=OFF NOGUI=OFF
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     env:
-      - USESTATIC=true USEWIDGETS=false USEGUI=true
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=OFF
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     env:
-      - USESTATIC=false USEWIDGETS=false USEGUI=true
+      - USESTATIC=OFF NOWIDGETS=ON NOGUI=OFF
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     env:
-      - USESTATIC=true USEWIDGETS=false USEGUI=false
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     env:
-      - USESTATIC=false USEWIDGETS=false USEGUI=false
+      - USESTATIC=OFF NOWIDGETS=ON NOGUI=ON
   - os: osx
     compiler: clang
     env:
-      - USESTATIC=true USEWIDGETS=true USEGUI=true
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF
   - os: osx
     compiler: clang
     env:
-      - USESTATIC=false USEWIDGETS=true USEGUI=true
+      - USESTATIC=OFF NOWIDGETS=OFF NOGUI=OFF
   - os: osx
     compiler: clang
     env:
-      - USESTATIC=true USEWIDGETS=false USEGUI=true
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=OFF
   - os: osx
     compiler: clang
     env:
-      - USESTATIC=false USEWIDGETS=false USEGUI=true
+      - USESTATIC=OFF NOWIDGETS=ON NOGUI=OFF
   - os: osx
     compiler: clang
     env:
-      - USESTATIC=true USEWIDGETS=false USEGUI=false
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON
   - os: osx
     compiler: clang
     env:
-      - USESTATIC=false USEWIDGETS=false USEGUI=false
+      - USESTATIC=OFF NOWIDGETS=ON NOGUI=ON
 
 install:
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
@@ -103,6 +103,8 @@ script:
          QTDIR="/opt/qt59"
       && PATH="$QTDIR/bin:$PATH"
       && qt59-env.sh
+      && export Qt5Gui_DIR=$QTDIR/lib/cmake/Qt5Gui
+      && export Qt5Widgets_DIR=$QTDIR/lib/cmake/Qt5Widgets
       ;
     else
          QTDIR="/usr/local/opt/qt5"
@@ -112,14 +114,14 @@ script:
       && CPPFLAGS=-I$QTDIR/include
       ;
     fi
-- ls $QTDIR/bin
-- ls $QTDIR/lib
+- ls -l -R $QTDIR/bin
+- ls -l -R $QTDIR/lib
 - mkdir ./build
 - cd ./build
 - cmake --version &&
-    cmake -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
+    cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_STATIC_LIBS=$USESTATIC -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=$NOWIDGETS -DNO_GUI=$NOGUI ../ &&
     make && sudo make install &&
-    cmake -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
+    cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=$USESTATIC -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=$NOWIDGETS -DNO_GUI=$NOGUI ../ &&
     make && sudo make install
 - export PATH=$PATH:$PWD/x64/lib
 - export PATH=$PATH:$PWD/x64/bin
