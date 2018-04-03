@@ -111,5 +111,4 @@ script:
     make && sudo make install
 - export PATH=$PATH:$PWD/x64/lib
 - export PATH=$PATH:$PWD/x64/bin
-- find ./x64/bin/ -type f \( -perm -u=x -o -perm -g=x -o -perm -o=x \)
-- find ./x64/bin/ -type f -perm -a=x
+- find ./x64/bin/ -type f -perm -a=x -exec '{}' \;
