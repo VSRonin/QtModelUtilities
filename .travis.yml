@@ -28,9 +28,9 @@ install:
       && sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
       && sudo apt-add-repository -y ppa:beineri/opt-qt594-trusty
       && sudo apt-get -qq update
-      && sudo apt-get -qq install g++-4.8 libc6-i386 qt59tools qt59svg qt59script
-      && export CXX="g++-4.8"
-      && export CC="gcc-4.8"
+      && sudo apt-get -qq install g++-6 libc6-i386 qt59tools qt59svg qt59script
+      && export CXX="g++-6"
+      && export CC="gcc-6"
       ;
     else
          brew update > /dev/null
@@ -59,4 +59,4 @@ script:
     make && sudo make install &&
     cmake -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
     make && sudo make install
-- ls
+- ls ./x64
