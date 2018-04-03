@@ -28,7 +28,8 @@ The library should be compatible with all platform supported by Qt, the CI will 
 + Windows MSVC 2015 32bit
 + Windows MSVC 2015 64bit
 + Windows MinGW 5.3.0 32bit
-+ 
++ Ubuntu Trusty gcc6 64bit
++ Mac OS X LLVM 8.1 64bit
 
 ### Examples
 
