@@ -153,11 +153,12 @@ before_build:
 build_script:
 - mkdir .\build 
 - cd .\build
-- cmake --version &&
-    cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
-    %MAKEBUILDER% && %MAKEBUILDER% install &&
-    cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
-    %MAKEBUILDER% && %MAKEBUILDER% install
+- cmake --version
+- cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
+- %MAKEBUILDER%
+- %MAKEBUILDER% install
+- cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
+- %MAKEBUILDER% && %MAKEBUILDER% install
 
 after_build:
 - if %use_mingw%==true set PATH=C:\Program Files\Git\usr\bin;%PATH%
@@ -293,5 +294,5 @@ test_script:
 artifacts:
 - path: '.\build\modelutilitiesarch\*.zip'
 
-on_finish::
+on_finish:
 - ps: if (Test-Path ".\testResults.xml") {(new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\testResults.xml));}
