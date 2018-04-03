@@ -61,7 +61,7 @@ void tst_RoleMaskProxyModel::testUseRoleMask()
     proxyModel.addMaskedRole(Qt::UserRole);
     proxyModel.setSourceModel(baseModel);
     const int magicNumber = 785874;
-    Q_FOREACH(const QModelIndex& singleIdx, magicNumerIndexes){
+    for(const QModelIndex& singleIdx : magicNumerIndexes){
         QVERIFY(proxyModel.setData(proxyModel.mapFromSource(singleIdx), magicNumber, Qt::UserRole));
         QVERIFY(userRoleEditable == baseModel->setData(singleIdx, ~magicNumber, Qt::UserRole));
     }
@@ -230,7 +230,8 @@ void tst_RoleMaskProxyModel::testDataChangeSignals()
     QVERIFY(proxyModel.setData(proxyDataIdx, 1, Qt::UserRole));
     QCOMPARE(baseDataChangeSpy.count(), 0);
     QCOMPARE(proxyDataChangeSpy.count(), 1);
-    QList<QVariant> arguments = proxyDataChangeSpy.takeFirst();
+    QList<QVariant> arguments = proxyDataChangeSpy.value(0);
+    proxyDataChangeSpy.clear();
     QCOMPARE(arguments.at(0).value<QModelIndex>(), proxyDataIdx);
     QCOMPARE(arguments.at(1).value<QModelIndex>(), proxyDataIdx);
     QVector<int> rolesVector = arguments.at(2).value<QVector<int> >();
@@ -251,7 +252,8 @@ void tst_RoleMaskProxyModel::testDataChangeSignals()
     QVERIFY(proxyModel.setData(proxyDataIdx, 5, Qt::EditRole));
     QCOMPARE(baseDataChangeSpy.count(), 0);
     QCOMPARE(proxyDataChangeSpy.count(), 1);
-    arguments = proxyDataChangeSpy.takeFirst();
+    arguments = proxyDataChangeSpy.value(0);
+    proxyDataChangeSpy.clear();
     QCOMPARE(arguments.at(0).value<QModelIndex>(), proxyDataIdx);
     QCOMPARE(arguments.at(1).value<QModelIndex>(), proxyDataIdx);
     rolesVector = arguments.at(2).value<QVector<int> >();
@@ -268,7 +270,243 @@ void tst_RoleMaskProxyModel::testDataChangeSignals()
     QCOMPARE(baseDataChangeSpy.count(), 0);
     QCOMPARE(proxyDataChangeSpy.count(), 1 + countChildren(baseModel));
     proxyDataChangeSpy.clear();
+    QVERIFY(proxyModel.setData(proxyDataIdx, QVariant(), Qt::EditRole));
+    QCOMPARE(baseDataChangeSpy.count(), 0);
+    QCOMPARE(proxyDataChangeSpy.count(), 1);
+    arguments = proxyDataChangeSpy.value(0);
+    proxyDataChangeSpy.clear();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(), proxyDataIdx);
+    QCOMPARE(arguments.at(1).value<QModelIndex>(), proxyDataIdx);
+    rolesVector = arguments.at(2).value<QVector<int> >();
+    QCOMPARE(rolesVector.size(), 2);
+    QVERIFY(rolesVector.contains(Qt::DisplayRole));
+    QVERIFY(rolesVector.contains(Qt::EditRole));
+    if (baseModel->setData(baseDataIdx, 86, Qt::EditRole)){
+        QCOMPARE(baseDataChangeSpy.count(), 1);
+        baseDataChangeSpy.clear();
+        QCOMPARE(proxyDataChangeSpy.count(), implementsRoles ? 0 : 1);
+        proxyDataChangeSpy.clear();
+    }
+    baseDataChangeSpy.clear();
+    proxyDataChangeSpy.clear();
+    proxyModel.setMergeDisplayEdit(false);
+    QCOMPARE(baseDataChangeSpy.count(), 0);
+    QCOMPARE(proxyDataChangeSpy.count(), 1 + countChildren(baseModel));
+    proxyDataChangeSpy.clear();
+    proxyModel.removeMaskedRole(Qt::DisplayRole);
+    QCOMPARE(baseDataChangeSpy.count(), 0);
+    QCOMPARE(proxyDataChangeSpy.count(), 1 + countChildren(baseModel));
+    proxyDataChangeSpy.clear();
+    QVERIFY(proxyModel.setData(proxyDataIdx, 37, Qt::EditRole));
+    QCOMPARE(baseDataChangeSpy.count(), 0);
+    QCOMPARE(proxyDataChangeSpy.count(), 1);
+    arguments = proxyDataChangeSpy.value(0);
+    proxyDataChangeSpy.clear();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(), proxyDataIdx);
+    QCOMPARE(arguments.at(1).value<QModelIndex>(), proxyDataIdx);
+    rolesVector = arguments.at(2).value<QVector<int> >();
+    QCOMPARE(rolesVector.size(), 1);
+    QVERIFY(rolesVector.contains(Qt::EditRole));
+    proxyDataChangeSpy.clear();
+    if (baseModel->setData(baseDataIdx, 123, Qt::DisplayRole)) {
+        QCOMPARE(baseDataChangeSpy.count(), 1);
+        baseDataChangeSpy.clear();
+        QCOMPARE(proxyDataChangeSpy.count(), 1);
+        proxyDataChangeSpy.clear();
+    }
+    if (baseModel->setData(baseDataIdx, 147, Qt::EditRole)) {
+        QCOMPARE(baseDataChangeSpy.count(), 1);
+        baseDataChangeSpy.clear();
+        if (proxyDataChangeSpy.count()>0){
+            arguments = proxyDataChangeSpy.value(0);
+            QCOMPARE(arguments.at(0).value<QModelIndex>(), proxyModel.mapFromSource(baseDataIdx));
+            QCOMPARE(arguments.at(1).value<QModelIndex>(), proxyModel.mapFromSource(baseDataIdx));
+            rolesVector = arguments.at(2).value<QVector<int> >();
+            QVERIFY(rolesVector.size() < 2);
+            if (rolesVector.size())
+                QCOMPARE(rolesVector.first(), int(Qt::DisplayRole));
+        }
+        proxyDataChangeSpy.clear();
+    }
+}
 
+void tst_RoleMaskProxyModel::testTransparentIfEmpty()
+{
+    QFETCH(QAbstractItemModel* const, baseModel);
+    RoleMaskProxyModel proxyModel;
+    proxyModel.setMergeDisplayEdit(true);
+    proxyModel.setTransparentIfEmpty(true);
+    proxyModel.addMaskedRole(Qt::DisplayRole);
+    proxyModel.setSourceModel(baseModel);
+    const QModelIndex proxyActionIndex = proxyModel.index(1, 0);
+    proxyModel.setData(proxyActionIndex, 777888999, Qt::DisplayRole);
+    testTransparentIfEmptyRecurse(baseModel, &proxyModel, proxyActionIndex, 777888999, false);
+    QSignalSpy proxyTransparentChangeSpy(&proxyModel, &RoleMaskProxyModel::transparentIfEmptyChanged);
+    proxyModel.setTransparentIfEmpty(false);
+    QCOMPARE(proxyTransparentChangeSpy.count(), 1);
+    testTransparentIfEmptyRecurse(baseModel, &proxyModel, proxyActionIndex, 777888999, true);
+    proxyModel.setTransparentIfEmpty(false);
+    QCOMPARE(proxyTransparentChangeSpy.count(), 1);
+}
+
+void tst_RoleMaskProxyModel::testTransparentIfEmptyRecurse(const QAbstractItemModel* const baseModel, const RoleMaskProxyModel* const proxyModel, const QModelIndex& maskedIdx, const QVariant& maskedVal, bool nonMaskedIsNull, const QModelIndex& sourceParent)
+{
+    for (int i = 0; i < baseModel->rowCount(sourceParent); ++i) {
+        for (int j = 0; j < baseModel->columnCount(sourceParent); ++j) {
+            const QModelIndex currBsaIdx = baseModel->index(i, j, sourceParent);
+            const QModelIndex currProxIdx = proxyModel->mapFromSource(currBsaIdx);
+            if (currProxIdx == maskedIdx) {
+                QCOMPARE(currProxIdx.data(), maskedVal);
+                QVERIFY(currBsaIdx.data()!= maskedVal);
+            }
+            else if(nonMaskedIsNull){
+                QVERIFY(!currProxIdx.data().isValid());
+                QVERIFY(currBsaIdx.data().isValid());
+            }
+            else{
+                QCOMPARE(currProxIdx.data(), currBsaIdx.data());
+            }
+            if (baseModel->hasChildren(currBsaIdx)){
+                testTransparentIfEmptyRecurse(baseModel, proxyModel, maskedIdx, maskedVal, nonMaskedIsNull, currBsaIdx);
+            }
+        }
+    }
+}
+
+void tst_RoleMaskProxyModel::testTransparentIfEmpty_data()
+{
+    QTest::addColumn<QAbstractItemModel*>("baseModel");
+    QTest::newRow("List") << m_models.at(0);
+#ifdef QT_GUI_LIB
+    QTest::newRow("Table") << m_models.at(1);
+    QTest::newRow("Tree") << m_models.at(2);
+#endif
+}
+
+void tst_RoleMaskProxyModel::testMergeDisplayEdit()
+{
+    QFETCH(QAbstractItemModel* const, baseModel);
+    RoleMaskProxyModel proxyModel;
+    proxyModel.setMergeDisplayEdit(true);
+    proxyModel.setTransparentIfEmpty(false);
+    proxyModel.addMaskedRole(Qt::DisplayRole);
+    proxyModel.setSourceModel(baseModel);
+    const QModelIndex proxyActionIndex = proxyModel.index(1, 0);
+    QVERIFY(proxyModel.setData(proxyActionIndex, 665522, Qt::EditRole));
+    QCOMPARE(proxyActionIndex.data(Qt::DisplayRole).toInt(), 665522);
+    QCOMPARE(proxyActionIndex.data(Qt::EditRole).toInt(), 665522);
+    QSignalSpy proxyMergeDisplayEditChangeSpy(&proxyModel, &RoleMaskProxyModel::mergeDisplayEditChanged);
+    proxyModel.setMergeDisplayEdit(false);
+    QCOMPARE(proxyMergeDisplayEditChangeSpy.count(), 1);
+    QCOMPARE(proxyActionIndex.data(Qt::DisplayRole).toInt(), 665522);
+    QCOMPARE(proxyActionIndex.data(Qt::EditRole).toInt(), 665522);
+    QVERIFY(proxyModel.setData(proxyActionIndex, QVariant(), Qt::EditRole));
+    QCOMPARE(proxyActionIndex.data(Qt::DisplayRole).toInt(), 665522);
+    QCOMPARE(proxyActionIndex.data(Qt::EditRole), QVariant());
+    proxyModel.setMergeDisplayEdit(false);
+    QCOMPARE(proxyMergeDisplayEditChangeSpy.count(), 1);
+}
+
+void tst_RoleMaskProxyModel::testMergeDisplayEdit_data()
+{
+    QTest::addColumn<QAbstractItemModel*>("baseModel");
+    QTest::newRow("List") << m_models.at(0);
+#ifdef QT_GUI_LIB
+    QTest::newRow("Table") << m_models.at(1);
+    QTest::newRow("Tree") << m_models.at(2);
+#endif
+}
+
+void tst_RoleMaskProxyModel::testManageMaskedRoles()
+{
+    RoleMaskProxyModel proxyModel;
+    proxyModel.setMergeDisplayEdit(true);
+    QVERIFY(proxyModel.maskedRoles().isEmpty());
+    proxyModel.addMaskedRole(Qt::EditRole);
+    QCOMPARE(proxyModel.maskedRoles().size(),1);
+    QCOMPARE(proxyModel.maskedRoles().value(0), int(Qt::DisplayRole));
+    proxyModel.addMaskedRole(Qt::DisplayRole);
+    QCOMPARE(proxyModel.maskedRoles().size(), 1);
+    QCOMPARE(proxyModel.maskedRoles().value(0), int(Qt::DisplayRole));
+    proxyModel.addMaskedRole(Qt::UserRole);
+    QCOMPARE(proxyModel.maskedRoles().size(), 2);
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::DisplayRole));
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::UserRole));
+    proxyModel.addMaskedRole(Qt::UserRole);
+    QCOMPARE(proxyModel.maskedRoles().size(), 2);
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::DisplayRole));
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::UserRole));
+    proxyModel.clearMaskedRoles();
+    QCOMPARE(proxyModel.maskedRoles().size(), 0);
+    proxyModel.setMaskedRoles({ Qt::UserRole, Qt::EditRole });
+    QCOMPARE(proxyModel.maskedRoles().size(), 2);
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::DisplayRole));
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::UserRole));
+    proxyModel.removeMaskedRole(Qt::UserRole);
+    QCOMPARE(proxyModel.maskedRoles().size(), 1);
+    QCOMPARE(proxyModel.maskedRoles().value(0), int(Qt::DisplayRole));
+    proxyModel.removeMaskedRole(Qt::EditRole);
+    QVERIFY(proxyModel.maskedRoles().isEmpty());
+    proxyModel.setMaskedRoles({ Qt::DisplayRole, Qt::EditRole });
+    QCOMPARE(proxyModel.maskedRoles().size(), 1);
+    QCOMPARE(proxyModel.maskedRoles().value(0), int(Qt::DisplayRole));
+    proxyModel.removeMaskedRole(Qt::DisplayRole);
+    QVERIFY(proxyModel.maskedRoles().isEmpty());
+
+    proxyModel.setMergeDisplayEdit(false);
+    proxyModel.addMaskedRole(Qt::EditRole);
+    QCOMPARE(proxyModel.maskedRoles().size(), 1);
+    QCOMPARE(proxyModel.maskedRoles().value(0), int(Qt::EditRole));
+    proxyModel.addMaskedRole(Qt::DisplayRole);
+    QCOMPARE(proxyModel.maskedRoles().size(), 2);
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::DisplayRole));
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::EditRole));
+    proxyModel.addMaskedRole(Qt::UserRole);
+    QCOMPARE(proxyModel.maskedRoles().size(), 3);
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::DisplayRole));
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::EditRole));
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::UserRole));
+    proxyModel.addMaskedRole(Qt::UserRole);
+    QCOMPARE(proxyModel.maskedRoles().size(), 3);
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::DisplayRole));
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::EditRole));
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::UserRole));
+    proxyModel.clearMaskedRoles();
+    QCOMPARE(proxyModel.maskedRoles().size(), 0);
+    proxyModel.setMaskedRoles({ Qt::UserRole, Qt::EditRole, Qt::DisplayRole });
+    QCOMPARE(proxyModel.maskedRoles().size(), 3);
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::DisplayRole));
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::UserRole));
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::EditRole));
+    proxyModel.removeMaskedRole(Qt::UserRole);
+    QCOMPARE(proxyModel.maskedRoles().size(), 2);
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::DisplayRole));
+    QVERIFY(proxyModel.maskedRoles().contains(Qt::EditRole));
+    proxyModel.removeMaskedRole(Qt::EditRole);
+    QCOMPARE(proxyModel.maskedRoles().size(), 1);
+    QCOMPARE(proxyModel.maskedRoles().value(0), int(Qt::DisplayRole));
+    proxyModel.removeMaskedRole(Qt::DisplayRole);
+    QVERIFY(proxyModel.maskedRoles().isEmpty());
+}
+
+void tst_RoleMaskProxyModel::testDisconnectedModel()
+{
+    QStringListModel baseModel1(QStringList({ QStringLiteral("London"), QStringLiteral("Berlin"), QStringLiteral("Paris") }));
+    QStringListModel baseModel2(QStringList({ QStringLiteral("Rome"), QStringLiteral("Madrid"), QStringLiteral("Prague") }));
+    RoleMaskProxyModel proxyModel;
+    proxyModel.setMergeDisplayEdit(true);
+    proxyModel.setTransparentIfEmpty(true);
+    proxyModel.setSourceModel(&baseModel1);
+    QSignalSpy proxyDataChangeSpy(&proxyModel, &QAbstractItemModel::dataChanged);
+    baseModel1.setData(baseModel1.index(0, 0), QStringLiteral("New York"));
+    QCOMPARE(proxyDataChangeSpy.count(), 1);
+    proxyDataChangeSpy.clear();
+    proxyModel.setSourceModel(&baseModel2);
+    baseModel1.setData(baseModel1.index(1, 0), QStringLiteral("Tokyo"));
+    QCOMPARE(proxyDataChangeSpy.count(), 0);
+    proxyDataChangeSpy.clear();
+    baseModel2.setData(baseModel2.index(0, 0), QStringLiteral("Lima"));
+    QCOMPARE(proxyDataChangeSpy.count(), 1);
 }
 
 int tst_RoleMaskProxyModel::countChildren(const QAbstractItemModel* const baseModel, const QModelIndex& parIdx)

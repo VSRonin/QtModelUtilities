@@ -136,9 +136,14 @@ void RoleMaskProxyModel::setMaskedRoles(const QList<int>& newRoles)
         changedRolesSet.unite(d->m_maskedRoles);
         if (d->m_mergeDisplayEdit && (changedRolesSet.contains(Qt::EditRole) || changedRolesSet.contains(Qt::DisplayRole)))
             changedRolesSet << Qt::EditRole << Qt::DisplayRole;
-        Q_FOREACH(int singleRole, changedRolesSet)
-            changedRoles.append(singleRole);
+        changedRoles.reserve(changedRolesSet.size());
+        for (auto i = changedRolesSet.cbegin(); i != changedRolesSet.cend();++i)
+            changedRoles.append(*i);
         d->m_maskedRoles = roles;
+        if (d->m_mergeDisplayEdit && d->m_maskedRoles.contains(Qt::EditRole)){
+            d->m_maskedRoles.remove(Qt::EditRole);
+            d->m_maskedRoles.insert(Qt::DisplayRole);
+        }
         d->clearUnusedMaskedRoles(d->m_maskedRoles);
         maskedRolesChanged();
         d->signalAllChanged(changedRoles);
@@ -150,11 +155,11 @@ void RoleMaskProxyModel::clearMaskedRoles()
     Q_D(RoleMaskProxyModel);
     if (!d->m_maskedRoles.isEmpty()){
         QVector<int> changedRoles;
-        changedRoles.reserve(d->m_maskedRoles.size());
+        changedRoles.reserve(d->m_maskedRoles.size()+1);
         const bool hasEdit = d->m_maskedRoles.contains(Qt::EditRole);
         const bool hasDisplay = d->m_maskedRoles.contains(Qt::DisplayRole);
-        Q_FOREACH(int singleRole, d->m_maskedRoles)
-            changedRoles.append(singleRole);
+        for (auto i = d->m_maskedRoles.cbegin(); i != d->m_maskedRoles.cend();++i)
+            changedRoles.append(*i);
         if (hasEdit != hasDisplay)
             changedRoles.append(hasEdit ? Qt::DisplayRole : Qt::EditRole);
         d->m_maskedRoles.clear();
@@ -307,8 +312,7 @@ void RoleMaskProxyModel::setMergeDisplayEdit(bool val)
 {
     Q_D(RoleMaskProxyModel);
     if (d->m_mergeDisplayEdit!=val) {
-        QVector<int> changedRoles(2, Qt::EditRole);
-        changedRoles[0] = Qt::DisplayRole;
+        QVector<int> changedRoles({ Qt::DisplayRole, Qt::EditRole });
         d->m_mergeDisplayEdit=val;
         const auto idxEnd = d->m_maskedData.end();
         for (auto idxIter = d->m_maskedData.begin(); idxIter != idxEnd; ++idxIter) {
@@ -325,12 +329,16 @@ void RoleMaskProxyModel::setMergeDisplayEdit(bool val)
                 }
             }
             else{
-                const QHash<int, QVariant>::const_iterator roleIter = idxIter->constFind(Qt::EditRole);
+                const QHash<int, QVariant>::const_iterator roleIter = idxIter->constFind(Qt::DisplayRole);
                 if (roleIter != idxIter->constEnd()) {
-                    idxIter->insert(Qt::DisplayRole, *roleIter);
+                    idxIter->insert(Qt::EditRole, *roleIter);
                 }
             }
         }
+        if (val)
+            d->m_maskedRoles.remove(Qt::EditRole);
+        else if (d->m_maskedRoles.contains(Qt::DisplayRole))
+            d->m_maskedRoles.insert(Qt::EditRole);
         mergeDisplayEditChanged(d->m_mergeDisplayEdit);
         d->signalAllChanged(changedRoles);
     }

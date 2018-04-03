@@ -7,7 +7,6 @@ branches:
   only:
   - master
   - dev
-  - travis
 
 matrix:
  fast_finish: true

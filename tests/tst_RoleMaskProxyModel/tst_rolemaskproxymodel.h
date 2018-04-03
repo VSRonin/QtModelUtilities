@@ -20,7 +20,14 @@ private Q_SLOTS:
     void testNullModel();
     void testDataChangeSignals_data();
     void testDataChangeSignals();
+    void testTransparentIfEmpty();
+    void testTransparentIfEmpty_data();
+    void testMergeDisplayEdit();
+    void testMergeDisplayEdit_data();
+    void testManageMaskedRoles();
+    void testDisconnectedModel();
 private:
+    void testTransparentIfEmptyRecurse(const QAbstractItemModel* const baseModel, const RoleMaskProxyModel* const proxyModel, const QModelIndex& maskedIdx, const QVariant& maskedVal, bool nonMaskedIsNull, const QModelIndex& sourceParent = QModelIndex());
     int countChildren(const QAbstractItemModel* const baseModel, const QModelIndex& parIdx = QModelIndex());
     void testUseRoleMaskRecurse(const int magicNumber, const QAbstractItemModel* const baseModel, const RoleMaskProxyModel* const proxyModel, const QModelIndexList& magicNumerIndexes, const bool userRoleEditable, const QModelIndex& sourceParent = QModelIndex(), const QModelIndex& proxyParent = QModelIndex());
     QList<QAbstractItemModel*> m_models;
