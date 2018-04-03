@@ -60,4 +60,4 @@ script:
     cmake -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
     make && sudo make install
 - export PATH=$PATH:$PWD/x64/lib
-- ls ./x64/bin
+- find x64/bin/ -type f -executable | while read prog do "$prog" done
