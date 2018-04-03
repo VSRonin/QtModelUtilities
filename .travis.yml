@@ -1,7 +1,7 @@
 language: cpp
 
 git:
-  depth: 3
+  depth: 1
 
 branches:
   only:
@@ -17,10 +17,60 @@ matrix:
     compiler: gcc
     env:
       - USESTATIC=true USEWIDGETS=true USEGUI=true
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=false USEWIDGETS=true USEGUI=true
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=true USEWIDGETS=false USEGUI=true
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=false USEWIDGETS=false USEGUI=true
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=true USEWIDGETS=false USEGUI=false
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=false USEWIDGETS=false USEGUI=false
   - os: osx
     compiler: clang
     env:
       - USESTATIC=true USEWIDGETS=true USEGUI=true
+  - os: osx
+    compiler: clang
+    env:
+      - USESTATIC=false USEWIDGETS=true USEGUI=true
+  - os: osx
+    compiler: clang
+    env:
+      - USESTATIC=true USEWIDGETS=false USEGUI=true
+  - os: osx
+    compiler: clang
+    env:
+      - USESTATIC=false USEWIDGETS=false USEGUI=true
+  - os: osx
+    compiler: clang
+    env:
+      - USESTATIC=true USEWIDGETS=false USEGUI=false
+  - os: osx
+    compiler: clang
+    env:
+      - USESTATIC=false USEWIDGETS=false USEGUI=false
 
 install:
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
@@ -60,4 +110,6 @@ script:
     cmake -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
     make && sudo make install
 - export PATH=$PATH:$PWD/x64/lib
-- find x64/bin/ -type f -executable | while read prog do "$prog" done
+- export PATH=$PATH:$PWD/x64/bin
+- find ./x64/bin/ -type f \( -perm -u=x -o -perm -g=x -o -perm -o=x \)
+- find ./x64/bin/ -type f -perm -a=x
