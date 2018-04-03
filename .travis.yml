@@ -78,7 +78,7 @@ install:
       && sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
       && sudo apt-add-repository -y ppa:beineri/opt-qt594-trusty
       && sudo apt-get -qq update
-      && sudo apt-get -qq install g++-6 libc6-i386 qt59tools qt59svg qt59gui qt59widgets
+      && sudo apt-get -qq install g++-6 libc6-i386 qt59tools qt59svg
       && export CXX="g++-6"
       && export CC="gcc-6"
       ;
@@ -88,6 +88,11 @@ install:
       && chmod -R 755 /usr/local/opt/qt5/*
       ;
     fi
+
+before_script:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
 
 script:
 - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
