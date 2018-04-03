@@ -192,7 +192,7 @@ void RoleMaskProxyModel::removeMaskedRole(int role)
         if (d->m_mergeDisplayEdit && adjRole == Qt::DisplayRole)
             d->signalAllChanged(QVector<int>{{Qt::EditRole, Qt::DisplayRole}});
         else
-            d->signalAllChanged(QVector<int>{{adjRole}});
+            d->signalAllChanged(QVector<int>(1,adjRole));
     }
 }
 

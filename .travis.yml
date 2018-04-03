@@ -59,4 +59,5 @@ script:
     make && sudo make install &&
     cmake -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../ &&
     make && sudo make install
-- ls ./x64
+- export PATH=$PATH:$PWD/x64/lib
+- ls ./x64/bin
