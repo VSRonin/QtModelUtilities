@@ -52,11 +52,8 @@ script:
       && CPPFLAGS=-I$QTDIR/include
       ;
     fi
-- dir
-- dir ./src
 - dir ./tests
 - dir ./tests/tst_InsertProxyModel
-- dir ./tests/tst_RoleMaskProxyModel
 - mkdir ./build 
 - cd ./build
 - cmake --version &&
