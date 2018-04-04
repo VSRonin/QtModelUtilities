@@ -17,41 +17,41 @@ matrix:
     sudo: required
     compiler: gcc
     env:
-      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594 DISTRO=trusty
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     env:
-      - USESTATIC=OFF NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594
+      - USESTATIC=OFF NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594 DISTRO=trusty
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     env:
-      - USESTATIC=ON NOWIDGETS=ON NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594 DISTRO=trusty
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     env:
-      - USESTATIC=OFF NOWIDGETS=ON NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594
+      - USESTATIC=OFF NOWIDGETS=ON NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594 DISTRO=trusty
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     env:
-      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 DISTRO=trusty
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     env:
-      - USESTATIC=OFF NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594
+      - USESTATIC=OFF NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 DISTRO=trusty
   - os: osx
     compiler: clang
     env:
-      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594 DISTRO=trusty
   - os: osx
     compiler: clang
     env:
@@ -73,23 +73,23 @@ matrix:
     env:
       - USESTATIC=OFF NOWIDGETS=ON NOGUI=ON
   - os: linux
-    dist: trusty
+    dist: precise
     sudo: required
     compiler: gcc
     env:
-      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=50 QTVERSIONPATCH=502
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=50 QTVERSIONPATCH=502 DISTRO=precise
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     env:
-      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=56 QTVERSIONPATCH=562
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=56 QTVERSIONPATCH=562 DISTRO=trusty
 
 install:
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
          lsb_release -a
       && sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
-      && sudo apt-add-repository -y ppa:beineri/opt-qt${QTVERSIONPATCH}-trusty
+      && sudo apt-add-repository -y ppa:beineri/opt-qt${QTVERSIONPATCH}-${DISTRO}
       && sudo apt-get -qq update
       && sudo apt-get -qq install g++-6 libc6-i386 qt${QTVERSIONMINOR}base qt${QTVERSIONMINOR}tools 
       && export CXX="g++-6"
@@ -112,7 +112,7 @@ before_script:
 
 script:
 - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-         QTDIR="/opt/qt59"
+         QTDIR="/opt/qt${QTVERSIONMINOR}"
       && PATH="$QTDIR/bin:$PATH"
       && qt59-env.sh
       ;
