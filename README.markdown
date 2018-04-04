@@ -3,9 +3,10 @@
 This library is a collection of utilities for Qt's Model/View framework.
 
 ### Status
-**master**: [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/3x8h2laxlbh9wc7c/branch/master?svg=true)](https://ci.appveyor.com/project/VSRonin/qtmodelutilities/branch/master)[![Travis Build Status](https://travis-ci.org/VSRonin/QtModelUtilities.svg?branch=master)](https://travis-ci.org/VSRonin/QtModelUtilities)
-**dev**: [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/3x8h2laxlbh9wc7c/branch/dev?svg=true)](https://ci.appveyor.com/project/VSRonin/qtmodelutilities/branch/dev)[![Travis Build Status](https://travis-ci.org/VSRonin/QtModelUtilities.svg?branch=dev)](https://travis-ci.org/VSRonin/QtModelUtilities)
-
+| **master** | **dev** |
+|------------|---------|
+| [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/3x8h2laxlbh9wc7c/branch/master?svg=true)](https://ci.appveyor.com/project/VSRonin/qtmodelutilities/branch/master) | [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/3x8h2laxlbh9wc7c/branch/dev?svg=true)](https://ci.appveyor.com/project/VSRonin/qtmodelutilities/branch/dev) |
+| [![Travis Build Status](https://travis-ci.org/VSRonin/QtModelUtilities.svg?branch=master)](https://travis-ci.org/VSRonin/QtModelUtilities) | [![Travis Build Status](https://travis-ci.org/VSRonin/QtModelUtilities.svg?branch=dev)](https://travis-ci.org/VSRonin/QtModelUtilities) |
 
 ### Contents
 
@@ -15,7 +16,7 @@ This library is a collection of utilities for Qt's Model/View framework.
 
 ### Installation
 
-TODO: decide the build system used. Currently considering CMake
+This library uses [CMake](https://cmake.org/) as build system.
 
 ### Usage
 
@@ -25,11 +26,16 @@ TODO: depends on the build system but it's designed to be compiled as either a s
 
 The library should be compatible with all platform supported by Qt, the CI will build and test the following configurations:
 
-+ Windows MSVC 2015 32bit
-+ Windows MSVC 2015 64bit
-+ Windows MinGW 5.3.0 32bit
-+ Ubuntu Trusty gcc6 64bit
-+ Mac OS X LLVM 8.1 64bit
++ Windows MSVC 2015 32bit Qt 5.9
++ Windows MSVC 2015 64bit Qt 5.9
++ Windows MinGW 5.3.0 32bit Qt 5.9
++ Ubuntu Trusty gcc6 64bit Qt 5.9
++ Mac OS X LLVM 8.1 64bit Qt 5.10
+
+A reduced suite of tests, to ensure compatibility, is also run on 
+
++ Ubuntu Trusty gcc6 64bit Qt 5.1
++ Ubuntu Trusty gcc6 64bit Qt 5.6
 
 ### Examples
 
@@ -49,4 +55,7 @@ Docs can, alternatively, be built using Doxygen and the DoxygenConfig.doxyfile f
 
 ### Contributing
 
-Contributions welcome, just submit a pull request on the [project's GitHub page](https://github.com/VSRonin/QtModelUtilities)
+Contributions are welcome. 
+You can either [open a ticket](https://github.com/VSRonin/QtModelUtilities/issues) or submit a pull request on the [project's GitHub page](https://github.com/VSRonin/QtModelUtilities).
+
+Contributed code should adhere to the [Qt Coding Style Guide](https://wiki.qt.io/Qt_Coding_Style)

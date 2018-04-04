@@ -114,7 +114,7 @@ script:
 - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
          QTDIR="/opt/qt${QTVERSIONMINOR}"
       && PATH="$QTDIR/bin:$PATH"
-      && qt59-env.sh
+      && qt${QTVERSIONMINOR}-env.sh
       ;
     else
          QTDIR="/usr/local/opt/qt5"
