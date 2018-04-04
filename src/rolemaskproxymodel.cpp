@@ -1,7 +1,6 @@
 #include "rolemaskproxymodel.h"
 #include "private/rolemaskproxymodel_p.h"
 #include <QVector>
-#include <functional>
 RoleMaskProxyModelPrivate::RoleMaskProxyModelPrivate(RoleMaskProxyModel* q)
     :q_ptr(q)
     , m_transparentIfEmpty(true)
@@ -117,6 +116,9 @@ Destructor
 */
 RoleMaskProxyModel::~RoleMaskProxyModel()
 {
+    Q_D(RoleMaskProxyModel);
+    if (sourceModel())
+        Q_ASSUME(QObject::disconnect(d->m_sourceDataChangedConnection));
     delete d_ptr;
 }
 
@@ -215,8 +217,7 @@ void RoleMaskProxyModel::setSourceModel(QAbstractItemModel *sourceMdl)
     QIdentityProxyModel::setSourceModel(sourceMdl);
     if (sourceModel()) {
         Q_ASSUME(sourceModel()->disconnect(SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)), this));
-        using namespace std::placeholders;
-        d->m_sourceDataChangedConnection = connect(sourceModel(), &QAbstractItemModel::dataChanged, this, std::bind(&RoleMaskProxyModelPrivate::interceptDataChanged, d, _1, _2, _3));
+        d->m_sourceDataChangedConnection = connect(sourceModel(), &QAbstractItemModel::dataChanged, [d](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)->void{d->interceptDataChanged(topLeft,bottomRight,roles);});
     }
 }
 

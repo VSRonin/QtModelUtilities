@@ -60,8 +60,16 @@ bool XmlModelSerialiserPrivate::readXmlElement(QXmlStreamReader& source, const Q
         && tableSizeAttribute.hasAttribute(QStringLiteral("ColumnCount"))
         ))
         return false;
-    rowCount = tableSizeAttribute.value(QStringLiteral("RowCount")).toInt();
-    colCount = tableSizeAttribute.value(QStringLiteral("ColumnCount")).toInt();
+    rowCount = tableSizeAttribute.value(QStringLiteral("RowCount"))
+        #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+        .toString()
+        #endif
+        .toInt();
+    colCount = tableSizeAttribute.value(QStringLiteral("ColumnCount"))
+        #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+        .toString()
+        #endif
+        .toInt();
     if (rowCount <= 0 || colCount <= 0)
         return false;
     if (m_model->rowCount(parent) < rowCount)
@@ -92,8 +100,16 @@ bool XmlModelSerialiserPrivate::readXmlElement(QXmlStreamReader& source, const Q
                     && dataPointTattributes.hasAttribute(QStringLiteral("Type"))
                     ))
                     return false;
-                int dataRole = dataPointTattributes.value(QStringLiteral("Role")).toInt();
-                int dataType = dataPointTattributes.value(QStringLiteral("Type")).toInt();
+                int dataRole = dataPointTattributes.value(QStringLiteral("Role"))
+                    #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+                    .toString()
+                    #endif
+                    .toInt();
+                int dataType = dataPointTattributes.value(QStringLiteral("Type"))
+                    #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+                    .toString()
+                    #endif
+                    .toInt();
                 const QVariant roleVariant = loadVariant(dataType, source.readElementText());
                 if (!roleVariant.isNull()) // skip unhandled types
                     m_model->setData(m_model->index(rowIndex, colIndex, parent), roleVariant, dataRole);
@@ -215,9 +231,21 @@ bool XmlModelSerialiserPrivate::readXml(QXmlStreamReader& reader)
                     && headDataAttribute.hasAttribute(QStringLiteral("Type"))
                     ))
                     return false;
-                int headerSection = headDataAttribute.value(QStringLiteral("Section")).toInt();
-                int headerRole = headDataAttribute.value(QStringLiteral("Role")).toInt();
-                int headerType = headDataAttribute.value(QStringLiteral("Type")).toInt();
+                int headerSection = headDataAttribute.value(QStringLiteral("Section"))
+                    #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+                    .toString()
+                    #endif
+                    .toInt();
+                int headerRole = headDataAttribute.value(QStringLiteral("Role"))
+                    #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+                    .toString()
+                    #endif
+                    .toInt();
+                int headerType = headDataAttribute.value(QStringLiteral("Type"))
+                    #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+                    .toString()
+                    #endif
+                    .toInt();
                 const QVariant roleVariant = loadVariant(headerType, reader.readElementText());
                 if (!roleVariant.isNull()) // skip unhandled types
                     m_model->setHeaderData(headerSection, (vHeaderDataStarted ? Qt::Vertical : Qt::Horizontal), roleVariant, headerRole);

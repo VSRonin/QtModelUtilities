@@ -20,7 +20,11 @@ public:
         , InsertColumn = 0x2
     };
     Q_DECLARE_FLAGS(InsertDirections, InsertDirection)
+    #if QT_VERSION >= QT_VERSION_CHECK(5, 5, 0)
     Q_FLAG(InsertDirections)
+    #else
+    Q_FLAGS(InsertDirections)
+    #endif
     explicit InsertProxyModel(QObject* parent = Q_NULLPTR);
     ~InsertProxyModel();
     void setSourceModel(QAbstractItemModel* newSourceModel) Q_DECL_OVERRIDE;

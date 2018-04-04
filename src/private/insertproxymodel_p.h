@@ -14,7 +14,7 @@ class InsertProxyModelPrivate
     QHash<int, QVariant> m_dataForCorner;
     bool m_separateEditDisplay;
     QList<QMetaObject::Connection> m_sourceConnections;
-    void checkExtraRowChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
+    void checkExtraRowChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
     void commitColumn();
     void commitRow();
     void commitToSource(const bool isRow);

@@ -9,9 +9,10 @@
 /*!
 \internal
 */
-void InsertProxyModelPrivate::checkExtraRowChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight)
+void InsertProxyModelPrivate::checkExtraRowChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int> &roles)
 {
     Q_UNUSED(topLeft)
+    Q_UNUSED(roles)
     Q_Q(InsertProxyModel);
     Q_ASSERT(!(bottomRight.column() >= q->sourceModel()->columnCount() && bottomRight.row() >= q->sourceModel()->rowCount()));
     if (bottomRight.column() >= q->sourceModel()->columnCount()) {
@@ -153,10 +154,15 @@ InsertProxyModelPrivate::InsertProxyModelPrivate(InsertProxyModel* q)
     , m_separateEditDisplay(false)
 {
     Q_ASSERT(q_ptr);
-    const QHash<int, QVariant> starHeader{ std::make_pair(Qt::DisplayRole, QVariant::fromValue(QStringLiteral("*"))) };
+    QHash<int, QVariant> starHeader;
+    starHeader.insert(Qt::DisplayRole, QVariant::fromValue(QStringLiteral("*")));
     m_extraHeaderData[true] = starHeader;
     m_extraHeaderData[false] = starHeader;
-    QObject::connect(q_ptr, &QAbstractItemModel::dataChanged, std::bind(&InsertProxyModelPrivate::checkExtraRowChanged, this, std::placeholders::_1, std::placeholders::_2));
+    QObject::connect(
+        q_ptr
+        , &QAbstractItemModel::dataChanged
+        , [this](const QModelIndex& topLeft,const QModelIndex& bottomRight, const QVector<int>& roles)->void{checkExtraRowChanged(topLeft,bottomRight,roles);}
+    );
 }
 
 /*!
@@ -172,6 +178,9 @@ Destructor
 */
 InsertProxyModel::~InsertProxyModel()
 {
+    Q_D(InsertProxyModel);
+    for (auto discIter = d->m_sourceConnections.cbegin(); discIter != d->m_sourceConnections.cend(); ++discIter)
+        QObject::disconnect(*discIter);
     delete m_dptr;
 }
 
@@ -191,32 +200,31 @@ void InsertProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
     for(auto& extraData : d->m_extraData)
         extraData.clear();
     if (sourceModel()) {
-        using namespace std::placeholders;
         d->m_sourceConnections
             << QObject::connect(sourceModel(), &QAbstractItemModel::modelAboutToBeReset, this, &QAbstractItemModel::modelAboutToBeReset)
         << QObject::connect(sourceModel(), &QAbstractItemModel::modelReset, this, &QAbstractItemModel::modelReset)
-        << QObject::connect(sourceModel(), &QAbstractItemModel::dataChanged, this, [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles) {
+        << QObject::connect(sourceModel(), &QAbstractItemModel::dataChanged, [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles) {
             dataChanged(mapFromSource(topLeft), mapFromSource(bottomRight), roles);
         })
         << QObject::connect(sourceModel(), &QAbstractItemModel::headerDataChanged, this, &QAbstractItemModel::headerDataChanged)
-        << QObject::connect(sourceModel(), &QAbstractItemModel::layoutAboutToBeChanged, this, [this](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {
+        << QObject::connect(sourceModel(), &QAbstractItemModel::layoutAboutToBeChanged, [this](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {
             QList<QPersistentModelIndex> mappedParents;
             for (const auto& parent : parents)
                 mappedParents << QPersistentModelIndex(mapFromSource(parent));
             layoutAboutToBeChanged(mappedParents, hint);
         })
-        << QObject::connect(sourceModel(), &QAbstractItemModel::layoutChanged, this, [this](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {
+        << QObject::connect(sourceModel(), &QAbstractItemModel::layoutChanged, [this](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {
             QList<QPersistentModelIndex> mappedParents;
             for (auto& parent : parents)
                 mappedParents << QPersistentModelIndex(mapFromSource(parent));
             layoutChanged(mappedParents, hint);
         })
-        << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeInserted, this, [this](const QModelIndex &parent, int first, int last) {
+        << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeInserted, [this](const QModelIndex &parent, int first, int last) {
             if (!parent.isValid()) {
                 beginInsertColumns(QModelIndex(), first, last);
             }
         })
-        << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeMoved, this, [this](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn) {
+        << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeMoved, [this](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn) {
             if (sourceParent.isValid())
                 return;
             if (destinationParent.isValid())
@@ -224,20 +232,20 @@ void InsertProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
             else 
                 beginMoveColumns(QModelIndex(), sourceStart, sourceEnd, QModelIndex(), destinationColumn);
         })
-        << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeRemoved, this, [this](const QModelIndex &parent, int first, int last) {
+        << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeRemoved, [this](const QModelIndex &parent, int first, int last) {
             if (!parent.isValid()) {
                 beginRemoveColumns(QModelIndex(), first, last);
             }
         })
-        << QObject::connect(sourceModel(), &QAbstractItemModel::columnsInserted, this, std::bind(&InsertProxyModelPrivate::onColumnsInserted,d,_1,_2,_3))
-        << QObject::connect(sourceModel(), &QAbstractItemModel::columnsRemoved, this, std::bind(&InsertProxyModelPrivate::onColumnsRemoved, d, _1, _2, _3))
-        << QObject::connect(sourceModel(), &QAbstractItemModel::columnsMoved, this, std::bind(&InsertProxyModelPrivate::onColumnsMoved, d, _1, _2, _3, _4,_5))
-        << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeInserted, this, [this](const QModelIndex &parent, int first, int last) {
+        << QObject::connect(sourceModel(), &QAbstractItemModel::columnsInserted,[d](const QModelIndex &parent, int first, int last)->void{d->onColumnsInserted(parent,first,last);})
+        << QObject::connect(sourceModel(), &QAbstractItemModel::columnsRemoved,[d](const QModelIndex &parent, int first, int last)->void{d->onColumnsRemoved(parent,first,last);})
+        << QObject::connect(sourceModel(), &QAbstractItemModel::columnsMoved, [d](const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)->void{d->onColumnsMoved(parent,start,end,destination,column);})
+        << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeInserted, [this](const QModelIndex &parent, int first, int last) {
             if (!parent.isValid()) {
                 beginInsertRows(QModelIndex(), first, last);
             }
         })
-        << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeMoved, this, [this](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow) {
+        << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeMoved, [this](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow) {
             if (sourceParent.isValid())
                 return;
             if (destinationParent.isValid())
@@ -245,14 +253,14 @@ void InsertProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
             else
                 beginMoveRows(QModelIndex(), sourceStart, sourceEnd, QModelIndex(), destinationRow);
         })
-        << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeRemoved, this, [this](const QModelIndex &parent, int first, int last) {
+        << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeRemoved, [this](const QModelIndex &parent, int first, int last) {
             if (!parent.isValid()) {
                 beginRemoveRows(QModelIndex(), first, last);
             }
         })
-        << QObject::connect(sourceModel(), &QAbstractItemModel::rowsInserted, this, std::bind(&InsertProxyModelPrivate::onRowsInserted, d, _1, _2, _3))
-        << QObject::connect(sourceModel(), &QAbstractItemModel::rowsRemoved, this, std::bind(&InsertProxyModelPrivate::onRowsRemoved, d, _1, _2, _3))
-        << QObject::connect(sourceModel(), &QAbstractItemModel::rowsMoved, this, std::bind(&InsertProxyModelPrivate::onRowsMoved, d, _1, _2, _3, _4, _5))
+        << QObject::connect(sourceModel(), &QAbstractItemModel::rowsInserted, [d](const QModelIndex &parent, int first, int last)->void{d->onRowsInserted(parent,first,last);})
+        << QObject::connect(sourceModel(), &QAbstractItemModel::rowsRemoved, [d](const QModelIndex &parent, int first, int last)->void{d->onRowsRemoved(parent,first,last);})
+        << QObject::connect(sourceModel(), &QAbstractItemModel::rowsMoved, [d](const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)->void{d->onRowsMoved(parent,start,end,destination,row);})
         ;
         const int sourceCols = sourceModel()->columnCount();
         const int sourceRows = sourceModel()->rowCount();
@@ -555,10 +563,22 @@ Qt::ItemFlags InsertProxyModel::flags(const QModelIndex &index) const
     if (isExtraRow && isExtraCol)
         return Qt::NoItemFlags;
     if (isExtraRow)
-        return flagForExtra(true, index.column()) | Qt::ItemNeverHasChildren;
+        return flagForExtra(true, index.column())
+        #if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
+        | Qt::ItemNeverHasChildren
+        #endif
+        ;
     if (isExtraCol)
-        return flagForExtra(false, index.row()) | Qt::ItemNeverHasChildren;
-    return sourceModel()->flags(sourceModel()->index(index.row(), index.column())) | Qt::ItemNeverHasChildren;
+        return flagForExtra(false, index.row())
+        #if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
+        | Qt::ItemNeverHasChildren
+        #endif
+        ;
+    return sourceModel()->flags(sourceModel()->index(index.row(), index.column()))
+        #if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
+        | Qt::ItemNeverHasChildren
+        #endif
+    ;
 }
 
 /*!
