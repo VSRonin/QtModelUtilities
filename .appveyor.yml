@@ -3,6 +3,8 @@ branches:
   only:
     - master
     - dev
+    - appveyor
+
 image: Visual Studio 2015
 clone_depth: 1
 environment:
@@ -154,10 +156,10 @@ build_script:
 - mkdir .\build 
 - cd .\build
 - cmake --version
-- 'cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../'
+- 'cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../'
 - '%MAKEBUILDER%'
 - '%MAKEBUILDER% install'
-- 'cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../'
+- 'cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../'
 - '%MAKEBUILDER%'
 - '%MAKEBUILDER% install'
 
@@ -171,9 +173,10 @@ after_build:
 
 test_script:
 - If NOT exist "%TESTOUTPUTFOLDER%/bin" (appveyor exit)
-- cd %TESTOUTPUTFOLDER%/bin
-- if %use_mingw%==true set PATH=%COMPILER%\lib;%PATH%
-- set PATH=../lib;%PATH%
+- If NOT exist "%TESTOUTPUTFOLDER%/bin/tests" (appveyor exit)
+- cd %TESTOUTPUTFOLDER%/bin/tests
+- set PATH=../../lib;%PATH%
+- set PATH=../../bin;%PATH%
 - for %%a in (*.exe) do (%%a -xml > %%a_tstres.xml & set preventFail = 1)
 - ps: '$xmlOut = new-object System.Xml.XmlDocument;
     $xmlOut.AppendChild($xmlOut.CreateXmlDeclaration("1.0","UTF-8",$null));

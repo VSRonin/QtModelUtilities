@@ -56,8 +56,8 @@ public:
     bool separateEditDisplay() const;
     void setSeparateEditDisplay(bool val);
 public Q_SLOTS:
-    void commitRow();
-    void commitColumn();
+    bool commitRow();
+    bool commitColumn();
 Q_SIGNALS:
     void dataForCornerChanged(int role);
     void extraDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
@@ -70,5 +70,6 @@ protected:
 private:
     InsertProxyModelPrivate* m_dptr;
 };
+Q_DECLARE_METATYPE(InsertProxyModel::InsertDirections)
 Q_DECLARE_OPERATORS_FOR_FLAGS(InsertProxyModel::InsertDirections)
 #endif // INSERTPROXY_H

@@ -7,9 +7,13 @@ class QAbstractItemModel;
 class tst_InsertProxyModel : public QObject{
     Q_OBJECT
 private Q_SLOTS:
-    void initTestCase();
-    void cleanupTestCase();
+    void testCommitSubclass();
+    void testCommitSubclass_data();
+    void testCommitSlot();
+    void testCommitSlot_data();
 private:
-    QList<QAbstractItemModel*> m_models;
+    QAbstractItemModel* createListModel();
+    QAbstractItemModel* createTableModel();
+    QAbstractItemModel* createTreeModel();
 };
 #endif // tst_insertproxymodel_h__

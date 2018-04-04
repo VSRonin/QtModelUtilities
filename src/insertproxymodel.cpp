@@ -29,20 +29,20 @@ void InsertProxyModelPrivate::checkExtraRowChanged(const QModelIndex& topLeft, c
 /*!
 \internal
 */
-void InsertProxyModelPrivate::commitRow()
+bool InsertProxyModelPrivate::commitRow()
 {
-    commitToSource(true);
+    return commitToSource(true);
 }
 
-void InsertProxyModelPrivate::commitToSource(const bool isRow)
+bool InsertProxyModelPrivate::commitToSource(const bool isRow)
 {
     Q_Q(InsertProxyModel);
     if (!q->sourceModel())
-        return;
+        return false;
     const int sourceCols = q->sourceModel()->columnCount();
     const int sourceRows = q->sourceModel()->rowCount();
     if (!(isRow ? q->sourceModel()->insertRow(sourceRows) : q->sourceModel()->insertColumn(sourceCols)))
-        return;
+        return false;
     const int loopEnd = isRow ? sourceCols : sourceRows;
     for (int i = 0; i < loopEnd; ++i) {
         QHash<int, QVariant>& allRoles = m_extraData[isRow][i];
@@ -76,6 +76,7 @@ void InsertProxyModelPrivate::commitToSource(const bool isRow)
         const QModelIndex proxyIdx = isRow ? q->index(sourceRows + 1, i) : q->index(i, sourceCols + 1);
         q->dataChanged(proxyIdx, proxyIdx, rolesChanged);
     }
+    return true;
 }
 
 /*!
@@ -140,9 +141,9 @@ void InsertProxyModelPrivate::onRemoved(bool isRow, const QModelIndex &parent, i
 /*!
 \internal
 */
-void InsertProxyModelPrivate::commitColumn()
+bool InsertProxyModelPrivate::commitColumn()
 {
-    commitToSource(false);
+    return commitToSource(false);
 }
 
 /*!
@@ -158,11 +159,7 @@ InsertProxyModelPrivate::InsertProxyModelPrivate(InsertProxyModel* q)
     starHeader.insert(Qt::DisplayRole, QVariant::fromValue(QStringLiteral("*")));
     m_extraHeaderData[true] = starHeader;
     m_extraHeaderData[false] = starHeader;
-    QObject::connect(
-        q_ptr
-        , &QAbstractItemModel::dataChanged
-        , [this](const QModelIndex& topLeft,const QModelIndex& bottomRight, const QVector<int>& roles)->void{checkExtraRowChanged(topLeft,bottomRight,roles);}
-    );
+    QObject::connect(q_ptr, &QAbstractItemModel::dataChanged, [this](const QModelIndex& topLeft,const QModelIndex& bottomRight, const QVector<int>& roles)->void{checkExtraRowChanged(topLeft,bottomRight,roles);});
 }
 
 /*!
@@ -180,7 +177,7 @@ InsertProxyModel::~InsertProxyModel()
 {
     Q_D(InsertProxyModel);
     for (auto discIter = d->m_sourceConnections.cbegin(); discIter != d->m_sourceConnections.cend(); ++discIter)
-        QObject::disconnect(*discIter);
+        Q_ASSUME(QObject::disconnect(*discIter));
     delete m_dptr;
 }
 
@@ -193,7 +190,7 @@ void InsertProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
     beginResetModel();
     if (sourceModel()) {
         for (auto discIter = d->m_sourceConnections.cbegin(); discIter != d->m_sourceConnections.cend(); ++discIter)
-            QObject::disconnect(*discIter);
+            Q_ASSUME(QObject::disconnect(*discIter));
     }
     QAbstractProxyModel::setSourceModel(newSourceModel);
     d->m_sourceConnections.clear();
@@ -785,19 +782,19 @@ void InsertProxyModel::setDataForCorner(const QVariant& value, int role)
 /*!
 Forces the extra row to be added to the source model
 */
-void InsertProxyModel::commitRow()
+bool InsertProxyModel::commitRow()
 {
     Q_D(InsertProxyModel);
-    d->commitRow();
+    return d->commitRow();
 }
 
 /*!
 Forces the extra row to be added to the source model
 */
-void InsertProxyModel::commitColumn()
+bool InsertProxyModel::commitColumn()
 {
     Q_D(InsertProxyModel);
-    d->commitColumn();
+    return d->commitColumn();
 }
 
 /*!
@@ -846,35 +843,45 @@ void InsertProxyModel::setSeparateEditDisplay(bool val)
 
 /*!
 \brief Returns true if the extra row can be merged in the main model
-\details The default implementation commits the row to the model as soon as there's any data in any cell
+\details The default implementation never commits the row to the model.
+
+If, for example, you want the row to be added to the source model as soon as there's any data in the Qt::DisplayRole of any cell you can repliement this method as:
+\code{.cpp}
+if (!sourceModel())
+    return false;
+const int sourceCols = sourceModel()->columnCount();
+const int sourceRows = sourceModel()->rowCount();
+for (int i = 0; i < sourceCols; ++i) {
+    if (index(sourceRows,i).data().isValid())
+        return true;
+}
+return false;
+\code
 */
 bool InsertProxyModel::validRow() const
 {
-    Q_D(const InsertProxyModel);
-    if (!sourceModel())
-        return false;
-    const int sourceCols = sourceModel()->columnCount();
-    for (int i = 0; i < sourceCols; ++i) {
-        if (!d->m_extraData[true].value(i).isEmpty())
-            return true;
-    }
     return false;
 }
 
 /*!
 \brief Returns true if the extra column can be merged in the main model
-\details The default implementation commits the column to the model as soon as there's any data in any cell
+\details The default implementation never commits the column to the model.
+
+If, for example, you want the row to be added to the source model as soon as there's any data in the Qt::DisplayRole of any cell you can repliement this method as:
+\code{.cpp}
+if (!sourceModel())
+    return false;
+const int sourceCols = sourceModel()->columnCount();
+const int sourceRows = sourceModel()->rowCount();
+for (int i = 0; i < sourceRows; ++i) {
+    if (index(i, sourceCols).data().isValid())
+        return true;
+}
+return false;
+\code
 */
 bool InsertProxyModel::validColumn() const
 {
-    Q_D(const InsertProxyModel);
-    if (!sourceModel())
-        return false;
-    const int sourceRows = sourceModel()->rowCount();
-    for (int i = 0; i < sourceRows; ++i) {
-        if (!d->m_extraData[false].value(i).isEmpty())
-            return true;
-    }
     return false;
 }
 
@@ -887,7 +894,6 @@ bool InsertProxyModel::validColumn() const
 You can use setInsertDirection to determine whether to show an extra row or column. By default, this model will behave as QIdentityProxyModel
 
 You can either call commitRow/commitColumn or reimplement validRow/validColumn to decide when a row/column should be added to the main model.
-By default the row/column is committed as soon as there is any data in any cell
 
 \warning Only flat models are supported. Branches of a tree will be hidden by the proxy
 */

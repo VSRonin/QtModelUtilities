@@ -15,9 +15,9 @@ class InsertProxyModelPrivate
     bool m_separateEditDisplay;
     QList<QMetaObject::Connection> m_sourceConnections;
     void checkExtraRowChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
-    void commitColumn();
-    void commitRow();
-    void commitToSource(const bool isRow);
+    bool commitColumn();
+    bool commitRow();
+    bool commitToSource(const bool isRow);
     void setSeparateEditDisplayHash(QHash<int, QVariant>& singleHash);
     void onColumnsInserted(const QModelIndex &parent, int first, int last) { onInserted(false, parent, first, last); }
     void onColumnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column) { onMoved(false, parent, start, end, destination, column); }

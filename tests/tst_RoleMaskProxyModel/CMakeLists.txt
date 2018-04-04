@@ -15,7 +15,7 @@ if(MSVC)
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
   else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W3")
   endif()
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-long-long -pedantic")
@@ -24,7 +24,12 @@ set(CMAKE_AUTOMOC ON)
 project(tst_RoleMaskProxyModel VERSION "1.0") 
 set(REQUIRED_QT_VERSION 5.0.0)
 find_package(Qt5Test ${REQUIRED_QT_VERSION} REQUIRED)
-find_package(Qt5Gui ${REQUIRED_QT_VERSION} REQUIRED)
+find_package(Qt5Gui ${REQUIRED_QT_VERSION})
+if(NOT Qt5Gui_FOUND)
+    set(NO_GUI ON)
+else()
+    message(STATUS "Found Qt Gui ${Qt5Gui_VERSION}")
+endif()
 message(STATUS "Found Qt Test ${Qt5Test_VERSION}")
 set(tst_RoleMaskProxyModel_LIBS ${tst_RoleMaskProxyModel_LIBS} ${Qt5Test_LIBRARIES})
 set(tst_RoleMaskProxyModel_INCLUDE ${tst_RoleMaskProxyModel_INCLUDE} ${Qt5Test_INCLUDE_DIRS})
@@ -47,7 +52,7 @@ set_target_properties(tst_RoleMaskProxyModel PROPERTIES
     VERSION "1.0"
     SOVERSION 1
     EXPORT_NAME "tstRoleMaskProxyModel"
-    ARCHIVE_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/bin"
+    ARCHIVE_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/tests"
+    LIBRARY_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/tests"
+    RUNTIME_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/bin/tests"
 )

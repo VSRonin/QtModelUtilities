@@ -16,11 +16,10 @@ This library is a collection of utilities for Qt's Model/View framework.
 
 ### Installation
 
-This library uses [CMake](https://cmake.org/) as build system.
+This library uses [CMake](https://cmake.org/) as build system and allows usage both using static and dynamic linking. 
+See INSTALL for detailed build instructions.
 
-### Usage
-
-TODO: depends on the build system but it's designed to be compiled as either a static or dynamic library
+Alternatively, if you use `qmake` (Qt Creator), you can include the entire source of the library directly in your code by adding `include(path/to/source/modelutilities.pri)` directly in your `.pro` file 
 
 ### Platforms
 
@@ -36,7 +35,8 @@ A reduced suite of tests, to ensure compatibility, is also run on
 
 + Ubuntu Trusty gcc6 64bit Qt 5.1
 + Ubuntu Trusty gcc6 64bit Qt 5.6
-+ Windows MinGW 4.7.0 32bit Qt 5.0
++ Windows MinGW 4.7.0 32bit Qt 5.0 (not on the CI)
++ Windows MSVC 2013 32bit Qt 5.8 (not on the CI)
 
 ### Examples
 
@@ -50,8 +50,8 @@ Docs can, alternatively, be built using Doxygen and the DoxygenConfig.doxyfile f
 
 ### Requirements:
 
-+ Qt 5.*
-+ A C++11 compatible compiler
++ Qt 5
++ C++11
 + Doxygen (optional to build documentation)
 
 ### Contributing
@@ -59,4 +59,4 @@ Docs can, alternatively, be built using Doxygen and the DoxygenConfig.doxyfile f
 Contributions are welcome. 
 You can either [open a ticket](https://github.com/VSRonin/QtModelUtilities/issues) or submit a pull request on the [project's GitHub page](https://github.com/VSRonin/QtModelUtilities).
 
-Contributed code should adhere to the [Qt Coding Style Guide](https://wiki.qt.io/Qt_Coding_Style)
+Contributed code should adhere to the [Qt Coding Style Guide](https://wiki.qt.io/Qt_Coding_Style).
