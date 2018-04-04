@@ -7,6 +7,7 @@ branches:
   only:
   - master
   - dev
+  - travis
 
 matrix:
  fast_finish: true
@@ -16,45 +17,45 @@ matrix:
     sudo: required
     compiler: gcc
     env:
-      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
+    env:
+      - USESTATIC=OFF NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=OFF NOWIDGETS=ON NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=OFF NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594
+  - os: osx
+    compiler: clang
+    env:
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594
+  - os: osx
+    compiler: clang
     env:
       - USESTATIC=OFF NOWIDGETS=OFF NOGUI=OFF
-  - os: linux
-    dist: trusty
-    sudo: required
-    compiler: gcc
-    env:
-      - USESTATIC=ON NOWIDGETS=ON NOGUI=OFF
-  - os: linux
-    dist: trusty
-    sudo: required
-    compiler: gcc
-    env:
-      - USESTATIC=OFF NOWIDGETS=ON NOGUI=OFF
-  - os: linux
-    dist: trusty
-    sudo: required
-    compiler: gcc
-    env:
-      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON
-  - os: linux
-    dist: trusty
-    sudo: required
-    compiler: gcc
-    env:
-      - USESTATIC=OFF NOWIDGETS=ON NOGUI=ON
-  - os: osx
-    compiler: clang
-    env:
-      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF
-  - os: osx
-    compiler: clang
-    env:
-      - USESTATIC=OFF NOWIDGETS=OFF NOGUI=OFF
   - os: osx
     compiler: clang
     env:
@@ -71,14 +72,26 @@ matrix:
     compiler: clang
     env:
       - USESTATIC=OFF NOWIDGETS=ON NOGUI=ON
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=50 QTVERSIONPATCH=502
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=56 QTVERSIONPATCH=562
 
 install:
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
          lsb_release -a
       && sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
-      && sudo apt-add-repository -y ppa:beineri/opt-qt594-trusty
+      && sudo apt-add-repository -y ppa:beineri/opt-qt$QTVERSIONPATCH-trusty
       && sudo apt-get -qq update
-      && sudo apt-get -qq install g++-6 libc6-i386 qt59base qt59tools 
+      && sudo apt-get -qq install g++-6 libc6-i386 qt$QTVERSIONMINORbase qt$QTVERSIONMINORtools 
       && export CXX="g++-6"
       && export CC="gcc-6"
       ;
