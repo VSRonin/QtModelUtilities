@@ -36,6 +36,7 @@ A reduced suite of tests, to ensure compatibility, is also run on
 
 + Ubuntu Trusty gcc6 64bit Qt 5.1
 + Ubuntu Trusty gcc6 64bit Qt 5.6
++ Windows MinGW 4.7.0 32bit Qt 5.0
 
 ### Examples
 
