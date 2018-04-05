@@ -36,7 +36,7 @@ The library should be compatible with all platform supported by Qt, the CI will 
 + Ubuntu Trusty gcc6 64bit Qt 5.9
 + Mac OS X LLVM 8.1 64bit Qt 5.10
 
-A reduced suite of tests, to ensure compatibility, is also run on 
+A reduced suite of tests, to ensure compatibility, is also run on:
 
 + Ubuntu Trusty gcc6 64bit Qt 5.1
 + Ubuntu Trusty gcc6 64bit Qt 5.6
@@ -45,7 +45,7 @@ A reduced suite of tests, to ensure compatibility, is also run on
 
 ### Examples
 
-See the Examples folder
+See the examples folder
 
 ### Documentation
 

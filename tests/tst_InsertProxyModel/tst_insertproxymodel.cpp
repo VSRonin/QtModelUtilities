@@ -184,6 +184,11 @@ void tst_InsertProxyModel::testCommitSlot_data()
 #endif
 }
 
+void tst_InsertProxyModel::testSourceInsertRow()
+{
+    QCOMPARE(1, 2);
+}
+
 void tst_InsertProxyModel::testCommitSubclass()
 {
     class InsertProxyModelCommit : public InsertProxyModel{

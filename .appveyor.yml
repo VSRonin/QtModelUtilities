@@ -198,10 +198,10 @@ after_build:
 - if %use_gui%==true if %use_widgets%==true if %use_static%==false 7z a -tzip ".\modelutilitiesarch\modelutilities_%archivename%_%APPVEYOR_BUILD_VERSION%.zip" .\installed\*
 
 test_script:
-- cd %TESTOUTPUTFOLDER%/bin/tests
 - set PATH=x86/lib;x64/lib;%PATH%
 - set PATH=x86/bin;x64/bin;%PATH%
 - cmake --build . --target test & set preventFail = 1
+- cd TestResults
 - ps: '$xmlOut = new-object System.Xml.XmlDocument;
     $xmlOut.AppendChild($xmlOut.CreateXmlDeclaration("1.0","UTF-8",$null));
     $rootXmlOut = $xmlOut.CreateElement("testsuites");

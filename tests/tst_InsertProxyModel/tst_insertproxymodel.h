@@ -11,6 +11,7 @@ private Q_SLOTS:
     void testCommitSubclass_data();
     void testCommitSlot();
     void testCommitSlot_data();
+    void testSourceInsertRow();
 private:
     QAbstractItemModel* createListModel();
     QAbstractItemModel* createTableModel();
