@@ -136,5 +136,5 @@ script:
 - export PATH=$PATH:$PWD/x64/lib
 - export PATH=$PATH:$PWD/x64/bin
 - for i in ./x64/bin/tests/*; do 
-    $i
+    "$i";
   done
