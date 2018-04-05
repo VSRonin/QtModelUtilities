@@ -135,4 +135,6 @@ script:
 - sudo make install
 - export PATH=$PATH:$PWD/x64/lib
 - export PATH=$PATH:$PWD/x64/bin
-- find ./x64/bin/tests/ -type f -perm -a=x -exec '{}' \;
+- for i in ./x64/bin/tests/*; do 
+    $i
+  done
