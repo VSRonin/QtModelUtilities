@@ -15,6 +15,7 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
+    use_jom: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "true"
@@ -22,6 +23,7 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
+    use_jom: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "false"
@@ -29,6 +31,7 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
+    use_jom: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "true"
@@ -36,6 +39,7 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
+    use_jom: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "false"
@@ -43,6 +47,7 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
+    use_jom: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "true"
@@ -50,6 +55,7 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
+    use_jom: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "false"
@@ -57,6 +63,7 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
+    use_jom: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "true"
@@ -64,6 +71,7 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
+    use_jom: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "false"
@@ -71,6 +79,7 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
+    use_jom: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "true"
@@ -78,6 +87,7 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
+    use_jom: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "false"
@@ -85,6 +95,7 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
+    use_jom: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "true"
@@ -92,6 +103,7 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
+    use_jom: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "false"
@@ -99,6 +111,7 @@ environment:
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
+    use_jom: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "true"
@@ -106,6 +119,7 @@ environment:
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
+    use_jom: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "false"
@@ -113,6 +127,7 @@ environment:
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
+    use_jom: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "true"
@@ -120,6 +135,7 @@ environment:
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
+    use_jom: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "false"
@@ -127,6 +143,7 @@ environment:
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
+    use_jom: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "true"
@@ -134,12 +151,14 @@ environment:
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
+    use_jom: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "false"
   - QT5: C:\Qt\%LatestLTSQtVersion%\msvc2015_64
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
+    use_mingw: "false"
     use_jom: "true"
     use_gui: "true"
     use_widgets: "true"
