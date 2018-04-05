@@ -198,8 +198,8 @@ after_build:
 - if %use_gui%==true if %use_widgets%==true if %use_static%==false 7z a -tzip ".\modelutilitiesarch\modelutilities_%archivename%_%APPVEYOR_BUILD_VERSION%.zip" .\installed\*
 
 test_script:
-- set PATH=x86/lib;x64/lib;%PATH%
-- set PATH=x86/bin;x64/bin;%PATH%
+- set PATH=%cd%\x86\lib;%cd%\x64\lib;%PATH%
+- set PATH=%cd%\x86\bin;%cd%\x64\bin;%PATH%
 - cmake --build . --target test & set preventFail = 1
 - cd TestResults
 - ps: '$xmlOut = new-object System.Xml.XmlDocument;

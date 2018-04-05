@@ -51,12 +51,12 @@ set_target_properties(tst_RoleMaskProxyModel PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib/tests"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin/tests"
 )
-if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-    set(Test_Output_FileName "tst_RoleMaskProxyModel_debug_tstres.xml")
-else()
-    set(Test_Output_FileName "tst_RoleMaskProxyModel_tstres.xml")
-endif()
 if(TEST_OUTPUT_XML)
+    set(Test_Output_FileName "tst_RoleMaskProxyModel")
+    if(CMAKE_BUILD_TYPE MATCHES DEBUG)
+        set(Test_Output_FileName "${Test_Output_FileName}_debug")
+    endif()
+    set(Test_Output_FileName "${Test_Output_FileName}_tstres.xml")
     add_test(NAME tstRoleMaskProxyModel WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/TestResults" COMMAND "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin/tests/tst_RoleMaskProxyModel" -o ${Test_Output_FileName},xml)
 else()
     add_test(NAME tstRoleMaskProxyModel WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/TestResults" COMMAND "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin/tests/tst_RoleMaskProxyModel" -txt)
