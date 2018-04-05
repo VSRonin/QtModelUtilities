@@ -175,7 +175,7 @@ before_build:
 - if %use_widgets%==true (set USEWIDGETS=OFF) else (set USEWIDGETS=ON)
 - if %use_mingw%==true (set CMAKEGENERATOR="MinGW Makefiles") else (set CMAKEGENERATOR="NMake Makefiles")
 - if %use_jom%==true set CMAKEGENERATOR="NMake Makefiles JOM"
-- if %use_jom%==true set PATH=%QT5%..\..\Tools\QtCreator\bin;%PATH%
+- if %use_jom%==true set PATH=C:\Qt\Tools\QtCreator\bin;%PATH%
 - if %use_mingw%==true set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
 
 build_script:
@@ -191,7 +191,7 @@ build_script:
 
 after_build:
 - if %use_mingw%==true set PATH=C:\Program Files\Git\usr\bin;%PATH%
-- if %use_jom%==true set PATH=%PATH:%QT5%..\..\Tools\QtCreator\bin;=%
+- if %use_jom%==true set PATH=%PATH:C:\Qt\Tools\QtCreator\bin;=%
 - if %use_mingw%==true (set archivename=mingw) else (set archivename=msvc2015)
 - if %platform%==x86 (set archivename=%archivename%_x86) else (set archivename=%archivename%_x64)
 - mkdir modelutilitiesarch
