@@ -11,15 +11,6 @@ endif()
 set (CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-if(MSVC)
-  if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-    string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-  else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W3")
-  endif()
-elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-long-long -pedantic")
-endif()
 set(CMAKE_AUTOMOC ON)
 project(exem_InsertProxyModel VERSION "1.0") 
 set(REQUIRED_QT_VERSION 5.0.0)
@@ -48,13 +39,16 @@ set(exem_InsertProxyModel_Commit_SRCS
 )
 add_executable(exem_InsertProxyModel_Subclass WIN32 ${exem_InsertProxyModel_Subclass_SRCS})
 add_executable(exem_InsertProxyModel_Commit WIN32 ${exem_InsertProxyModel_Commit_SRCS})
+if(BUILD_STATIC_LIBS)
+    set(exem_InsertProxyModel_DEFINE ${exem_InsertProxyModel_DEFINE} MODELUTILITIES_STATIC)
+endif()
 target_include_directories(exem_InsertProxyModel_Subclass PRIVATE ../../src ../../src/includes ${exem_InsertProxyModel_INCLUDE})
 target_link_libraries(exem_InsertProxyModel_Subclass PRIVATE modelutilities ${exem_InsertProxyModel_LIBS})
 target_compile_definitions(exem_InsertProxyModel_Subclass PRIVATE ${exem_InsertProxyModel_DEFINE})
 set_target_properties(exem_InsertProxyModel_Subclass PROPERTIES 
     VERSION "1.0"
     SOVERSION 1
-    EXPORT_NAME "exemModelSerialisation"
+    EXPORT_NAME "exemInsertProxyModelSubclass"
     ARCHIVE_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/examples"
     LIBRARY_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/examples"
     RUNTIME_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/bin/examples"
@@ -65,7 +59,7 @@ target_compile_definitions(exem_InsertProxyModel_Commit PRIVATE ${exem_InsertPro
 set_target_properties(exem_InsertProxyModel_Commit PROPERTIES 
     VERSION "1.0"
     SOVERSION 1
-    EXPORT_NAME "exemModelSerialisation"
+    EXPORT_NAME "exemInsertProxyModelCommit"
     ARCHIVE_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/examples"
     LIBRARY_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/examples"
     RUNTIME_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/bin/examples"

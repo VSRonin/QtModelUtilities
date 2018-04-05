@@ -1,4 +1,3 @@
-/*
 #include <InsertProxyModel>
 #include <QStandardItemModel>
 #include <QPushButton>
@@ -69,4 +68,4 @@ int main(int argc, char *argv[])
     mainLay->addWidget(proxyView, 1, 1);
     mainWid.show();
     return a.exec();
-}*/
+}
