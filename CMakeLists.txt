@@ -133,9 +133,9 @@ set_target_properties(modelutilities PROPERTIES
     VERSION ${modelutilities_VERSION}
     SOVERSION 0
     EXPORT_NAME "ModelUtilities"
-    ARCHIVE_OUTPUT_DIRECTORY "${modelutilities_PlatformDir}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${modelutilities_PlatformDir}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${modelutilities_PlatformDir}/bin"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin"
 )
 if(BUILD_DOCS)
     set(htmlDocRedirect "<!DOCTYPE html><html><head><meta http-equiv=\"refresh\" content=\"0; url=html/index.html\" /></head><body><p><a href=\"html/index.html\">Redirect</a></p></body></html>")
@@ -153,6 +153,12 @@ if(BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
 if(BUILD_TESTS)
+    include(CTest)
+    enable_testing()
+    option(TEST_OUTPUT_XML "Redirects the test output to xml files in the TestResults folder" OFF)
+    if(TEST_OUTPUT_XML)
+        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/TestResults")
+    endif()
     add_subdirectory(tests)
 endif()
 

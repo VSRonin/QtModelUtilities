@@ -39,14 +39,25 @@ add_executable(tst_InsertProxyModel ${tst_InsertProxyModel_SRCS})
 if(BUILD_STATIC_LIBS)
     set(tst_InsertProxyModel_DEFINE ${tst_InsertProxyModel_DEFINE} MODELUTILITIES_STATIC)
 endif()
+add_dependencies(tst_InsertProxyModel modelutilities)
 target_include_directories(tst_InsertProxyModel PRIVATE ../../src ${tst_InsertProxyModel_INCLUDE})
 target_link_libraries(tst_InsertProxyModel PRIVATE modelutilities ${tst_InsertProxyModel_LIBS})
 target_compile_definitions(tst_InsertProxyModel PRIVATE ${tst_InsertProxyModel_DEFINE})
 set_target_properties(tst_InsertProxyModel PROPERTIES 
     VERSION "1.0"
     SOVERSION 1
-    EXPORT_NAME "tstRoleMaskProxyModel"
-    ARCHIVE_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/tests"
-    LIBRARY_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/tests"
-    RUNTIME_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/bin/tests"
+    EXPORT_NAME "tstInsertProxyModel"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib/tests"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib/tests"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin/tests"
 )
+if(CMAKE_BUILD_TYPE MATCHES DEBUG)
+    set(Test_Output_FileName "tst_InsertProxyModel_debug_tstres.xml")
+else()
+    set(Test_Output_FileName "tst_InsertProxyModel_tstres.xml")
+endif()
+if(TEST_OUTPUT_XML)
+    add_test(NAME tstInsertProxyModel WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/TestResults" COMMAND "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin/tests/tst_InsertProxyModel" -o ${Test_Output_FileName},xml)
+else()
+    add_test(NAME tstInsertProxyModel WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/TestResults" COMMAND "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin/tests/tst_InsertProxyModel" -txt)
+endif()

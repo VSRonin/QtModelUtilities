@@ -16,14 +16,19 @@ This library is a collection of utilities for Qt's Model/View framework.
 
 ### Installation
 
+#### Official Binary Release
+If your system is compatible with one of the 5 main platforms you can download the pre-compiled dinamically linked library from [the releases page](https://github.com/VSRonin/QtModelUtilities/releases).
+
+#### Build from Source
 This library uses [CMake](https://cmake.org/) as build system and allows usage both using static and dynamic linking. 
 See INSTALL for detailed build instructions.
 
-Alternatively, if you use `qmake` (Qt Creator), you can include the entire source of the library directly in your code by adding `include(path/to/source/modelutilities.pri)` directly in your `.pro` file 
+#### Use the source directly
+If you use `qmake` (Qt Creator), you can include the entire source of the library directly in your code by adding `include(path/to/source/modelutilities.pri)` in your `.pro` file.
 
 ### Platforms
 
-The library should be compatible with all platform supported by Qt, the CI will build and test the following configurations:
+The library should be compatible with all platform supported by Qt, the CI will build, test and deploy the following configurations:
 
 + Windows MSVC 2015 32bit Qt 5.9
 + Windows MSVC 2015 64bit Qt 5.9
@@ -35,8 +40,8 @@ A reduced suite of tests, to ensure compatibility, is also run on
 
 + Ubuntu Trusty gcc6 64bit Qt 5.1
 + Ubuntu Trusty gcc6 64bit Qt 5.6
-+ Windows MinGW 4.7.0 32bit Qt 5.0 (not on the CI)
-+ Windows MSVC 2013 32bit Qt 5.8 (not on the CI)
++ Windows MinGW 4.7.0 32bit Qt 5.0 (manual)
++ Windows MSVC 2013 32bit Qt 5.8 (manual)
 
 ### Examples
 

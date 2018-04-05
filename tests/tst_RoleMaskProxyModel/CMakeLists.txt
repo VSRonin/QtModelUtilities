@@ -39,6 +39,7 @@ add_executable(tst_RoleMaskProxyModel ${tst_RoleMaskProxyModel_SRCS})
 if(BUILD_STATIC_LIBS)
     set(tst_RoleMaskProxyModel_DEFINE ${tst_RoleMaskProxyModel_DEFINE} MODELUTILITIES_STATIC)
 endif()
+add_dependencies(tst_RoleMaskProxyModel modelutilities)
 target_include_directories(tst_RoleMaskProxyModel PRIVATE ../../src ${tst_RoleMaskProxyModel_INCLUDE})
 target_link_libraries(tst_RoleMaskProxyModel PRIVATE modelutilities ${tst_RoleMaskProxyModel_LIBS})
 target_compile_definitions(tst_RoleMaskProxyModel PRIVATE ${tst_RoleMaskProxyModel_DEFINE})
@@ -46,7 +47,17 @@ set_target_properties(tst_RoleMaskProxyModel PROPERTIES
     VERSION "1.0"
     SOVERSION 1
     EXPORT_NAME "tstRoleMaskProxyModel"
-    ARCHIVE_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/tests"
-    LIBRARY_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/tests"
-    RUNTIME_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/bin/tests"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib/tests"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib/tests"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin/tests"
 )
+if(CMAKE_BUILD_TYPE MATCHES DEBUG)
+    set(Test_Output_FileName "tst_RoleMaskProxyModel_debug_tstres.xml")
+else()
+    set(Test_Output_FileName "tst_RoleMaskProxyModel_tstres.xml")
+endif()
+if(TEST_OUTPUT_XML)
+    add_test(NAME tstRoleMaskProxyModel WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/TestResults" COMMAND "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin/tests/tst_RoleMaskProxyModel" -o ${Test_Output_FileName},xml)
+else()
+    add_test(NAME tstRoleMaskProxyModel WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/TestResults" COMMAND "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin/tests/tst_RoleMaskProxyModel" -txt)
+endif()

@@ -42,6 +42,8 @@ add_executable(exem_InsertProxyModel_Commit WIN32 ${exem_InsertProxyModel_Commit
 if(BUILD_STATIC_LIBS)
     set(exem_InsertProxyModel_DEFINE ${exem_InsertProxyModel_DEFINE} MODELUTILITIES_STATIC)
 endif()
+add_dependencies(exem_InsertProxyModel_Subclass modelutilities)
+add_dependencies(exem_InsertProxyModel_Commit modelutilities)
 target_include_directories(exem_InsertProxyModel_Subclass PRIVATE ../../src ../../src/includes ${exem_InsertProxyModel_INCLUDE})
 target_link_libraries(exem_InsertProxyModel_Subclass PRIVATE modelutilities ${exem_InsertProxyModel_LIBS})
 target_compile_definitions(exem_InsertProxyModel_Subclass PRIVATE ${exem_InsertProxyModel_DEFINE})
@@ -49,9 +51,9 @@ set_target_properties(exem_InsertProxyModel_Subclass PROPERTIES
     VERSION "1.0"
     SOVERSION 1
     EXPORT_NAME "exemInsertProxyModelSubclass"
-    ARCHIVE_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/examples"
-    LIBRARY_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/examples"
-    RUNTIME_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/bin/examples"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib/examples"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib/examples"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin/examples"
 )
 target_include_directories(exem_InsertProxyModel_Commit PRIVATE ../../src ../../src/includes ${exem_InsertProxyModel_INCLUDE})
 target_link_libraries(exem_InsertProxyModel_Commit PRIVATE modelutilities ${exem_InsertProxyModel_LIBS})

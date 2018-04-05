@@ -38,6 +38,7 @@ add_executable(exem_ModelSerialisation WIN32 ${exem_ModelSerialisation_SRCS})
 if(BUILD_STATIC_LIBS)
     set(exem_ModelSerialisation_DEFINE ${exem_ModelSerialisation_DEFINE} MODELUTILITIES_STATIC)
 endif()
+add_dependencies(exem_ModelSerialisation modelutilities)
 target_include_directories(exem_ModelSerialisation PRIVATE ../../src ../../src/includes ${exem_ModelSerialisation_INCLUDE})
 target_link_libraries(exem_ModelSerialisation PRIVATE modelutilities ${exem_ModelSerialisation_LIBS})
 target_compile_definitions(exem_ModelSerialisation PRIVATE ${exem_ModelSerialisation_DEFINE})
@@ -45,7 +46,7 @@ set_target_properties(exem_ModelSerialisation PROPERTIES
     VERSION "1.0"
     SOVERSION 1
     EXPORT_NAME "exemModelSerialisation"
-    ARCHIVE_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/examples"
-    LIBRARY_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/examples"
-    RUNTIME_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/bin/examples"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib/examples"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib/examples"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin/examples"
 )
