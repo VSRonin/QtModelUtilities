@@ -54,27 +54,17 @@ bool InsertProxyModelPrivate::commitToSource(const bool isRow)
             q->sourceModel()->index(sourceRows, i)
             : q->sourceModel()->index(i, sourceCols)
             ;
-        QVector<int> rolesChanged;
-        rolesChanged.reserve(allRoles.size() + 1);
-        bool hasDisplay = false;
-        bool hasEdit = false;
-        for (auto j = allRoles.constBegin(); j != endRoles; ++j) {
-            q->sourceModel()->setData(currentIdx, j.value(), j.key());
-            rolesChanged.append(j.key());
-            if (!hasDisplay && j.key() == Qt::DisplayRole)
-                hasDisplay = true;
-            if (!hasDisplay && j.key() == Qt::EditRole)
-                hasEdit = true;
-        }
-        if (hasDisplay != hasEdit && !m_separateEditDisplay){
-            if (hasDisplay)
-                rolesChanged.append(Qt::EditRole);
-            if (hasEdit)
-                rolesChanged.append(Qt::DisplayRole);
-        }
-        allRoles.clear();
+        Q_ASSERT(m_separateEditDisplay || (allRoles.contains(Qt::DisplayRole) == allRoles.contains(Qt::EditRole)));
+        Q_ASSERT(m_separateEditDisplay || (allRoles.value(Qt::DisplayRole) == allRoles.value(Qt::EditRole)));
+        if(!q->sourceModel()->setItemData(currentIdx, hashToMap(allRoles)))
+            return false;
+        QVector<int> aggregateRoles;
+        aggregateRoles.reserve(allRoles.size());
+        for (auto j = allRoles.begin(); !allRoles.isEmpty(); j = allRoles.erase(j))
+            aggregateRoles << j.key();
         const QModelIndex proxyIdx = isRow ? q->index(sourceRows + 1, i) : q->index(i, sourceCols + 1);
-        q->dataChanged(proxyIdx, proxyIdx, rolesChanged);
+        q->dataChanged(proxyIdx, proxyIdx, aggregateRoles);
+        q->extraDataChanged(proxyIdx, proxyIdx, aggregateRoles);
     }
     return true;
 }
@@ -431,7 +421,35 @@ bool InsertProxyModel::setData(const QModelIndex &index, const QVariant &value, 
         return false;
     if (!(isExtraRow || isExtraCol))
         return sourceModel()->setData(sourceModel()->index(index.row(), index.column()), value, role);
-    return setItemData(index, QMap<int, QVariant>{{std::make_pair(role,value)}});
+    const int sectionIdx = isExtraRow ? index.column() : index.row();
+    QVector<int> rolesToSet;
+    QVector<int> changedRoles;
+    rolesToSet.reserve(2);
+    changedRoles.reserve(2);
+    rolesToSet << role;
+    if (!d->m_separateEditDisplay && (role == Qt::DisplayRole || role == Qt::EditRole))
+        rolesToSet << (role == Qt::DisplayRole ? Qt::EditRole : Qt::DisplayRole);
+    for (auto i = rolesToSet.cbegin(); i != rolesToSet.cend();++i){
+        auto roleIter = d->m_extraData[isExtraRow][sectionIdx].find(*i);
+        if (roleIter == d->m_extraData[isExtraRow][sectionIdx].end()){
+            if (value.isValid()) {
+                d->m_extraData[isExtraRow][sectionIdx].insert(*i, value);
+                changedRoles << *i;
+            }
+        }
+        else{
+            if (roleIter.value() != value){
+                roleIter.value() = value;
+                changedRoles << *i;
+            }
+        }
+    }
+    if (!changedRoles.isEmpty()){
+        dataChanged(index, index, changedRoles);
+        extraDataChanged(index, index, changedRoles);
+        return true;
+    }
+    return false;
 }
 
 /*!

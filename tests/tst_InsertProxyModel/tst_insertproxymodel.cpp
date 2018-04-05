@@ -132,6 +132,9 @@ void tst_InsertProxyModel::testCommitSlot()
         for (int i = 0; i < originalRowCount; ++i)
             QCOMPARE(proxy.index(i, originalColCount + 1).data(), QVariant());
     }
+    proxyDataChangedSpy.clear();
+    proxyExtraDataChangedSpy.clear();
+    baseDataChangedSpy.clear();
     if (insertDirection & InsertProxyModel::InsertRow) {
         for (int i = 0; i < originalColCount; ++i)
             QCOMPARE(proxy.index(originalRowCount, i).data(), QVariant());
@@ -141,11 +144,15 @@ void tst_InsertProxyModel::testCommitSlot()
         QCOMPARE(proxyExtraDataChangedSpy.count(), 1);
         proxyExtraDataChangedSpy.clear();
         QVERIFY(proxy.commitRow());
+        QVERIFY(proxyDataChangedSpy.count() >= 2); // change to QCOMPARE(proxyDataChangedSpy.count(),2) once QTBUG-67511 is fixed
+        proxyDataChangedSpy.clear();
+        QCOMPARE(proxyExtraDataChangedSpy.count(), 1);
+        proxyExtraDataChangedSpy.clear();
         QCOMPARE(baseRowsInsertedSpy.count(), 1);
         baseRowsInsertedSpy.clear();
         QCOMPARE(proxyRowsInsertedSpy.count(), 1);
         proxyRowsInsertedSpy.clear();
-        QCOMPARE(baseDataChangedSpy.count(), 1);
+        QVERIFY(baseDataChangedSpy.count()>0); // change to QCOMPARE(baseDataChangedSpy.count(),1) once QTBUG-67511 is fixed
         baseDataChangedSpy.clear();
         QCOMPARE(proxy.rowCount(), baseModel->rowCount() + 1);
         QCOMPARE(baseModel->rowCount(), originalRowCount + 1);
@@ -180,7 +187,6 @@ void tst_InsertProxyModel::testCommitSlot_data()
 void tst_InsertProxyModel::testCommitSubclass()
 {
     class InsertProxyModelCommit : public InsertProxyModel{
-        Q_DISABLE_COPY(InsertProxyModelCommit)
     public:
         explicit InsertProxyModelCommit(QObject* parent = Q_NULLPTR) : InsertProxyModel(parent) {}
     protected:
@@ -238,43 +244,45 @@ void tst_InsertProxyModel::testCommitSubclass()
     QVERIFY(baseColsInsertedSpy.isValid());
     QSignalSpy proxyColsInsertedSpy(&proxy, SIGNAL(columnsInserted(QModelIndex, int, int)));
     QVERIFY(proxyColsInsertedSpy.isValid());
-    if (insertDirection & InsertProxyModel::InsertColumn) {
+    if (insertDirection & InsertProxyModel::InsertColumn && canInsertColumns) {
         for (int i = 0; i < originalRowCount; ++i)
             QCOMPARE(proxy.index(i, originalColCount).data(), QVariant());
         QVERIFY(proxy.setData(proxy.index(0, originalColCount), QStringLiteral("Test")));
-        QCOMPARE(proxyDataChangedSpy.count(), 1);
+        QCOMPARE(proxyDataChangedSpy.count(), 3);
         proxyDataChangedSpy.clear();
-        QCOMPARE(proxyExtraDataChangedSpy.count(), 1);
+        QCOMPARE(proxyExtraDataChangedSpy.count(), 2);
         proxyExtraDataChangedSpy.clear();
         QCOMPARE(proxy.columnCount(), baseModel->columnCount() + 1);
         QCOMPARE(baseModel->columnCount(), originalColCount + canInsertColumns);
-        if (canInsertColumns) {
-            QCOMPARE(baseColsInsertedSpy.count(), 1);
-            baseColsInsertedSpy.clear();
-            QCOMPARE(proxyColsInsertedSpy.count(), 1);
-            proxyColsInsertedSpy.clear();
-            QCOMPARE(baseDataChangedSpy.count(), 1);
-            baseDataChangedSpy.clear();
-            QCOMPARE(baseModel->index(0, originalColCount).data().toString(), QStringLiteral("Test"));
-            for (int i = 1; i < originalRowCount; ++i)
-                QCOMPARE(baseModel->index(i, originalColCount).data(), QVariant());
-        }
+        QCOMPARE(baseColsInsertedSpy.count(), 1);
+        baseColsInsertedSpy.clear();
+        QCOMPARE(proxyColsInsertedSpy.count(), 1);
+        proxyColsInsertedSpy.clear();
+        QCOMPARE(baseDataChangedSpy.count(), 1);
+        baseDataChangedSpy.clear();
+        QCOMPARE(baseModel->index(0, originalColCount).data().toString(), QStringLiteral("Test"));
+        for (int i = 1; i < originalRowCount; ++i)
+            QCOMPARE(baseModel->index(i, originalColCount).data(), QVariant());
+        
         for (int i = 0; i < originalRowCount; ++i)
             QCOMPARE(proxy.index(i, originalColCount+1).data(), QVariant());
     }
+    proxyDataChangedSpy.clear();
+    proxyExtraDataChangedSpy.clear();
+    baseDataChangedSpy.clear();
     if (insertDirection & InsertProxyModel::InsertRow) {
         for (int i = 0; i < originalColCount; ++i)
             QCOMPARE(proxy.index(originalRowCount,i).data(), QVariant());
         QVERIFY(proxy.setData(proxy.index(originalRowCount,0), QStringLiteral("Test")));
-        QCOMPARE(proxyDataChangedSpy.count(), 1);
+        QVERIFY(proxyDataChangedSpy.count() >=3);// change to QCOMPARE(proxyDataChangedSpy.count(),3) once QTBUG-67511 is fixed
         proxyDataChangedSpy.clear();
-        QCOMPARE(proxyExtraDataChangedSpy.count(), 1);
+        QCOMPARE(proxyExtraDataChangedSpy.count(), 2);
         proxyExtraDataChangedSpy.clear();
         QCOMPARE(baseRowsInsertedSpy.count(), 1);
         baseRowsInsertedSpy.clear();
         QCOMPARE(proxyRowsInsertedSpy.count(), 1);
         proxyRowsInsertedSpy.clear();
-        QCOMPARE(baseDataChangedSpy.count(), 1);
+        QVERIFY(baseDataChangedSpy.count() >= 1);// change to QCOMPARE(baseDataChangedSpy.count(),1) once QTBUG-67511 is fixed
         baseDataChangedSpy.clear();
         QCOMPARE(proxy.rowCount(), baseModel->rowCount() + 1);
         QCOMPARE(baseModel->rowCount(), originalRowCount + 1);

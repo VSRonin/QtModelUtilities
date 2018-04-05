@@ -2,7 +2,7 @@
 #define insertproxy_p_h__
 #include "insertproxymodel.h"
 #include <QHash>
-
+#include <QMap>
 class InsertProxyModelPrivate
 {
     Q_DECLARE_PUBLIC(InsertProxyModel)
@@ -17,6 +17,7 @@ class InsertProxyModelPrivate
     void checkExtraRowChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
     bool commitColumn();
     bool commitRow();
+    static QMap<int, QVariant> hashToMap(const QHash<int, QVariant>& other);
     bool commitToSource(const bool isRow);
     void setSeparateEditDisplayHash(QHash<int, QVariant>& singleHash);
     void onColumnsInserted(const QModelIndex &parent, int first, int last) { onInserted(false, parent, first, last); }
@@ -30,4 +31,14 @@ class InsertProxyModelPrivate
     void onRemoved(bool isRow, const QModelIndex &parent, int first, int last);
     InsertProxyModel* q_ptr;
 };
+
+QMap<int, QVariant> InsertProxyModelPrivate::hashToMap(const QHash<int, QVariant>& other)
+{
+    QMap<int, QVariant> result;
+    auto hashEnd = other.cend();
+    for (auto i = other.cbegin(); i != hashEnd; ++i)
+        result.insert(i.key(), i.value());
+    return result;
+}
+
 #endif // insertproxy_p_h__
