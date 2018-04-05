@@ -128,15 +128,11 @@ script:
 - cd ./build
 - cmake --version
 - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=$USESTATIC -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=$NOWIDGETS -DNO_GUI=$NOGUI ../
-- make
-- sudo make install
+- cmake --build .
+- cmake --build . --target install
 - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=$USESTATIC -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=$NOWIDGETS -DNO_GUI=$NOGUI ../
-- make
-- sudo make install
+- cmake --build .
+- cmake --build . --target install
 - export PATH=$PATH:$PWD/x64/lib
 - export PATH=$PATH:$PWD/x64/bin
-- exit=0
-- while IFS= read line; do 
-    "$line" || exit=1 ;
-  done <<< "$(find ./x64/bin/tests/ -type f -perm -a=x)"
-- exit $exit
+- ctest --verbose
