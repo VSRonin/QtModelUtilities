@@ -196,7 +196,7 @@ test_script:
         $localSkip = 0;
         $localTime = 0;
         $currentFilePath = $_.FullName;
-        $testSuiteName = $_.BaseName.subString(0,$_.BaseName.Length - 7);
+        $testSuiteName = $_.BaseName.subString(0,$_.BaseName.Length - 11);
         if([bool]((Get-Content -Path $currentFilePath) -as [xml])){
             [xml]$XmlDocument = (Get-Content -Path $currentFilePath) -as [xml];
         }
