@@ -137,6 +137,6 @@ script:
 - export PATH=$PATH:$PWD/x64/bin
 - exit=0
 - while IFS= read line; do 
-    "$i" || exit=1;
-  done <<< "$(find ./x64/bin/tests/ -type f -perm -a=x)"
+    "$i" || exit=1 ;
+  done <<< "$(find ./x64/bin/tests/ -type f -perm -a=x)" ;
 - exit $exit
