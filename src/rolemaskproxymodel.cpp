@@ -118,7 +118,7 @@ RoleMaskProxyModel::~RoleMaskProxyModel()
 {
     Q_D(RoleMaskProxyModel);
     if (sourceModel())
-        Q_ASSUME(QObject::disconnect(d->m_sourceDataChangedConnection));
+        QObject::disconnect(d->m_sourceDataChangedConnection);
     delete d_ptr;
 }
 

@@ -167,7 +167,7 @@ InsertProxyModel::~InsertProxyModel()
 {
     Q_D(InsertProxyModel);
     for (auto discIter = d->m_sourceConnections.cbegin(); discIter != d->m_sourceConnections.cend(); ++discIter)
-        Q_ASSUME(QObject::disconnect(*discIter));
+        QObject::disconnect(*discIter);
     delete m_dptr;
 }
 
