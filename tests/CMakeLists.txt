@@ -1,6 +1,3 @@
-if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-    set(CMAKE_EXECUTABLE_SUFFIX "_debug${CMAKE_EXECUTABLE_SUFFIX}")
-endif()
 if(BUILD_ROLEMASKPROXY)
     add_subdirectory(tst_RoleMaskProxyModel)
 endif()
