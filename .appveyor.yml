@@ -15,7 +15,6 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
-    use_jom: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "true"
@@ -23,7 +22,6 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
-    use_jom: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "false"
@@ -31,7 +29,6 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
-    use_jom: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "true"
@@ -39,7 +36,6 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
-    use_jom: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "false"
@@ -47,7 +43,6 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
-    use_jom: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "true"
@@ -55,7 +50,6 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
     use_mingw: "false"
-    use_jom: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "false"
@@ -63,7 +57,6 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
-    use_jom: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "true"
@@ -71,7 +64,6 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
-    use_jom: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "false"
@@ -79,7 +71,6 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
-    use_jom: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "true"
@@ -87,7 +78,6 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
-    use_jom: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "false"
@@ -95,7 +85,6 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
-    use_jom: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "true"
@@ -103,7 +92,6 @@ environment:
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: amd64
     use_mingw: "false"
-    use_jom: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "false"
@@ -111,7 +99,6 @@ environment:
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
-    use_jom: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "true"
@@ -119,7 +106,6 @@ environment:
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
-    use_jom: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "false"
@@ -127,7 +113,6 @@ environment:
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
-    use_jom: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "true"
@@ -135,7 +120,6 @@ environment:
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
-    use_jom: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "false"
@@ -143,7 +127,6 @@ environment:
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
-    use_jom: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "true"
@@ -151,17 +134,8 @@ environment:
     COMPILER: C:\Qt\Tools\mingw530_32
     platform: x86
     use_mingw: "true"
-    use_jom: "false"
     use_gui: "false"
     use_widgets: "false"
-    use_static: "false"
-  - QT5: C:\Qt\%LatestLTSQtVersion%\msvc2015_64
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
-    platform: amd64
-    use_mingw: "false"
-    use_jom: "true"
-    use_gui: "true"
-    use_widgets: "true"
     use_static: "false"
 
 matrix:
@@ -174,8 +148,6 @@ before_build:
 - if %use_gui%==true (set USEGUI=OFF) else (set USEGUI=ON)
 - if %use_widgets%==true (set USEWIDGETS=OFF) else (set USEWIDGETS=ON)
 - if %use_mingw%==true (set CMAKEGENERATOR="MinGW Makefiles") else (set CMAKEGENERATOR="NMake Makefiles")
-- if %use_jom%==true set CMAKEGENERATOR="NMake Makefiles JOM"
-- if %use_jom%==true set PATH=C:\Qt\Tools\QtCreator\bin;%PATH%
 - if %use_mingw%==true set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
 
 build_script:
@@ -184,18 +156,17 @@ build_script:
 - set PATH=%cd%\x86\lib;%cd%\x64\lib;%PATH%
 - set PATH=%cd%\x86\bin;%cd%\x64\bin;%PATH%
 - cmake --version
-- cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../
+- cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../
 - cmake --build .
 - cmake --build . --target install
 - cmake --build . --target test & set preventFail = 1
-- cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTS=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../
+- cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../
 - cmake --build .
 - cmake --build . --target install
 - cmake --build . --target test & set preventFail = 1
 
 after_build:
 - if %use_mingw%==true set PATH=C:\Program Files\Git\usr\bin;%PATH%
-- if %use_jom%==true set PATH=%PATH:C:\Qt\Tools\QtCreator\bin;=%
 - if %use_mingw%==true (set archivename=mingw) else (set archivename=msvc2015)
 - if %platform%==x86 (set archivename=%archivename%_x86) else (set archivename=%archivename%_x64)
 - mkdir modelutilitiesarch
