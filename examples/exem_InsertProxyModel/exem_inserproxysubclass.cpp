@@ -67,8 +67,8 @@ int main(int argc, char *argv[])
     insertDirectionCombo->addItem("Insert Rows", InsertProxyModel::InsertRow);
     insertDirectionCombo->addItem("Insert Columns", InsertProxyModel::InsertColumn);
     insertDirectionCombo->addItem("Insert Both", int(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow));
-    QObject::connect(insertDirectionCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [insertProxy, insertDirectionCombo]()->void {
-        const auto newDirection = InsertProxyModel::InsertDirection(insertDirectionCombo->currentData().toInt());
+    QObject::connect(insertDirectionCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [insertProxy, insertDirectionCombo](int idx)->void {
+        const auto newDirection = InsertProxyModel::InsertDirection(insertDirectionCombo->itemData(idx).toInt());
         insertProxy->setInsertDirection(newDirection);
     });
 
