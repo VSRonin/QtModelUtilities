@@ -465,12 +465,52 @@ void tst_InsertProxyModel::testNullModel()
 void tst_InsertProxyModel::testProperties()
 {
     InsertProxyModel proxyModel;
-    QVERIFY(proxyModel.setProperty("maskedRoles", QVariant::fromValue(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow)));
-    QCOMPARE(proxyModel.property("maskedRoles").value<InsertProxyModel::InsertDirections>(), InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
-    QVERIFY(proxyModel.setProperty("transparentIfEmpty",false));
-    QCOMPARE(proxyModel.property("transparentIfEmpty").toBool(), false);
-    QVERIFY(proxyModel.setProperty("mergeDisplayEdit", false));
-    QCOMPARE(proxyModel.property("mergeDisplayEdit").toBool(), false);
+    QVERIFY(proxyModel.setProperty("insertDirection", QVariant::fromValue(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow)));
+    QCOMPARE(proxyModel.property("insertDirection").value<InsertProxyModel::InsertDirections>(), InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
+    QVERIFY(proxyModel.setProperty("separateEditDisplay", true));
+    QCOMPARE(proxyModel.property("separateEditDisplay").toBool(), true);
+}
+
+void tst_InsertProxyModel::testDataForCorner()
+{
+    QAbstractItemModel* const baseModel = createTableModel(this);
+    InsertProxyModel proxyModel;
+    QSignalSpy cornerChangeSpy(&proxyModel, SIGNAL(dataForCornerChanged(QVector<int>)));
+    QSignalSpy cornerDataChangeSpy(&proxyModel, SIGNAL(dataChanged(QModelIndex, , QModelIndex, QVector<int>)));
+    QVERIFY(cornerChangeSpy.isValid());
+    QVERIFY(cornerDataChangeSpy.isValid());
+    proxyModel.setInsertDirection(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
+    proxyModel.setSourceModel(baseModel);
+    proxyModel.setDataForCorner(5689);
+    QCOMPARE(proxyModel.index(baseModel->rowCount(), baseModel->columnCount()).data().toInt(), 5689);
+    QCOMPARE(proxyModel.dataForCorner().toInt(), 5689);
+    QCOMPARE(cornerChangeSpy.count(), 1);
+    QCOMPARE(cornerDataChangeSpy.count(), 1);
+    auto roles = cornerChangeSpy.value(0).value(0).value<QVector<int> >();
+    cornerChangeSpy.clear();
+    cornerDataChangeSpy.clear();
+    QCOMPARE(roles.size(), 2);
+    QVERIFY(roles.contains(Qt::EditRole));
+    QVERIFY(roles.contains(Qt::DisplayRole));
+    proxyModel.setSeparateEditDisplay(true);
+    proxyModel.setDataForCorner(8741);
+    QCOMPARE(proxyModel.index(baseModel->rowCount(), baseModel->columnCount()).data().toInt(), 5689);
+    QCOMPARE(proxyModel.dataForCorner().toInt(), 5689);
+    QCOMPARE(proxyModel.index(baseModel->rowCount(), baseModel->columnCount()).data(Qt::EditRole).toInt(), 8741);
+    QCOMPARE(proxyModel.dataForCorner(Qt::EditRole).toInt(), 8741);
+    QCOMPARE(cornerChangeSpy.count(), 1);
+    QCOMPARE(cornerDataChangeSpy.count(), 1);
+    roles = cornerChangeSpy.value(0).value(0).value<QVector<int> >();
+    cornerChangeSpy.clear();
+    cornerDataChangeSpy.clear();
+    QCOMPARE(roles.size(), 1);
+    QVERIFY(roles.contains(Qt::EditRole));
+    baseModel->deleteLater();
+}
+
+void tst_InsertProxyModel::testSort()
+{
+    QSKIP("Needs to implement");
 }
 
 void tst_InsertProxyModel::testDisconnectedModel()
@@ -494,6 +534,89 @@ void tst_InsertProxyModel::testDisconnectedModel()
 void tst_InsertProxyModel::initTestCase()
 {
     qRegisterMetaType<QVector<int> >();
+}
+
+void tst_InsertProxyModel::testData()
+{
+    QFETCH(QAbstractItemModel*, baseModel);
+    InsertProxyModel proxyModel;
+    proxyModel.setInsertDirection(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
+    proxyModel.setSourceModel(baseModel);
+    const int sourceRows = baseModel->rowCount();
+    const int sourceCols = baseModel->columnCount();
+    for (int i = 0; i < sourceRows;++i){
+        for (int j = 0; j < sourceCols; ++j) {
+            QCOMPARE(proxyModel.index(i, j).data(), baseModel->index(i, j).data());
+        }
+    }
+    for (int i = 0; i < sourceRows; ++i) {
+        QVERIFY(!proxyModel.index(i, sourceCols).data().isValid());
+    }
+    for (int i = 0; i < sourceCols; ++i) {
+        QVERIFY(!proxyModel.index(sourceRows,i).data().isValid());
+    }
+    baseModel->deleteLater();
+}
+
+void tst_InsertProxyModel::testData_data()
+{
+    QTest::addColumn<QAbstractItemModel*>("baseModel");
+    QTest::newRow("List") << createListModel(this);
+#ifdef QT_GUI_LIB
+    QTest::newRow("Table") << createTableModel(this);
+    QTest::newRow("Tree") << createTreeModel(this);
+#endif
+}
+
+void tst_InsertProxyModel::testSetData()
+{
+    QFETCH(QAbstractItemModel*, baseModel);
+    QFETCH(int, idxRow);
+    QFETCH(int, idxCol);
+    InsertProxyModel proxyModel;
+    proxyModel.setSeparateEditDisplay(false);
+    proxyModel.setInsertDirection(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
+    proxyModel.setSourceModel(baseModel);
+    const QModelIndex proxyIdX = proxyModel.index(idxRow, idxCol);
+    const QString idxData = QStringLiteral("Test");
+    QVERIFY(proxyModel.setData(proxyIdX, idxData,Qt::DisplayRole));
+    QCOMPARE(proxyModel.data(proxyIdX, Qt::DisplayRole).toString(), idxData);
+    baseModel->deleteLater();
+}
+
+void tst_InsertProxyModel::testSetData_data()
+{
+    QTest::addColumn<QAbstractItemModel*>("baseModel");
+    QTest::addColumn<int>("idxRow");
+    QTest::addColumn<int>("idxCol");
+    QTest::newRow("List Inside Base Model") << createListModel(this) << 0 << 0;
+    QAbstractItemModel* baseModel = createListModel(this);
+    QTest::newRow("List Extra Row") << baseModel << baseModel->rowCount() << 0;
+    baseModel = createListModel(this);
+    QTest::newRow("List Extra Col") << baseModel << 0 << baseModel->columnCount();
+    baseModel = createListModel(this);
+    QTest::newRow("List Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
+#ifdef QT_GUI_LIB
+    QTest::newRow("Table Inside Base Model") << createTableModel(this) << 0 << 0;
+    baseModel = createTableModel(this);
+    QTest::newRow("Table Extra Row") << baseModel << baseModel->rowCount() << 0;
+    baseModel = createTableModel(this);
+    QTest::newRow("Table Extra Col") << baseModel << 0 << baseModel->columnCount();
+    baseModel = createTableModel(this);
+    QTest::newRow("Table Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
+    QTest::newRow("Tree Inside Base Model") << createTreeModel(this) << 0 << 0;
+    baseModel = createTreeModel(this);
+    QTest::newRow("Tree Extra Row") << baseModel << baseModel->rowCount() << 0;
+    baseModel = createTreeModel(this);
+    QTest::newRow("Tree Extra Col") << baseModel << 0 << baseModel->columnCount();
+    baseModel = createTreeModel(this);
+    QTest::newRow("Tree Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
+#endif
+}
+
+void tst_InsertProxyModel::testSetItemData()
+{
+    QSKIP("Needs to implement");
 }
 
 void tst_InsertProxyModel::testCommitSubclass()

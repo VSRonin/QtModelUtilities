@@ -19,7 +19,7 @@ class InsertProxyModelPrivate
     bool commitRow();
     static QMap<int, QVariant> hashToMap(const QHash<int, QVariant>& other);
     bool commitToSource(const bool isRow);
-    void setSeparateEditDisplayHash(QHash<int, QVariant>& singleHash);
+    int mergeEditDisplayHash(QHash<int, QVariant>& singleHash);
     void onColumnsInserted(const QModelIndex &parent, int first, int last) { onInserted(false, parent, first, last); }
     void onColumnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column) { onMoved(false, parent, start, end, destination, column); }
     void onColumnsRemoved(const QModelIndex &parent, int first, int last) { onRemoved(false, parent, first, last); }
@@ -29,16 +29,8 @@ class InsertProxyModelPrivate
     void onInserted(bool isRow, const QModelIndex &parent, int first, int last);
     void onMoved(bool isRow, const QModelIndex &parent, int start, int end, const QModelIndex &destination, int destIdx);
     void onRemoved(bool isRow, const QModelIndex &parent, int first, int last);
+    QVector<int> setDataInHash(QHash<int, QVariant>& baseHash, int role, const QVariant& value);
     InsertProxyModel* q_ptr;
 };
-
-QMap<int, QVariant> InsertProxyModelPrivate::hashToMap(const QHash<int, QVariant>& other)
-{
-    QMap<int, QVariant> result;
-    auto hashEnd = other.cend();
-    for (auto i = other.cbegin(); i != hashEnd; ++i)
-        result.insert(i.key(), i.value());
-    return result;
-}
 
 #endif // insertproxy_p_h__

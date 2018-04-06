@@ -52,14 +52,14 @@ public:
     InsertDirections insertDirection() const;
     void setInsertDirection(const InsertDirections& direction);
     virtual QVariant dataForCorner(int role = Qt::DisplayRole) const;
-    virtual void setDataForCorner(const QVariant& value, int role = Qt::DisplayRole);
+    virtual void setDataForCorner(const QVariant& value, int role = Qt::EditRole);
     bool separateEditDisplay() const;
     void setSeparateEditDisplay(bool val);
 public Q_SLOTS:
     bool commitRow();
     bool commitColumn();
 Q_SIGNALS:
-    void dataForCornerChanged(int role);
+    void dataForCornerChanged(const QVector<int>& roles);
     void extraDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
     void separateEditDisplayChanged(bool separate);
     void insertDirectionChanged(const InsertDirections& direction);

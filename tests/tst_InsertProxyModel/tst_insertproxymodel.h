@@ -8,6 +8,11 @@ class tst_InsertProxyModel : public QObject{
     Q_OBJECT
 private Q_SLOTS:
     void initTestCase();
+    void testData();
+    void testData_data();
+    void testSetData();
+    void testSetData_data();
+    void testSetItemData();
     void testCommitSubclass();
     void testCommitSubclass_data();
     void testCommitSlot();
@@ -19,5 +24,8 @@ private Q_SLOTS:
     void testDisconnectedModel();
     void testNullModel();
     void testProperties();
+    void testDataForCorner();
+    void testSort();
+    
 };
 #endif // tst_insertproxymodel_h__

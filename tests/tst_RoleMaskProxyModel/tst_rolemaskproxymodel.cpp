@@ -138,10 +138,10 @@ void tst_RoleMaskProxyModel::testProperties()
     const auto roleList = proxyModel.property("maskedRoles").value<QList<int> >();
     QVERIFY(roleList.contains(Qt::UserRole));
     QVERIFY(roleList.contains(Qt::DisplayRole));
-    QVERIFY(proxyModel.setProperty("separateEditDisplay", true));
-    QCOMPARE(proxyModel.property("separateEditDisplay").toBool(), true);
     QVERIFY(proxyModel.setProperty("transparentIfEmpty", false));
     QCOMPARE(proxyModel.property("transparentIfEmpty").toBool(), false);
+    QVERIFY(proxyModel.setProperty("mergeDisplayEdit", false));
+    QCOMPARE(proxyModel.property("mergeDisplayEdit").toBool(), false);
 }
 void tst_RoleMaskProxyModel::testInsertColumn()
 {

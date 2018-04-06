@@ -5,6 +5,54 @@
 #include <QVector>
 #include <QByteArray>
 
+/*!
+\internal
+*/
+QMap<int, QVariant> InsertProxyModelPrivate::hashToMap(const QHash<int, QVariant>& other)
+{
+    QMap<int, QVariant> result;
+    auto hashEnd = other.cend();
+    for (auto i = other.cbegin(); i != hashEnd; ++i)
+        result.insert(i.key(), i.value());
+    return result;
+}
+
+/*!
+\internal
+*/
+QVector<int> InsertProxyModelPrivate::setDataInHash(QHash<int, QVariant>& baseHash, int role, const QVariant& value)
+{
+    QVector<int> changedRoles;
+    QVector<int> adjRoles;
+    adjRoles.reserve(2);
+    changedRoles.reserve(2);
+    adjRoles.append(role);
+    if ((!m_separateEditDisplay) && (role == Qt::DisplayRole || role == Qt::EditRole))
+        adjRoles.append(role == Qt::DisplayRole ? Qt::EditRole : Qt::DisplayRole);
+    for (auto adjRole = adjRoles.cbegin(); adjRole != adjRoles.cend(); ++adjRole) {
+        const auto dataIter = baseHash.find(*adjRole);
+        if (dataIter == baseHash.end()) {
+            if (!value.isValid())
+                continue;
+            baseHash.insert(role, value);
+            changedRoles.append(*adjRole);
+        }
+        else {
+            Q_ASSERT(dataIter.value().isValid());
+            if (!value.isValid()){
+                baseHash.erase(dataIter);
+                changedRoles.append(*adjRole);
+            }
+            else {
+                if (dataIter.value() != value) {
+                    dataIter.value() = value;
+                    changedRoles.append(*adjRole);
+                }
+            }
+        }
+    }
+    return changedRoles;
+}
 
 /*!
 \internal
@@ -14,13 +62,15 @@ void InsertProxyModelPrivate::checkExtraRowChanged(const QModelIndex& topLeft, c
     Q_UNUSED(topLeft)
     Q_UNUSED(roles)
     Q_Q(InsertProxyModel);
-    Q_ASSERT(!(bottomRight.column() >= q->sourceModel()->columnCount() && bottomRight.row() >= q->sourceModel()->rowCount()));
-    if (bottomRight.column() >= q->sourceModel()->columnCount()) {
+    const int sourceCols = q->sourceModel()->columnCount();
+    const int sourceRows = q->sourceModel()->rowCount();
+    if(bottomRight.column() >= sourceCols && bottomRight.row() >= sourceRows)
+        return; // the corner changed
+    if (bottomRight.column() >= sourceCols) {
         if (q->validColumn())
             commitColumn();
-        return;
     }
-    if (bottomRight.row() >= q->sourceModel()->rowCount()) {
+    else if (bottomRight.row() >= sourceRows) {
         if (q->validRow())
             commitRow();
     }
@@ -34,6 +84,9 @@ bool InsertProxyModelPrivate::commitRow()
     return commitToSource(true);
 }
 
+/*!
+\internal
+*/
 bool InsertProxyModelPrivate::commitToSource(const bool isRow)
 {
     Q_Q(InsertProxyModel);
@@ -76,19 +129,29 @@ bool InsertProxyModelPrivate::commitToSource(const bool isRow)
 /*!
 \internal
 */
-void InsertProxyModelPrivate::setSeparateEditDisplayHash(QHash<int, QVariant>& singleHash)
+int InsertProxyModelPrivate::mergeEditDisplayHash(QHash<int, QVariant>& singleHash)
 {
-    const auto displayFind = singleHash.constFind(Qt::DisplayRole);
-    if (m_separateEditDisplay && displayFind != singleHash.cend())
-        m_extraHeaderData->insert(Qt::EditRole, displayFind.value());
-    else if (!m_separateEditDisplay) {
-        if (displayFind == singleHash.cend()) {
-            const auto editFind = m_extraHeaderData->find(Qt::EditRole);
-            if (editFind != singleHash.cend())
-                m_extraHeaderData->insert(Qt::DisplayRole, editFind.value());
+    const auto displayIter = singleHash.constFind(Qt::DisplayRole);
+    const auto editIter = m_extraHeaderData->find(Qt::EditRole);
+    if (displayIter == singleHash.cend()){
+        if (editIter != singleHash.end()) {
+            m_extraHeaderData->insert(Qt::DisplayRole, editIter.value());
+            return Qt::DisplayRole;
         }
-        m_extraHeaderData->remove(Qt::EditRole);
     }
+    else {
+        if (editIter != singleHash.end()){
+            if (editIter.value() != displayIter.value()){
+                editIter.value() = displayIter.value();
+                return Qt::EditRole;
+            }
+        }
+        else {
+            m_extraHeaderData->insert(Qt::EditRole, displayIter.value());
+            return Qt::EditRole;
+        }
+    }
+    return -1;
 }
 
 /*!
@@ -344,33 +407,14 @@ bool InsertProxyModel::setHeaderData(int section, Qt::Orientation orientation, c
     Q_D(InsertProxyModel);
     if (!sourceModel())
         return false;
-    const int adjRole = (!d->m_separateEditDisplay && (role == Qt::EditRole)) ? Qt::DisplayRole : role;
     if (
         (orientation == Qt::Horizontal && (d->m_insertDirection & InsertColumn) && section == sourceModel()->columnCount())
         || (orientation == Qt::Vertical && (d->m_insertDirection & InsertRow) && section == sourceModel()->rowCount())
-        ) {
-        auto& headIter = d->m_extraHeaderData[orientation == Qt::Vertical];
-        if (value.isValid()) {
-            auto roleIter = headIter.find(adjRole);
-            if (roleIter == headIter.end()) {
-                headIter.insert(adjRole, value);
-                headerDataChanged(orientation, section, section);
-                return true;
-            }
-            if (roleIter.value() == value)
-                return true;
-            roleIter.value() = value;
+        ) 
+    {
+        const QVector<int> changedRoles = d->setDataInHash(d->m_extraHeaderData[orientation == Qt::Vertical], role, value);
+        if (!changedRoles.isEmpty())
             headerDataChanged(orientation, section, section);
-            return true;
-        }
-        else {
-            auto roleIter = headIter.find(adjRole);
-            if (roleIter == headIter.end())
-                return true;
-            headIter.erase(roleIter);
-            headerDataChanged(orientation, section, section);
-            return true;
-        }
     }
     return sourceModel()->setHeaderData(section, orientation, value, role);
 }
@@ -389,13 +433,12 @@ QVariant InsertProxyModel::data(const QModelIndex &proxyIndex, int role) const
     Q_D(const InsertProxyModel);
     const bool isExtraRow = proxyIndex.row() == sourceModel()->rowCount() && d->m_insertDirection & InsertRow;
     const bool isExtraCol = proxyIndex.column() == sourceModel()->columnCount() && d->m_insertDirection & InsertColumn;
-    const int adjRole = (!d->m_separateEditDisplay && (role == Qt::EditRole)) ? Qt::DisplayRole : role;
     if (isExtraCol && isExtraRow)
-        return d->m_dataForCorner.value(adjRole);
+        return d->m_dataForCorner.value(role);
     if (isExtraRow)
-        return d->m_extraData[true].value(proxyIndex.column()).value(adjRole);
+        return d->m_extraData[true].value(proxyIndex.column()).value(role);
     if (isExtraCol)
-        return d->m_extraData[false].value(proxyIndex.row()).value(adjRole);
+        return d->m_extraData[false].value(proxyIndex.row()).value(role);
     return sourceModel()->data(sourceModel()->index(proxyIndex.row(), proxyIndex.column()), role);
 }
 
@@ -421,33 +464,14 @@ bool InsertProxyModel::setData(const QModelIndex &index, const QVariant &value, 
         return false;
     const bool isExtraRow = index.row() == sourceRows  && d->m_insertDirection & InsertRow;
     const bool isExtraCol = index.column() == sourceCols  && d->m_insertDirection & InsertColumn;
-    if (isExtraRow && isExtraCol)
-        return false;
+    if (isExtraRow && isExtraCol) {
+        setDataForCorner(value, role);
+        return true;
+    }
     if (!(isExtraRow || isExtraCol))
         return sourceModel()->setData(sourceModel()->index(index.row(), index.column()), value, role);
     const int sectionIdx = isExtraRow ? index.column() : index.row();
-    QVector<int> rolesToSet;
-    QVector<int> changedRoles;
-    rolesToSet.reserve(2);
-    changedRoles.reserve(2);
-    rolesToSet << role;
-    if (!d->m_separateEditDisplay && (role == Qt::DisplayRole || role == Qt::EditRole))
-        rolesToSet << (role == Qt::DisplayRole ? Qt::EditRole : Qt::DisplayRole);
-    for (auto i = rolesToSet.cbegin(); i != rolesToSet.cend();++i){
-        auto roleIter = d->m_extraData[isExtraRow][sectionIdx].find(*i);
-        if (roleIter == d->m_extraData[isExtraRow][sectionIdx].end()){
-            if (value.isValid()) {
-                d->m_extraData[isExtraRow][sectionIdx].insert(*i, value);
-                changedRoles << *i;
-            }
-        }
-        else{
-            if (roleIter.value() != value){
-                roleIter.value() = value;
-                changedRoles << *i;
-            }
-        }
-    }
+    QVector<int> changedRoles = d->setDataInHash(d->m_extraData[isExtraRow][sectionIdx], role, value);
     if (!changedRoles.isEmpty()){
         dataChanged(index, index, changedRoles);
         extraDataChanged(index, index, changedRoles);
@@ -710,6 +734,7 @@ bool InsertProxyModel::moveColumns(const QModelIndex &sourceParent, int sourceCo
 */
 void InsertProxyModel::sort(int column, Qt::SortOrder order) 
 {
+    return; // #TODO implement
     if (!sourceModel())
         return;
     sourceModel()->sort(column, order);
@@ -781,23 +806,13 @@ Set the data for the corner cell at the intersection between the extra row and e
 void InsertProxyModel::setDataForCorner(const QVariant& value, int role)
 {
     Q_D(InsertProxyModel);
-    const auto dataIter = d->m_dataForCorner.find(role);
-    if (value.isValid()) {
-        if (dataIter == d->m_dataForCorner.end()) {
-            d->m_dataForCorner.insert(role, value);
-            dataForCornerChanged(role);
-            return;
-        }
-        if (dataIter.value() == value)
-            return;
-        dataIter.value() = value;
-        dataForCornerChanged(role);
-    }
-    else {
-        if (dataIter == d->m_dataForCorner.end())
-            return;
-        d->m_dataForCorner.erase(dataIter);
-        dataForCornerChanged(role);
+    const QVector<int> changedRoles = d->setDataInHash(d->m_dataForCorner,role,value);
+    if (changedRoles.isEmpty())
+        return;
+    dataForCornerChanged(changedRoles);
+    if (sourceModel() && (d->m_insertDirection & (InsertProxyModel::InsertRow | InsertProxyModel::InsertColumn))){
+        const QModelIndex cornerIndex = index(sourceModel()->rowCount(), sourceModel()->columnCount());
+        dataChanged(cornerIndex, cornerIndex, changedRoles);
     }
 }
 
@@ -840,24 +855,48 @@ void InsertProxyModel::setSeparateEditDisplay(bool val)
     Q_D(InsertProxyModel);
     if (d->m_separateEditDisplay != val) {
         d->m_separateEditDisplay = val;
-        if (sourceModel()) {
-            const QVector<int> rolesVector = QVector<int>() << Qt::EditRole << Qt::DisplayRole;
+        if (sourceModel() && !val) {
             const int sourceCol = sourceModel()->columnCount();
             const int sourceRows = sourceModel()->rowCount();
-            for (QHash<int, QVariant>& singleHash : d->m_extraHeaderData)
-                d->setSeparateEditDisplayHash(singleHash);
-            if (d->m_insertDirection & InsertColumn)
-                headerDataChanged(Qt::Horizontal, sourceCol, sourceCol);
-            if (d->m_insertDirection & InsertRow)
+            //orientation == Qt::Vertical
+            int roleChange = d->mergeEditDisplayHash(d->m_extraHeaderData[1]);
+            if (roleChange>=0){
                 headerDataChanged(Qt::Vertical, sourceRows, sourceRows);
-            for (auto& sectionHash : d->m_extraData) {
-                for (auto singleHashIter = sectionHash.begin(); singleHashIter != sectionHash.end(); ++singleHashIter)
-                    d->setSeparateEditDisplayHash(*singleHashIter);
             }
-            if (d->m_insertDirection & InsertColumn)
-                dataChanged(index(0, sourceCol), index(sourceRows - 1, sourceCol), rolesVector);
-            if (d->m_insertDirection & InsertRow)
-                dataChanged(index(sourceRows, 0), index(sourceRows, sourceCol - 1), rolesVector);
+            roleChange = d->mergeEditDisplayHash(d->m_extraHeaderData[0]);
+            if (roleChange >= 0) {
+                headerDataChanged(Qt::Horizontal, sourceCol, sourceCol);
+            }
+            roleChange = d->mergeEditDisplayHash(d->m_dataForCorner);
+            if (roleChange >= 0) {
+                const QVector<int> roleChangeVect(1, roleChange);
+                dataForCornerChanged(roleChangeVect);
+                if (d->m_insertDirection & (InsertRow | InsertColumn)) {
+                    const QModelIndex cornerIdx = index(sourceRows, sourceCol);
+                    dataChanged(cornerIdx, cornerIdx, roleChangeVect);
+                }
+            }
+
+            // 0 rows 1 cols
+            for (int i = 0; i < sourceRows;++i){
+                roleChange = d->mergeEditDisplayHash(d->m_extraData[0][i]);
+                if (roleChange >= 0){
+                    const QVector<int> roleChangeVect(1, roleChange);
+                    const QModelIndex currentIdx = index(i, sourceCol);
+                    extraDataChanged(currentIdx, currentIdx, roleChangeVect);
+                    if (d->m_insertDirection & InsertColumn)
+                        dataChanged(currentIdx, currentIdx, roleChangeVect);
+                }
+            }
+            for (int i = 0; i < sourceCol; ++i) {
+                if (roleChange >= 0) {
+                    const QVector<int> roleChangeVect(1, roleChange);
+                    const QModelIndex currentIdx = index(sourceRows,i);
+                    extraDataChanged(currentIdx, currentIdx, roleChangeVect);
+                    if (d->m_insertDirection & InsertRow)
+                        dataChanged(currentIdx, currentIdx, roleChangeVect);
+                }
+            }
         }
         separateEditDisplayChanged(val);
     }
