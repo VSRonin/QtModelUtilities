@@ -39,6 +39,10 @@ bool InsertProxyModelPrivate::commitToSource(const bool isRow)
     Q_Q(InsertProxyModel);
     if (!q->sourceModel())
         return false;
+    const bool canInsCol = m_insertDirection & InsertProxyModel::InsertColumn;
+    const bool canInsRow = m_insertDirection & InsertProxyModel::InsertRow;
+    if (!((isRow && canInsRow) || (!isRow && canInsCol)))
+        return false;
     const int sourceCols = q->sourceModel()->columnCount();
     const int sourceRows = q->sourceModel()->rowCount();
     if (!(isRow ? q->sourceModel()->insertRow(sourceRows) : q->sourceModel()->insertColumn(sourceCols)))

@@ -131,10 +131,23 @@ void tst_RoleMaskProxyModel::testInsertRow_data()
     QTest::newRow("Tree Insert End Child") << m_models.at(2) << m_models.at(2)->rowCount(m_models.at(2)->index(0, 0)) << m_models.at(2)->index(0, 0);
 #endif
 }
-
+void tst_RoleMaskProxyModel::testProperties()
+{
+    RoleMaskProxyModel proxyModel;
+    QVERIFY(proxyModel.setProperty("maskedRoles", QVariant::fromValue(QList<int>({Qt::UserRole, Qt::DisplayRole}))));
+    const auto roleList = proxyModel.property("maskedRoles").value<QList<int> >();
+    QVERIFY(roleList.contains(Qt::UserRole));
+    QVERIFY(roleList.contains(Qt::DisplayRole));
+    QVERIFY(proxyModel.setProperty("separateEditDisplay", true));
+    QCOMPARE(proxyModel.property("separateEditDisplay").toBool(), true);
+    QVERIFY(proxyModel.setProperty("transparentIfEmpty", false));
+    QCOMPARE(proxyModel.property("transparentIfEmpty").toBool(), false);
+}
 void tst_RoleMaskProxyModel::testInsertColumn()
 {
-#ifdef QT_GUI_LIB
+#ifndef QT_GUI_LIB
+    QSKIP("This test requires the Qt GUI module");
+#else
     QFETCH(QAbstractItemModel*, baseModel);
     QFETCH(int, insertIndex);
     QFETCH(QModelIndex, parentIndex);
@@ -156,8 +169,6 @@ void tst_RoleMaskProxyModel::testInsertColumn()
             QCOMPARE(proxyModel.index(0, i, proxyParent).data(Qt::UserRole).toInt(), magicNumber + i);
     }
     QVERIFY(baseModel->removeColumn(insertIndex, parentIndex));
-#else
-    QSKIP("This test requires the Qt GUI module");
 #endif
 }
 

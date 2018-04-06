@@ -15,6 +15,7 @@ private Q_SLOTS:
     void testUseRoleMask_data();
     void testInsertRow();
     void testInsertRow_data();
+    void testProperties();
     void testInsertColumn();
     void testInsertColumn_data();
     void testNullModel();
