@@ -476,7 +476,7 @@ void tst_InsertProxyModel::testDataForCorner()
     QAbstractItemModel* const baseModel = createTableModel(this);
     InsertProxyModel proxyModel;
     QSignalSpy cornerChangeSpy(&proxyModel, SIGNAL(dataForCornerChanged(QVector<int>)));
-    QSignalSpy cornerDataChangeSpy(&proxyModel, SIGNAL(dataChanged(QModelIndex, , QModelIndex, QVector<int>)));
+    QSignalSpy cornerDataChangeSpy(&proxyModel, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)));
     QVERIFY(cornerChangeSpy.isValid());
     QVERIFY(cornerDataChangeSpy.isValid());
     proxyModel.setInsertDirection(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
@@ -510,7 +510,33 @@ void tst_InsertProxyModel::testDataForCorner()
 
 void tst_InsertProxyModel::testSort()
 {
-    QSKIP("Needs to implement");
+    QFETCH(bool, sortProxy);
+    QStringListModel baseModel(QStringList({ QStringLiteral("b"), QStringLiteral("a"), QStringLiteral("d"), QStringLiteral("c") }));
+    InsertProxyModel proxyModel;
+    proxyModel.setSourceModel(&baseModel);
+    proxyModel.setInsertDirection(InsertProxyModel::InsertColumn);
+    QVERIFY(proxyModel.setData(proxyModel.index(0, 1), 1));
+    QVERIFY(proxyModel.setData(proxyModel.index(1, 1), 0));
+    QVERIFY(proxyModel.setData(proxyModel.index(2, 1), 3));
+    QVERIFY(proxyModel.setData(proxyModel.index(3, 1), 2));
+    QPersistentModelIndex persistBase = proxyModel.index(0, 0);
+    QPersistentModelIndex persistExtra = proxyModel.index(0, 1);
+    if (sortProxy)
+        proxyModel.sort(0, Qt::AscendingOrder);
+    else
+        baseModel.sort(0, Qt::AscendingOrder);
+    QCOMPARE(persistBase.data().toString(), QStringLiteral("b"));
+    QCOMPARE(persistExtra.data().toInt(), 1);
+    for (int i = 0; i < baseModel.rowCount(); ++i)
+        QCOMPARE(proxyModel.index(i, 1).data().toInt(), i);
+
+}
+
+void tst_InsertProxyModel::testSort_data()
+{
+    QTest::addColumn<bool>("sortProxy");
+    QTest::newRow("Sort via Proxy") << true;
+    QTest::newRow("Sort via Base") << false;
 }
 
 void tst_InsertProxyModel::testDisconnectedModel()

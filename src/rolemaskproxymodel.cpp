@@ -74,7 +74,7 @@ bool RoleMaskProxyModelPrivate::removeRole(const QPersistentModelIndex& idx, int
     return removeRole(idxIter, role);
 }
 
-bool RoleMaskProxyModelPrivate::removeRole(const QHash<QPersistentModelIndex, QHash<int, QVariant> >::iterator& idxIter, int role)
+bool RoleMaskProxyModelPrivate::removeRole(const QHash<QPersistentModelIndex, RolesContainer >::iterator& idxIter, int role)
 {
     if (idxIter == m_maskedData.end())
         return false;
@@ -233,9 +233,9 @@ QVariant RoleMaskProxyModel::data(const QModelIndex &proxyIndex, int role) const
     if (!d->m_maskedRoles.contains(adjRole))
         return QIdentityProxyModel::data(proxyIndex, role);
     const QModelIndex sourceIndex = mapToSource(proxyIndex);
-    const QHash<QPersistentModelIndex, QHash<int, QVariant> >::const_iterator idxIter = d->m_maskedData.constFind(sourceIndex);
+    const auto idxIter = d->m_maskedData.constFind(sourceIndex);
     if (idxIter != d->m_maskedData.constEnd()){
-        const QHash<int, QVariant>::const_iterator roleIter = idxIter->constFind(adjRole);
+        const auto roleIter = idxIter->constFind(adjRole);
         if (roleIter != idxIter->constEnd())
             return roleIter.value();
     }
@@ -265,7 +265,7 @@ bool RoleMaskProxyModel::setData(const QModelIndex &proxyIndex, const QVariant &
             return true;
         }
         else {
-            idxIter = d->m_maskedData.insert(sourceIndex, QHash<int, QVariant>());
+            idxIter = d->m_maskedData.insert(sourceIndex, RolesContainer());
             idxIter->insert(role, value);
             dataChanged(proxyIndex, proxyIndex, changedRolesVector);
             return true;
@@ -322,7 +322,7 @@ void RoleMaskProxyModel::setMergeDisplayEdit(bool val)
                     idxIter->remove(Qt::EditRole);
                 }
                 else {
-                    const QHash<int, QVariant>::const_iterator roleIter = idxIter->constFind(Qt::EditRole);
+                    const auto roleIter = idxIter->constFind(Qt::EditRole);
                     if (roleIter != idxIter->constEnd()) {
                         idxIter->insert(Qt::DisplayRole, *roleIter);
                         idxIter->remove(Qt::EditRole);
@@ -330,7 +330,7 @@ void RoleMaskProxyModel::setMergeDisplayEdit(bool val)
                 }
             }
             else{
-                const QHash<int, QVariant>::const_iterator roleIter = idxIter->constFind(Qt::DisplayRole);
+                const auto roleIter = idxIter->constFind(Qt::DisplayRole);
                 if (roleIter != idxIter->constEnd()) {
                     idxIter->insert(Qt::EditRole, *roleIter);
                 }

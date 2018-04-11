@@ -26,6 +26,6 @@ private Q_SLOTS:
     void testProperties();
     void testDataForCorner();
     void testSort();
-    
+    void testSort_data();
 };
 #endif // tst_insertproxymodel_h__

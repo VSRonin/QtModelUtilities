@@ -8,19 +8,7 @@
 /*!
 \internal
 */
-QMap<int, QVariant> InsertProxyModelPrivate::hashToMap(const QHash<int, QVariant>& other)
-{
-    QMap<int, QVariant> result;
-    auto hashEnd = other.cend();
-    for (auto i = other.cbegin(); i != hashEnd; ++i)
-        result.insert(i.key(), i.value());
-    return result;
-}
-
-/*!
-\internal
-*/
-QVector<int> InsertProxyModelPrivate::setDataInHash(QHash<int, QVariant>& baseHash, int role, const QVariant& value)
+QVector<int> InsertProxyModelPrivate::setDataInContainer(RolesContainer& baseHash, int role, const QVariant& value)
 {
     QVector<int> changedRoles;
     QVector<int> adjRoles;
@@ -34,7 +22,7 @@ QVector<int> InsertProxyModelPrivate::setDataInHash(QHash<int, QVariant>& baseHa
         if (dataIter == baseHash.end()) {
             if (!value.isValid())
                 continue;
-            baseHash.insert(role, value);
+            baseHash.insert(*adjRole, value);
             changedRoles.append(*adjRole);
         }
         else {
@@ -57,11 +45,13 @@ QVector<int> InsertProxyModelPrivate::setDataInHash(QHash<int, QVariant>& baseHa
 /*!
 \internal
 */
-void InsertProxyModelPrivate::checkExtraRowChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int> &roles)
+void InsertProxyModelPrivate::checkExtraDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int> &roles)
 {
     Q_UNUSED(topLeft)
     Q_UNUSED(roles)
     Q_Q(InsertProxyModel);
+    if (!bottomRight.isValid())
+        return;
     const int sourceCols = q->sourceModel()->columnCount();
     const int sourceRows = q->sourceModel()->rowCount();
     if(bottomRight.column() >= sourceCols && bottomRight.row() >= sourceRows)
@@ -102,7 +92,7 @@ bool InsertProxyModelPrivate::commitToSource(const bool isRow)
         return false;
     const int loopEnd = isRow ? sourceCols : sourceRows;
     for (int i = 0; i < loopEnd; ++i) {
-        QHash<int, QVariant>& allRoles = m_extraData[isRow][i];
+        RolesContainer& allRoles = m_extraData[isRow][i];
         if (allRoles.isEmpty())
             continue;
         const auto endRoles = allRoles.constEnd();
@@ -113,7 +103,7 @@ bool InsertProxyModelPrivate::commitToSource(const bool isRow)
             ;
         Q_ASSERT(m_separateEditDisplay || (allRoles.contains(Qt::DisplayRole) == allRoles.contains(Qt::EditRole)));
         Q_ASSERT(m_separateEditDisplay || (allRoles.value(Qt::DisplayRole) == allRoles.value(Qt::EditRole)));
-        if(!q->sourceModel()->setItemData(currentIdx, hashToMap(allRoles)))
+        if(!q->sourceModel()->setItemData(currentIdx, convertFromContainer<QMap<int,QVariant> >(allRoles)))
             return false;
         QVector<int> aggregateRoles;
         aggregateRoles.reserve(allRoles.size());
@@ -129,7 +119,7 @@ bool InsertProxyModelPrivate::commitToSource(const bool isRow)
 /*!
 \internal
 */
-int InsertProxyModelPrivate::mergeEditDisplayHash(QHash<int, QVariant>& singleHash)
+int InsertProxyModelPrivate::mergeEditDisplayHash(RolesContainer& singleHash)
 {
     const auto displayIter = singleHash.constFind(Qt::DisplayRole);
     const auto editIter = m_extraHeaderData->find(Qt::EditRole);
@@ -162,7 +152,7 @@ void InsertProxyModelPrivate::onInserted(bool isRow, const QModelIndex &parent, 
     if (parent.isValid())
         return;
     for (; first <= last; --last)
-        m_extraData[!isRow].insert(first, QHash<int, QVariant>());
+        m_extraData[!isRow].insert(first, RolesContainer());
     Q_Q(InsertProxyModel);
     isRow ? q->endInsertRows() : q->endInsertColumns();
 }
@@ -212,11 +202,11 @@ InsertProxyModelPrivate::InsertProxyModelPrivate(InsertProxyModel* q)
     , m_separateEditDisplay(false)
 {
     Q_ASSERT(q_ptr);
-    QHash<int, QVariant> starHeader;
+    RolesContainer starHeader;
     starHeader.insert(Qt::DisplayRole, QVariant::fromValue(QStringLiteral("*")));
     m_extraHeaderData[true] = starHeader;
     m_extraHeaderData[false] = starHeader;
-    QObject::connect(q_ptr, &QAbstractItemModel::dataChanged, [this](const QModelIndex& topLeft,const QModelIndex& bottomRight, const QVector<int>& roles)->void{checkExtraRowChanged(topLeft,bottomRight,roles);});
+    QObject::connect(q_ptr, &InsertProxyModel::extraDataChanged, [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)->void {checkExtraDataChanged(topLeft, bottomRight, roles); });
 }
 
 /*!
@@ -261,18 +251,8 @@ void InsertProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
             dataChanged(mapFromSource(topLeft), mapFromSource(bottomRight), roles);
         })
         << QObject::connect(sourceModel(), &QAbstractItemModel::headerDataChanged, this, &QAbstractItemModel::headerDataChanged)
-        << QObject::connect(sourceModel(), &QAbstractItemModel::layoutAboutToBeChanged, [this](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {
-            QList<QPersistentModelIndex> mappedParents;
-            for (const auto& parent : parents)
-                mappedParents << QPersistentModelIndex(mapFromSource(parent));
-            layoutAboutToBeChanged(mappedParents, hint);
-        })
-        << QObject::connect(sourceModel(), &QAbstractItemModel::layoutChanged, [this](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {
-            QList<QPersistentModelIndex> mappedParents;
-            for (auto& parent : parents)
-                mappedParents << QPersistentModelIndex(mapFromSource(parent));
-            layoutChanged(mappedParents, hint);
-        })
+        << QObject::connect(sourceModel(), &QAbstractItemModel::layoutAboutToBeChanged, [d](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {d->beforeLayoutChange(parents, hint); })
+        << QObject::connect(sourceModel(), &QAbstractItemModel::layoutChanged, [d](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {d->afetrLayoutChange(parents, hint);})
         << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeInserted, [this](const QModelIndex &parent, int first, int last) {
             if (!parent.isValid()) {
                 beginInsertColumns(QModelIndex(), first, last);
@@ -319,9 +299,9 @@ void InsertProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
         const int sourceCols = sourceModel()->columnCount();
         const int sourceRows = sourceModel()->rowCount();
         for (int i = 0; i < sourceRows; ++i)
-            d->m_extraData[0].append(QHash<int, QVariant>());
+            d->m_extraData[0].append(RolesContainer());
         for (int i = 0; i < sourceCols; ++i)
-            d->m_extraData[1].append(QHash<int, QVariant>());
+            d->m_extraData[1].append(RolesContainer());
     }
    
     endResetModel();
@@ -412,7 +392,7 @@ bool InsertProxyModel::setHeaderData(int section, Qt::Orientation orientation, c
         || (orientation == Qt::Vertical && (d->m_insertDirection & InsertRow) && section == sourceModel()->rowCount())
         ) 
     {
-        const QVector<int> changedRoles = d->setDataInHash(d->m_extraHeaderData[orientation == Qt::Vertical], role, value);
+        const QVector<int> changedRoles = d->setDataInContainer(d->m_extraHeaderData[orientation == Qt::Vertical], role, value);
         if (!changedRoles.isEmpty())
             headerDataChanged(orientation, section, section);
     }
@@ -471,7 +451,7 @@ bool InsertProxyModel::setData(const QModelIndex &index, const QVariant &value, 
     if (!(isExtraRow || isExtraCol))
         return sourceModel()->setData(sourceModel()->index(index.row(), index.column()), value, role);
     const int sectionIdx = isExtraRow ? index.column() : index.row();
-    QVector<int> changedRoles = d->setDataInHash(d->m_extraData[isExtraRow][sectionIdx], role, value);
+    QVector<int> changedRoles = d->setDataInContainer(d->m_extraData[isExtraRow][sectionIdx], role, value);
     if (!changedRoles.isEmpty()){
         dataChanged(index, index, changedRoles);
         extraDataChanged(index, index, changedRoles);
@@ -506,8 +486,8 @@ bool InsertProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVa
         return sourceModel()->setItemData(sourceModel()->index(index.row(), index.column()), roles);
 
     const int sectionIdx = isExtraRow ? index.column() : index.row();
-    QHash<int,QVariant>& oldData = d->m_extraData[isExtraRow][sectionIdx];
-    QHash<int, QVariant> newData;
+    RolesContainer& oldData = d->m_extraData[isExtraRow][sectionIdx];
+    RolesContainer newData;
     QVector<int> changedRoles;
     bool hasDisplay = false;
     bool hasEdit = false;
@@ -734,11 +714,148 @@ bool InsertProxyModel::moveColumns(const QModelIndex &sourceParent, int sourceCo
 */
 void InsertProxyModel::sort(int column, Qt::SortOrder order) 
 {
-    return; // #TODO implement
     if (!sourceModel())
+        return;
+    if (column<0 || column>=sourceModel()->columnCount())
         return;
     sourceModel()->sort(column, order);
 }
+
+/*!
+\internal
+*/
+void InsertProxyModelPrivate::beforeLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
+{
+    if (!parents.isEmpty() && std::all_of(parents.cbegin(), parents.cend(), [](const QPersistentModelIndex& idx) {return idx.isValid(); }))
+        return;
+    Q_Q(InsertProxyModel);
+    Q_ASSERT(q->sourceModel());
+    q->layoutAboutToBeChanged(parents, hint);
+    if (hint == QAbstractItemModel::VerticalSortHint)
+        return beforeSortRows();
+    if (hint == QAbstractItemModel::HorizontalSortHint)
+        return beforeSortCols();
+    // Not much we can do otherwise
+    m_baseDataLayoutMapper.clear();
+    for (qint32 i = 0, maxRow = q->sourceModel()->rowCount(); i < maxRow;++i){
+        for (qint32 j = 0, maxCol = q->sourceModel()->columnCount(); j < maxCol; ++j) {
+            //m_baseDataLayoutMapper.insert(static_cast<quint64>(i) << )
+        }
+    }
+}
+
+/*!
+\internal
+*/
+void InsertProxyModelPrivate::afetrLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
+{
+    
+    if (!parents.isEmpty() && std::all_of(parents.cbegin(), parents.cend(), [](const QPersistentModelIndex& idx) {return idx.isValid(); }))
+        return;
+    if (hint == QAbstractItemModel::VerticalSortHint)
+        return afterSortRows();
+    if (hint == QAbstractItemModel::HorizontalSortHint)
+        return afterSortCols();
+    // Not much we can do otherwise
+    Q_Q(InsertProxyModel);
+    Q_ASSERT(q->sourceModel());
+    const int maxRow = q->sourceModel()->rowCount();
+    const int maxCol = q->sourceModel()->columnCount();
+    for (int i = 0; i < maxRow; ++i) {
+        for (int j = 0; j < maxCol; ++j){
+        
+        }
+    }
+    q->layoutChanged(parents, hint);
+}
+
+/*!
+\internal
+*/
+void InsertProxyModelPrivate::beforeSortRows()
+{
+    return beforeSort(true);
+}
+
+/*!
+\internal
+*/
+void InsertProxyModelPrivate::beforeSort(bool isRow)
+{
+    Q_Q(InsertProxyModel);
+    if (!q->sourceModel())
+        return;
+    if (isRow && q->sourceModel()->columnCount() == 0)
+        return;
+    if (!isRow && q->sourceModel()->rowCount() == 0)
+        return;
+    const int maxSortedIdx = isRow ? q->sourceModel()->rowCount() : q->sourceModel()->columnCount();
+    const InsertProxyModel::InsertDirections directionCheck = isRow ? InsertProxyModel::InsertColumn : InsertProxyModel::InsertRow;
+    if (m_insertDirection & directionCheck){
+        m_extraDataSorter.clear();
+        m_extraDataSorter.reserve(maxSortedIdx);
+        for (int i = 0; i < maxSortedIdx; ++i) {
+            if (isRow)
+                m_extraDataSorter.append(q->sourceModel()->index(i, 0));
+            else
+                m_extraDataSorter.append(q->sourceModel()->index(0, i));
+        }
+    }
+}
+
+/*!
+\internal
+*/
+void InsertProxyModelPrivate::afterSort(bool isRow)
+{
+    Q_Q(InsertProxyModel);
+    const int maxSortedIdx = isRow ? q->sourceModel()->rowCount() : q->sourceModel()->columnCount();
+    const InsertProxyModel::InsertDirections directionCheck = isRow ? InsertProxyModel::InsertColumn : InsertProxyModel::InsertRow;
+    if (m_insertDirection & directionCheck){
+        const QList<RolesContainer> oldlayout = m_extraData[!isRow];
+        const int maxSecondaryIdx = isRow ? q->sourceModel()->columnCount() : q->sourceModel()->rowCount();
+        for (int i = 0; i < maxSortedIdx; ++i) {
+            const int newSortedIdx = isRow ? m_extraDataSorter.at(i).row() : m_extraDataSorter.at(i).column();
+            m_extraData[!isRow][newSortedIdx] = oldlayout.at(i);
+            for (int j = 0; j < maxSecondaryIdx; ++j) {
+                if (isRow)
+                    q->changePersistentIndex(q->index(i, j), q->index(newSortedIdx, j));
+
+                else
+                    q->changePersistentIndex(q->index(j, i), q->index(j, newSortedIdx));
+                
+            }
+        }
+    }
+    m_extraDataSorter.clear();
+    q->layoutChanged(QList<QPersistentModelIndex>(), isRow ? QAbstractItemModel::VerticalSortHint : QAbstractItemModel::HorizontalSortHint);
+}
+
+
+/*!
+\internal
+*/
+void InsertProxyModelPrivate::afterSortRows()
+{
+    return beforeSort(true);    
+}
+
+/*!
+\internal
+*/
+void InsertProxyModelPrivate::beforeSortCols()
+{
+    return beforeSort(false);
+}
+
+/*!
+\internal
+*/
+void InsertProxyModelPrivate::afterSortCols()
+{
+    return beforeSort(false);
+}
+
 
 /*!
 \brief flag function for the extra row or column
@@ -806,7 +923,7 @@ Set the data for the corner cell at the intersection between the extra row and e
 void InsertProxyModel::setDataForCorner(const QVariant& value, int role)
 {
     Q_D(InsertProxyModel);
-    const QVector<int> changedRoles = d->setDataInHash(d->m_dataForCorner,role,value);
+    const QVector<int> changedRoles = d->setDataInContainer(d->m_dataForCorner,role,value);
     if (changedRoles.isEmpty())
         return;
     dataForCornerChanged(changedRoles);
