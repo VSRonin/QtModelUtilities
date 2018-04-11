@@ -220,13 +220,13 @@ test_script:
             $testSuitePropertiesXmlOut = $testSuiteXmlOut.AppendChild($xmlOut.CreateElement("properties"));
             $testSuitePropertiesPropertyXmlOut = $testSuitePropertiesXmlOut.AppendChild($xmlOut.CreateElement("property"));
             $testSuitePropertiesPropertyXmlOut.SetAttribute("name","QtVersion");
-            $testSuitePropertiesPropertyXmlOut.SetAttribute("value",[Security.SecurityElement]::Escape($XmlDocument.TestCase.Environment.QtVersion));
+            $testSuitePropertiesPropertyXmlOut.SetAttribute("value",($XmlDocument.TestCase.Environment.QtVersion));
             $testSuitePropertiesPropertyXmlOut = $testSuitePropertiesXmlOut.AppendChild($xmlOut.CreateElement("property"));
             $testSuitePropertiesPropertyXmlOut.SetAttribute("name","QtBuild");
-            $testSuitePropertiesPropertyXmlOut.SetAttribute("value",[Security.SecurityElement]::Escape($XmlDocument.TestCase.Environment.QtBuild));
+            $testSuitePropertiesPropertyXmlOut.SetAttribute("value",($XmlDocument.TestCase.Environment.QtBuild));
             $testSuitePropertiesPropertyXmlOut = $testSuitePropertiesXmlOut.AppendChild($xmlOut.CreateElement("property"));
             $testSuitePropertiesPropertyXmlOut.SetAttribute("name","QTestVersion");
-            $testSuitePropertiesPropertyXmlOut.SetAttribute("value",[Security.SecurityElement]::Escape($XmlDocument.TestCase.Environment.QTestVersion));
+            $testSuitePropertiesPropertyXmlOut.SetAttribute("value",($XmlDocument.TestCase.Environment.QTestVersion));
             foreach($testFunction in $XmlDocument.SelectNodes("//TestFunction")){
                 $testFunctionName = $testFunction.name;
                 $countIncidents = $testFunction.ChildNodes.Count;
@@ -240,7 +240,7 @@ test_script:
                     if($incident.DataTag -ne $null){
                         $incidentName = $incidentName + " - " + $incident.DataTag.InnerText;
                     }
-                    $incidentName = [Security.SecurityElement]::Escape($incidentName);
+                    $incidentName = ($incidentName);
                     $testSuitetestcaseXmlOut = $testSuiteXmlOut.AppendChild($xmlOut.CreateElement("testcase"));
                     $testSuitetestcaseXmlOut.SetAttribute("name",$incidentName);
                     $testSuitetestcaseXmlOut.SetAttribute("classname",$testClassName);
@@ -248,16 +248,16 @@ test_script:
                     if($incident.type -eq "skip"){
                         ++$localSkip;
                         $testSuitetestcaseSkipXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("skipped"));
-                        $testSuitetestcaseSkipXmlOut.SetAttribute("message","file: " + [Security.SecurityElement]::Escape($incident.file + " line: " + $incident.line + " " + $incident.Description.InnerText));
+                        $testSuitetestcaseSkipXmlOut.SetAttribute("message","file: " + ($incident.file + " line: " + $incident.line + " " + $incident.Description.InnerText));
                     }
                     ElseIf ($incident.type -eq "fail"){
                         ++$localFail;
                         $testSuitetestcaseSkipXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("failure"));
-                        $testSuitetestcaseSkipXmlOut.SetAttribute("message",[Security.SecurityElement]::Escape("file: " + $incident.file + " line: " + $incident.line + " " + $incident.Description.InnerText));
+                        $testSuitetestcaseSkipXmlOut.SetAttribute("message",("file: " + $incident.file + " line: " + $incident.line + " " + $incident.Description.InnerText));
                     }
                     ElseIf ($incident.type -eq "qdebug" -or $incident.type -eq "qwarn" -or $incident.type -eq "system" -or $incident.type -eq "qfatal"){
                         $testSuitetestcaseCerrXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("system-err"));
-                        $testSuitetestcaseCerrXmlOut.AppendChild($xmlOut.CreateTextNode([Security.SecurityElement]::Escape($incident.Description.InnerText)));
+                        $testSuitetestcaseCerrXmlOut.AppendChild($xmlOut.CreateTextNode(($incident.Description.InnerText)));
                     }
                     else{
                         ++$localPass;
@@ -270,7 +270,7 @@ test_script:
             $testSuitetestcaseXmlOut.SetAttribute("name","SystemError");
             $testSuitetestcaseXmlOut.SetAttribute("classname",$testClassName);
             $testSuitetestcaseErrorXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("error"));
-            $testSuitetestcaseErrorXmlOut.SetAttribute("message",[Security.SecurityElement]::Escape($crashMessage));
+            $testSuitetestcaseErrorXmlOut.SetAttribute("message",($crashMessage));
         }
         $testSuiteXmlOut.SetAttribute("time",$localTime/1000);
         $testSuiteXmlOut.SetAttribute("skipped",$localSkip);
