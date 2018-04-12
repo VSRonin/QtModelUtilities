@@ -90,6 +90,42 @@ matrix:
     compiler: gcc
     env:
       - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=56 QTVERSIONPATCH=562 OPTIMISE_FOR_MANY_ROLES=OFF
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF TSAN=ON
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF ASAN=ON
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF MSAN=ON
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF LSAN=ON
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF UBSAN=ON
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: clang
+    env:
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF
 
 install:
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
@@ -106,6 +142,31 @@ install:
       && brew install qt5
       && chmod -R 755 /usr/local/opt/qt5/*
       ;
+    fi
+  - if [ "${TSAN}" = "ON" ]; then
+        export CFLAGS=-fsanitize=thread
+        export LDFLAGS=-fsanitize=thread
+    ;
+    fi
+  - if [ "${ASAN}" = "ON" ]; then
+        export CFLAGS=-fsanitize=address
+        export LDFLAGS=-fsanitize=address
+    ;
+    fi
+  - if [ "${MSAN}" = "ON" ]; then
+        export CFLAGS=-fsanitize=memory
+        export LDFLAGS=-fsanitize=memory
+    ;
+    fi
+  - if [ "${LSAN}" = "ON" ]; then
+        export CFLAGS=-fsanitize=leak
+        export LDFLAGS=-fsanitize=leak
+    ;
+    fi
+  - if [ "${UBSAN}" = "ON" ]; then
+        export CFLAGS=-fsanitize=undefined
+        export LDFLAGS=-fsanitize=undefined
+    ;
     fi
 
 before_script:
