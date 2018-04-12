@@ -730,18 +730,26 @@ void InsertProxyModelPrivate::beforeLayoutChange(const QList<QPersistentModelInd
         return;
     Q_Q(InsertProxyModel);
     Q_ASSERT(q->sourceModel());
-    q->layoutAboutToBeChanged(parents, hint);
     if (hint == QAbstractItemModel::VerticalSortHint)
-        return beforeSortRows();
-    if (hint == QAbstractItemModel::HorizontalSortHint)
-        return beforeSortCols();
+        beforeSortRows();
+    else if (hint == QAbstractItemModel::HorizontalSortHint)
+        beforeSortCols();
     // Not much we can do otherwise
-    m_baseDataLayoutMapper.clear();
-    for (qint32 i = 0, maxRow = q->sourceModel()->rowCount(); i < maxRow;++i){
-        for (qint32 j = 0, maxCol = q->sourceModel()->columnCount(); j < maxCol; ++j) {
-            //m_baseDataLayoutMapper.insert(static_cast<quint64>(i) << )
+    Q_ASSERT(m_layoutChangeProxyIndexes.isEmpty());
+    Q_ASSERT(m_layoutChangePersistentIndexes.isEmpty());
+    const int maxRow = q->sourceModel()->rowCount();
+    const int maxCol = q->sourceModel()->columnCount();
+    m_layoutChangeProxyIndexes.reserve(maxRow*maxCol);
+    m_layoutChangePersistentIndexes.reserve(maxRow*maxCol);
+    for (int i = 0; i < maxRow; ++i) {
+        for (int j = 0; j < maxCol; ++j) {
+            m_layoutChangeProxyIndexes << q->index(i, j);
+            Q_ASSERT(m_layoutChangeProxyIndexes.last().isValid());
+            m_layoutChangePersistentIndexes << q->sourceModel()->index(i, j);
+            Q_ASSERT(m_layoutChangePersistentIndexes.last().isValid());
         }
     }
+    q->layoutAboutToBeChanged(QList<QPersistentModelIndex>({ QPersistentModelIndex() }), hint);
 }
 
 /*!
@@ -753,20 +761,17 @@ void InsertProxyModelPrivate::afetrLayoutChange(const QList<QPersistentModelInde
     if (!parents.isEmpty() && std::all_of(parents.cbegin(), parents.cend(), [](const QPersistentModelIndex& idx) {return idx.isValid(); }))
         return;
     if (hint == QAbstractItemModel::VerticalSortHint)
-        return afterSortRows();
-    if (hint == QAbstractItemModel::HorizontalSortHint)
-        return afterSortCols();
+        afterSortRows();
+    else  if (hint == QAbstractItemModel::HorizontalSortHint)
+        afterSortCols();
     // Not much we can do otherwise
     Q_Q(InsertProxyModel);
     Q_ASSERT(q->sourceModel());
-    const int maxRow = q->sourceModel()->rowCount();
-    const int maxCol = q->sourceModel()->columnCount();
-    for (int i = 0; i < maxRow; ++i) {
-        for (int j = 0; j < maxCol; ++j){
-        
-        }
-    }
-    q->layoutChanged(parents, hint);
+    for (int i = 0; i < m_layoutChangeProxyIndexes.size(); ++i) 
+        q->changePersistentIndex(m_layoutChangeProxyIndexes.at(i), q->mapFromSource(m_layoutChangePersistentIndexes.at(i)));
+    m_layoutChangeProxyIndexes.clear();
+    m_layoutChangePersistentIndexes.clear();
+    q->layoutChanged(QList<QPersistentModelIndex>({ QPersistentModelIndex() }), hint);
 }
 
 /*!
@@ -792,13 +797,15 @@ void InsertProxyModelPrivate::beforeSort(bool isRow)
     const int maxSortedIdx = isRow ? q->sourceModel()->rowCount() : q->sourceModel()->columnCount();
     const InsertProxyModel::InsertDirections directionCheck = isRow ? InsertProxyModel::InsertColumn : InsertProxyModel::InsertRow;
     if (m_insertDirection & directionCheck){
-        m_extraDataSorter.clear();
-        m_extraDataSorter.reserve(maxSortedIdx);
+        Q_ASSERT(m_layoutChangeExtraIndexes.isEmpty());
+        Q_ASSERT(m_layoutChangeExtraPersistent.isEmpty());
+        m_layoutChangeExtraIndexes.reserve(maxSortedIdx);
+        m_layoutChangeExtraPersistent.reserve(maxSortedIdx);
+        const int maxSecondaryIdx = isRow ? q->sourceModel()->columnCount() : q->sourceModel()->rowCount();
         for (int i = 0; i < maxSortedIdx; ++i) {
-            if (isRow)
-                m_extraDataSorter.append(q->sourceModel()->index(i, 0));
-            else
-                m_extraDataSorter.append(q->sourceModel()->index(0, i));
+                m_layoutChangeExtraPersistent.append(isRow ? q->sourceModel()->index(i, 0) : q->sourceModel()->index(0,i));
+                m_layoutChangeExtraIndexes.append(isRow ? q->index(i, maxSecondaryIdx) : q->index(maxSecondaryIdx, i));
+
         }
     }
 }
@@ -815,20 +822,13 @@ void InsertProxyModelPrivate::afterSort(bool isRow)
         const QList<RolesContainer> oldlayout = m_extraData[!isRow];
         const int maxSecondaryIdx = isRow ? q->sourceModel()->columnCount() : q->sourceModel()->rowCount();
         for (int i = 0; i < maxSortedIdx; ++i) {
-            const int newSortedIdx = isRow ? m_extraDataSorter.at(i).row() : m_extraDataSorter.at(i).column();
+            const int newSortedIdx = isRow ? m_layoutChangeExtraPersistent.at(i).row() : m_layoutChangeExtraPersistent.at(i).column();
             m_extraData[!isRow][newSortedIdx] = oldlayout.at(i);
-            for (int j = 0; j < maxSecondaryIdx; ++j) {
-                if (isRow)
-                    q->changePersistentIndex(q->index(i, j), q->index(newSortedIdx, j));
-
-                else
-                    q->changePersistentIndex(q->index(j, i), q->index(j, newSortedIdx));
-                
-            }
+            q->changePersistentIndex(m_layoutChangeExtraIndexes.at(i), isRow ? q->index(newSortedIdx, maxSecondaryIdx) : q->index(maxSecondaryIdx, newSortedIdx));
         }
     }
-    m_extraDataSorter.clear();
-    q->layoutChanged(QList<QPersistentModelIndex>(), isRow ? QAbstractItemModel::VerticalSortHint : QAbstractItemModel::HorizontalSortHint);
+    m_layoutChangeExtraIndexes.clear();
+    m_layoutChangeExtraPersistent.clear();
 }
 
 
@@ -837,11 +837,11 @@ void InsertProxyModelPrivate::afterSort(bool isRow)
 */
 void InsertProxyModelPrivate::afterSortRows()
 {
-    return beforeSort(true);    
+    return afterSort(true);    
 }
 
 /*!
-\internal
+\internal 
 */
 void InsertProxyModelPrivate::beforeSortCols()
 {
@@ -853,7 +853,7 @@ void InsertProxyModelPrivate::beforeSortCols()
 */
 void InsertProxyModelPrivate::afterSortCols()
 {
-    return beforeSort(false);
+    return afterSort(false);
 }
 
 

@@ -10,8 +10,10 @@ class InsertProxyModelPrivate
     Q_DISABLE_COPY(InsertProxyModelPrivate)
     InsertProxyModelPrivate(InsertProxyModel* q);
     InsertProxyModel::InsertDirections m_insertDirection;
-    QVector<QPersistentModelIndex> m_extraDataSorter;
-    QHash<quint64, QPersistentModelIndex> m_baseDataLayoutMapper;
+    QList<QPersistentModelIndex> m_layoutChangeExtraPersistent;
+    QModelIndexList m_layoutChangeExtraIndexes;
+    QList<QPersistentModelIndex> m_layoutChangePersistentIndexes;
+    QModelIndexList m_layoutChangeProxyIndexes;
     QList<RolesContainer> m_extraData[2];
     RolesContainer m_extraHeaderData[2];
     RolesContainer m_dataForCorner;

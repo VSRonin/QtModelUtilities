@@ -519,14 +519,21 @@ void tst_InsertProxyModel::testSort()
     QVERIFY(proxyModel.setData(proxyModel.index(1, 1), 0));
     QVERIFY(proxyModel.setData(proxyModel.index(2, 1), 3));
     QVERIFY(proxyModel.setData(proxyModel.index(3, 1), 2));
-    QPersistentModelIndex persistBase = proxyModel.index(0, 0);
+    QPersistentModelIndex persistBase = baseModel.index(0, 0);
+    std::pair<int, int> persistCode = std::make_pair(persistBase.row(), persistBase.column());
+    QPersistentModelIndex persistInside = proxyModel.index(0, 0);
+    persistCode = std::make_pair(persistInside.row(), persistInside.column());
     QPersistentModelIndex persistExtra = proxyModel.index(0, 1);
+    persistCode = std::make_pair(persistExtra.row(), persistExtra.column());
     if (sortProxy)
         proxyModel.sort(0, Qt::AscendingOrder);
     else
         baseModel.sort(0, Qt::AscendingOrder);
-    QCOMPARE(persistBase.data().toString(), QStringLiteral("b"));
+    persistCode = std::make_pair(persistBase.row(), persistBase.column());
+    persistCode = std::make_pair(persistInside.row(), persistInside.column());
+    persistCode = std::make_pair(persistExtra.row(), persistExtra.column());
     QCOMPARE(persistExtra.data().toInt(), 1);
+    QCOMPARE(persistInside.data().toString(), persistBase.data().toString());
     for (int i = 0; i < baseModel.rowCount(); ++i)
         QCOMPARE(proxyModel.index(i, 1).data().toInt(), i);
 
