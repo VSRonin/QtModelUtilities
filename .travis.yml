@@ -17,61 +17,91 @@ matrix:
     sudo: required
     compiler: gcc
     addons:
-      apt:
-        packages:
-          - g++-7
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - beineri/opt-qt594-trusty
+          packages:
+            - g++-7
+            - qt59base
+            - qt59tools
     env:
-      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF COMPILER=g++-7
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=59 OPTIMISE_FOR_MANY_ROLES=OFF CXX=g++-7
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     addons:
-      apt:
-        packages:
-          - g++-7
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - beineri/opt-qt594-trusty
+          packages:
+            - g++-7
+            - qt59base
+            - qt59tools
     env:
-      - USESTATIC=OFF NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF COMPILER=g++-7
+      - USESTATIC=OFF NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=59 OPTIMISE_FOR_MANY_ROLES=OFF COMPILER=g++-7
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     addons:
-      apt:
-        packages:
-          - g++-7
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - beineri/opt-qt594-trusty
+          packages:
+            - g++-7
+            - qt59base
+            - qt59tools
     env:
-      - USESTATIC=ON NOWIDGETS=ON NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF COMPILER=g++-7
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=OFF QTVERSIONMINOR=59 OPTIMISE_FOR_MANY_ROLES=OFF COMPILER=g++-7
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     addons:
-      apt:
-        packages:
-          - g++-7
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - beineri/opt-qt594-trusty
+          packages:
+            - g++-7
+            - qt59base
+            - qt59tools
     env:
-      - USESTATIC=OFF NOWIDGETS=ON NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF COMPILER=g++-7
+      - USESTATIC=OFF NOWIDGETS=ON NOGUI=OFF QTVERSIONMINOR=59 OPTIMISE_FOR_MANY_ROLES=OFF COMPILER=g++-7
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     addons:
-      apt:
-        packages:
-          - g++-7
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - beineri/opt-qt594-trusty
+          packages:
+            - g++-7
+            - qt59base
+            - qt59tools
     env:
-      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF COMPILER=g++-7
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 OPTIMISE_FOR_MANY_ROLES=OFF COMPILER=g++-7
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     addons:
-      apt:
-        packages:
-          - g++-7
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - beineri/opt-qt594-trusty
+          packages:
+            - g++-7
+            - qt59base
+            - qt59tools
     env:
-      - USESTATIC=OFF NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF COMPILER=g++-7
+      - USESTATIC=OFF NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 OPTIMISE_FOR_MANY_ROLES=OFF COMPILER=g++-7
   - os: osx
     compiler: clang
     env:
@@ -101,100 +131,142 @@ matrix:
     sudo: required
     compiler: gcc
     addons:
-      apt:
-        packages:
-          - g++-7
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - beineri/opt-qt511-trusty
+          packages:
+            - g++-7
+            - qt51base
+            - qt51tools
     env:
-      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=51 QTVERSIONPATCH=511 OPTIMISE_FOR_MANY_ROLES=OFF COMPILER=g++-7
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=51 OPTIMISE_FOR_MANY_ROLES=OFF COMPILER=g++-7
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=51 OPTIMISE_FOR_MANY_ROLES=ON COMPILER=g++-7
+    addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - beineri/opt-qt511-trusty
+          packages:
+            - g++-7
+            - qt51base
+            - qt51tools
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     addons:
-      apt:
-        packages:
-          - g++-7
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - beineri/opt-qt562-trusty
+          packages:
+            - g++-7
+            - qt56base
+            - qt56tools
     env:
-      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=51 QTVERSIONPATCH=511 OPTIMISE_FOR_MANY_ROLES=ON COMPILER=g++-7
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=56 OPTIMISE_FOR_MANY_ROLES=OFF COMPILER=g++-7
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     addons:
-      apt:
-        packages:
-          - g++-7
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - beineri/opt-qt594-trusty
+          packages:
+            - g++-7
+            - qt59base
+            - qt59tools
     env:
-      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=56 QTVERSIONPATCH=562 OPTIMISE_FOR_MANY_ROLES=OFF COMPILER=g++-7
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 OPTIMISE_FOR_MANY_ROLES=OFF TSAN=ON COMPILER=g++-7
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     addons:
-      apt:
-        packages:
-          - g++-7
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - beineri/opt-qt594-trusty
+          packages:
+            - g++-7
+            - qt59base
+            - qt59tools
     env:
-      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF TSAN=ON COMPILER=g++-7
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 OPTIMISE_FOR_MANY_ROLES=OFF ASAN=ON COMPILER=g++-7
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     addons:
-      apt:
-        packages:
-          - g++-7
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - beineri/opt-qt594-trusty
+          packages:
+            - g++-7
+            - qt59base
+            - qt59tools
     env:
-      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF ASAN=ON COMPILER=g++-7
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 OPTIMISE_FOR_MANY_ROLES=OFF MSAN=ON COMPILER=g++-7
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     addons:
-      apt:
-        packages:
-          - g++-7
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - beineri/opt-qt594-trusty
+          packages:
+            - g++-7
+            - qt59base
+            - qt59tools
     env:
-      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF MSAN=ON COMPILER=g++-7
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 OPTIMISE_FOR_MANY_ROLES=OFF LSAN=ON COMPILER=g++-7
   - os: linux
     dist: trusty
     sudo: required
     compiler: gcc
     addons:
-      apt:
-        packages:
-          - g++-7
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - beineri/opt-qt594-trusty
+          packages:
+            - g++-7
+            - qt59base
+            - qt59tools
     env:
-      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF LSAN=ON COMPILER=g++-7
-  - os: linux
-    dist: trusty
-    sudo: required
-    compiler: gcc
-    addons:
-      apt:
-        packages:
-          - g++-7
-    env:
-      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF UBSAN=ON COMPILER=g++-7
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 OPTIMISE_FOR_MANY_ROLES=OFF UBSAN=ON COMPILER=g++-7
   - os: linux
     dist: trusty
     sudo: required
     compiler: clang
     addons:
         apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - beineri/opt-qt594-trusty
+            - llvm-toolchain-trusty-6.0
           packages:
             - clang-6.0
+            - qt59base
+            - qt59tools
     env:
-      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF COMPILER=clang++-6.0
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 OPTIMISE_FOR_MANY_ROLES=OFF COMPILER=clang++-6.0
 
 install:
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
          lsb_release -a
-      && sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
-      && sudo apt-add-repository -y ppa:beineri/opt-qt${QTVERSIONPATCH}-trusty
       && sudo apt-get -qq update
-      && sudo apt-get -qq install g++-6 libc6-i386 qt${QTVERSIONMINOR}base qt${QTVERSIONMINOR}tools
-      && export CXX=$COMPILER
       ;
     else
          brew update > /dev/null

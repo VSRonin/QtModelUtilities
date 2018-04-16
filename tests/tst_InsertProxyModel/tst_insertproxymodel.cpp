@@ -473,7 +473,7 @@ void tst_InsertProxyModel::testProperties()
 
 void tst_InsertProxyModel::testDataForCorner()
 {
-    QAbstractItemModel* const baseModel = createTableModel(this);
+    QAbstractItemModel* const baseModel = createListModel(this);
     InsertProxyModel proxyModel;
     QSignalSpy cornerChangeSpy(&proxyModel, SIGNAL(dataForCornerChanged(QVector<int>)));
     QSignalSpy cornerDataChangeSpy(&proxyModel, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)));
