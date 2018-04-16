@@ -33,14 +33,13 @@ The library should be compatible with all platform supported by Qt, the CI will 
 + Windows MSVC 2015 32bit Qt 5.9
 + Windows MSVC 2015 64bit Qt 5.9
 + Windows MinGW 5.3.0 32bit Qt 5.9
-+ Ubuntu Trusty gcc 7 64bit Qt 5.9
++ Ubuntu Trusty gcc 6 64bit Qt 5.9
 + Mac OS X LLVM 8.1 64bit Qt 5.10
 
 A reduced suite of tests, to ensure compatibility, is also run on:
 
-+ Ubuntu Trusty gcc 7 64bit Qt 5.1
-+ Ubuntu Trusty gcc 7 64bit Qt 5.6
-+ Ubuntu Trusty clang 6 64bit Qt 5.9
++ Ubuntu Trusty gcc 6 64bit Qt 5.1
++ Ubuntu Trusty gcc 6 64bit Qt 5.6
 + Windows MinGW 4.7.0 32bit Qt 5.0 (manual)
 + Windows MSVC 2013 32bit Qt 5.8 (manual)
 
