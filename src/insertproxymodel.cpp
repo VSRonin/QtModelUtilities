@@ -735,8 +735,6 @@ void InsertProxyModelPrivate::beforeLayoutChange(const QList<QPersistentModelInd
     else if (hint == QAbstractItemModel::HorizontalSortHint)
         beforeSortCols();
     // Not much we can do otherwise
-    Q_ASSERT(m_layoutChangeProxyIndexes.isEmpty());
-    Q_ASSERT(m_layoutChangePersistentIndexes.isEmpty());
     const int maxRow = q->sourceModel()->rowCount();
     const int maxCol = q->sourceModel()->columnCount();
     m_layoutChangeProxyIndexes.reserve(maxRow*maxCol);
@@ -767,8 +765,12 @@ void InsertProxyModelPrivate::afetrLayoutChange(const QList<QPersistentModelInde
     // Not much we can do otherwise
     Q_Q(InsertProxyModel);
     Q_ASSERT(q->sourceModel());
-    for (int i = 0; i < m_layoutChangeProxyIndexes.size(); ++i) 
-        q->changePersistentIndex(m_layoutChangeProxyIndexes.at(i), q->mapFromSource(m_layoutChangePersistentIndexes.at(i)));
+    QModelIndexList toList;
+    toList.reserve(m_layoutChangePersistentIndexes.size());
+    for (auto i = m_layoutChangePersistentIndexes.cbegin(), listEnd = m_layoutChangePersistentIndexes.cend(); i != listEnd; ++i) {
+        toList << q->mapFromSource(*i);
+    }
+    q->changePersistentIndexList(m_layoutChangeProxyIndexes, toList);
     m_layoutChangeProxyIndexes.clear();
     m_layoutChangePersistentIndexes.clear();
     q->layoutChanged(QList<QPersistentModelIndex>({ QPersistentModelIndex() }), hint);
@@ -797,14 +799,14 @@ void InsertProxyModelPrivate::beforeSort(bool isRow)
     const int maxSortedIdx = isRow ? q->sourceModel()->rowCount() : q->sourceModel()->columnCount();
     const InsertProxyModel::InsertDirections directionCheck = isRow ? InsertProxyModel::InsertColumn : InsertProxyModel::InsertRow;
     if (m_insertDirection & directionCheck){
-        Q_ASSERT(m_layoutChangeExtraIndexes.isEmpty());
-        Q_ASSERT(m_layoutChangeExtraPersistent.isEmpty());
-        m_layoutChangeExtraIndexes.reserve(maxSortedIdx);
-        m_layoutChangeExtraPersistent.reserve(maxSortedIdx);
+        Q_ASSERT(m_layoutChangeProxyIndexes.isEmpty());
+        Q_ASSERT(m_layoutChangePersistentIndexes.isEmpty());
+        m_layoutChangeProxyIndexes.reserve(maxSortedIdx);
+        m_layoutChangePersistentIndexes.reserve(maxSortedIdx);
         const int maxSecondaryIdx = isRow ? q->sourceModel()->columnCount() : q->sourceModel()->rowCount();
         for (int i = 0; i < maxSortedIdx; ++i) {
-                m_layoutChangeExtraPersistent.append(isRow ? q->sourceModel()->index(i, 0) : q->sourceModel()->index(0,i));
-                m_layoutChangeExtraIndexes.append(isRow ? q->index(i, maxSecondaryIdx) : q->index(maxSecondaryIdx, i));
+            m_layoutChangePersistentIndexes.append(isRow ? q->sourceModel()->index(i, 0) : q->sourceModel()->index(0, i));
+            m_layoutChangeProxyIndexes.append(isRow ? q->index(i, maxSecondaryIdx) : q->index(maxSecondaryIdx, i));
 
         }
     }
@@ -821,14 +823,17 @@ void InsertProxyModelPrivate::afterSort(bool isRow)
     if (m_insertDirection & directionCheck){
         const QList<RolesContainer> oldlayout = m_extraData[!isRow];
         const int maxSecondaryIdx = isRow ? q->sourceModel()->columnCount() : q->sourceModel()->rowCount();
+        QModelIndexList toList;
+        toList.reserve(maxSortedIdx);
         for (int i = 0; i < maxSortedIdx; ++i) {
-            const int newSortedIdx = isRow ? m_layoutChangeExtraPersistent.at(i).row() : m_layoutChangeExtraPersistent.at(i).column();
+            const int newSortedIdx = isRow ? m_layoutChangePersistentIndexes.at(i).row() : m_layoutChangePersistentIndexes.at(i).column();
             m_extraData[!isRow][newSortedIdx] = oldlayout.at(i);
-            q->changePersistentIndex(m_layoutChangeExtraIndexes.at(i), isRow ? q->index(newSortedIdx, maxSecondaryIdx) : q->index(maxSecondaryIdx, newSortedIdx));
+            toList << (isRow ? q->index(newSortedIdx, maxSecondaryIdx) : q->index(maxSecondaryIdx, newSortedIdx));
         }
+        q->changePersistentIndexList(m_layoutChangeProxyIndexes.mid(0, maxSortedIdx), toList);
     }
-    m_layoutChangeExtraIndexes.clear();
-    m_layoutChangeExtraPersistent.clear();
+    m_layoutChangeProxyIndexes.erase(m_layoutChangeProxyIndexes.begin(), m_layoutChangeProxyIndexes.begin() + maxSortedIdx);
+    m_layoutChangePersistentIndexes.erase(m_layoutChangePersistentIndexes.begin(), m_layoutChangePersistentIndexes.begin() + maxSortedIdx);
 }
 
 

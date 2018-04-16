@@ -248,12 +248,12 @@ test_script:
                     if($incident.type -eq "skip"){
                         ++$localSkip;
                         $testSuitetestcaseSkipXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("skipped"));
-                        $testSuitetestcaseSkipXmlOut.SetAttribute("message","file: " + ($incident.file + "\nline: " + $incident.line + "\n" + $incident.Description.InnerText));
+                        $testSuitetestcaseSkipXmlOut.SetAttribute("message","file: " + ($incident.file + "`nline: " + $incident.line + "`n" + $incident.Description.InnerText));
                     }
                     ElseIf ($incident.type -eq "fail"){
                         ++$localFail;
                         $testSuitetestcaseSkipXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("failure"));
-                        $testSuitetestcaseSkipXmlOut.SetAttribute("message",("file: " + $incident.file + "\nline: " + $incident.line + "\n" + $incident.Description.InnerText));
+                        $testSuitetestcaseSkipXmlOut.SetAttribute("message",("file: " + $incident.file + "`nline: " + $incident.line + "`n" + $incident.Description.InnerText));
                     }
                     ElseIf ($incident.type -eq "qdebug" -or $incident.type -eq "qwarn" -or $incident.type -eq "system" -or $incident.type -eq "qfatal"){
                         $testSuitetestcaseCerrXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("system-err"));
