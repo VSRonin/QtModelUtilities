@@ -169,8 +169,7 @@ after_build:
 - if %use_mingw%==true set PATH=C:\Program Files\Git\usr\bin;%PATH%
 - if %use_mingw%==true (set archivename=mingw) else (set archivename=msvc2015)
 - if %platform%==x86 (set archivename=%archivename%_x86) else (set archivename=%archivename%_x64)
-- mkdir modelutilitiesarch
-- if %APPVEYOR_REPO_BRANCH%==master if %use_gui%==true if %use_widgets%==true if %use_static%==false 7z a -tzip ".\modelutilitiesarch\modelutilities_%archivename%_%APPVEYOR_BUILD_VERSION%.zip" .\installed\*
+- if %APPVEYOR_REPO_BRANCH%==master if %use_gui%==true if %use_widgets%==true if %use_static%==false cpack -G ZIP
 
 test_script:
 - cd TestResults
@@ -293,7 +292,7 @@ test_script:
     }'
 
 artifacts:
-- path: '.\build\modelutilitiesarch\*.zip'
+- path: '.\build\*.zip'
 
 on_finish:
 - ps: if (Test-Path ".\testResults.xml") {(new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\testResults.xml));}

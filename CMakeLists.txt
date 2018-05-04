@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.3)
-set(modelutilities_VERSION "0.0.1")
+set(modelutilities_VERSION_MAJOR 0)
+set(modelutilities_VERSION_MINOR 0)
+set(modelutilities_VERSION_PATCH 1)
+set(modelutilities_VERSION "${modelutilities_VERSION_MAJOR}.${modelutilities_VERSION_MINOR}.${modelutilities_VERSION_PATCH}")
 if(POLICY CMP0025)
   cmake_policy(SET CMP0025 NEW)
 endif()
@@ -123,18 +126,26 @@ if(BUILD_STATIC_LIBS)
 else()
     add_library(modelutilities SHARED ${modelutilities_SRCS})
 endif()
-install(FILES ${modelutilities_INSTALL_INCLUDE} DESTINATION include COMPONENT headers)
+install(FILES ${modelutilities_INSTALL_INCLUDE}
+    DESTINATION include 
+    COMPONENT headers
+)
 install(TARGETS modelutilities
+    EXPORT modelutilitiesBinary
     RUNTIME DESTINATION bin COMPONENT library
     LIBRARY DESTINATION lib COMPONENT library
     ARCHIVE DESTINATION lib COMPONENT library
 )
-target_include_directories(modelutilities PRIVATE ${modelutilities_INCLUDE})
-target_link_libraries(modelutilities PRIVATE ${modelutilities_LIBS})
-target_compile_definitions(modelutilities PRIVATE ${modelutilities_COMPILE_DEFINE})
+install(FILES modelutilities-config.cmake DESTINATION cmake)
+install(EXPORT modelutilitiesBinary DESTINATION cmake)
+target_include_directories(modelutilities PUBLIC 
+    $<BUILD_INTERFACE:${modelutilities_INCLUDE}>
+    $<INSTALL_INTERFACE:include>
+    )
+target_link_libraries(modelutilities PUBLIC ${modelutilities_LIBS})
+target_compile_definitions(modelutilities PUBLIC ${modelutilities_COMPILE_DEFINE})
 set_target_properties(modelutilities PROPERTIES 
     VERSION ${modelutilities_VERSION}
-    SOVERSION 0
     EXPORT_NAME "ModelUtilities"
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib"
@@ -163,4 +174,11 @@ if(BUILD_TESTING)
     endif()
     add_subdirectory(tests)
 endif()
+SET(CPACK_PACKAGE_VERSION_MAJOR modelutilities_VERSION_MAJOR)
+SET(CPACK_PACKAGE_VERSION_MINOR modelutilities_VERSION_MINOR)
+SET(CPACK_PACKAGE_VERSION_PATCH modelutilities_VERSION_PATCH)
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.markdown")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+SET(CPACK_PACKAGE_FILE_NAME "modelutilities-${modelutilities_VERSION}-${CMAKE_SYSTEM_NAME}-${modelutilities_PlatformDir}")
+include(CPack)
 
