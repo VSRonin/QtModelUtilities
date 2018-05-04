@@ -486,7 +486,7 @@ bool InsertProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVa
         return sourceModel()->setItemData(sourceModel()->index(index.row(), index.column()), roles);
 
     const int sectionIdx = isExtraRow ? index.column() : index.row();
-    RolesContainer& oldData = d->m_extraData[isExtraRow][sectionIdx];
+    const RolesContainer& oldData = (isExtraRow && isExtraCol) ? d->m_dataForCorner : d->m_extraData[isExtraRow][sectionIdx];
     RolesContainer newData;
     QVector<int> changedRoles;
     bool hasDisplay = false;
@@ -526,10 +526,41 @@ bool InsertProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVa
         if (!newData.contains(i.key()))
             changedRoles << i.key();
     }
-    oldData = newData;
+    if (isExtraRow && isExtraCol) 
+        d->m_dataForCorner = newData;
+    else
+        d->m_extraData[isExtraRow][sectionIdx] = newData;
     dataChanged(index, index, changedRoles);
     extraDataChanged(index, index, changedRoles);
     return true;
+}
+
+QMap<int, QVariant> InsertProxyModel::itemData(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return QMap<int, QVariant>();
+    if (!sourceModel())
+        return QMap<int, QVariant>();
+    const int sourceRows = sourceModel()->rowCount();
+    const int sourceCols = sourceModel()->columnCount();
+    Q_D(const InsertProxyModel);
+    if (
+        index.parent().isValid()
+        || index.row() > sourceRows
+        || index.column() > sourceCols
+        || (index.row() == sourceRows && !(d->m_insertDirection & InsertRow))
+        || (index.column() == sourceCols && !(d->m_insertDirection & InsertColumn))
+        )
+        return QMap<int, QVariant>();
+    const bool isExtraRow = index.row() == sourceRows  && d->m_insertDirection & InsertRow;
+    const bool isExtraCol = index.column() == sourceCols  && d->m_insertDirection & InsertColumn;
+    if (!(isExtraRow || isExtraCol))
+        return sourceModel()->itemData(sourceModel()->index(index.row(), index.column()));
+    if (isExtraRow && isExtraCol)
+        return convertFromContainer<QMap<int, QVariant> >(d->m_dataForCorner);
+    const int sectionIdx = isExtraRow ? index.column() : index.row();
+    return convertFromContainer<QMap<int, QVariant> >(d->m_extraData[isExtraRow][sectionIdx]);
+
 }
 
 /*!

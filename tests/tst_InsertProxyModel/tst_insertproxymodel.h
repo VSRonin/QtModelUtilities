@@ -12,6 +12,7 @@ private Q_SLOTS:
     void testData_data();
     void testSetData();
     void testSetData_data();
+    void testSetItemData_data();
     void testSetItemData();
     void testCommitSubclass();
     void testCommitSubclass_data();

@@ -614,6 +614,7 @@ void tst_InsertProxyModel::testSetData()
     const QString idxData = QStringLiteral("Test");
     QVERIFY(proxyModel.setData(proxyIdX, idxData,Qt::DisplayRole));
     QCOMPARE(proxyModel.data(proxyIdX, Qt::DisplayRole).toString(), idxData);
+    QCOMPARE(proxyModel.data(proxyIdX, Qt::EditRole).toString(), idxData);
     baseModel->deleteLater();
 }
 
@@ -647,9 +648,58 @@ void tst_InsertProxyModel::testSetData_data()
 #endif
 }
 
+void tst_InsertProxyModel::testSetItemData_data()
+{
+    QTest::addColumn<QAbstractItemModel*>("baseModel");
+    QTest::addColumn<int>("idxRow");
+    QTest::addColumn<int>("idxCol");
+    QAbstractItemModel* baseModel = createListModel(this);
+    QTest::newRow("List Extra Row") << baseModel << baseModel->rowCount() << 0;
+    baseModel = createListModel(this);
+    QTest::newRow("List Extra Col") << baseModel << 0 << baseModel->columnCount();
+    baseModel = createListModel(this);
+    QTest::newRow("List Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
+#ifdef QT_GUI_LIB
+    QTest::newRow("Table Inside Base Model") << createTableModel(this) << 0 << 0;
+    baseModel = createTableModel(this);
+    QTest::newRow("Table Extra Row") << baseModel << baseModel->rowCount() << 0;
+    baseModel = createTableModel(this);
+    QTest::newRow("Table Extra Col") << baseModel << 0 << baseModel->columnCount();
+    baseModel = createTableModel(this);
+    QTest::newRow("Table Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
+    QTest::newRow("Tree Inside Base Model") << createTreeModel(this) << 0 << 0;
+    baseModel = createTreeModel(this);
+    QTest::newRow("Tree Extra Row") << baseModel << baseModel->rowCount() << 0;
+    baseModel = createTreeModel(this);
+    QTest::newRow("Tree Extra Col") << baseModel << 0 << baseModel->columnCount();
+    baseModel = createTreeModel(this);
+    QTest::newRow("Tree Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
+#endif
+}
+
 void tst_InsertProxyModel::testSetItemData()
 {
-    QSKIP("Needs to implement");
+    QFETCH(QAbstractItemModel*, baseModel);
+    QFETCH(int, idxRow);
+    QFETCH(int, idxCol);
+    const QMap<int, QVariant> itemDataSet{{ //TextAlignmentRole
+            std::make_pair<int, QVariant>(Qt::UserRole, 5)
+            ,std::make_pair<int, QVariant>(Qt::DisplayRole, QStringLiteral("Test"))
+            , std::make_pair<int, QVariant>(Qt::ToolTipRole, QStringLiteral("ToolTip"))
+        }};
+    InsertProxyModel proxyModel;
+    proxyModel.setSeparateEditDisplay(false);
+    proxyModel.setInsertDirection(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
+    proxyModel.setSourceModel(baseModel);
+    const QModelIndex proxyIdX = proxyModel.index(idxRow, idxCol);
+    QVERIFY(proxyModel.setData(proxyIdX, Qt::AlignRight, Qt::TextAlignmentRole));
+    QVERIFY(proxyModel.setItemData(proxyIdX, itemDataSet));
+    QCOMPARE(proxyModel.data(proxyIdX, Qt::DisplayRole).toString(), QStringLiteral("Test"));
+    QCOMPARE(proxyModel.data(proxyIdX, Qt::EditRole).toString(), QStringLiteral("Test"));
+    QCOMPARE(proxyModel.data(proxyIdX, Qt::UserRole).toInt(), 5);
+    QCOMPARE(proxyModel.data(proxyIdX, Qt::ToolTipRole).toString(), QStringLiteral("ToolTip"));
+    QVERIFY(!proxyModel.data(proxyIdX, Qt::TextAlignmentRole).isValid());
+    baseModel->deleteLater();
 }
 
 void tst_InsertProxyModel::testCommitSubclass()
