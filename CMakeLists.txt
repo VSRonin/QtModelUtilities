@@ -143,7 +143,7 @@ target_include_directories(modelutilities PUBLIC
     $<INSTALL_INTERFACE:include>
     )
 target_link_libraries(modelutilities PUBLIC ${modelutilities_LIBS})
-target_compile_definitions(modelutilities PUBLIC ${modelutilities_COMPILE_DEFINE})
+target_compile_definitions(modelutilities PRIVATE ${modelutilities_COMPILE_DEFINE})
 set_target_properties(modelutilities PROPERTIES 
     VERSION ${modelutilities_VERSION}
     EXPORT_NAME "ModelUtilities"
