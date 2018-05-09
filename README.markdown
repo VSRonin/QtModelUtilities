@@ -3,10 +3,10 @@
 This library is a collection of utilities for Qt's Model/View framework.
 
 ### Status
-| **master** | **dev** |
-|------------|---------|
-| [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/3x8h2laxlbh9wc7c/branch/master?svg=true)](https://ci.appveyor.com/project/VSRonin/qtmodelutilities/branch/master) | [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/3x8h2laxlbh9wc7c/branch/dev?svg=true)](https://ci.appveyor.com/project/VSRonin/qtmodelutilities/branch/dev) |
-| [![Travis Build Status](https://travis-ci.org/VSRonin/QtModelUtilities.svg?branch=master)](https://travis-ci.org/VSRonin/QtModelUtilities) | [![Travis Build Status](https://travis-ci.org/VSRonin/QtModelUtilities.svg?branch=dev)](https://travis-ci.org/VSRonin/QtModelUtilities) |
+| **CI** | **master** | **dev** |
+|--------|------------|---------|
+| [Appveyor](https://ci.appveyor.com/project/VSRonin/qtmodelutilities) | ![Appveyor Build status](https://ci.appveyor.com/api/projects/status/3x8h2laxlbh9wc7c/branch/master?svg=true) | ![Appveyor Build status](https://ci.appveyor.com/api/projects/status/3x8h2laxlbh9wc7c/branch/dev?svg=true)|
+| [Travis](https://travis-ci.org/VSRonin/QtModelUtilities) | ![Travis Build Status](https://travis-ci.org/VSRonin/QtModelUtilities.svg?branch=master) | ![Travis Build Status](https://travis-ci.org/VSRonin/QtModelUtilities.svg?branch=dev) |
 
 ### Contents
 

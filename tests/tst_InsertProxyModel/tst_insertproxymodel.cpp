@@ -677,6 +677,86 @@ void tst_InsertProxyModel::testSetItemData_data()
 #endif
 }
 
+void tst_InsertProxyModel::testSetItemDataDataChanged_data()
+{
+    QTest::addColumn<QAbstractItemModel*>("baseModel");
+    QTest::addColumn<int>("idxRow");
+    QTest::addColumn<int>("idxCol");
+    QAbstractItemModel* baseModel = createListModel(this);
+    QTest::newRow("List Extra Row") << baseModel << baseModel->rowCount() << 0;
+    baseModel = createListModel(this);
+    QTest::newRow("List Extra Col") << baseModel << 0 << baseModel->columnCount();
+    baseModel = createListModel(this);
+    QTest::newRow("List Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
+#ifdef QT_GUI_LIB
+    baseModel = createTableModel(this);
+    QTest::newRow("Table Extra Row") << baseModel << baseModel->rowCount() << 0;
+    baseModel = createTableModel(this);
+    QTest::newRow("Table Extra Col") << baseModel << 0 << baseModel->columnCount();
+    baseModel = createTableModel(this);
+    QTest::newRow("Table Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
+    baseModel = createTreeModel(this);
+    QTest::newRow("Tree Extra Row") << baseModel << baseModel->rowCount() << 0;
+    baseModel = createTreeModel(this);
+    QTest::newRow("Tree Extra Col") << baseModel << 0 << baseModel->columnCount();
+    baseModel = createTreeModel(this);
+    QTest::newRow("Tree Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
+#endif
+}
+
+void tst_InsertProxyModel::testSetItemDataDataChanged()
+{
+    QFETCH(QAbstractItemModel*, baseModel);
+    QFETCH(int, idxRow);
+    QFETCH(int, idxCol);
+    QMap<int, QVariant> itemDataSet{ { //TextAlignmentRole
+            std::make_pair<int, QVariant>(Qt::UserRole, 5)
+            , std::make_pair<int, QVariant>(Qt::DisplayRole, QStringLiteral("Test"))
+            , std::make_pair<int, QVariant>(Qt::ToolTipRole, QStringLiteral("ToolTip"))
+        } };
+    InsertProxyModel proxyModel;
+    proxyModel.setSeparateEditDisplay(false);
+    proxyModel.setInsertDirection(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
+    proxyModel.setSourceModel(baseModel);
+    const QModelIndex proxyIdX = proxyModel.index(idxRow, idxCol);
+    QVERIFY(proxyModel.setData(proxyIdX, Qt::AlignRight, Qt::TextAlignmentRole));
+    QSignalSpy proxyDataChangeSpy(&proxyModel, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)));
+    QVERIFY(proxyModel.setItemData(proxyIdX, itemDataSet));
+    QCOMPARE(proxyDataChangeSpy.size(), 1);
+    auto argList = proxyDataChangeSpy.takeFirst();
+    QCOMPARE(argList.at(0).value<QModelIndex>(), proxyIdX);
+    QCOMPARE(argList.at(1).value<QModelIndex>(), proxyIdX);
+    auto rolesVector = argList.at(2).value<QVector<int> >();
+    QCOMPARE(rolesVector.size(), 5);
+    QVERIFY(rolesVector.contains(Qt::TextAlignmentRole));
+    QVERIFY(rolesVector.contains(Qt::ToolTipRole));
+    QVERIFY(rolesVector.contains(Qt::EditRole));
+    QVERIFY(rolesVector.contains(Qt::DisplayRole));
+    QVERIFY(rolesVector.contains(Qt::UserRole));
+    itemDataSet[Qt::UserRole] = 6;
+    QVERIFY(proxyModel.setItemData(proxyIdX, itemDataSet));
+    QCOMPARE(proxyDataChangeSpy.size(), 1);
+    argList = proxyDataChangeSpy.takeFirst();
+    QCOMPARE(argList.at(0).value<QModelIndex>(), proxyIdX);
+    QCOMPARE(argList.at(1).value<QModelIndex>(), proxyIdX);
+    rolesVector = argList.at(2).value<QVector<int> >();
+    QCOMPARE(rolesVector.size(), 1);
+    QVERIFY(rolesVector.contains(Qt::UserRole));
+    itemDataSet.clear();
+    itemDataSet[Qt::UserRole] = 6;
+    QVERIFY(proxyModel.setItemData(proxyIdX, itemDataSet));
+    QCOMPARE(proxyDataChangeSpy.size(), 1);
+    argList = proxyDataChangeSpy.takeFirst();
+    QCOMPARE(argList.at(0).value<QModelIndex>(), proxyIdX);
+    QCOMPARE(argList.at(1).value<QModelIndex>(), proxyIdX);
+    rolesVector = argList.at(2).value<QVector<int> >();
+    QCOMPARE(rolesVector.size(), 3);
+    QVERIFY(rolesVector.contains(Qt::ToolTipRole));
+    QVERIFY(rolesVector.contains(Qt::EditRole));
+    QVERIFY(rolesVector.contains(Qt::DisplayRole));
+    baseModel->deleteLater();
+}
+
 void tst_InsertProxyModel::testSetItemData()
 {
     QFETCH(QAbstractItemModel*, baseModel);

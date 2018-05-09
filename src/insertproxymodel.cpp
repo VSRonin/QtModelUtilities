@@ -495,13 +495,12 @@ bool InsertProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVa
         if (i.value().isValid()) {
             newData.insert(i.key(), i.value());
             const auto oldDataIter = oldData.constFind(i.key());
-            if (oldDataIter == oldData.constEnd() || oldDataIter.value() != i.value()) {
+            if (oldDataIter == oldData.constEnd() || oldDataIter.value() != i.value()) 
                 changedRoles << i.key();
-                if (i.key() == Qt::DisplayRole)
-                    hasDisplay = true;
-                if (i.key() == Qt::EditRole)
-                    hasEdit = true;
-            }
+            if (i.key() == Qt::DisplayRole)
+                hasDisplay = true;
+            if (i.key() == Qt::EditRole)
+                hasEdit = true;
         }
     }    
     if (!d->m_separateEditDisplay && hasDisplay != hasEdit) {
