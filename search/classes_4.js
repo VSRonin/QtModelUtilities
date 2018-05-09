@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['insertproxy',['InsertProxy',['../class_insert_proxy.html',1,'']]]
+  ['insertproxymodel',['InsertProxyModel',['../class_insert_proxy_model.html',1,'']]]
 ];

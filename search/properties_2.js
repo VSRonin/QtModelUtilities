@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['model',['model',['../class_abstract_model_serialiser.html#aed65069ff5b57f8601a50f22c2a2b1f2',1,'AbstractModelSerialiser']]]
+  ['rolestosave',['rolesToSave',['../class_abstract_multi_role_serialiser.html#ad17b8409ea175253572741a543734bae',1,'AbstractMultiRoleSerialiser']]],
+  ['roletosave',['roleToSave',['../class_abstract_single_role_serialiser.html#a77992b7cbf8981a659bf5d984cd0925a',1,'AbstractSingleRoleSerialiser']]]
 ];

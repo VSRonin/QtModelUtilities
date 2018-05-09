@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['flagforextra',['flagForExtra',['../class_insert_proxy.html#a90dfbfb3bf540e4b484036495ef35efb',1,'InsertProxy']]],
-  ['flags',['flags',['../class_insert_proxy.html#ac47b73097e69220a8e40db4cc658cadc',1,'InsertProxy']]]
+  ['flagforextra',['flagForExtra',['../class_insert_proxy_model.html#a709f512875c745dabe6b19af1211d8c7',1,'InsertProxyModel']]],
+  ['flags',['flags',['../class_insert_proxy_model.html#ac26c0b7174bcf87f4111b3c8b3f82663',1,'InsertProxyModel']]]
 ];

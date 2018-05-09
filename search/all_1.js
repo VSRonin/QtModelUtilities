@@ -1,5 +1,5 @@
 var searchData=
 [
   ['binarymodelserialiser',['BinaryModelSerialiser',['../class_binary_model_serialiser.html',1,'']]],
-  ['buddy',['buddy',['../class_insert_proxy.html#a187bec53c41782bb0dfc25796c1f2c12',1,'InsertProxy']]]
+  ['buddy',['buddy',['../class_insert_proxy_model.html#abb39b1e20d916c0185fde13522c8008a',1,'InsertProxyModel']]]
 ];

@@ -119,9 +119,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae7d9e258073cb5ff6fa754593d8a8d38"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae7d9e258073cb5ff6fa754593d8a8d38"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>CsvModelSerialiser</b> (const QAbstractItemModel *<a class="el" href="class_abstract_model_serialiser.html#aed65069ff5b57f8601a50f22c2a2b1f2">model</a>)</td></tr>
 <tr class="separator:ae7d9e258073cb5ff6fa754593d8a8d38"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a228d180dbaa144f215b0b58167a6081a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a228d180dbaa144f215b0b58167a6081a"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>CsvModelSerialiser</b> (const <a class="el" href="class_csv_model_serialiser.html">CsvModelSerialiser</a> &amp;other)</td></tr>
-<tr class="separator:a228d180dbaa144f215b0b58167a6081a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a395a12ec5939a797f1d60e268f238561"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a395a12ec5939a797f1d60e268f238561"></a>
 const QString &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>csvSeparator</b> () const </td></tr>
 <tr class="separator:a395a12ec5939a797f1d60e268f238561"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -132,22 +129,19 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>firstColumnIsHeader</
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>firstRowIsHeader</b> ()</td></tr>
 <tr class="separator:a4bc42a805369404b14936cd4fb6e9010"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09f7e757ab36676bf6e971922bd301a7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a09f7e757ab36676bf6e971922bd301a7"></a>
-virtual Q_INVOKABLE bool&#160;</td><td class="memItemRight" valign="bottom"><b>loadModel</b> (QIODevice *source) Q_DECL_OVERRIDE</td></tr>
+Q_INVOKABLE bool&#160;</td><td class="memItemRight" valign="bottom"><b>loadModel</b> (QIODevice *source) Q_DECL_OVERRIDE</td></tr>
 <tr class="separator:a09f7e757ab36676bf6e971922bd301a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e25be8928704706da0ec1771da23029"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6e25be8928704706da0ec1771da23029"></a>
-virtual Q_INVOKABLE bool&#160;</td><td class="memItemRight" valign="bottom"><b>loadModel</b> (const QByteArray &amp;source) Q_DECL_OVERRIDE</td></tr>
+Q_INVOKABLE bool&#160;</td><td class="memItemRight" valign="bottom"><b>loadModel</b> (const QByteArray &amp;source) Q_DECL_OVERRIDE</td></tr>
 <tr class="separator:a6e25be8928704706da0ec1771da23029"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0af59af2cd1a1d83fb56feeaecf2988b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0af59af2cd1a1d83fb56feeaecf2988b"></a>
 virtual Q_INVOKABLE bool&#160;</td><td class="memItemRight" valign="bottom"><b>loadModel</b> (QString *source)</td></tr>
 <tr class="separator:a0af59af2cd1a1d83fb56feeaecf2988b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef82b144759d0be2386d7853e9aa31ea"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aef82b144759d0be2386d7853e9aa31ea"></a>
-<a class="el" href="class_csv_model_serialiser.html">CsvModelSerialiser</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="class_csv_model_serialiser.html">CsvModelSerialiser</a> &amp;other)</td></tr>
-<tr class="separator:aef82b144759d0be2386d7853e9aa31ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c41b5ec872f20531f61bdbe1428cdd6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0c41b5ec872f20531f61bdbe1428cdd6"></a>
-virtual Q_INVOKABLE bool&#160;</td><td class="memItemRight" valign="bottom"><b>saveModel</b> (QIODevice *destination) const Q_DECL_OVERRIDE</td></tr>
+Q_INVOKABLE bool&#160;</td><td class="memItemRight" valign="bottom"><b>saveModel</b> (QIODevice *destination) const Q_DECL_OVERRIDE</td></tr>
 <tr class="separator:a0c41b5ec872f20531f61bdbe1428cdd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe95fedda0f41890cf98ddc22c46584a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abe95fedda0f41890cf98ddc22c46584a"></a>
-virtual Q_INVOKABLE bool&#160;</td><td class="memItemRight" valign="bottom"><b>saveModel</b> (QByteArray *destination) const Q_DECL_OVERRIDE</td></tr>
+Q_INVOKABLE bool&#160;</td><td class="memItemRight" valign="bottom"><b>saveModel</b> (QByteArray *destination) const Q_DECL_OVERRIDE</td></tr>
 <tr class="separator:abe95fedda0f41890cf98ddc22c46584a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a47a8133275db0f502d87220278edcc35"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a47a8133275db0f502d87220278edcc35"></a>
 virtual Q_INVOKABLE bool&#160;</td><td class="memItemRight" valign="bottom"><b>saveModel</b> (QString *destination) const </td></tr>
@@ -166,12 +160,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setFirstRowIsHeader</
 <tr class="separator:aa85ffdf20fc6c1ab6e17a3cc351ccf02 inherit pub_methods_class_abstract_single_role_serialiser"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c1c9f577a8ef0bba0a98ddcbb64eda2 inherit pub_methods_class_abstract_single_role_serialiser"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_single_role_serialiser.html#a2c1c9f577a8ef0bba0a98ddcbb64eda2">AbstractSingleRoleSerialiser</a> (const QAbstractItemModel *<a class="el" href="class_abstract_model_serialiser.html#aed65069ff5b57f8601a50f22c2a2b1f2">model</a>)</td></tr>
 <tr class="separator:a2c1c9f577a8ef0bba0a98ddcbb64eda2 inherit pub_methods_class_abstract_single_role_serialiser"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a268fa4247ad71a88022a1ebdc949abac inherit pub_methods_class_abstract_single_role_serialiser"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_single_role_serialiser.html#a268fa4247ad71a88022a1ebdc949abac">AbstractSingleRoleSerialiser</a> (const <a class="el" href="class_abstract_single_role_serialiser.html">AbstractSingleRoleSerialiser</a> &amp;other)</td></tr>
-<tr class="separator:a268fa4247ad71a88022a1ebdc949abac inherit pub_methods_class_abstract_single_role_serialiser"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a734fe4023ce3b2e019aea64b49dd7e4d inherit pub_methods_class_abstract_single_role_serialiser"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_single_role_serialiser.html#a734fe4023ce3b2e019aea64b49dd7e4d">~AbstractSingleRoleSerialiser</a> () Q_DECL_OVERRIDE=0</td></tr>
-<tr class="separator:a734fe4023ce3b2e019aea64b49dd7e4d inherit pub_methods_class_abstract_single_role_serialiser"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a38ea9fd54623dfde8b3f813c05452a0e inherit pub_methods_class_abstract_single_role_serialiser"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_abstract_single_role_serialiser.html">AbstractSingleRoleSerialiser</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_single_role_serialiser.html#a38ea9fd54623dfde8b3f813c05452a0e">operator=</a> (const <a class="el" href="class_abstract_single_role_serialiser.html">AbstractSingleRoleSerialiser</a> &amp;other)</td></tr>
-<tr class="separator:a38ea9fd54623dfde8b3f813c05452a0e inherit pub_methods_class_abstract_single_role_serialiser"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afab1e07a697986999b9704e5950c3114 inherit pub_methods_class_abstract_single_role_serialiser"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_single_role_serialiser.html#afab1e07a697986999b9704e5950c3114">~AbstractSingleRoleSerialiser</a> ()=0</td></tr>
+<tr class="separator:afab1e07a697986999b9704e5950c3114 inherit pub_methods_class_abstract_single_role_serialiser"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f745e0b7d99ce8b8f474cc8a8b21ea7 inherit pub_methods_class_abstract_single_role_serialiser"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7f745e0b7d99ce8b8f474cc8a8b21ea7"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>roleToSave</b> () const </td></tr>
 <tr class="separator:a7f745e0b7d99ce8b8f474cc8a8b21ea7 inherit pub_methods_class_abstract_single_role_serialiser"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -183,8 +173,6 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>roleToSave</b> () cons
 <tr class="separator:a5c6f9fafe3d5f5e450dd5d6480922c55 inherit pub_methods_class_abstract_model_serialiser"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8401e514638e3137e5553ef42d4409ad inherit pub_methods_class_abstract_model_serialiser"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_model_serialiser.html#a8401e514638e3137e5553ef42d4409ad">AbstractModelSerialiser</a> (const QAbstractItemModel *<a class="el" href="class_abstract_model_serialiser.html#aed65069ff5b57f8601a50f22c2a2b1f2">model</a>)</td></tr>
 <tr class="separator:a8401e514638e3137e5553ef42d4409ad inherit pub_methods_class_abstract_model_serialiser"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d4d824c78d113737d76332b9f1bb3e5 inherit pub_methods_class_abstract_model_serialiser"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_model_serialiser.html#a3d4d824c78d113737d76332b9f1bb3e5">AbstractModelSerialiser</a> (const <a class="el" href="class_abstract_model_serialiser.html">AbstractModelSerialiser</a> &amp;other)</td></tr>
-<tr class="separator:a3d4d824c78d113737d76332b9f1bb3e5 inherit pub_methods_class_abstract_model_serialiser"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c6206a42de61790ce1b6036ddc779a1 inherit pub_methods_class_abstract_model_serialiser"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_model_serialiser.html#a4c6206a42de61790ce1b6036ddc779a1">~AbstractModelSerialiser</a> ()=0</td></tr>
 <tr class="separator:a4c6206a42de61790ce1b6036ddc779a1 inherit pub_methods_class_abstract_model_serialiser"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b95203ccb8442b4967d33d242a136d1 inherit pub_methods_class_abstract_model_serialiser"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5b95203ccb8442b4967d33d242a136d1"></a>
@@ -193,8 +181,6 @@ virtual const QAbstractItemModel *&#160;</td><td class="memItemRight" valign="bo
 <tr class="memitem:a60b53c1a6b7b88d01eca021a704d9677 inherit pub_methods_class_abstract_model_serialiser"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a60b53c1a6b7b88d01eca021a704d9677"></a>
 virtual QAbstractItemModel *&#160;</td><td class="memItemRight" valign="bottom"><b>model</b> () const </td></tr>
 <tr class="separator:a60b53c1a6b7b88d01eca021a704d9677 inherit pub_methods_class_abstract_model_serialiser"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ac4c7145f57534f6612f60d2daa5bb7 inherit pub_methods_class_abstract_model_serialiser"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_abstract_model_serialiser.html">AbstractModelSerialiser</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_model_serialiser.html#a5ac4c7145f57534f6612f60d2daa5bb7">operator=</a> (const <a class="el" href="class_abstract_model_serialiser.html">AbstractModelSerialiser</a> &amp;other)</td></tr>
-<tr class="separator:a5ac4c7145f57534f6612f60d2daa5bb7 inherit pub_methods_class_abstract_model_serialiser"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84e44c2083cf016adc4dc4613b2c05ca inherit pub_methods_class_abstract_model_serialiser"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_model_serialiser.html#a84e44c2083cf016adc4dc4613b2c05ca">setModel</a> (QAbstractItemModel *val)</td></tr>
 <tr class="memdesc:a84e44c2083cf016adc4dc4613b2c05ca inherit pub_methods_class_abstract_model_serialiser"><td class="mdescLeft">&#160;</td><td class="mdescRight">setter of model property  <a href="#a84e44c2083cf016adc4dc4613b2c05ca">More...</a><br /></td></tr>
 <tr class="separator:a84e44c2083cf016adc4dc4613b2c05ca inherit pub_methods_class_abstract_model_serialiser"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -249,7 +235,7 @@ AbstractModelSerialiserPrivate *&#160;</td><td class="memItemRight" valign="bott
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 21 2018 14:25:24 for Qt Model Utilities by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 9 2018 08:08:25 for Qt Model Utilities by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

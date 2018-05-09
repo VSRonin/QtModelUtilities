@@ -110,13 +110,12 @@ Inheritance diagram for AbstractModelSerialiser:</div>
  <div class="center">
   <img src="class_abstract_model_serialiser.png" usemap="#AbstractModelSerialiser_map" alt=""/>
   <map id="AbstractModelSerialiser_map" name="AbstractModelSerialiser_map">
-<area href="class_abstract_multi_role_serialiser.html" title="The interface for model serialisers saving multiple roles. " alt="AbstractMultiRoleSerialiser" shape="rect" coords="274,56,447,80"/>
-<area href="class_abstract_single_role_serialiser.html" title="The interface for model serialisers saving only one role. " alt="AbstractSingleRoleSerialiser" shape="rect" coords="732,56,905,80"/>
+<area href="class_abstract_multi_role_serialiser.html" title="The interface for model serialisers saving multiple roles. " alt="AbstractMultiRoleSerialiser" shape="rect" coords="183,56,356,80"/>
+<area href="class_abstract_single_role_serialiser.html" title="The interface for model serialisers saving only one role. " alt="AbstractSingleRoleSerialiser" shape="rect" coords="549,56,722,80"/>
 <area href="class_binary_model_serialiser.html" alt="BinaryModelSerialiser" shape="rect" coords="0,112,173,136"/>
 <area href="class_html_model_serialiser.html" alt="HtmlModelSerialiser" shape="rect" coords="183,112,356,136"/>
-<area href="class_json_model_serialiser.html" alt="JsonModelSerialiser" shape="rect" coords="366,112,539,136"/>
-<area href="class_xml_model_serialiser.html" alt="XmlModelSerialiser" shape="rect" coords="549,112,722,136"/>
-<area href="class_csv_model_serialiser.html" alt="CsvModelSerialiser" shape="rect" coords="732,112,905,136"/>
+<area href="class_xml_model_serialiser.html" alt="XmlModelSerialiser" shape="rect" coords="366,112,539,136"/>
+<area href="class_csv_model_serialiser.html" alt="CsvModelSerialiser" shape="rect" coords="549,112,722,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -126,8 +125,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a5c6f9fafe3d5f5e450dd5d6480922c55"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8401e514638e3137e5553ef42d4409ad"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_model_serialiser.html#a8401e514638e3137e5553ef42d4409ad">AbstractModelSerialiser</a> (const QAbstractItemModel *<a class="el" href="class_abstract_model_serialiser.html#aed65069ff5b57f8601a50f22c2a2b1f2">model</a>)</td></tr>
 <tr class="separator:a8401e514638e3137e5553ef42d4409ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d4d824c78d113737d76332b9f1bb3e5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_model_serialiser.html#a3d4d824c78d113737d76332b9f1bb3e5">AbstractModelSerialiser</a> (const <a class="el" href="class_abstract_model_serialiser.html">AbstractModelSerialiser</a> &amp;other)</td></tr>
-<tr class="separator:a3d4d824c78d113737d76332b9f1bb3e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c6206a42de61790ce1b6036ddc779a1"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_model_serialiser.html#a4c6206a42de61790ce1b6036ddc779a1">~AbstractModelSerialiser</a> ()=0</td></tr>
 <tr class="separator:a4c6206a42de61790ce1b6036ddc779a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b95203ccb8442b4967d33d242a136d1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5b95203ccb8442b4967d33d242a136d1"></a>
@@ -142,8 +139,6 @@ virtual Q_INVOKABLE bool&#160;</td><td class="memItemRight" valign="bottom"><b>l
 <tr class="memitem:a60b53c1a6b7b88d01eca021a704d9677"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a60b53c1a6b7b88d01eca021a704d9677"></a>
 virtual QAbstractItemModel *&#160;</td><td class="memItemRight" valign="bottom"><b>model</b> () const </td></tr>
 <tr class="separator:a60b53c1a6b7b88d01eca021a704d9677"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ac4c7145f57534f6612f60d2daa5bb7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_abstract_model_serialiser.html">AbstractModelSerialiser</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_model_serialiser.html#a5ac4c7145f57534f6612f60d2daa5bb7">operator=</a> (const <a class="el" href="class_abstract_model_serialiser.html">AbstractModelSerialiser</a> &amp;other)</td></tr>
-<tr class="separator:a5ac4c7145f57534f6612f60d2daa5bb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a944a90aaac83af1876c2fb3689ce14ae"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a944a90aaac83af1876c2fb3689ce14ae"></a>
 virtual Q_INVOKABLE bool&#160;</td><td class="memItemRight" valign="bottom"><b>saveModel</b> (QIODevice *destination) const =0</td></tr>
 <tr class="separator:a944a90aaac83af1876c2fb3689ce14ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -218,23 +213,6 @@ Properties</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a3d4d824c78d113737d76332b9f1bb3e5"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">AbstractModelSerialiser::AbstractModelSerialiser </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_abstract_model_serialiser.html">AbstractModelSerialiser</a> &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Creates a copy of <em>other</em>. </p>
-
-</div>
-</div>
 <a class="anchor" id="a4c6206a42de61790ce1b6036ddc779a1"></a>
 <div class="memitem">
 <div class="memproto">
@@ -260,23 +238,6 @@ Properties</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a5ac4c7145f57534f6612f60d2daa5bb7"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_abstract_model_serialiser.html">AbstractModelSerialiser</a> &amp; AbstractModelSerialiser::operator= </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_abstract_model_serialiser.html">AbstractModelSerialiser</a> &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Assigns <em>other</em> to this object. </p>
-
-</div>
-</div>
 <a class="anchor" id="a84e44c2083cf016adc4dc4613b2c05ca"></a>
 <div class="memitem">
 <div class="memproto">
@@ -364,7 +325,7 @@ Properties</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 21 2018 14:25:24 for Qt Model Utilities by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 9 2018 08:08:25 for Qt Model Utilities by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['index',['index',['../class_insert_proxy.html#ab4b691f4c14c14d06a0af413e5b771b5',1,'InsertProxy']]],
-  ['insertcolumns',['insertColumns',['../class_insert_proxy.html#af69d2f50890388d343096e40a02e3ae5',1,'InsertProxy']]],
-  ['insertdirection',['insertDirection',['../class_insert_proxy.html#a047c3d1c8973656efe16c0d251aa5d20',1,'InsertProxy']]],
-  ['insertproxy',['InsertProxy',['../class_insert_proxy.html',1,'InsertProxy'],['../class_insert_proxy.html#a474c32f996419ac44296e75c17fc0617',1,'InsertProxy::InsertProxy()']]],
-  ['insertrows',['insertRows',['../class_insert_proxy.html#a085666c5569ddfc4db35e1167ab1337a',1,'InsertProxy']]],
+  ['index',['index',['../class_insert_proxy_model.html#a568df312bfbbee45da5c6937cb6fd176',1,'InsertProxyModel']]],
+  ['insertcolumns',['insertColumns',['../class_insert_proxy_model.html#ac080109e4c1238a83f44fbc66546a7ea',1,'InsertProxyModel']]],
+  ['insertproxymodel',['InsertProxyModel',['../class_insert_proxy_model.html',1,'InsertProxyModel'],['../class_insert_proxy_model.html#abe73020e91293ea8cde8a9fa45f07650',1,'InsertProxyModel::InsertProxyModel()']]],
+  ['insertrows',['insertRows',['../class_insert_proxy_model.html#a938bad6059352548c8932b28c0b57bdf',1,'InsertProxyModel']]],
   ['insert_20proxy_20model',['Insert Proxy Model',['../md__r_e_a_d_m_e__insert__proxy__model.html',1,'']]]
 ];

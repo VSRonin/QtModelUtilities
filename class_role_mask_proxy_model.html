@@ -92,13 +92,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#signals">Signals</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#properties">Properties</a> &#124;
 <a href="class_role_mask_proxy_model-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">RoleMaskProxyModel Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>This proxy will act as a mask on top of the source model to intercept data.  
+ <a href="class_role_mask_proxy_model.html#details">More...</a></p>
 <div class="dynheader">
 Inheritance diagram for RoleMaskProxyModel:</div>
 <div class="dyncontent">
@@ -108,37 +113,42 @@ Inheritance diagram for RoleMaskProxyModel:</div>
 </map>
  </div></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="signals"></a>
+Signals</h2></td></tr>
+<tr class="memitem:a61a682a2bd47c6480ea63c485281d8bc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a61a682a2bd47c6480ea63c485281d8bc"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>maskedRolesChanged</b> ()</td></tr>
+<tr class="separator:a61a682a2bd47c6480ea63c485281d8bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3385a17bfaa62041d2029beff8eac088"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3385a17bfaa62041d2029beff8eac088"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>mergeDisplayEditChanged</b> (bool val)</td></tr>
+<tr class="separator:a3385a17bfaa62041d2029beff8eac088"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f3df2a10e29bff0f363e5237cf1aac7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2f3df2a10e29bff0f363e5237cf1aac7"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>transparentIfEmptyChanged</b> (bool val)</td></tr>
+<tr class="separator:a2f3df2a10e29bff0f363e5237cf1aac7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aeac66ef94eec9f7d97193c94773b7d8d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeac66ef94eec9f7d97193c94773b7d8d"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>RoleMaskProxyModel</b> (QObject *parent=Q_NULLPTR)</td></tr>
+<tr class="memitem:aeac66ef94eec9f7d97193c94773b7d8d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_role_mask_proxy_model.html#aeac66ef94eec9f7d97193c94773b7d8d">RoleMaskProxyModel</a> (QObject *parent=Q_NULLPTR)</td></tr>
 <tr class="separator:aeac66ef94eec9f7d97193c94773b7d8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa816754403a11ecce7e91caa33182514"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_role_mask_proxy_model.html#aa816754403a11ecce7e91caa33182514">~RoleMaskProxyModel</a> ()</td></tr>
+<tr class="separator:aa816754403a11ecce7e91caa33182514"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c96afb1e5e1c2b8e4eba4ef300dc661"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6c96afb1e5e1c2b8e4eba4ef300dc661"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>addMaskedRole</b> (int role)</td></tr>
 <tr class="separator:a6c96afb1e5e1c2b8e4eba4ef300dc661"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06256d369000a3ba97041a8cc3509b5c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a06256d369000a3ba97041a8cc3509b5c"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>clearMaskedRoles</b> ()</td></tr>
 <tr class="separator:a06256d369000a3ba97041a8cc3509b5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aff8208f0526f9b701cc06609579c45e6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aff8208f0526f9b701cc06609579c45e6"></a>
-QVariant&#160;</td><td class="memItemRight" valign="bottom"><b>data</b> (const QModelIndex &amp;proxyIndex, int role=Qt::DisplayRole) const Q_DECL_OVERRIDE</td></tr>
+<tr class="memitem:aff8208f0526f9b701cc06609579c45e6"><td class="memItemLeft" align="right" valign="top">QVariant&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_role_mask_proxy_model.html#aff8208f0526f9b701cc06609579c45e6">data</a> (const QModelIndex &amp;proxyIndex, int role=Qt::DisplayRole) const Q_DECL_OVERRIDE</td></tr>
 <tr class="separator:aff8208f0526f9b701cc06609579c45e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a35426a1ac669b662745149eb35ac9fd3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a35426a1ac669b662745149eb35ac9fd3"></a>
 QList&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>maskedRoles</b> () const </td></tr>
 <tr class="separator:a35426a1ac669b662745149eb35ac9fd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afd97df78be5c2b9bc3999a0c23816510"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afd97df78be5c2b9bc3999a0c23816510"></a>
-Q_SIGNAL void&#160;</td><td class="memItemRight" valign="bottom"><b>maskedRolesChanged</b> ()</td></tr>
-<tr class="separator:afd97df78be5c2b9bc3999a0c23816510"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1467da88fc1e352f5d398fa740b8d401"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1467da88fc1e352f5d398fa740b8d401"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>mergeDisplayEdit</b> () const </td></tr>
 <tr class="separator:a1467da88fc1e352f5d398fa740b8d401"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8975cc1fb4e8c8ddeb0d8c6e85b800a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af8975cc1fb4e8c8ddeb0d8c6e85b800a"></a>
-Q_SIGNAL void&#160;</td><td class="memItemRight" valign="bottom"><b>mergeDisplayEditChanged</b> (bool val)</td></tr>
-<tr class="separator:af8975cc1fb4e8c8ddeb0d8c6e85b800a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a1487f83e8e803f95369435b886cec8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3a1487f83e8e803f95369435b886cec8"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>removeMaskedRole</b> (int role)</td></tr>
 <tr class="separator:a3a1487f83e8e803f95369435b886cec8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a333579e021af6ba4632df7f61221484d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a333579e021af6ba4632df7f61221484d"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>setData</b> (const QModelIndex &amp;index, const QVariant &amp;value, int role=Qt::EditRole) Q_DECL_OVERRIDE</td></tr>
+<tr class="memitem:a333579e021af6ba4632df7f61221484d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_role_mask_proxy_model.html#a333579e021af6ba4632df7f61221484d">setData</a> (const QModelIndex &amp;index, const QVariant &amp;value, int role=Qt::EditRole) Q_DECL_OVERRIDE</td></tr>
 <tr class="separator:a333579e021af6ba4632df7f61221484d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7cad47bc796522d2c50862e97dd0bec"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad7cad47bc796522d2c50862e97dd0bec"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setMaskedRoles</b> (const QList&lt; int &gt; &amp;roles)</td></tr>
@@ -146,8 +156,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setMaskedRoles</b> (c
 <tr class="memitem:a89632e37d57ee082820528aede23bc2d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a89632e37d57ee082820528aede23bc2d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setMergeDisplayEdit</b> (bool val)</td></tr>
 <tr class="separator:a89632e37d57ee082820528aede23bc2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b06e5d88d1996b830100b3138954d1b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0b06e5d88d1996b830100b3138954d1b"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setSourceModel</b> (QAbstractItemModel *sourceModel) Q_DECL_OVERRIDE</td></tr>
+<tr class="memitem:a0b06e5d88d1996b830100b3138954d1b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_role_mask_proxy_model.html#a0b06e5d88d1996b830100b3138954d1b">setSourceModel</a> (QAbstractItemModel *sourceModel) Q_DECL_OVERRIDE</td></tr>
 <tr class="separator:a0b06e5d88d1996b830100b3138954d1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac02a8438885d97584c38be71780b6656"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac02a8438885d97584c38be71780b6656"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setTransparentIfEmpty</b> (bool val)</td></tr>
@@ -155,9 +164,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setTransparentIfEmpty
 <tr class="memitem:a409ed3a9c4f5e781a8e9b09db8a875bd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a409ed3a9c4f5e781a8e9b09db8a875bd"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>transparentIfEmpty</b> () const </td></tr>
 <tr class="separator:a409ed3a9c4f5e781a8e9b09db8a875bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afd5827df7917ffdbd9a1df2f0b2d6d75"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afd5827df7917ffdbd9a1df2f0b2d6d75"></a>
-Q_SIGNAL void&#160;</td><td class="memItemRight" valign="bottom"><b>transparentIfEmptyChanged</b> (bool val)</td></tr>
-<tr class="separator:afd5827df7917ffdbd9a1df2f0b2d6d75"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a94bbdeb692cf86ff1cab3f2de615b00b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a94bbdeb692cf86ff1cab3f2de615b00b"></a>
+const QSet&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>maskedRolesSets</b> () const </td></tr>
+<tr class="separator:a94bbdeb692cf86ff1cab3f2de615b00b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="properties"></a>
 Properties</h2></td></tr>
@@ -171,10 +183,133 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>mergeDisplayEdit</b><
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>transparentIfEmpty</b></td></tr>
 <tr class="separator:a3ac3b5856f95ea7a3e2ac45075075f5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>This proxy will act as a mask on top of the source model to intercept data. </p>
+<p>This proxy model will mask </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="aeac66ef94eec9f7d97193c94773b7d8d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">RoleMaskProxyModel::RoleMaskProxyModel </td>
+          <td>(</td>
+          <td class="paramtype">QObject *&#160;</td>
+          <td class="paramname"><em>parent</em> = <code>Q_NULLPTR</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Constructs a new proxy model with the given <em>parent</em>. </p>
+
+</div>
+</div>
+<a class="anchor" id="aa816754403a11ecce7e91caa33182514"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">RoleMaskProxyModel::~RoleMaskProxyModel </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Destructor </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="aff8208f0526f9b701cc06609579c45e6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QVariant RoleMaskProxyModel::data </td>
+          <td>(</td>
+          <td class="paramtype">const QModelIndex &amp;&#160;</td>
+          <td class="paramname"><em>proxyIndex</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>role</em> = <code>Qt::DisplayRole</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Reimplemented from base class </p>
+
+</div>
+</div>
+<a class="anchor" id="a333579e021af6ba4632df7f61221484d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool RoleMaskProxyModel::setData </td>
+          <td>(</td>
+          <td class="paramtype">const QModelIndex &amp;&#160;</td>
+          <td class="paramname"><em>proxyIndex</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QVariant &amp;&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>role</em> = <code>Qt::EditRole</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Reimplemented from base class </p>
+
+</div>
+</div>
+<a class="anchor" id="a0b06e5d88d1996b830100b3138954d1b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RoleMaskProxyModel::setSourceModel </td>
+          <td>(</td>
+          <td class="paramtype">QAbstractItemModel *&#160;</td>
+          <td class="paramname"><em>sourceMdl</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Reimplemented from base class </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 21 2018 14:25:24 for Qt Model Utilities by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 9 2018 08:08:25 for Qt Model Utilities by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>
