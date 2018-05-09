@@ -121,8 +121,16 @@ bool HtmlModelSerialiserPrivate::readHtmlElement(QXmlStreamReader& source, const
         || !tableAttributes.hasAttribute(QStringLiteral("data-colcount"))
         )
         return false;
-    m_model->insertRows(0, tableAttributes.value(QStringLiteral("data-rowcount")).toInt(), parent);
-    m_model->insertColumns(0, tableAttributes.value(QStringLiteral("data-colcount")).toInt(), parent);
+    m_model->insertRows(0, tableAttributes.value(QStringLiteral("data-rowcount"))
+        #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+        .toString()
+        #endif
+        .toInt(), parent);
+    m_model->insertColumns(0, tableAttributes.value(QStringLiteral("data-colcount"))
+       #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+       .toString()
+       #endif
+       .toInt(), parent);
     bool rowStarted = false;
     bool cellStarted = false;
     int currentRow = 0;
@@ -162,8 +170,16 @@ bool HtmlModelSerialiserPrivate::readHtmlElement(QXmlStreamReader& source, const
                     || !cellAttributes.hasAttribute(QStringLiteral("data-rolecode"))
                     )
                     return false;
-                const int cellRole = cellAttributes.value(QStringLiteral("data-rolecode")).toInt();
-                const int cellType = cellAttributes.value(QStringLiteral("data-varianttype")).toInt();
+                const int cellRole = cellAttributes.value(QStringLiteral("data-rolecode"))
+                    #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+                    .toString()
+                    #endif
+                    .toInt();
+                const int cellType = cellAttributes.value(QStringLiteral("data-varianttype"))
+                    #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+                    .toString()
+                    #endif
+                    .toInt();
                 if (cellStarted) {
                     m_model->setData(m_model->index(currentRow, currentCol, parent), readHtmlVariant(source, cellType), cellRole);
                 }
@@ -192,7 +208,7 @@ bool HtmlModelSerialiserPrivate::readHtmlElement(QXmlStreamReader& source, const
                 cellStarted = false;
             }
             else if (rowStarted && source.name() == QStringLiteral("th")) {
-                if (headCode = Col)
+                if (headCode == Col)
                     ++currentCol;
                 headCode = None;
             }

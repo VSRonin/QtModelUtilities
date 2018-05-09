@@ -1,0 +1,164 @@
+language: cpp
+
+git:
+  depth: 1
+
+branches:
+  only:
+  - master
+  - dev
+  - travis
+
+matrix:
+ fast_finish: true
+ include:
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=OFF NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=OFF NOWIDGETS=ON NOGUI=OFF QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=OFF NOWIDGETS=ON NOGUI=ON QTVERSIONMINOR=59 QTVERSIONPATCH=594 OPTIMISE_FOR_MANY_ROLES=OFF
+  - os: osx
+    compiler: clang
+    env:
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF OPTIMISE_FOR_MANY_ROLES=OFF
+  - os: osx
+    compiler: clang
+    env:
+      - USESTATIC=OFF NOWIDGETS=OFF NOGUI=OFF OPTIMISE_FOR_MANY_ROLES=OFF
+  - os: osx
+    compiler: clang
+    env:
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=OFF OPTIMISE_FOR_MANY_ROLES=OFF
+  - os: osx
+    compiler: clang
+    env:
+      - USESTATIC=OFF NOWIDGETS=ON NOGUI=OFF OPTIMISE_FOR_MANY_ROLES=OFF
+  - os: osx
+    compiler: clang
+    env:
+      - USESTATIC=ON NOWIDGETS=ON NOGUI=ON OPTIMISE_FOR_MANY_ROLES=OFF
+  - os: osx
+    compiler: clang
+    env:
+      - USESTATIC=OFF NOWIDGETS=ON NOGUI=ON OPTIMISE_FOR_MANY_ROLES=OFF
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=51 QTVERSIONPATCH=511 OPTIMISE_FOR_MANY_ROLES=OFF
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=51 QTVERSIONPATCH=511 OPTIMISE_FOR_MANY_ROLES=ON
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
+    env:
+      - USESTATIC=ON NOWIDGETS=OFF NOGUI=OFF QTVERSIONMINOR=56 QTVERSIONPATCH=562 OPTIMISE_FOR_MANY_ROLES=OFF
+
+install:
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+         lsb_release -a
+      && sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
+      && sudo apt-add-repository -y ppa:beineri/opt-qt${QTVERSIONPATCH}-trusty
+      && sudo apt-get -qq update
+      && sudo apt-get -qq install g++-6 libc6-i386 qt${QTVERSIONMINOR}base qt${QTVERSIONMINOR}tools 
+      && export CXX="g++-6"
+      && export CC="gcc-6"
+      ;
+    else
+         brew update > /dev/null
+      && brew install qt5
+      && chmod -R 755 /usr/local/opt/qt5/*
+      ;
+    fi
+
+before_script:
+- if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+    export DISPLAY=:99.0
+    && sh -e /etc/init.d/xvfb start
+    && sleep 3
+    ;
+  fi
+
+script:
+- if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+         QTDIR="/opt/qt${QTVERSIONMINOR}"
+      && PATH="$QTDIR/bin:$PATH"
+      && qt${QTVERSIONMINOR}-env.sh
+      ;
+    else
+         QTDIR="/usr/local/opt/qt5"
+      && PATH="$QTDIR/bin:$PATH"
+      && PATH="$QTDIR/lib:$PATH"
+      && LDFLAGS=-L$QTDIR/lib
+      && CPPFLAGS=-I$QTDIR/include
+      ;
+    fi
+- mkdir ./build
+- cd ./build
+- export PATH=$PATH:$PWD/x64/lib
+- export PATH=$PATH:$PWD/x64/bin
+- cmake --version
+- cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=$USESTATIC -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=$NOWIDGETS -DNO_GUI=$NOGUI -DOPTIMISE_FOR_MANY_ROLES=$OPTIMISE_FOR_MANY_ROLES ../
+- cmake --build .
+- cmake --build . --target install
+- ctest --verbose
+- cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=$USESTATIC -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=$NOWIDGETS -DNO_GUI=$NOGUI -DOPTIMISE_FOR_MANY_ROLES=$OPTIMISE_FOR_MANY_ROLES ../
+- cmake --build .
+- cmake --build . --target install
+- ctest --verbose
+
+before_deploy:
+- cpack -G TGZ
+
+deploy:
+  skip_cleanup: true
+  api_key: "${GitHubToken}"
+  provider: releases
+  file_glob: true
+  file: "build/*.tar.gz"
+  on:
+    tags: true
+    branch: master
+    condition: $USESTATIC=OFF
+    condition: $NOWIDGETS=OFF
+    condition: $NOGUI=OFF
+
+notifications:
+  email: false

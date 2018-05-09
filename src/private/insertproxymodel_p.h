@@ -1,24 +1,27 @@
 #ifndef insertproxy_p_h__
 #define insertproxy_p_h__
 #include "insertproxymodel.h"
+#include "private/modelutilities_common_p.h"
 #include <QHash>
-
+#include <QMap>
 class InsertProxyModelPrivate
 {
     Q_DECLARE_PUBLIC(InsertProxyModel)
     Q_DISABLE_COPY(InsertProxyModelPrivate)
     InsertProxyModelPrivate(InsertProxyModel* q);
     InsertProxyModel::InsertDirections m_insertDirection;
-    QList<QHash<int, QVariant> > m_extraData[2];
-    QHash<int, QVariant> m_extraHeaderData[2];
-    QHash<int, QVariant> m_dataForCorner;
+    QList<QPersistentModelIndex> m_layoutChangePersistentIndexes;
+    QModelIndexList m_layoutChangeProxyIndexes;
+    QList<RolesContainer> m_extraData[2];
+    RolesContainer m_extraHeaderData[2];
+    RolesContainer m_dataForCorner;
     bool m_separateEditDisplay;
     QList<QMetaObject::Connection> m_sourceConnections;
-    void checkExtraRowChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
-    void commitColumn();
-    void commitRow();
-    void commitToSource(const bool isRow);
-    void setSeparateEditDisplayHash(QHash<int, QVariant>& singleHash);
+    void checkExtraDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
+    bool commitColumn();
+    bool commitRow();
+    bool commitToSource(const bool isRow);
+    int mergeEditDisplayHash(RolesContainer& singleHash);
     void onColumnsInserted(const QModelIndex &parent, int first, int last) { onInserted(false, parent, first, last); }
     void onColumnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column) { onMoved(false, parent, start, end, destination, column); }
     void onColumnsRemoved(const QModelIndex &parent, int first, int last) { onRemoved(false, parent, first, last); }
@@ -28,6 +31,16 @@ class InsertProxyModelPrivate
     void onInserted(bool isRow, const QModelIndex &parent, int first, int last);
     void onMoved(bool isRow, const QModelIndex &parent, int start, int end, const QModelIndex &destination, int destIdx);
     void onRemoved(bool isRow, const QModelIndex &parent, int first, int last);
+    void beforeSortRows();
+    void afterSortRows();
+    void beforeSortCols();
+    void afterSortCols();
+    void beforeSort(bool isRow);
+    void afterSort(bool isRow);
+    void beforeLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint);
+    void afetrLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint);
+    QVector<int> setDataInContainer(RolesContainer& baseHash, int role, const QVariant& value);
     InsertProxyModel* q_ptr;
 };
+
 #endif // insertproxy_p_h__

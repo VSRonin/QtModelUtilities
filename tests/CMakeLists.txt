@@ -1,0 +1,6 @@
+if(BUILD_ROLEMASKPROXY)
+    add_subdirectory(tst_RoleMaskProxyModel)
+endif()
+if(BUILD_INSERTPROXY)
+    add_subdirectory(tst_InsertProxyModel)
+endif()

@@ -2,7 +2,7 @@
 #define csvmodelserialiser_p_h__
 
 #include "private/abstractsingleroleserialiser_p.h"
-#include "CsvModelSerialiser.h"
+#include "csvmodelserialiser.h"
 #include <QModelIndex>
 class CsvModelSerialiserPrivate : public AbstractSingleRoleSerialiserPrivate
 {

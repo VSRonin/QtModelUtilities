@@ -1,4 +1,10 @@
-/Docs/*/*
+/[Dd]ocs/*/*
+/[Dd]ocs/*/
+/[Bb]uild/*
+/TestApplication/*
+*.vcxproj
+*.vcxproj.filters
+*.sln
 #ignore thumbnails created by windows
 Thumbs.db
 #Ignore files build by Visual Studio
@@ -426,3 +432,4 @@ target_wrapper.*
 
 # QtCtreator CMake
 CMakeLists.txt.user*
+/docs/htmldocs.html

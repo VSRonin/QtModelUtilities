@@ -4,6 +4,7 @@
 #include <QDataStream>
 #include <QVariant>
 #include <QDateTime>
+#include <cmath>
 #ifdef QT_GUI_LIB
 #include <QImage>
 #include <QPixmap>

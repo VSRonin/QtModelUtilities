@@ -8,3 +8,4 @@ To change the background brush of a `QSqlQueryModel` for example, you just need 
 ### Dependencies
 
 + Qt Core
++ Qt Gui (optional, only for tests)

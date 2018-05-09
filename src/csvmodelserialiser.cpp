@@ -1,10 +1,10 @@
-
 #include "csvmodelserialiser.h"
 #include "private/csvmodelserialiser_p.h"
 #include <QTextStream>
 #include <QDateTime>
 #include <QStringBuilder>
 #include <QTextCodec>
+#include <QStringList>
 
 CsvModelSerialiserPrivate::CsvModelSerialiserPrivate(CsvModelSerialiser* q)
     :AbstractSingleRoleSerialiserPrivate(q)
@@ -103,7 +103,10 @@ bool CsvModelSerialiserPrivate::readCsv(QTextStream& reader)
     QString line;
     QStringList fields;
     QString currentField;
-    for (bool firstRow = true; reader.readLineInto(&line); firstRow = false) {
+    for (bool firstRow = true; ; firstRow = false) {
+        line = reader.readLine();
+        if (line.isNull())
+            break;
         if (line.count(QChar('\"')) % 2 > 0) {
             m_model->removeColumns(0, m_model->columnCount());
             m_model->removeRows(0, m_model->rowCount());

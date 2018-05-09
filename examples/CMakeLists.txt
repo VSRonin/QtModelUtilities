@@ -1,0 +1,6 @@
+if(BUILD_MODELSERIALISATION)
+    add_subdirectory(exem_ModelSerialisation)
+endif()
+if(BUILD_INSERTPROXY)
+    add_subdirectory(exem_InsertProxyModel)
+endif()
