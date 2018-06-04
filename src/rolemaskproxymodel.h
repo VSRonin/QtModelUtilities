@@ -34,6 +34,7 @@ Q_SIGNALS:
     void maskedRolesChanged();
 protected:
     const QSet<int>& maskedRolesSets() const;
+    RoleMaskProxyModel(RoleMaskProxyModelPrivate& dptr, QObject* parent);
 private:
     RoleMaskProxyModelPrivate* d_ptr;
 };

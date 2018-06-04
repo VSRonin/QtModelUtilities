@@ -8,6 +8,7 @@ RoleMaskProxyModelPrivate::RoleMaskProxyModelPrivate(RoleMaskProxyModel* q)
 {
     Q_ASSERT(q_ptr);
 }
+
 void RoleMaskProxyModelPrivate::interceptDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
 {
     Q_Q(RoleMaskProxyModel);
@@ -107,8 +108,16 @@ void RoleMaskProxyModelPrivate::signalAllChanged(const QVector<int>& roles, cons
 Constructs a new proxy model with the given \a parent.
 */
 RoleMaskProxyModel::RoleMaskProxyModel(QObject* parent)
-    :QIdentityProxyModel(parent)
-    , d_ptr(new RoleMaskProxyModelPrivate(this))
+    :RoleMaskProxyModel(*new RoleMaskProxyModelPrivate(this),parent)
+{}
+
+/*!
+Constructor used only while subclassing the private class.
+Not part of the public API
+*/
+RoleMaskProxyModel::RoleMaskProxyModel(RoleMaskProxyModelPrivate& dptr, QObject* parent)
+    : QIdentityProxyModel(parent)
+    , d_ptr(&dptr)
 {}
 
 /*!

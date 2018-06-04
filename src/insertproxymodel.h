@@ -68,6 +68,7 @@ protected:
     virtual bool validRow() const;
     virtual bool validColumn() const;
     virtual Qt::ItemFlags flagForExtra(bool isRow, int section) const;
+    InsertProxyModel(InsertProxyModelPrivate& dptr, QObject* parent);
 private:
     InsertProxyModelPrivate* m_dptr;
 };

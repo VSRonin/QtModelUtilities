@@ -4,19 +4,20 @@
 #include "private/modelutilities_common_p.h"
 #include <QHash>
 #include <QMap>
+#include <QVector>
 class InsertProxyModelPrivate
 {
     Q_DECLARE_PUBLIC(InsertProxyModel)
     Q_DISABLE_COPY(InsertProxyModelPrivate)
     InsertProxyModelPrivate(InsertProxyModel* q);
     InsertProxyModel::InsertDirections m_insertDirection;
-    QList<QPersistentModelIndex> m_layoutChangePersistentIndexes;
+    QVector<QPersistentModelIndex> m_layoutChangePersistentIndexes;
     QModelIndexList m_layoutChangeProxyIndexes;
-    QList<RolesContainer> m_extraData[2];
+    QVector<RolesContainer> m_extraData[2];
     RolesContainer m_extraHeaderData[2];
     RolesContainer m_dataForCorner;
     bool m_separateEditDisplay;
-    QList<QMetaObject::Connection> m_sourceConnections;
+    QVector<QMetaObject::Connection> m_sourceConnections;
     void checkExtraDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
     bool commitColumn();
     bool commitRow();
