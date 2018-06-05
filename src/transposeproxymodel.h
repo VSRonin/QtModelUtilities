@@ -1,5 +1,6 @@
 #ifndef transposeproxymodel_h__
 #define transposeproxymodel_h__
+
 #include "modelutilities_global.h"
 #include <QAbstractProxyModel>
 class TransposeProxyModelPrivate;
@@ -35,6 +36,8 @@ public:
     bool removeColumns(int column, int count, const QModelIndex &parent = QModelIndex()) Q_DECL_OVERRIDE;
     bool moveColumns(const QModelIndex &sourceParent, int sourceColumn, int count, const QModelIndex &destinationParent, int destinationChild) Q_DECL_OVERRIDE;
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) Q_DECL_OVERRIDE;
+    bool canFetchMore(const QModelIndex &parent) const Q_DECL_OVERRIDE;
+    void fetchMore(const QModelIndex &parent) Q_DECL_OVERRIDE;
 protected:
     TransposeProxyModel(TransposeProxyModelPrivate& dptr, QObject* parent);
 private:

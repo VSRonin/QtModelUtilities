@@ -213,7 +213,8 @@ InsertProxyModelPrivate::InsertProxyModelPrivate(InsertProxyModel* q)
 Constructs a new proxy model with the given \a parent.
 */
 InsertProxyModel::InsertProxyModel(QObject* parent)
-    : InsertProxyModel(*new InsertProxyModelPrivate(this),parent)
+    : QAbstractProxyModel(parent)
+    , m_dptr(new InsertProxyModelPrivate(this))
 {}
 
 /*!
@@ -255,20 +256,21 @@ void InsertProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
         extraData.clear();
     if (sourceModel()) {
         d->m_sourceConnections
+            << QObject::connect(sourceModel(), &QAbstractItemModel::destroyed, [this]()->void { setSourceModel(Q_NULLPTR); })
             << QObject::connect(sourceModel(), &QAbstractItemModel::modelAboutToBeReset,  [this]()->void { beginResetModel(); })
             << QObject::connect(sourceModel(), &QAbstractItemModel::modelReset,  [this]()->void { endResetModel(); })
             << QObject::connect(sourceModel(), &QAbstractItemModel::dataChanged,  [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles) {
                 dataChanged(mapFromSource(topLeft), mapFromSource(bottomRight), roles);
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::headerDataChanged,  &QAbstractItemModel::headerDataChanged)
-            << QObject::connect(sourceModel(), &QAbstractItemModel::layoutAboutToBeChanged,  [d](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {d->beforeLayoutChange(parents, hint); })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::layoutChanged,  [d](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {d->afetrLayoutChange(parents, hint); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::headerDataChanged, this, &QAbstractItemModel::headerDataChanged)
+            << QObject::connect(sourceModel(), &QAbstractItemModel::layoutAboutToBeChanged, [d](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {d->beforeLayoutChange(parents, hint); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::layoutChanged, [d](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {d->afetrLayoutChange(parents, hint); })
             << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeInserted,  [this](const QModelIndex &parent, int first, int last) {
                 if (!parent.isValid()) {
                     beginInsertColumns(QModelIndex(), first, last);
                 }
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeMoved,  [this](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn) {
+            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeMoved, [this](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn) {
                 if (sourceParent.isValid())
                     return;
                 if (destinationParent.isValid())
@@ -281,9 +283,9 @@ void InsertProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
                     beginRemoveColumns(QModelIndex(), first, last);
                 }
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsInserted,  [d](const QModelIndex &parent, int first, int last)->void {d->onColumnsInserted(parent, first, last); })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsRemoved,  [d](const QModelIndex &parent, int first, int last)->void {d->onColumnsRemoved(parent, first, last); })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsMoved,  [d](const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)->void {d->onColumnsMoved(parent, start, end, destination, column); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsInserted, [d](const QModelIndex &parent, int first, int last)->void {d->onColumnsInserted(parent, first, last); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsRemoved, [d](const QModelIndex &parent, int first, int last)->void {d->onColumnsRemoved(parent, first, last); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsMoved, [d](const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)->void {d->onColumnsMoved(parent, start, end, destination, column); })
             << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeInserted, [this](const QModelIndex &parent, int first, int last) {
                 if (!parent.isValid()) {
                     beginInsertRows(QModelIndex(), first, last);

@@ -262,10 +262,27 @@ void TransposeProxyModelPrivate::onLayoutAboutToBeChanged(const QList<QPersisten
 }
 
 /*!
+\internal
+*/
+void TransposeProxyModelPrivate::onDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
+{
+    if (!topLeft.isValid())
+        return;
+    if (!bottomRight.isValid())
+        return;
+    Q_Q(TransposeProxyModel);
+    Q_ASSERT(q->sourceModel());
+    Q_ASSERT(topLeft.model() == bottomRight.model());
+    Q_ASSERT(topLeft.model() == q->sourceModel());
+
+}
+
+/*!
 Constructs a new proxy model with the given \a parent.
 */
 TransposeProxyModel::TransposeProxyModel(QObject* parent)
-    : TransposeProxyModel(*new TransposeProxyModelPrivate(this), parent)
+    : QAbstractProxyModel(parent)
+    , m_dptr(new TransposeProxyModelPrivate(this))
 {}
 
 /*!
@@ -297,16 +314,17 @@ void TransposeProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
     beginResetModel();
     if (sourceModel()) {
         for (auto discIter = d->m_sourceConnections.cbegin(); discIter != d->m_sourceConnections.cend(); ++discIter)
-            Q_ASSUME(QObject::disconnect(*discIter));
+            QObject::disconnect(*discIter);
     }
-    QAbstractProxyModel::setSourceModel(newSourceModel);
     d->m_sourceConnections.clear();
+    QAbstractProxyModel::setSourceModel(newSourceModel);
     if (sourceModel()) {
         d->m_sourceConnections
+            << QObject::connect(sourceModel(), &QAbstractItemModel::destroyed, [this]()->void { setSourceModel(Q_NULLPTR); })
             << QObject::connect(sourceModel(), &QAbstractItemModel::modelAboutToBeReset, [this]()->void { beginResetModel(); })
             << QObject::connect(sourceModel(), &QAbstractItemModel::modelReset, [d]()->void {d->onModelReset(); })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::dataChanged, [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles) {
-                dataChanged(mapFromSource(topLeft), mapFromSource(bottomRight), roles);
+            << QObject::connect(sourceModel(), &QAbstractItemModel::dataChanged, [d](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles) {
+                d->onDataChanged(topLeft, bottomRight, roles);
             })
             << QObject::connect(sourceModel(), &QAbstractItemModel::headerDataChanged, [this](Qt::Orientation orientation, int first, int last)->void { 
                 headerDataChanged(orientation == Qt::Horizontal ? Qt::Vertical : Qt::Horizontal, first, last); 
@@ -364,6 +382,7 @@ void TransposeProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
 */
 QModelIndex TransposeProxyModel::buddy(const QModelIndex &index) const 
 {
+    Q_ASSERT(!index.isValid() || index.model() == this);
     return index;
 }
 
@@ -374,6 +393,7 @@ bool TransposeProxyModel::hasChildren(const QModelIndex &parent) const
 {
     if (!sourceModel())
         return false;
+    Q_ASSERT(!parent.isValid() || parent.model() == this);
     return sourceModel()->hasChildren(mapToSource(parent));
 }
 
@@ -384,6 +404,7 @@ int TransposeProxyModel::rowCount(const QModelIndex &parent) const
 {
     if (!sourceModel())
         return 0;
+    Q_ASSERT(!parent.isValid() || parent.model() == this);
     return sourceModel()->columnCount(mapToSource(parent));
 }
 
@@ -394,6 +415,7 @@ int TransposeProxyModel::columnCount(const QModelIndex &parent) const
 {
     if (!sourceModel())
         return 0;
+    Q_ASSERT(!parent.isValid() || parent.model() == this);
     return sourceModel()->rowCount(mapToSource(parent));
 }
 
@@ -424,6 +446,7 @@ QVariant TransposeProxyModel::data(const QModelIndex &proxyIndex, int role) cons
 {
     if (!sourceModel())
         return QVariant();
+    Q_ASSERT(!proxyIndex.isValid() || proxyIndex.model() == this);
     return sourceModel()->data(mapToSource(proxyIndex), role);
 }
 
@@ -432,8 +455,9 @@ QVariant TransposeProxyModel::data(const QModelIndex &proxyIndex, int role) cons
 */
 bool TransposeProxyModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (!sourceModel())
+    if (!sourceModel() || !index.isValid())
         return false;
+    Q_ASSERT(index.model() == this);
     return sourceModel()->setData(mapToSource(index), value, role);
 }
 
@@ -442,8 +466,9 @@ bool TransposeProxyModel::setData(const QModelIndex &index, const QVariant &valu
 */
 bool TransposeProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles)
 {
-    if (!sourceModel())
+    if (!sourceModel() || !index.isValid())
         return false;
+    Q_ASSERT(index.model() == this);
     return sourceModel()->setItemData(mapToSource(index), roles);
 }
 
@@ -454,6 +479,7 @@ QMap<int, QVariant> TransposeProxyModel::itemData(const QModelIndex &index) cons
 {
     if (!sourceModel())
         return QMap<int, QVariant>();
+    Q_ASSERT(!index.isValid() || index.model() == this);
     return sourceModel()->itemData(mapToSource(index));
 }
 
@@ -493,7 +519,7 @@ Qt::ItemFlags TransposeProxyModel::flags(const QModelIndex &index) const
 {
     if (!sourceModel())
         Qt::NoItemFlags;
-    Q_ASSERT(index.model() == this);
+    Q_ASSERT(!index.isValid() || index.model() == this);
     return sourceModel()->flags(mapToSource(index));
 }
 
@@ -513,8 +539,9 @@ QModelIndex TransposeProxyModel::parent(const QModelIndex &index) const
 */
 QModelIndex TransposeProxyModel::index(int row, int column, const QModelIndex &parent) const
 {
-    if (!sourceModel());
+    if (!sourceModel())
         return QModelIndex();
+    Q_ASSERT(!parent.isValid() || parent.model() == this);
     return mapFromSource(sourceModel()->index(column, row, mapToSource(parent)));
 }
 
@@ -523,8 +550,9 @@ QModelIndex TransposeProxyModel::index(int row, int column, const QModelIndex &p
 */
 QModelIndex TransposeProxyModel::sibling(int row, int column, const QModelIndex &idx) const
 {
-    if (!sourceModel());
-    return QModelIndex();
+    if (!sourceModel())
+        return QModelIndex();
+    Q_ASSERT(!idx.isValid() || idx.model() == this);
     return mapFromSource(sourceModel()->sibling(row, column, mapToSource(idx)));
 }
 
@@ -535,6 +563,7 @@ bool TransposeProxyModel::insertRows(int row, int count, const QModelIndex &pare
 {
     if (!sourceModel())
         return false;
+    Q_ASSERT(!parent.isValid() || parent.model() == this);
     return sourceModel()->insertColumns(row, count, mapToSource(parent));
 }
 
@@ -545,6 +574,7 @@ bool TransposeProxyModel::removeRows(int row, int count, const QModelIndex &pare
 {
     if (!sourceModel())
         return false;
+    Q_ASSERT(!parent.isValid() || parent.model() == this);
     return sourceModel()->removeColumns(row, count, mapToSource(parent));
 }
 
@@ -555,6 +585,8 @@ bool TransposeProxyModel::moveRows(const QModelIndex &sourceParent, int sourceRo
 {
     if (!sourceModel())
         return false;
+    Q_ASSERT(!sourceParent.isValid() || sourceParent.model() == this);
+    Q_ASSERT(!destinationParent.isValid() || destinationParent.model() == this);
     return sourceModel()->moveColumns(mapToSource(sourceParent), sourceRow, count, mapToSource(destinationParent), destinationChild);
 }
 
@@ -565,6 +597,7 @@ bool TransposeProxyModel::insertColumns(int column, int count, const QModelIndex
 {
     if (!sourceModel())
         return false;
+    Q_ASSERT(!parent.isValid() || parent.model() == this);
     return sourceModel()->insertRows(column, count, mapToSource(parent));
 }
 
@@ -575,6 +608,7 @@ bool TransposeProxyModel::removeColumns(int column, int count, const QModelIndex
 {
     if (!sourceModel())
         return false;
+    Q_ASSERT(!parent.isValid() || parent.model() == this);
     return sourceModel()->removeRows(column, count, mapToSource(parent));
 }
 
@@ -585,6 +619,8 @@ bool TransposeProxyModel::moveColumns(const QModelIndex &sourceParent, int sourc
 {
     if (!sourceModel())
         return false;
+    Q_ASSERT(!sourceParent.isValid() || sourceParent.model() == this);
+    Q_ASSERT(!destinationParent.isValid() || destinationParent.model() == this);
     return sourceModel()->moveRows(mapToSource(sourceParent), sourceRow, count, mapToSource(destinationParent), destinationChild);
 }
 
@@ -593,14 +629,38 @@ bool TransposeProxyModel::moveColumns(const QModelIndex &sourceParent, int sourc
 */
 void TransposeProxyModel::sort(int column, Qt::SortOrder order)
 {
-    // There is no method to sort column generically in QAbstractItemModel
+    // There is no method to sort columns generically in QAbstractItemModel
+    Q_UNUSED(column)
+    Q_UNUSED(order)
     return;
+}
+
+/*!
+\reimp
+*/
+bool TransposeProxyModel::canFetchMore(const QModelIndex &parent) const
+{
+    Q_ASSERT(!parent.isValid() || parent.model() == this);
+    if (!sourceModel())
+        return false;
+    return sourceModel()->canFetchMore(mapToSource(parent));
+}
+
+/*!
+\reimp
+*/
+void TransposeProxyModel::fetchMore(const QModelIndex &parent)
+{
+    Q_ASSERT(!parent.isValid() || parent.model() == this);
+    if (!sourceModel())
+        return;
+    sourceModel()->fetchMore(mapToSource(parent));
 }
 
 
 /*!
-\class TransposeProxyModel
-\brief This proxy transposes the source model
+\class InvertRowColProxyModel
+\brief This proxy inverts the rows and columns of the source model
 \details This model will make the rows of the source model become columns of and vice-versa 
-If the model is a tree the parents will be transposed as well. For example, if an index in the source model had parent `index(2,0)` it will have parent `index(2,0)` in the proxy
+If the model is a tree the parents will be transposed as well. For example, if an index in the source model had parent `index(2,0)` it will have parent `index(0,2)` in the proxy
 */

@@ -13,7 +13,7 @@ class InsertProxyModelPrivate
     InsertProxyModel::InsertDirections m_insertDirection;
     QVector<QPersistentModelIndex> m_layoutChangePersistentIndexes;
     QModelIndexList m_layoutChangeProxyIndexes;
-    QVector<RolesContainer> m_extraData[2];
+    QList<RolesContainer> m_extraData[2];
     RolesContainer m_extraHeaderData[2];
     RolesContainer m_dataForCorner;
     bool m_separateEditDisplay;

@@ -1,3 +1,6 @@
+#ifndef transposeproxymodel_p_h__
+#define transposeproxymodel_p_h__
+
 #include "transposeproxymodel.h"
 #include <QVector>
 #include <QMetaObject>
@@ -21,6 +24,7 @@ private:
     void onColsInserted(const QModelIndex& parent);
     void onColsRemoved(const QModelIndex& parent);
     void onColsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent);
+    void onDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
     void onModelReset();
     void buildTree();
     void buildTree(const QModelIndex& parent);
@@ -33,7 +37,4 @@ private:
     bool nodeFound(QVector<QPersistentModelIndex*>::iterator node) const;
 };
 
-
-
-
-
+#endif // transposeproxymodel_p_h__

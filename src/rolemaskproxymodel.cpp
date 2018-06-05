@@ -108,7 +108,8 @@ void RoleMaskProxyModelPrivate::signalAllChanged(const QVector<int>& roles, cons
 Constructs a new proxy model with the given \a parent.
 */
 RoleMaskProxyModel::RoleMaskProxyModel(QObject* parent)
-    :RoleMaskProxyModel(*new RoleMaskProxyModelPrivate(this),parent)
+    : QIdentityProxyModel(parent)
+    , d_ptr(new RoleMaskProxyModelPrivate(this))
 {}
 
 /*!
