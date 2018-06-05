@@ -474,6 +474,8 @@ bool InsertProxyModel::setData(const QModelIndex &index, const QVariant &value, 
 
 /*!
 \reimp
+\details If the map contains both Qt::DisplayRole and Qt::EditRole and separateEditDisplay is set to false,
+the value of Qt::DisplayRole will prevail.
 */
 bool InsertProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles)
 {
@@ -498,49 +500,76 @@ bool InsertProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVa
         return sourceModel()->setItemData(sourceModel()->index(index.row(), index.column()), roles);
 
     const int sectionIdx = isExtraRow ? index.column() : index.row();
-    const RolesContainer& oldData = (isExtraRow && isExtraCol) ? d->m_dataForCorner : d->m_extraData[isExtraRow][sectionIdx];
-    RolesContainer newData;
+    RolesContainer* const dataContainer = (isExtraRow && isExtraCol) ? &d->m_dataForCorner : &d->m_extraData[isExtraRow][sectionIdx];
     QVector<int> changedRoles;
-    bool hasDisplay = false;
-    bool hasEdit = false;
-    for (auto i = roles.cbegin(); i != roles.cend(); ++i) {
+    for (auto i = roles.cbegin(); i != roles.cend(); ) {
         if (i.value().isValid()) {
-            newData.insert(i.key(), i.value());
-            const auto oldDataIter = oldData.constFind(i.key());
-            if (oldDataIter == oldData.constEnd() || oldDataIter.value() != i.value()) 
+            const auto oldDataIter = dataContainer->find(i.key());
+            if (oldDataIter == dataContainer->end()) {
+                if (i.value().isValid()) {
+                    changedRoles << i.key();
+                    dataContainer->insert(i.key(), i.value());
+                }
+            }
+            else if (!i.value().isValid()){
                 changedRoles << i.key();
-            if (i.key() == Qt::DisplayRole)
-                hasDisplay = true;
-            if (i.key() == Qt::EditRole)
-                hasEdit = true;
+                i = dataContainer->erase(oldDataIter);
+                continue;
+            }
+            else if (oldDataIter.value() != i.value()) {
+                changedRoles << i.key();
+                oldDataIter.value() = i.value();
+            }           
         }
-    }    
-    if (!d->m_separateEditDisplay && hasDisplay != hasEdit) {
-        if(hasDisplay){
-            const QVariant displayData = newData.value(Qt::DisplayRole);
-            newData.insert(Qt::EditRole, displayData);
-            const auto oldDataIter = oldData.constFind(Qt::EditRole);
-            if (oldDataIter == oldData.constEnd() || oldDataIter.value() != displayData) {
-                changedRoles << Qt::EditRole;
+        ++i;
+    }
+    if (changedRoles.isEmpty())
+        return true;
+    Q_ASSERT(std::is_sorted(changedRoles.cbegin(), changedRoles.cend()));
+    const bool hasDisplay = std::binary_search(changedRoles.cbegin(), changedRoles.cend(),Qt::DisplayRole);
+    const bool hasEdit = std::binary_search(changedRoles.cbegin(), changedRoles.cend(), Qt::EditRole);
+    if (!d->m_separateEditDisplay) {
+        if (hasDisplay && hasEdit){
+            const auto displayIter = dataContainer->constFind(Qt::DisplayRole);
+            const auto editIter = dataContainer->find(Qt::EditRole);
+            // in QStandardItemModel DisplayRole wins over EditRole so we do the same
+            if (displayIter == dataContainer->cend()) {
+                if (editIter != dataContainer->end()) {
+                    dataContainer->erase(editIter);
+                }
+            }
+            else{
+                if (editIter == dataContainer->end())
+                    dataContainer->insert(Qt::EditRole, displayIter.value());
+                else
+                    editIter.value() = displayIter.value(); // assign without checking should optimise memory use due to implicit sharing
             }
         }
-        else {
-            const QVariant editData = newData.value(Qt::EditRole);
-            newData.insert(Qt::DisplayRole, editData);
-            const auto oldDataIter = oldData.constFind(Qt::DisplayRole);
-            if (oldDataIter == oldData.constEnd() || oldDataIter.value() != editData) {
+        else if (hasDisplay != hasEdit) {
+            if (hasDisplay) {
+                const auto displayIter = dataContainer->constFind(Qt::DisplayRole);
+                if (displayIter == dataContainer->constEnd()) {
+                    Q_ASSERT(dataContainer->contains(Qt::EditRole));
+                    dataContainer->remove(Qt::EditRole);
+                }
+                else {
+                    dataContainer->operator[](Qt::EditRole) = displayIter.value();
+                }
+                changedRoles << Qt::EditRole;
+            }
+            else {
+                const auto editIter = dataContainer->constFind(Qt::EditRole);
+                if (editIter == dataContainer->constEnd()) {
+                    Q_ASSERT(dataContainer->contains(Qt::DisplayRole));
+                    dataContainer->remove(Qt::DisplayRole);
+                }
+                else {
+                    dataContainer->operator[](Qt::DisplayRole) = editIter.value();
+                }
                 changedRoles << Qt::DisplayRole;
             }
         }
     }
-    for (auto i = oldData.cbegin(); i != oldData.cend(); ++i) {
-        if (!newData.contains(i.key()))
-            changedRoles << i.key();
-    }
-    if (isExtraRow && isExtraCol) 
-        d->m_dataForCorner = newData;
-    else
-        d->m_extraData[isExtraRow][sectionIdx] = newData;
     dataChanged(index, index, changedRoles);
     extraDataChanged(index, index, changedRoles);
     return true;
