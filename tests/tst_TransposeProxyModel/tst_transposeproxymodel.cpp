@@ -1,9 +1,12 @@
 #include "tst_transposeproxymodel.h"
-#include <QStandardItemModel>
 #include <transposeproxymodel.h>
 #include <QtTest/QTest>
+#ifdef QT_GUI_LIB
+#include <QStandardItemModel>
+#endif
 void tst_TransposeProxyModel::basicTestTable()
 {
+#ifdef QT_GUI_LIB
     QStandardItemModel model;
     model.insertRows(0, 2);
     model.insertColumns(0, 2);
@@ -24,5 +27,9 @@ void tst_TransposeProxyModel::basicTestTable()
             QCOMPARE(proxy.index(i, j).data(), model.index(j, i).data());
         }
     }
+#else
+    QSKIP("This test requires the Qt GUI module");
+#endif
+
 }
 
