@@ -625,11 +625,12 @@ bool TransposeProxyModel::moveColumns(const QModelIndex &sourceParent, int sourc
 }
 
 /*!
-\reimp
+\brief This method will perform no action
+\brief There is no method to sort columns generically in QAbstractItemModel so the action can't be performed. 
+Use a QSortFilterProxyModel on top of this one if you require sorting
 */
 void TransposeProxyModel::sort(int column, Qt::SortOrder order)
 {
-    // There is no method to sort columns generically in QAbstractItemModel
     Q_UNUSED(column)
     Q_UNUSED(order)
     return;
@@ -659,7 +660,7 @@ void TransposeProxyModel::fetchMore(const QModelIndex &parent)
 
 
 /*!
-\class InvertRowColProxyModel
+\class TransposeProxyModel
 \brief This proxy inverts the rows and columns of the source model
 \details This model will make the rows of the source model become columns of and vice-versa 
 If the model is a tree the parents will be transposed as well. For example, if an index in the source model had parent `index(2,0)` it will have parent `index(0,2)` in the proxy
