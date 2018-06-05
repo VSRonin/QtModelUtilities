@@ -383,7 +383,9 @@ void TransposeProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
 QModelIndex TransposeProxyModel::buddy(const QModelIndex &index) const 
 {
     Q_ASSERT(!index.isValid() || index.model() == this);
-    return index;
+    if (!sourceModel())
+        return QModelIndex();
+    return mapFromSource(sourceModel()->buddy(mapToSource(index)));
 }
 
 /*!
