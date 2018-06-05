@@ -24,6 +24,8 @@ public:
     void setSourceModel(QAbstractItemModel *sourceModel) Q_DECL_OVERRIDE;
     QVariant data(const QModelIndex &proxyIndex, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) Q_DECL_OVERRIDE;
+    bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles) Q_DECL_OVERRIDE;
+    QMap<int, QVariant> itemData(const QModelIndex &index) const Q_DECL_OVERRIDE;
     bool transparentIfEmpty() const;
     void setTransparentIfEmpty(bool val);
     bool mergeDisplayEdit() const;

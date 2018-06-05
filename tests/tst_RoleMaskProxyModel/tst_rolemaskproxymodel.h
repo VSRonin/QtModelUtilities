@@ -27,6 +27,8 @@ private Q_SLOTS:
     void testMergeDisplayEdit_data();
     void testManageMaskedRoles();
     void testDisconnectedModel();
+    void testSetItemData_data();
+    void testSetItemData();
 private:
     void testTransparentIfEmptyRecurse(const QAbstractItemModel* const baseModel, const RoleMaskProxyModel* const proxyModel, const QModelIndex& maskedIdx, const QVariant& maskedVal, bool nonMaskedIsNull, const QModelIndex& sourceParent = QModelIndex());
     int countChildren(const QAbstractItemModel* const baseModel, const QModelIndex& parIdx = QModelIndex());
