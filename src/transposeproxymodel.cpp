@@ -11,6 +11,257 @@ TransposeProxyModelPrivate::TransposeProxyModelPrivate(TransposeProxyModel* q)
 }
 
 /*!
+\internal
+*/
+TransposeProxyModelPrivate::~TransposeProxyModelPrivate()
+{
+    clearTreeMap();
+}
+
+/*!
+\internal
+*/
+void TransposeProxyModelPrivate::buildTree(const QModelIndex& parent)
+{
+    Q_Q(TransposeProxyModel);
+    Q_ASSERT(q->sourceModel());
+    const int numRows = q->sourceModel()->rowCount(parent);
+    const int numCols = q->sourceModel()->columnCount(parent);
+    for (int i = 0; i < numRows; ++i) {
+        for (int j = 0; j < numCols; ++j) {
+            const QModelIndex currIdx = q->sourceModel()->index(i, j, parent);
+            if (q->sourceModel()->hasChildren(currIdx)) {
+                m_treeMapper.append(new QPersistentModelIndex(currIdx));
+                buildTree(currIdx);
+            }
+        }
+    }
+}
+
+/*!
+\internal
+*/
+void TransposeProxyModelPrivate::buildTree()
+{
+    Q_Q(TransposeProxyModel);
+    clearTreeMap();
+    if (!q->sourceModel())
+        return;
+    buildTree(QModelIndex());
+}
+
+/*!
+\internal
+*/
+void TransposeProxyModelPrivate::clearTreeMap()
+{
+    for (QPersistentModelIndex* node : m_treeMapper)
+        delete node;
+    m_treeMapper.clear();
+}
+
+/*!
+\internal
+*/
+QVector<QPersistentModelIndex*>::iterator TransposeProxyModelPrivate::findNode(const QModelIndex& sourceIdx)
+{
+    Q_Q(TransposeProxyModel);
+    if (!sourceIdx.isValid())
+        return m_treeMapper.end();
+    Q_ASSERT(q->sourceModel());
+    Q_ASSERT(q->sourceModel() == sourceIdx.model());
+    return std::find_if(m_treeMapper.begin(), m_treeMapper.end(), [&sourceIdx](const QPersistentModelIndex* const node)->bool {
+        return sourceIdx == *node;
+    });
+}
+
+/*!
+\internal
+*/
+bool TransposeProxyModelPrivate::nodeFound(QVector<QPersistentModelIndex*>::const_iterator node) const
+{
+    return node != m_treeMapper.cend();
+}
+
+/*!
+\internal
+*/
+bool TransposeProxyModelPrivate::nodeFound(QVector<QPersistentModelIndex*>::iterator node) const
+{
+    return node != m_treeMapper.end();
+}
+
+/*!
+\internal
+*/
+QVector<QPersistentModelIndex*>::const_iterator TransposeProxyModelPrivate::findNode(const QModelIndex& sourceIdx) const
+{
+    Q_Q(const TransposeProxyModel);
+    if (!sourceIdx.isValid())
+        return m_treeMapper.end();
+    Q_ASSERT(q->sourceModel());
+    Q_ASSERT(q->sourceModel() == sourceIdx.model());
+    return std::find_if(m_treeMapper.cbegin(), m_treeMapper.cend(), [&sourceIdx](const QPersistentModelIndex* const node)->bool {
+        return sourceIdx == *node;
+    });
+}
+
+/*!
+\internal
+*/
+void TransposeProxyModelPrivate::possibleNewParent(const QModelIndex& parent)
+{
+    Q_Q(TransposeProxyModel);
+    if (!parent.isValid())
+        return;
+    if (findNode(parent) != m_treeMapper.cend())
+        return;
+    if (q->sourceModel()->hasChildren(parent)) {
+        m_treeMapper.append(new QPersistentModelIndex(parent));
+    }
+}
+
+/*!
+\internal
+*/
+void TransposeProxyModelPrivate::possibleRemovedParent(const QModelIndex& parent)
+{
+    Q_Q(TransposeProxyModel);
+    if (!parent.isValid())
+        return;
+    const auto foundNode = findNode(parent);
+    if (foundNode == m_treeMapper.end())
+        return;
+    if (!q->sourceModel()->hasChildren(parent)){
+        delete *foundNode;
+        m_treeMapper.erase(foundNode);
+    }
+}
+
+/*!
+\internal
+*/
+void TransposeProxyModelPrivate::onRowsInserted(const QModelIndex& parent)
+{
+    Q_Q(TransposeProxyModel);
+    possibleNewParent(parent);
+    q->endInsertColumns();
+}
+
+/*!
+\internal
+*/
+void TransposeProxyModelPrivate::onRowsRemoved(const QModelIndex& parent)
+{
+    Q_Q(TransposeProxyModel);
+    possibleRemovedParent(parent);
+    q->endRemoveColumns();
+}
+
+/*!
+\internal
+*/
+void TransposeProxyModelPrivate::onRowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent)
+{
+    Q_UNUSED(sourceStart)
+    Q_UNUSED(sourceEnd)
+    Q_Q(TransposeProxyModel);
+    possibleNewParent(destinationParent);
+    possibleRemovedParent(sourceParent);
+    q->endMoveColumns();
+}
+
+/*!
+\internal
+*/
+void TransposeProxyModelPrivate::onColsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent)
+{
+    Q_UNUSED(sourceStart)
+    Q_UNUSED(sourceEnd)
+    Q_Q(TransposeProxyModel);
+    possibleNewParent(destinationParent);
+    possibleRemovedParent(sourceParent);
+    q->endMoveRows();
+}
+
+/*!
+\internal
+*/
+void TransposeProxyModelPrivate::onColsInserted(const QModelIndex& parent)
+{
+    Q_Q(TransposeProxyModel);
+    possibleNewParent(parent);
+    q->endInsertRows();
+}
+
+/*!
+\internal
+*/
+void TransposeProxyModelPrivate::onColsRemoved(const QModelIndex& parent)
+{
+    Q_Q(TransposeProxyModel);
+    possibleRemovedParent(parent);
+    q->endRemoveRows();
+}
+
+/*!
+\internal
+*/
+void TransposeProxyModelPrivate::onModelReset()
+{
+    Q_Q(TransposeProxyModel);
+    buildTree();
+    q->endResetModel();
+}
+
+/*!
+\internal
+*/
+void TransposeProxyModelPrivate::onLayoutChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
+{
+    Q_Q(TransposeProxyModel);
+    Q_ASSERT(q->sourceModel());
+    QModelIndexList toList;
+    toList.reserve(m_layoutChangePersistentIndexes.size());
+    for (auto i = m_layoutChangePersistentIndexes.cbegin(), listEnd = m_layoutChangePersistentIndexes.cend(); i != listEnd; ++i) {
+        toList << q->mapFromSource(*i);
+    }
+    q->changePersistentIndexList(m_layoutChangeProxyIndexes, toList);
+    m_layoutChangeProxyIndexes.clear();
+    m_layoutChangePersistentIndexes.clear();
+    QList<QPersistentModelIndex> proxyParents;
+    proxyParents.reserve(parents.size());
+    for (auto& srcParent : parents)
+        proxyParents << q->mapFromSource(srcParent);
+    q->layoutChanged(proxyParents, hint);
+}
+
+/*!
+\internal
+*/
+void TransposeProxyModelPrivate::onLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
+{
+    Q_Q(TransposeProxyModel);
+    const auto proxyPersistentIndexes = q->persistentIndexList();
+    m_layoutChangeProxyIndexes.clear();
+    m_layoutChangePersistentIndexes.clear();
+    m_layoutChangeProxyIndexes.reserve(proxyPersistentIndexes.size());
+    m_layoutChangePersistentIndexes.reserve(proxyPersistentIndexes.size());
+    for (const QPersistentModelIndex &proxyPersistentIndex : proxyPersistentIndexes) {
+        m_layoutChangeProxyIndexes << proxyPersistentIndex;
+        Q_ASSERT(proxyPersistentIndex.isValid());
+        const QPersistentModelIndex srcPersistentIndex = q->mapToSource(proxyPersistentIndex);
+        Q_ASSERT(srcPersistentIndex.isValid());
+        m_layoutChangePersistentIndexes << srcPersistentIndex;
+    }
+    QList<QPersistentModelIndex> proxyParents;
+    proxyParents.reserve(parents.size());
+    for (auto& srcParent : parents)
+        proxyParents << q->mapFromSource(srcParent);
+    q->layoutAboutToBeChanged(proxyParents, hint);
+}
+
+/*!
 Constructs a new proxy model with the given \a parent.
 */
 TransposeProxyModel::TransposeProxyModel(QObject* parent)
@@ -31,6 +282,9 @@ Destructor
 */
 TransposeProxyModel::~TransposeProxyModel()
 {
+    Q_D(TransposeProxyModel);
+    for (auto discIter = d->m_sourceConnections.cbegin(); discIter != d->m_sourceConnections.cend(); ++discIter)
+        QObject::disconnect(*discIter);
     delete m_dptr;
 }
 
@@ -49,58 +303,59 @@ void TransposeProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
     d->m_sourceConnections.clear();
     if (sourceModel()) {
         d->m_sourceConnections
-            << QObject::connect(sourceModel(), &QAbstractItemModel::modelAboutToBeReset, this, [this]()->void { beginResetModel(); })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::modelReset, this, [this]()->void { endResetModel(); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::modelAboutToBeReset, [this]()->void { beginResetModel(); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::modelReset, [d]()->void {d->onModelReset(); })
             << QObject::connect(sourceModel(), &QAbstractItemModel::dataChanged, [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles) {
                 dataChanged(mapFromSource(topLeft), mapFromSource(bottomRight), roles);
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::headerDataChanged, this, [this](Qt::Orientation orientation, int first, int last)->void { 
+            << QObject::connect(sourceModel(), &QAbstractItemModel::headerDataChanged, [this](Qt::Orientation orientation, int first, int last)->void { 
                 headerDataChanged(orientation == Qt::Horizontal ? Qt::Vertical : Qt::Horizontal, first, last); 
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeInserted, this, [this](const QModelIndex &parent, int first, int last) {
+            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeInserted, [this](const QModelIndex &parent, int first, int last) {
                 beginInsertRows(mapFromSource(parent), first, last);
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeMoved, this, [this](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn) {
+            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeMoved, [this](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn) {
                 beginMoveRows(mapFromSource(sourceParent), sourceStart, sourceEnd, mapFromSource(destinationParent), destinationColumn);
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeRemoved, this, [this](const QModelIndex &parent, int first, int last) {
+            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeRemoved, [this](const QModelIndex &parent, int first, int last) {
                 beginRemoveRows(mapFromSource(parent), first, last);
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsInserted, this, [this](const QModelIndex &parent)->void {
-                endInsertRows();
+            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsInserted, [d](const QModelIndex &parent)->void {
+                d->onColsInserted(parent);
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsRemoved, this, [this](const QModelIndex &parent)->void {
-                endRemoveRows();
+            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsRemoved, [d](const QModelIndex &parent)->void {
+                d->onColsRemoved(parent);
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsMoved, this, [this]()->void {
-                endMoveRows();
+            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsMoved, [d](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent)->void {
+                d->onColsMoved(sourceParent, sourceStart, sourceEnd, destinationParent);
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeInserted, this, [this](const QModelIndex &parent, int first, int last) {
+            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeInserted, [this](const QModelIndex &parent, int first, int last) {
                 beginInsertColumns(mapFromSource(parent), first, last);
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeMoved, this, [this](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow) {
+            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeMoved, [this](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow) {
                 beginMoveColumns(mapFromSource(sourceParent), sourceStart, sourceEnd, mapFromSource(destinationParent), destinationRow);
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeRemoved, this, [this](const QModelIndex &parent, int first, int last) {
+            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeRemoved, [this](const QModelIndex &parent, int first, int last) {
                 beginRemoveColumns(mapFromSource(parent), first, last);
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsInserted, this, [this]()->void {
-                endInsertColumns();
+            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsInserted, [d](const QModelIndex &parent)->void {
+                d->onRowsInserted(parent);
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsRemoved, this, [this]()->void {
-                endRemoveColumns();
+            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsRemoved, [d](const QModelIndex &parent)->void {
+                d->onRowsRemoved(parent);
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsMoved, this, [this]()->void {
-                endMoveColumns();
+            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsMoved, [d](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent)->void {
+                d->onRowsMoved(sourceParent, sourceStart, sourceEnd, destinationParent);
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::layoutAboutToBeChanged, this, [d](const QList<QPersistentModelIndex>& parents, QAbstractItemModel::LayoutChangeHint hint){
+            << QObject::connect(sourceModel(), &QAbstractItemModel::layoutAboutToBeChanged, [d](const QList<QPersistentModelIndex>& parents, QAbstractItemModel::LayoutChangeHint hint){
                 d->onLayoutAboutToBeChanged(parents, hint);
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::layoutChanged, this, [d](const QList<QPersistentModelIndex>& parents, QAbstractItemModel::LayoutChangeHint hint) {
+            << QObject::connect(sourceModel(), &QAbstractItemModel::layoutChanged, [d](const QList<QPersistentModelIndex>& parents, QAbstractItemModel::LayoutChangeHint hint) {
                 d->onLayoutChanged(parents, hint);
             })
         ;
     }
+    d->buildTree();
     endResetModel();
 }
 
@@ -207,10 +462,14 @@ QMap<int, QVariant> TransposeProxyModel::itemData(const QModelIndex &index) cons
 */
 QModelIndex TransposeProxyModel::mapFromSource(const QModelIndex &sourceIndex) const
 {
+    Q_D(const TransposeProxyModel);
     if (!sourceIndex.isValid() || !sourceModel())
         return QModelIndex();
     Q_ASSERT(sourceIndex.model() == sourceModel());
-    return QAbstractItemModel::createIndex(sourceIndex.column(), sourceIndex.row(), sourceIndex.internalPointer());
+    const auto foundNode = d->findNode(sourceIndex.parent());
+    if(d->nodeFound(foundNode))
+        return createIndex(sourceIndex.column(), sourceIndex.row(), *foundNode);
+    return createIndex(sourceIndex.column(), sourceIndex.row());
 }
 
 /*!
@@ -218,10 +477,13 @@ QModelIndex TransposeProxyModel::mapFromSource(const QModelIndex &sourceIndex) c
 */
 QModelIndex TransposeProxyModel::mapToSource(const QModelIndex &proxyIndex) const
 {
+    Q_D(const TransposeProxyModel);
     if (!proxyIndex.isValid() || !sourceModel())
         return QModelIndex();
     Q_ASSERT(proxyIndex.model() == this);
-    return QAbstractItemModel::createIndex(proxyIndex.column(), proxyIndex.row(), proxyIndex.internalPointer());
+    if (proxyIndex.internalPointer())
+        return sourceModel()->index(proxyIndex.column(), proxyIndex.row(), *static_cast<QPersistentModelIndex*>(proxyIndex.internalPointer()));
+    return sourceModel()->index(proxyIndex.column(), proxyIndex.row());
 }
 
 /*!
@@ -335,52 +597,6 @@ void TransposeProxyModel::sort(int column, Qt::SortOrder order)
     return;
 }
 
-/*!
-\internal
-*/
-void TransposeProxyModelPrivate::onLayoutChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
-{
-    Q_Q(TransposeProxyModel);
-    Q_ASSERT(q->sourceModel());
-    QModelIndexList toList;
-    toList.reserve(m_layoutChangePersistentIndexes.size());
-    for (auto i = m_layoutChangePersistentIndexes.cbegin(), listEnd = m_layoutChangePersistentIndexes.cend(); i != listEnd; ++i) {
-        toList << q->mapFromSource(*i);
-    }
-    q->changePersistentIndexList(m_layoutChangeProxyIndexes, toList);
-    m_layoutChangeProxyIndexes.clear();
-    m_layoutChangePersistentIndexes.clear();
-    QList<QPersistentModelIndex> proxyParents;
-    proxyParents.reserve(parents.size());
-    for (auto& srcParent : parents)
-        proxyParents << q->mapFromSource(srcParent);
-    q->layoutChanged(proxyParents, hint);
-}
-
-/*!
-\internal
-*/
-void TransposeProxyModelPrivate::onLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
-{
-    Q_Q(TransposeProxyModel);
-    const auto proxyPersistentIndexes = q->persistentIndexList();
-    m_layoutChangeProxyIndexes.clear();
-    m_layoutChangePersistentIndexes.clear();
-    m_layoutChangeProxyIndexes.reserve(proxyPersistentIndexes.size());
-    m_layoutChangePersistentIndexes.reserve(proxyPersistentIndexes.size());
-    for (const QPersistentModelIndex &proxyPersistentIndex : proxyPersistentIndexes) {
-        m_layoutChangeProxyIndexes << proxyPersistentIndex;
-        Q_ASSERT(proxyPersistentIndex.isValid());
-        const QPersistentModelIndex srcPersistentIndex = q->mapToSource(proxyPersistentIndex);
-        Q_ASSERT(srcPersistentIndex.isValid());
-        m_layoutChangePersistentIndexes << srcPersistentIndex;
-    }
-    QList<QPersistentModelIndex> proxyParents;
-    proxyParents.reserve(parents.size());
-    for (auto& srcParent : parents)
-        proxyParents << q->mapFromSource(srcParent);
-    q->layoutAboutToBeChanged(proxyParents, hint);
-}
 
 /*!
 \class TransposeProxyModel
