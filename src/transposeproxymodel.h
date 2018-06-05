@@ -1,10 +1,9 @@
 #ifndef transposeproxymodel_h__
 #define transposeproxymodel_h__
-
-
+#include "modelutilities_global.h"
 #include <QAbstractProxyModel>
 class TransposeProxyModelPrivate;
-class TransposeProxyModel : public QAbstractProxyModel
+class MODELUTILITIES_EXPORT TransposeProxyModel : public QAbstractProxyModel
 {
     Q_OBJECT
     Q_DISABLE_COPY(TransposeProxyModel)
