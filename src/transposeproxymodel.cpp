@@ -518,7 +518,7 @@ QModelIndex TransposeProxyModel::mapToSource(const QModelIndex &proxyIndex) cons
 Qt::ItemFlags TransposeProxyModel::flags(const QModelIndex &index) const 
 {
     if (!sourceModel())
-        Qt::NoItemFlags;
+        return Qt::NoItemFlags;
     Q_ASSERT(!index.isValid() || index.model() == this);
     return sourceModel()->flags(mapToSource(index));
 }
