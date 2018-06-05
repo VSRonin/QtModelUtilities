@@ -728,7 +728,12 @@ void tst_InsertProxyModel::testSetItemDataDataChanged()
     QCOMPARE(argList.at(1).value<QModelIndex>(), proxyIdX);
     auto rolesVector = argList.at(2).value<QVector<int> >();
     QCOMPARE(rolesVector.size(), 5);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+    // bug fixed by Qt commit 1382374deaa4a854aeb542e6c8f7e1841f2abb10
+    QVERIFY(!rolesVector.contains(Qt::TextAlignmentRole));
+#else
     QVERIFY(rolesVector.contains(Qt::TextAlignmentRole));
+#endif
     QVERIFY(rolesVector.contains(Qt::ToolTipRole));
     QVERIFY(rolesVector.contains(Qt::EditRole));
     QVERIFY(rolesVector.contains(Qt::DisplayRole));
@@ -762,7 +767,7 @@ void tst_InsertProxyModel::testSetItemData()
     QFETCH(QAbstractItemModel*, baseModel);
     QFETCH(int, idxRow);
     QFETCH(int, idxCol);
-    const QMap<int, QVariant> itemDataSet{{ //TextAlignmentRole
+    const QMap<int, QVariant> itemDataSet{{
             std::make_pair<int, QVariant>(Qt::UserRole, 5)
             ,std::make_pair<int, QVariant>(Qt::DisplayRole, QStringLiteral("Test"))
             , std::make_pair<int, QVariant>(Qt::ToolTipRole, QStringLiteral("ToolTip"))
@@ -778,7 +783,12 @@ void tst_InsertProxyModel::testSetItemData()
     QCOMPARE(proxyModel.data(proxyIdX, Qt::EditRole).toString(), QStringLiteral("Test"));
     QCOMPARE(proxyModel.data(proxyIdX, Qt::UserRole).toInt(), 5);
     QCOMPARE(proxyModel.data(proxyIdX, Qt::ToolTipRole).toString(), QStringLiteral("ToolTip"));
-    QVERIFY(!proxyModel.data(proxyIdX, Qt::TextAlignmentRole).isValid());
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+    // bug fixed by Qt commit 1382374deaa4a854aeb542e6c8f7e1841f2abb10
+    QCOMPARE(proxyModel.data(proxyIdX, Qt::TextAlignmentRole).toInt(), Qt::AlignRight);
+#else
+    QCOMPARE(!proxyModel.data(proxyIdX, Qt::TextAlignmentRole).toInt(), Qt::AlignRight);
+#endif
     baseModel->deleteLater();
 }
 
