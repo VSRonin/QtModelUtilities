@@ -255,20 +255,20 @@ void InsertProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
         extraData.clear();
     if (sourceModel()) {
         d->m_sourceConnections
-            << QObject::connect(sourceModel(), &QAbstractItemModel::modelAboutToBeReset, this, [this]()->void { beginResetModel(); })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::modelReset, this, [this]()->void { endResetModel(); })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::dataChanged, this, [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles) {
+            << QObject::connect(sourceModel(), &QAbstractItemModel::modelAboutToBeReset,  [this]()->void { beginResetModel(); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::modelReset,  [this]()->void { endResetModel(); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::dataChanged,  [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles) {
                 dataChanged(mapFromSource(topLeft), mapFromSource(bottomRight), roles);
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::headerDataChanged, this, &QAbstractItemModel::headerDataChanged)
-            << QObject::connect(sourceModel(), &QAbstractItemModel::layoutAboutToBeChanged, this, [d](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {d->beforeLayoutChange(parents, hint); })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::layoutChanged, this, [d](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {d->afetrLayoutChange(parents, hint); })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeInserted, this, [this](const QModelIndex &parent, int first, int last) {
+            << QObject::connect(sourceModel(), &QAbstractItemModel::headerDataChanged,  &QAbstractItemModel::headerDataChanged)
+            << QObject::connect(sourceModel(), &QAbstractItemModel::layoutAboutToBeChanged,  [d](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {d->beforeLayoutChange(parents, hint); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::layoutChanged,  [d](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {d->afetrLayoutChange(parents, hint); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeInserted,  [this](const QModelIndex &parent, int first, int last) {
                 if (!parent.isValid()) {
                     beginInsertColumns(QModelIndex(), first, last);
                 }
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeMoved, this, [this](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn) {
+            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeMoved,  [this](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn) {
                 if (sourceParent.isValid())
                     return;
                 if (destinationParent.isValid())
@@ -276,20 +276,20 @@ void InsertProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
                 else 
                     beginMoveColumns(QModelIndex(), sourceStart, sourceEnd, QModelIndex(), destinationColumn);
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeRemoved, this, [this](const QModelIndex &parent, int first, int last) {
+            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeRemoved, [this](const QModelIndex &parent, int first, int last) {
                 if (!parent.isValid()) {
                     beginRemoveColumns(QModelIndex(), first, last);
                 }
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsInserted, this, [d](const QModelIndex &parent, int first, int last)->void {d->onColumnsInserted(parent, first, last); })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsRemoved, this, [d](const QModelIndex &parent, int first, int last)->void {d->onColumnsRemoved(parent, first, last); })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsMoved, this, [d](const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)->void {d->onColumnsMoved(parent, start, end, destination, column); })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeInserted, this, [this](const QModelIndex &parent, int first, int last) {
+            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsInserted,  [d](const QModelIndex &parent, int first, int last)->void {d->onColumnsInserted(parent, first, last); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsRemoved,  [d](const QModelIndex &parent, int first, int last)->void {d->onColumnsRemoved(parent, first, last); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::columnsMoved,  [d](const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)->void {d->onColumnsMoved(parent, start, end, destination, column); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeInserted, [this](const QModelIndex &parent, int first, int last) {
                 if (!parent.isValid()) {
                     beginInsertRows(QModelIndex(), first, last);
                 }
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeMoved, this, [this](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow) {
+            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeMoved, [this](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow) {
                 if (sourceParent.isValid())
                     return;
                 if (destinationParent.isValid())
@@ -297,14 +297,14 @@ void InsertProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
                 else
                     beginMoveRows(QModelIndex(), sourceStart, sourceEnd, QModelIndex(), destinationRow);
             })
-                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeRemoved, this, [this](const QModelIndex &parent, int first, int last) {
+                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeRemoved, [this](const QModelIndex &parent, int first, int last) {
                 if (!parent.isValid()) {
                     beginRemoveRows(QModelIndex(), first, last);
                 }
             })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsInserted, this, [d](const QModelIndex &parent, int first, int last)->void {d->onRowsInserted(parent, first, last); })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsRemoved, this, [d](const QModelIndex &parent, int first, int last)->void {d->onRowsRemoved(parent, first, last); })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsMoved, this, [d](const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)->void {d->onRowsMoved(parent, start, end, destination, row); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsInserted, [d](const QModelIndex &parent, int first, int last)->void {d->onRowsInserted(parent, first, last); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsRemoved, [d](const QModelIndex &parent, int first, int last)->void {d->onRowsRemoved(parent, first, last); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::rowsMoved, [d](const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)->void {d->onRowsMoved(parent, start, end, destination, row); })
         ;
         const int sourceCols = sourceModel()->columnCount();
         const int sourceRows = sourceModel()->rowCount();
