@@ -2,13 +2,13 @@
 #define transposeproxymodel_h__
 
 #include "modelutilities_global.h"
-#include <QAbstractProxyModel>
+#include "treemapproxymodel.h"
 class TransposeProxyModelPrivate;
-class MODELUTILITIES_EXPORT TransposeProxyModel : public QAbstractProxyModel
+class MODELUTILITIES_EXPORT TransposeProxyModel : public TreeMapProxyModel
 {
     Q_OBJECT
     Q_DISABLE_COPY(TransposeProxyModel)
-    Q_DECLARE_PRIVATE_D(m_dptr, TransposeProxyModel)
+    Q_DECLARE_PRIVATE(TransposeProxyModel)
 public:
     explicit TransposeProxyModel(QObject* parent = Q_NULLPTR);
     ~TransposeProxyModel();
@@ -39,9 +39,7 @@ public:
     bool canFetchMore(const QModelIndex &parent) const Q_DECL_OVERRIDE;
     void fetchMore(const QModelIndex &parent) Q_DECL_OVERRIDE;
 protected:
-    TransposeProxyModel(TransposeProxyModelPrivate& dptr, QObject* parent);
-private:
-    TransposeProxyModelPrivate* m_dptr;
+    TransposeProxyModel(TransposeProxyModelPrivate* dptr, QObject* parent);
 };
 
 #endif // transposeproxymodel_h__
