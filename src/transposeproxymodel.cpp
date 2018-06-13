@@ -76,14 +76,14 @@ void TransposeProxyModelPrivate::onDataChanged(const QModelIndex& topLeft, const
 Constructs a new proxy model with the given \a parent.
 */
 TransposeProxyModel::TransposeProxyModel(QObject* parent)
-    : TreeMapProxyModel(new TransposeProxyModelPrivate(this), parent)
+    : TreeMapProxyModel(*new TransposeProxyModelPrivate(this), parent)
 {}
 
 /*!
 Constructor used only while subclassing the private class.
 Not part of the public API
 */
-TransposeProxyModel::TransposeProxyModel(TransposeProxyModelPrivate* dptr, QObject* parent)
+TransposeProxyModel::TransposeProxyModel(TransposeProxyModelPrivate& dptr, QObject* parent)
     : TreeMapProxyModel(dptr,parent)
 {}
 

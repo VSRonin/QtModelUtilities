@@ -55,17 +55,16 @@ TreeMapProxyModel::~TreeMapProxyModel()
 Constructs a new proxy model with the given \a parent.
 */
 TreeMapProxyModel::TreeMapProxyModel(QObject* parent)
-    :QAbstractProxyModel(parent)
-    , d_ptr(new TreeMapProxyModelPrivate(this))
+    :TreeMapProxyModel(*new TreeMapProxyModelPrivate(this), parent)
 {}
 
 /*!
 Constructor used only while subclassing the private class.
 Not part of the public API
 */
-TreeMapProxyModel::TreeMapProxyModel(TreeMapProxyModelPrivate* dptr, QObject* parent)
+TreeMapProxyModel::TreeMapProxyModel(TreeMapProxyModelPrivate& dptr, QObject* parent)
     : QAbstractProxyModel(parent)
-    , d_ptr(dptr)
+    , d_ptr(&dptr)
 {}
 
 

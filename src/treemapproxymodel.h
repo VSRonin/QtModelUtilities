@@ -21,7 +21,7 @@ public:
     void possibleRemovedParent(const QModelIndex& parent);
     ~TreeMapProxyModel();
 protected:
-    TreeMapProxyModel(TreeMapProxyModelPrivate* dptr, QObject* parent);
+    TreeMapProxyModel(TreeMapProxyModelPrivate& dptr, QObject* parent);
     TreeMapProxyModelPrivate* d_ptr;
 };
 

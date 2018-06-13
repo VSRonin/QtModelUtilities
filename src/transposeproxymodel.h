@@ -39,7 +39,7 @@ public:
     bool canFetchMore(const QModelIndex &parent) const Q_DECL_OVERRIDE;
     void fetchMore(const QModelIndex &parent) Q_DECL_OVERRIDE;
 protected:
-    TransposeProxyModel(TransposeProxyModelPrivate* dptr, QObject* parent);
+    TransposeProxyModel(TransposeProxyModelPrivate& dptr, QObject* parent);
 };
 
 #endif // transposeproxymodel_h__
