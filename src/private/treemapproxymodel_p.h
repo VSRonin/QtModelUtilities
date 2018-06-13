@@ -7,15 +7,12 @@
 class TreeMapProxyNode;
 using NodeContainer = QVector<TreeMapProxyNode*>;
 class TreeMapProxyNode{
+    Q_DISABLE_COPY(TreeMapProxyNode)
 public:
     TreeMapProxyNode* parentNode;
     QPersistentModelIndex* sourceIdx;
     NodeContainer children;
     TreeMapProxyNode(QPersistentModelIndex* srcIdx = Q_NULLPTR, TreeMapProxyNode* parNode = Q_NULLPTR);
-    TreeMapProxyNode(const TreeMapProxyNode& other) = delete;
-    TreeMapProxyNode& operator=(const TreeMapProxyNode& other) = delete;
-    TreeMapProxyNode(TreeMapProxyNode&& other);
-    TreeMapProxyNode& operator=(TreeMapProxyNode&& other);
     ~TreeMapProxyNode();
     void clear();
 };
@@ -31,6 +28,7 @@ public:
 protected:
     TreeMapProxyModel* q_ptr;
 private:
+    void rebuildTreeMap(const QModelIndex& parent, TreeMapProxyNode* container);
     void onRowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent);
     void onColsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent);
     QVector<QMetaObject::Connection> m_sourceConnections;

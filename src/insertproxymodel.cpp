@@ -244,6 +244,8 @@ InsertProxyModel::~InsertProxyModel()
 */
 void InsertProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
 {
+    if (newSourceModel == sourceModel())
+        return;
     Q_D(InsertProxyModel);
     beginResetModel();
     if (sourceModel()) {

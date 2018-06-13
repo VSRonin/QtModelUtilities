@@ -17,7 +17,6 @@ public:
     QModelIndex internalPointerToIndex(void* internalPoiner) const;
     void rebuildTreeMap();
     void clearTreeMap();
-    void rebuildTreeMap(const QModelIndex& parent, TreeMapProxyNode* container);
     void possibleNewParent(const QModelIndex& parent);
     void possibleRemovedParent(const QModelIndex& parent);
     ~TreeMapProxyModel();

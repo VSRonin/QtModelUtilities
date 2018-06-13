@@ -218,9 +218,9 @@ void RoleMaskProxyModel::removeMaskedRole(int role)
 */
 void RoleMaskProxyModel::setSourceModel(QAbstractItemModel *sourceMdl)
 {
-    Q_D(RoleMaskProxyModel);
     if (sourceMdl == sourceModel())
         return; 
+    Q_D(RoleMaskProxyModel);
     d->m_maskedData.clear();
     if (sourceModel())
         Q_ASSUME(QObject::disconnect(d->m_sourceDataChangedConnection));

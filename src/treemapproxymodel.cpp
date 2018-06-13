@@ -68,38 +68,21 @@ TreeMapProxyModel::TreeMapProxyModel(TreeMapProxyModelPrivate* dptr, QObject* pa
     , d_ptr(dptr)
 {}
 
-TreeMapProxyNode& TreeMapProxyNode::operator=(TreeMapProxyNode&& other)
-{
-    std::swap(other.parentNode, parentNode);
-    std::swap(other.sourceIdx, sourceIdx);
-    std::swap(other.children, children);
-    return *this;
-}
-
-TreeMapProxyNode::TreeMapProxyNode(TreeMapProxyNode&& other)
-    : parentNode(other.parentNode)
-    , sourceIdx(other.sourceIdx)
-    , children(other.children)
-{
-    other.sourceIdx = Q_NULLPTR;
-    other.parentNode = Q_NULLPTR;
-    other.children.clear();
-}
 
 /*!
-Rebuilds the mapping recursively for all descendants of \a parent
+\internal
 */
-void TreeMapProxyModel::rebuildTreeMap(const QModelIndex& parent, TreeMapProxyNode* container)
+void TreeMapProxyModelPrivate::rebuildTreeMap(const QModelIndex& parent, TreeMapProxyNode* container)
 {
-    Q_D(TreeMapProxyModel);
-    Q_ASSERT(sourceModel());
+    Q_Q(TreeMapProxyModel);
+    Q_ASSERT(q->sourceModel());
     Q_ASSERT(container);
-    const int numRows = sourceModel()->rowCount(parent);
-    const int numCols = sourceModel()->columnCount(parent);
+    const int numRows = q->sourceModel()->rowCount(parent);
+    const int numCols = q->sourceModel()->columnCount(parent);
     for (int i = 0; i < numRows; ++i) {
         for (int j = 0; j < numCols; ++j) {
-            const QModelIndex currIdx = sourceModel()->index(i, j, parent);
-            if (sourceModel()->hasChildren(currIdx)) {
+            const QModelIndex currIdx = q->sourceModel()->index(i, j, parent);
+            if (q->sourceModel()->hasChildren(currIdx)) {
                 auto newNode = new TreeMapProxyNode(new QPersistentModelIndex(currIdx), container);
                 rebuildTreeMap(currIdx, newNode);
                 container->children.append(newNode);
@@ -117,7 +100,7 @@ void TreeMapProxyModel::rebuildTreeMap()
     if (!sourceModel())
         return;
     Q_D(TreeMapProxyModel);
-    rebuildTreeMap(QModelIndex(),&d->m_treeMapper);
+    d->rebuildTreeMap(QModelIndex(),&d->m_treeMapper);
 }
 
 /*!
@@ -193,7 +176,7 @@ void TreeMapProxyModel::possibleNewParent(const QModelIndex& possibleParent)
         return;
     if (sourceModel()->hasChildren(possibleParent)) {
         TreeMapProxyNode* const  parentNode = possibleParent.parent().isValid() ? d->findNode(possibleParent.parent()) : &d->m_treeMapper;
-        rebuildTreeMap(possibleParent, parentNode);
+        d->rebuildTreeMap(possibleParent, parentNode);
         parentNode->children.append(new TreeMapProxyNode(new QPersistentModelIndex(possibleParent), parentNode));
     }
 }
