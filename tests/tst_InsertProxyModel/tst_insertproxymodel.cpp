@@ -731,8 +731,6 @@ void tst_InsertProxyModel::testSetItemDataDataChanged()
 #if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
     // bug fixed by Qt commit 1382374deaa4a854aeb542e6c8f7e1841f2abb10
     QVERIFY(!rolesVector.contains(Qt::TextAlignmentRole));
-#else
-    QVERIFY(rolesVector.contains(Qt::TextAlignmentRole));
 #endif
     QVERIFY(rolesVector.contains(Qt::ToolTipRole));
     QVERIFY(rolesVector.contains(Qt::EditRole));
@@ -786,8 +784,6 @@ void tst_InsertProxyModel::testSetItemData()
 #if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
     // bug fixed by Qt commit 1382374deaa4a854aeb542e6c8f7e1841f2abb10
     QCOMPARE(proxyModel.data(proxyIdX, Qt::TextAlignmentRole).toInt(), Qt::AlignRight);
-#else
-    QCOMPARE(!proxyModel.data(proxyIdX, Qt::TextAlignmentRole).toInt(), Qt::AlignRight);
 #endif
     baseModel->deleteLater();
 }

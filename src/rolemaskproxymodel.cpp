@@ -1,6 +1,10 @@
 #include "rolemaskproxymodel.h"
 #include "private/rolemaskproxymodel_p.h"
 #include <QVector>
+
+/*!
+\internal
+*/
 RoleMaskProxyModelPrivate::RoleMaskProxyModelPrivate(RoleMaskProxyModel* q)
     :q_ptr(q)
     , m_transparentIfEmpty(true)
@@ -9,6 +13,9 @@ RoleMaskProxyModelPrivate::RoleMaskProxyModelPrivate(RoleMaskProxyModel* q)
     Q_ASSERT(q_ptr);
 }
 
+/*!
+\internal
+*/
 void RoleMaskProxyModelPrivate::interceptDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
 {
     Q_Q(RoleMaskProxyModel);
@@ -47,6 +54,9 @@ void RoleMaskProxyModelPrivate::interceptDataChanged(const QModelIndex& topLeft,
     q->dataChanged(q->mapFromSource(topLeft), q->mapFromSource(bottomRight), filteredRoles);
 }
 
+/*!
+\internal
+*/
 void RoleMaskProxyModelPrivate::clearUnusedMaskedRoles(const QSet<int>& newRoles)
 {
     if (newRoles.isEmpty()) {
@@ -69,12 +79,18 @@ void RoleMaskProxyModelPrivate::clearUnusedMaskedRoles(const QSet<int>& newRoles
     }
 }
 
+/*!
+\internal
+*/
 bool RoleMaskProxyModelPrivate::removeRole(const QPersistentModelIndex& idx, int role)
 {
     const auto idxIter = m_maskedData.find(idx);
     return removeRole(idxIter, role);
 }
 
+/*!
+\internal
+*/
 bool RoleMaskProxyModelPrivate::removeRole(const QHash<QPersistentModelIndex, RolesContainer >::iterator& idxIter, int role)
 {
     if (idxIter == m_maskedData.end())
@@ -88,7 +104,9 @@ bool RoleMaskProxyModelPrivate::removeRole(const QHash<QPersistentModelIndex, Ro
 }
 
 
-
+/*!
+\internal
+*/
 void RoleMaskProxyModelPrivate::signalAllChanged(const QVector<int>& roles, const QModelIndex& parent)
 {
     Q_Q(RoleMaskProxyModel);
@@ -223,7 +241,7 @@ void RoleMaskProxyModel::setSourceModel(QAbstractItemModel *sourceMdl)
     Q_D(RoleMaskProxyModel);
     d->m_maskedData.clear();
     if (sourceModel())
-        Q_ASSUME(QObject::disconnect(d->m_sourceDataChangedConnection));
+        QObject::disconnect(d->m_sourceDataChangedConnection);
     QIdentityProxyModel::setSourceModel(sourceMdl);
     if (sourceModel()) {
         Q_ASSUME(sourceModel()->disconnect(SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)), this));
@@ -295,6 +313,90 @@ bool RoleMaskProxyModel::setData(const QModelIndex &proxyIndex, const QVariant &
         return true;
     dataChanged(proxyIndex, proxyIndex, changedRolesVector);
     return true;
+}
+
+/*!
+\reimp
+\details Due to limitations in the architecture, the model might emit 2 separate dataChanged signals, one for the roles that were masked and one for the roles that are managed by the sorce model
+*/
+bool RoleMaskProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles)
+{
+    Q_D(RoleMaskProxyModel);
+    QMap<int, QVariant> adjustedRoles = roles;
+    if (d->m_mergeDisplayEdit) {
+        const auto editIter = adjustedRoles.find(Qt::EditRole);
+        const auto displayIter = adjustedRoles.constFind(Qt::DisplayRole);
+        if (editIter != adjustedRoles.end()) {
+            if (displayIter == adjustedRoles.cend()) {
+                adjustedRoles.insert(Qt::DisplayRole, editIter.value());
+            }
+            adjustedRoles.erase(editIter);
+        }
+    }
+    const QModelIndex sourceIndex = mapToSource(index);
+    Q_ASSERT(sourceIndex.isValid());
+    QMap<int, QVariant> rolesForSource;
+    QVector<int> changedRoles;
+    changedRoles.reserve(adjustedRoles.size());
+    for (auto i = adjustedRoles.cbegin(), rolesEnd = adjustedRoles.cend(); i != rolesEnd; ++i) {
+        if (!d->m_maskedRoles.contains(i.key())) {
+            rolesForSource.insert(i.key(), i.value());
+            continue;
+        }
+        auto idxIter = d->m_maskedData.find(sourceIndex);
+        if (idxIter == d->m_maskedData.end()) {
+            if (i->isValid()) {
+                idxIter = d->m_maskedData.insert(sourceIndex, RolesContainer());
+                idxIter->insert(i.key(), i.value());
+                changedRoles << i.key();
+            }
+            continue;
+        }
+        if (!i->isValid()) {
+            if (d->removeRole(idxIter, i.key()))
+                changedRoles << i.key();
+            continue;
+        }
+        const auto roleIter = idxIter->find(i.key());
+        if (roleIter == idxIter->end())
+            idxIter->insert(i.key(), i.value());
+        else if (roleIter.value() != i.value())
+            roleIter.value() = i.value();
+        else
+            continue;
+        changedRoles << i.key();
+    }
+    if (d->m_mergeDisplayEdit && changedRoles.contains(Qt::DisplayRole))
+        changedRoles << Qt::EditRole;
+    if (!changedRoles.isEmpty())
+        dataChanged(index, index, changedRoles);
+    if (!rolesForSource.isEmpty())
+        return QIdentityProxyModel::setItemData(index, rolesForSource);
+    return true;
+}
+
+/*!
+\reimp
+*/
+QMap<int, QVariant> RoleMaskProxyModel::itemData(const QModelIndex &index) const 
+{
+    Q_D(const RoleMaskProxyModel);
+    RolesContainer result;
+    const auto maskedIter = d->m_maskedData.constFind(index);
+    if (maskedIter != d->m_maskedData.cend()) {
+        result = maskedIter.value();
+        const auto displayIter = result.constFind(Qt::DisplayRole);
+        if (d->m_mergeDisplayEdit && displayIter != result.cend())
+            result.insert(Qt::EditRole, displayIter.value());
+    }
+    if(!d->m_transparentIfEmpty){
+        const QMap<int, QVariant> baseData = QIdentityProxyModel::itemData(index);
+        for (auto i = baseData.cbegin(), baseEnd = baseData.cend(); i != baseEnd;++i){
+            if (!result.contains(i.key()))
+                result.insert(i.key(), i.value());
+        }
+    }
+    return convertFromContainer<QMap<int, QVariant> >(result);
 }
 
 bool RoleMaskProxyModel::transparentIfEmpty() const
