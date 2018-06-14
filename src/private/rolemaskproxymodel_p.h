@@ -4,6 +4,7 @@
 #include <QHash>
 #include <QSet>
 #include <QMetaObject>
+#include <QVector>
 #include "private/modelutilities_common_p.h"
 #include "rolemaskproxymodel.h"
 class RoleMaskProxyModelPrivate
@@ -15,7 +16,7 @@ class RoleMaskProxyModelPrivate
     QHash<QPersistentModelIndex, RolesContainer > m_maskedData;
     bool m_transparentIfEmpty;
     bool m_mergeDisplayEdit;
-    QMetaObject::Connection m_sourceDataChangedConnection;
+    QVector<QMetaObject::Connection> m_sourceConnections;
     void clearUnusedMaskedRoles(const QSet<int>& roles);
     bool removeRole(const QPersistentModelIndex& idx, int role);
     bool removeRole(const QHash<QPersistentModelIndex, RolesContainer >::iterator& idxIter, int role);

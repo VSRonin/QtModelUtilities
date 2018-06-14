@@ -145,8 +145,8 @@ Destructor
 RoleMaskProxyModel::~RoleMaskProxyModel()
 {
     Q_D(RoleMaskProxyModel);
-    if (sourceModel())
-        QObject::disconnect(d->m_sourceDataChangedConnection);
+    for (auto discIter = d->m_sourceConnections.cbegin(); discIter != d->m_sourceConnections.cend(); ++discIter)
+        QObject::disconnect(*discIter);
     delete d_ptr;
 }
 
@@ -239,13 +239,18 @@ void RoleMaskProxyModel::setSourceModel(QAbstractItemModel *sourceMdl)
     if (sourceMdl == sourceModel())
         return; 
     Q_D(RoleMaskProxyModel);
+    for (auto discIter = d->m_sourceConnections.cbegin(); discIter != d->m_sourceConnections.cend(); ++discIter)
+        QObject::disconnect(*discIter);
+    d->m_sourceConnections.clear();
     d->m_maskedData.clear();
-    if (sourceModel())
-        QObject::disconnect(d->m_sourceDataChangedConnection);
     QIdentityProxyModel::setSourceModel(sourceMdl);
     if (sourceModel()) {
         Q_ASSUME(sourceModel()->disconnect(SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)), this));
-        d->m_sourceDataChangedConnection = connect(sourceModel(), &QAbstractItemModel::dataChanged, [d](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)->void{d->interceptDataChanged(topLeft,bottomRight,roles);});
+        d->m_sourceConnections 
+            << QObject::connect(sourceModel(), &QAbstractItemModel::dataChanged, [d](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)->void {d->interceptDataChanged(topLeft, bottomRight, roles); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::modelReset, [d]()->void { d->m_maskedData.clear(); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::destroyed, [this]()->void { setSourceModel(Q_NULLPTR); })
+        ;
     }
 }
 
