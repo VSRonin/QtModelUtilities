@@ -504,7 +504,7 @@ bool InsertProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVa
     const int sectionIdx = isExtraRow ? index.column() : index.row();
     RolesContainer* const dataContainer = (isExtraRow && isExtraCol) ? &d->m_dataForCorner : &d->m_extraData[isExtraRow][sectionIdx];
     QVector<int> changedRoles;
-    for (auto i = roles.cbegin(); i != roles.cend(); ) {
+    for (auto i = roles.cbegin(); i != roles.cend(); ++i) {
         if (i.value().isValid()) {
             const auto oldDataIter = dataContainer->find(i.key());
             if (oldDataIter == dataContainer->end()) {
@@ -515,7 +515,7 @@ bool InsertProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVa
             }
             else if (!i.value().isValid()){
                 changedRoles << i.key();
-                i = dataContainer->erase(oldDataIter);
+                dataContainer->erase(oldDataIter);
                 continue;
             }
             else if (oldDataIter.value() != i.value()) {
@@ -523,7 +523,7 @@ bool InsertProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVa
                 oldDataIter.value() = i.value();
             }           
         }
-        ++i;
+        
     }
     if (changedRoles.isEmpty())
         return true;
