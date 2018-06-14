@@ -492,7 +492,7 @@ void tst_InsertProxyModel::testDataForCorner()
     QCOMPARE(roles.size(), 2);
     QVERIFY(roles.contains(Qt::EditRole));
     QVERIFY(roles.contains(Qt::DisplayRole));
-    proxyModel.setSeparateEditDisplay(true);
+    proxyModel.setMergeDisplayEdit(false);
     proxyModel.setDataForCorner(8741);
     QCOMPARE(proxyModel.index(baseModel->rowCount(), baseModel->columnCount()).data().toInt(), 5689);
     QCOMPARE(proxyModel.dataForCorner().toInt(), 5689);
@@ -607,7 +607,7 @@ void tst_InsertProxyModel::testSetData()
     QFETCH(int, idxRow);
     QFETCH(int, idxCol);
     InsertProxyModel proxyModel;
-    proxyModel.setSeparateEditDisplay(false);
+    proxyModel.setMergeDisplayEdit(true);
     proxyModel.setInsertDirection(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
     proxyModel.setSourceModel(baseModel);
     const QModelIndex proxyIdX = proxyModel.index(idxRow, idxCol);
@@ -715,7 +715,7 @@ void tst_InsertProxyModel::testSetItemDataDataChanged()
             , std::make_pair<int, QVariant>(Qt::ToolTipRole, QStringLiteral("ToolTip"))
         } };
     InsertProxyModel proxyModel;
-    proxyModel.setSeparateEditDisplay(false);
+    proxyModel.setMergeDisplayEdit(true);
     proxyModel.setInsertDirection(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
     proxyModel.setSourceModel(baseModel);
     const QModelIndex proxyIdX = proxyModel.index(idxRow, idxCol);
@@ -766,7 +766,7 @@ void tst_InsertProxyModel::testSetItemData()
             , std::make_pair<int, QVariant>(Qt::ToolTipRole, QStringLiteral("ToolTip"))
         }};
     InsertProxyModel proxyModel;
-    proxyModel.setSeparateEditDisplay(false);
+    proxyModel.setMergeDisplayEdit(true);
     proxyModel.setInsertDirection(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
     proxyModel.setSourceModel(baseModel);
     const QModelIndex proxyIdX = proxyModel.index(idxRow, idxCol);
