@@ -727,9 +727,9 @@ void tst_InsertProxyModel::testSetItemDataDataChanged()
     QCOMPARE(argList.at(0).value<QModelIndex>(), proxyIdX);
     QCOMPARE(argList.at(1).value<QModelIndex>(), proxyIdX);
     auto rolesVector = argList.at(2).value<QVector<int> >();
-    QCOMPARE(rolesVector.size(), 5);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
     // bug fixed by Qt commit 1382374deaa4a854aeb542e6c8f7e1841f2abb10
+    QCOMPARE(rolesVector.size(), 4);
     QVERIFY(!rolesVector.contains(Qt::TextAlignmentRole));
 #endif
     QVERIFY(rolesVector.contains(Qt::ToolTipRole));
@@ -748,15 +748,10 @@ void tst_InsertProxyModel::testSetItemDataDataChanged()
     itemDataSet.clear();
     itemDataSet[Qt::UserRole] = 6;
     QVERIFY(proxyModel.setItemData(proxyIdX, itemDataSet));
-    QCOMPARE(proxyDataChangeSpy.size(), 1);
-    argList = proxyDataChangeSpy.takeFirst();
-    QCOMPARE(argList.at(0).value<QModelIndex>(), proxyIdX);
-    QCOMPARE(argList.at(1).value<QModelIndex>(), proxyIdX);
-    rolesVector = argList.at(2).value<QVector<int> >();
-    QCOMPARE(rolesVector.size(), 3);
-    QVERIFY(rolesVector.contains(Qt::ToolTipRole));
-    QVERIFY(rolesVector.contains(Qt::EditRole));
-    QVERIFY(rolesVector.contains(Qt::DisplayRole));
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+    // bug fixed by Qt commit 1382374deaa4a854aeb542e6c8f7e1841f2abb10
+    QCOMPARE(proxyDataChangeSpy.size(), 0);
+#endif
     baseModel->deleteLater();
 }
 

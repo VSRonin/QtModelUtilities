@@ -79,6 +79,7 @@ void tst_RoleMaskProxyModel::testUseRoleMask()
         QVERIFY(userRoleEditable == baseModel->setData(singleIdx, ~magicNumber, Qt::UserRole));
     }
     testUseRoleMaskRecurse(magicNumber, baseModel, &proxyModel, magicNumerIndexes, userRoleEditable);
+    baseModel->deleteLater();
 }
 
 void tst_RoleMaskProxyModel::testUseRoleMask_data()
@@ -86,10 +87,13 @@ void tst_RoleMaskProxyModel::testUseRoleMask_data()
     QTest::addColumn<QAbstractItemModel*>("baseModel");
     QTest::addColumn<QModelIndexList>("magicNumerIndexes");
     QTest::addColumn<bool>("userRoleEditable");
-    QTest::newRow("QStringListModel") << createListModel(this) << QModelIndexList({ createListModel(this)->index(0, 0) }) << false;
+    QAbstractItemModel* baseModel = createListModel(this);
+    QTest::newRow("QStringListModel") << baseModel << QModelIndexList({ baseModel->index(0, 0) }) << false;
 #ifdef QT_GUI_LIB
-    QTest::newRow("QStandadItemModel Table") << createTableModel(this) << QModelIndexList({ createTableModel(this)->index(1, 0), createTableModel(this)->index(0, 1) }) << true;
-    QTest::newRow("QStandadItemModel Tree") << createTreeModel(this) << QModelIndexList({ createTreeModel(this)->index(1, 0), createTreeModel(this)->index(0, 1), createTreeModel(this)->index(0, 1, createTreeModel(this)->index(0, 0)) }) << true;
+    baseModel = createTableModel(this);
+    QTest::newRow("QStandadItemModel Table") << baseModel << QModelIndexList({ baseModel->index(1, 0), baseModel->index(0, 1) }) << true;
+    baseModel = createTreeModel(this);
+    QTest::newRow("QStandadItemModel Tree") << baseModel << QModelIndexList({ baseModel->index(1, 0), baseModel->index(0, 1), baseModel->index(0, 1, baseModel->index(0, 0)) }) << true;
 #endif
 }
 
@@ -116,6 +120,7 @@ void tst_RoleMaskProxyModel::testInsertRow()
             QCOMPARE(proxyModel.index(i, 0, proxyParent).data(Qt::UserRole).toInt(), magicNumber + i);
     }
     QVERIFY(baseModel->removeRow(insertIndex, parentIndex));
+    baseModel->deleteLater();
 }
 
 void tst_RoleMaskProxyModel::testInsertRow_data()
@@ -128,19 +133,25 @@ void tst_RoleMaskProxyModel::testInsertRow_data()
     QTest::newRow("Table Insert Begin") << createTableModel(this) << 0 << QModelIndex();
     QTest::newRow("Tree Insert Begin") << createTreeModel(this) << 0 << QModelIndex();
 #endif
-    QTest::newRow("List Insert End") << createListModel(this) << createListModel(this)->rowCount() << QModelIndex();
+    QAbstractItemModel* baseModel = createListModel(this);
+    QTest::newRow("List Insert End") << baseModel << baseModel->rowCount() << QModelIndex();
 #ifdef QT_GUI_LIB
-    QTest::newRow("Table Insert End") << createTableModel(this) << createTableModel(this)->rowCount() << QModelIndex();
-    QTest::newRow("Tree Insert End") << createTreeModel(this) << createTreeModel(this)->rowCount() << QModelIndex();
+    baseModel = createTableModel(this);
+    QTest::newRow("Table Insert End") << baseModel << baseModel->rowCount() << QModelIndex();
+    baseModel = createTreeModel(this);
+    QTest::newRow("Tree Insert End") << baseModel << baseModel->rowCount() << QModelIndex();
 #endif
     QTest::newRow("List Insert Middle") << createListModel(this) << 2 << QModelIndex();
 #ifdef QT_GUI_LIB
     QTest::newRow("Table Insert Middle") << createTableModel(this) << 2 << QModelIndex();
     QTest::newRow("Tree Insert Middle") << createTreeModel(this) << 2 << QModelIndex();
 
-    QTest::newRow("Tree Insert Begin Child") << createTreeModel(this) << 0 << createTreeModel(this)->index(0, 0);
-    QTest::newRow("Tree Insert Middle Child") << createTreeModel(this) << 2 << createTreeModel(this)->index(0, 0);
-    QTest::newRow("Tree Insert End Child") << createTreeModel(this) << createTreeModel(this)->rowCount(createTreeModel(this)->index(0, 0)) << createTreeModel(this)->index(0, 0);
+    baseModel = createTreeModel(this);
+    QTest::newRow("Tree Insert Begin Child") << baseModel << 0 << baseModel->index(0, 0);
+    baseModel = createTreeModel(this);
+    QTest::newRow("Tree Insert Middle Child") << baseModel << 2 << baseModel->index(0, 0);
+    baseModel = createTreeModel(this);
+    QTest::newRow("Tree Insert End Child") << baseModel << baseModel->rowCount(baseModel->index(0, 0)) << baseModel->index(0, 0);
 #endif
 }
 void tst_RoleMaskProxyModel::testProperties()
@@ -182,6 +193,7 @@ void tst_RoleMaskProxyModel::testInsertColumn()
     }
     QVERIFY(baseModel->removeColumn(insertIndex, parentIndex));
 #endif
+    baseModel->deleteLater();
 }
 
 void tst_RoleMaskProxyModel::testInsertColumn_data()
@@ -190,18 +202,24 @@ void tst_RoleMaskProxyModel::testInsertColumn_data()
     QTest::addColumn<QAbstractItemModel*>("baseModel");
     QTest::addColumn<int>("insertIndex");
     QTest::addColumn<QModelIndex>("parentIndex");
+
     QTest::newRow("Table Insert Begin") << createTableModel(this) << 0 << QModelIndex();
     QTest::newRow("Tree Insert Begin") << createTreeModel(this) << 0 << QModelIndex();
 
-    QTest::newRow("Table Insert End") << createTableModel(this) << createTableModel(this)->columnCount() << QModelIndex();
-    QTest::newRow("Tree Insert End") << createTreeModel(this) << createTreeModel(this)->columnCount() << QModelIndex();
+    QAbstractItemModel* baseModel = createTableModel(this);
+    QTest::newRow("Table Insert End") << baseModel << baseModel->columnCount() << QModelIndex();
+    baseModel = createTreeModel(this);
+    QTest::newRow("Tree Insert End") << baseModel << baseModel->columnCount() << QModelIndex();
 
     QTest::newRow("Table Insert Middle") << createTableModel(this) << 2 << QModelIndex();
     QTest::newRow("Tree Insert Middle") << createTreeModel(this) << 2 << QModelIndex();
 
-    QTest::newRow("Tree Insert Begin Child") << createTreeModel(this) << 0 << createTreeModel(this)->index(0, 0);
-    QTest::newRow("Tree Insert Middle Child") << createTreeModel(this) << 2 << createTreeModel(this)->index(0, 0);
-    QTest::newRow("Tree Insert End Child") << createTreeModel(this) << createTreeModel(this)->columnCount(createTreeModel(this)->index(0, 0)) << createTreeModel(this)->index(0, 0);
+    baseModel = createTreeModel(this);
+    QTest::newRow("Tree Insert Begin Child") << baseModel << 0 << baseModel->index(0, 0);
+    baseModel = createTreeModel(this);
+    QTest::newRow("Tree Insert Middle Child") << baseModel << 2 << baseModel->index(0, 0);
+    baseModel = createTreeModel(this);
+    QTest::newRow("Tree Insert End Child") << baseModel << baseModel->columnCount(baseModel->index(0, 0)) << baseModel->index(0, 0);
 #endif
 }
 
@@ -357,6 +375,7 @@ void tst_RoleMaskProxyModel::testDataChangeSignals()
         }
         proxyDataChangeSpy.clear();
     }
+    baseModel->deleteLater();
 }
 
 void tst_RoleMaskProxyModel::testTransparentIfEmpty()
@@ -377,6 +396,7 @@ void tst_RoleMaskProxyModel::testTransparentIfEmpty()
     testTransparentIfEmptyRecurse(baseModel, &proxyModel, proxyActionIndex, 777888999, true);
     proxyModel.setTransparentIfEmpty(false);
     QCOMPARE(proxyTransparentChangeSpy.count(), 1);
+    baseModel->deleteLater();
 }
 
 void tst_RoleMaskProxyModel::testTransparentIfEmptyRecurse(const QAbstractItemModel* const baseModel, const RoleMaskProxyModel* const proxyModel, const QModelIndex& maskedIdx, const QVariant& maskedVal, bool nonMaskedIsNull, const QModelIndex& sourceParent)
@@ -436,6 +456,7 @@ void tst_RoleMaskProxyModel::testMergeDisplayEdit()
     QCOMPARE(proxyActionIndex.data(Qt::EditRole), QVariant());
     proxyModel.setMergeDisplayEdit(false);
     QCOMPARE(proxyMergeDisplayEditChangeSpy.count(), 1);
+    baseModel->deleteLater();
 }
 
 void tst_RoleMaskProxyModel::testMergeDisplayEdit_data()
@@ -624,23 +645,31 @@ void tst_RoleMaskProxyModel::testSetItemDataDataChanged()
     QVERIFY(proxyModel.setData(proxyIdX, Qt::AlignRight, Qt::TextAlignmentRole));
     QSignalSpy proxyDataChangeSpy(&proxyModel, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)));
     QVERIFY(proxyModel.setItemData(proxyIdX, itemDataSet));
-    QCOMPARE(proxyDataChangeSpy.size(), 1);
+    QCOMPARE(proxyDataChangeSpy.size(), 2);
     auto argList = proxyDataChangeSpy.takeFirst();
     QCOMPARE(argList.at(0).value<QModelIndex>(), proxyIdX);
     QCOMPARE(argList.at(1).value<QModelIndex>(), proxyIdX);
     auto rolesVector = argList.at(2).value<QVector<int> >();
-    QCOMPARE(rolesVector.size(), 5);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
     // bug fixed by Qt commit 1382374deaa4a854aeb542e6c8f7e1841f2abb10
+    QCOMPARE(rolesVector.size(), 2);
     QVERIFY(!rolesVector.contains(Qt::TextAlignmentRole));
-#endif
     QVERIFY(rolesVector.contains(Qt::ToolTipRole));
-    QVERIFY(rolesVector.contains(Qt::EditRole));
-    QVERIFY(rolesVector.contains(Qt::DisplayRole));
     QVERIFY(rolesVector.contains(Qt::UserRole));
+#endif
+    argList = proxyDataChangeSpy.takeFirst();
+    QCOMPARE(argList.at(0).value<QModelIndex>(), proxyIdX);
+    QCOMPARE(argList.at(1).value<QModelIndex>(), proxyIdX);
+    rolesVector = argList.at(2).value<QVector<int> >();
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+    // bug fixed by Qt commit 1382374deaa4a854aeb542e6c8f7e1841f2abb10
+    QCOMPARE(rolesVector.size(), 2);
+    QVERIFY(!rolesVector.contains(Qt::DisplayRole));
+    QVERIFY(!rolesVector.contains(Qt::EditRole));
+#endif
     itemDataSet[Qt::UserRole] = 6;
     QVERIFY(proxyModel.setItemData(proxyIdX, itemDataSet));
-    QCOMPARE(proxyDataChangeSpy.size(), 1);
+    QVERIFY(proxyDataChangeSpy.size() >= 1); //the source model signal depends on the version of Qt
     argList = proxyDataChangeSpy.takeFirst();
     QCOMPARE(argList.at(0).value<QModelIndex>(), proxyIdX);
     QCOMPARE(argList.at(1).value<QModelIndex>(), proxyIdX);
@@ -650,15 +679,10 @@ void tst_RoleMaskProxyModel::testSetItemDataDataChanged()
     itemDataSet.clear();
     itemDataSet[Qt::UserRole] = 6;
     QVERIFY(proxyModel.setItemData(proxyIdX, itemDataSet));
-    QCOMPARE(proxyDataChangeSpy.size(), 1);
-    argList = proxyDataChangeSpy.takeFirst();
-    QCOMPARE(argList.at(0).value<QModelIndex>(), proxyIdX);
-    QCOMPARE(argList.at(1).value<QModelIndex>(), proxyIdX);
-    rolesVector = argList.at(2).value<QVector<int> >();
-    QCOMPARE(rolesVector.size(), 3);
-    QVERIFY(rolesVector.contains(Qt::ToolTipRole));
-    QVERIFY(rolesVector.contains(Qt::EditRole));
-    QVERIFY(rolesVector.contains(Qt::DisplayRole));
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+    // bug fixed by Qt commit 1382374deaa4a854aeb542e6c8f7e1841f2abb10
+    QCOMPARE(proxyDataChangeSpy.size(), 0);
+#endif
     baseModel->deleteLater();
 }
 
