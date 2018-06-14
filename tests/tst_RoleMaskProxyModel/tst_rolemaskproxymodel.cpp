@@ -192,8 +192,8 @@ void tst_RoleMaskProxyModel::testInsertColumn()
             QCOMPARE(proxyModel.index(0, i, proxyParent).data(Qt::UserRole).toInt(), magicNumber + i);
     }
     QVERIFY(baseModel->removeColumn(insertIndex, parentIndex));
-#endif
     baseModel->deleteLater();
+#endif
 }
 
 void tst_RoleMaskProxyModel::testInsertColumn_data()
