@@ -250,7 +250,7 @@ void InsertProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
     beginResetModel();
     if (sourceModel()) {
         for (auto discIter = d->m_sourceConnections.cbegin(); discIter != d->m_sourceConnections.cend(); ++discIter)
-            Q_ASSUME(QObject::disconnect(*discIter));
+            QObject::disconnect(*discIter);
     }
     QAbstractProxyModel::setSourceModel(newSourceModel);
     d->m_sourceConnections.clear();
