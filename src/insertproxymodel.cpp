@@ -1030,8 +1030,8 @@ bool InsertProxyModel::commitColumn()
 }
 
 /*!
-\property InsertProxy::separateEditDisplay
-\accessors %separateEditDisplay(), setSeparateEditDisplay()
+\property InsertProxy::mergeDisplayEdit
+\accessors %mergeDisplayEdit(), setMergeDisplayEdit()
 \brief This property determines if the Qt::DisplayRole and Qt::EditRole should be merged in the extra row/column
 \details By default the two roles are one and the same you can use this property to separate them.
 If there's any data in the role when you set this property to true it will be duplicated for both roles.
@@ -1039,18 +1039,18 @@ If there is data both in Qt::DisplayRole and Qt::EditRole when you set this prop
 This property only affects the extra row/column. Data in the source model is not affected.
 */
 
-bool InsertProxyModel::separateEditDisplay() const
+bool InsertProxyModel::mergeDisplayEdit() const
 {
     Q_D(const InsertProxyModel);
-    return d->m_separateEditDisplay;
+    return !d->m_separateEditDisplay;
 }
 
-void InsertProxyModel::setSeparateEditDisplay(bool val)
+void InsertProxyModel::setMergeDisplayEdit(bool val)
 {
     Q_D(InsertProxyModel);
-    if (d->m_separateEditDisplay != val) {
-        d->m_separateEditDisplay = val;
-        if (sourceModel() && !val) {
+    if (d->m_separateEditDisplay == val) {
+        d->m_separateEditDisplay = !val;
+        if (sourceModel() && val) {
             const int sourceCol = sourceModel()->columnCount();
             const int sourceRows = sourceModel()->rowCount();
             //orientation == Qt::Vertical
@@ -1093,7 +1093,7 @@ void InsertProxyModel::setSeparateEditDisplay(bool val)
                 }
             }
         }
-        separateEditDisplayChanged(val);
+        mergeDisplayEditChanged(val);
     }
 }
 
