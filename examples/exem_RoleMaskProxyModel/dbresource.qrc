@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/db">
+        <file>exampledb.sqlite3</file>
+    </qresource>
+</RCC>

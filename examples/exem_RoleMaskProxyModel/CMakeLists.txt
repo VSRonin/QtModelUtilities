@@ -1,0 +1,76 @@
+cmake_minimum_required(VERSION 3.3)
+if(POLICY CMP0025)
+  cmake_policy(SET CMP0025 NEW)
+endif()
+if(POLICY CMP0048)
+    cmake_policy(SET CMP0048 NEW)
+endif()
+if(POLICY CMP0057)
+    cmake_policy(SET CMP0057 NEW)
+endif()
+set (CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+project(exem_RoleMaskProxyModel VERSION "1.0") 
+set(REQUIRED_QT_VERSION 5.0.0)
+find_package(Qt5Core ${REQUIRED_QT_VERSION} REQUIRED)
+find_package(Qt5Gui ${REQUIRED_QT_VERSION} REQUIRED)
+find_package(Qt5Widgets ${REQUIRED_QT_VERSION} REQUIRED)
+find_package(Qt5Sql ${REQUIRED_QT_VERSION})
+
+set(exem_RoleMaskProxyModel_LIBS ${exem_RoleMaskProxyModel_LIBS} ${Qt5Core_LIBRARIES})
+set(exem_RoleMaskProxyModel_INCLUDE ${exem_RoleMaskProxyModel_INCLUDE} ${Qt5Core_INCLUDE_DIRS})
+set(exem_RoleMaskProxyModel_COMPILE_DEFINE ${exem_RoleMaskProxyModel_COMPILE_DEFINE} ${Qt5Core_COMPILE_DEFINITIONS} )
+
+set(exem_RoleMaskProxyModel_LIBS ${exem_RoleMaskProxyModel_LIBS} ${Qt5Gui_LIBRARIES})
+set(exem_RoleMaskProxyModel_INCLUDE ${exem_RoleMaskProxyModel_INCLUDE} ${Qt5Gui_INCLUDE_DIRS})
+set(exem_RoleMaskProxyModel_COMPILE_DEFINE ${exem_RoleMaskProxyModel_COMPILE_DEFINE} ${Qt5Gui_COMPILE_DEFINITIONS})
+
+set(exem_RoleMaskProxyModel_LIBS ${exem_RoleMaskProxyModel_LIBS} ${Qt5Widgets_LIBRARIES})
+set(exem_RoleMaskProxyModel_INCLUDE ${exem_RoleMaskProxyModel_INCLUDE} ${Qt5Widgets_INCLUDE_DIRS})
+set(exem_RoleMaskProxyModel_COMPILE_DEFINE ${exem_RoleMaskProxyModel_COMPILE_DEFINE} ${Qt5Widgets_COMPILE_DEFINITIONS})
+
+set(exem_RoleMaskProxyModel_INCLUDE ${exem_RoleMaskProxyModel_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR})
+set(exem_RoleMaskProxyModel_Highlight_SRCS
+    exem_rolemaskhighlight.cpp
+)
+set(exem_RoleMaskProxyModel_EditableSQL_SRCS
+    exem_rolemaskeditablesql.cpp
+    dbresource.qrc
+)
+add_executable(exem_RoleMaskProxyModel_Highlight WIN32 ${exem_RoleMaskProxyModel_Highlight_SRCS})
+
+if(BUILD_STATIC_LIBS)
+    set(exem_RoleMaskProxyModel_DEFINE ${exem_RoleMaskProxyModel_DEFINE} MODELUTILITIES_STATIC)
+endif()
+add_dependencies(exem_RoleMaskProxyModel_Highlight modelutilities)
+
+target_include_directories(exem_RoleMaskProxyModel_Highlight PRIVATE ../../src ../../src/includes ${exem_RoleMaskProxyModel_INCLUDE})
+target_link_libraries(exem_RoleMaskProxyModel_Highlight PRIVATE modelutilities ${exem_RoleMaskProxyModel_LIBS})
+target_compile_definitions(exem_RoleMaskProxyModel_Highlight PRIVATE ${exem_RoleMaskProxyModel_DEFINE})
+set_target_properties(exem_RoleMaskProxyModel_Highlight PROPERTIES 
+    VERSION "1.0"
+    SOVERSION 1
+    EXPORT_NAME "exemRoleMaskProxyModelHighlight"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib/examples"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib/examples"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin/examples"
+)
+
+if(Qt5Sql_FOUND)
+    add_executable(exem_RoleMaskProxyModel_EditableSQL WIN32 ${exem_RoleMaskProxyModel_EditableSQL_SRCS})
+    add_dependencies(exem_RoleMaskProxyModel_EditableSQL modelutilities)
+    target_include_directories(exem_RoleMaskProxyModel_EditableSQL PRIVATE ../../src ../../src/includes ${exem_RoleMaskProxyModel_INCLUDE} ${Qt5Sql_INCLUDE_DIRS})
+    target_link_libraries(exem_RoleMaskProxyModel_EditableSQL PRIVATE modelutilities ${exem_RoleMaskProxyModel_LIBS} ${Qt5Sql_LIBRARIES})
+    target_compile_definitions(exem_RoleMaskProxyModel_EditableSQL PRIVATE ${exem_RoleMaskProxyModel_DEFINE} ${Qt5Sql_COMPILE_DEFINITIONS})
+    set_target_properties(exem_RoleMaskProxyModel_EditableSQL PROPERTIES 
+        VERSION "1.0"
+        SOVERSION 1
+        EXPORT_NAME "exemRoleMaskProxyModelEditableSQL"
+        ARCHIVE_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/examples"
+        LIBRARY_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/examples"
+        RUNTIME_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/bin/examples"
+    )
+endif()
