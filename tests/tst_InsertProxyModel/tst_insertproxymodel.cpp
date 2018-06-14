@@ -467,8 +467,8 @@ void tst_InsertProxyModel::testProperties()
     InsertProxyModel proxyModel;
     QVERIFY(proxyModel.setProperty("insertDirection", QVariant::fromValue(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow)));
     QCOMPARE(proxyModel.property("insertDirection").value<InsertProxyModel::InsertDirections>(), InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
-    QVERIFY(proxyModel.setProperty("separateEditDisplay", true));
-    QCOMPARE(proxyModel.property("separateEditDisplay").toBool(), true);
+    QVERIFY(proxyModel.setProperty("mergeDisplayEdit", false));
+    QCOMPARE(proxyModel.property("mergeDisplayEdit").toBool(), false);
 }
 
 void tst_InsertProxyModel::testDataForCorner()
