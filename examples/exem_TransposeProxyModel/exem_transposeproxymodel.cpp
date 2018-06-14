@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
 
     // create a ui with 4 views to display our 4 models
     QWidget mainW;
+    mainW.setWindowTitle(QStringLiteral("TransposeProxyModel Example"));
     QTableView* sourceTableView = new QTableView(&mainW);
     sourceTableView->setModel(&tableModel);
     QTableView* proxyTableView = new QTableView(&mainW);
