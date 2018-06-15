@@ -1,3 +1,15 @@
+/****************************************************************************\
+   Copyright 2018 Luca Beldi
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+       http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+\****************************************************************************/
 #include "rolemaskproxymodel.h"
 #include "private/rolemaskproxymodel_p.h"
 #include <QVector>
@@ -404,6 +416,13 @@ QMap<int, QVariant> RoleMaskProxyModel::itemData(const QModelIndex &index) const
     return convertFromContainer<QMap<int, QVariant> >(result);
 }
 
+/*!
+\property RoleMaskProxyModel::transparentIfEmpty
+\accessors %transparentIfEmpty(), setTransparentIfEmpty()
+\brief This property determines if a mapped role containing no data should be transparent
+\details If this property is set to true, a 
+
+*/
 bool RoleMaskProxyModel::transparentIfEmpty() const
 {
     Q_D(const RoleMaskProxyModel);
@@ -420,6 +439,15 @@ void RoleMaskProxyModel::setTransparentIfEmpty(bool val)
     }
 }
 
+/*!
+\property RoleMaskProxyModel::mergeDisplayEdit
+\accessors %mergeDisplayEdit(), setMergeDisplayEdit()
+\brief This property determines if the Qt::DisplayRole and Qt::EditRole should be merged in the extra row/column
+\details By default the two roles are one and the same you can use this property to separate them.
+If there's any data in the role when you set this property to true it will be duplicated for both roles.
+If there is data both in Qt::DisplayRole and Qt::EditRole when you set this property to false Qt::DisplayRole will prevail.
+This property only has effect if Qt::DisplayRole and/or Qt::EditRole are masked by the proxy. Data in the source model is not affected.
+*/
 bool RoleMaskProxyModel::mergeDisplayEdit() const
 {
     Q_D(const RoleMaskProxyModel);
@@ -462,6 +490,9 @@ void RoleMaskProxyModel::setMergeDisplayEdit(bool val)
     }
 }
 
+/*!
+Same as maskedRoles but returns it in the way it is stored internally rather than converting it to QList
+*/
 const QSet<int>& RoleMaskProxyModel::maskedRolesSets() const
 {
     Q_D(const RoleMaskProxyModel);
