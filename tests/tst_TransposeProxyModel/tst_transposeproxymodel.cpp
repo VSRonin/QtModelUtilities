@@ -4,6 +4,7 @@
 #ifdef QT_GUI_LIB
 #include <QStandardItemModel>
 #endif
+#include "modeltest.h"
 void tst_TransposeProxyModel::basicTestTable()
 {
 #ifdef QT_GUI_LIB
@@ -18,6 +19,7 @@ void tst_TransposeProxyModel::basicTestTable()
         }
     }
     TransposeProxyModel proxy;
+    new ModelTest(&proxy, &proxy);
     proxy.setSourceModel(&model);
     QCOMPARE(proxy.hasChildren(), model.hasChildren());
     QCOMPARE(proxy.columnCount(), model.rowCount());

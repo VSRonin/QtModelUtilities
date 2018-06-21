@@ -6,6 +6,7 @@
 #endif
 #include <QtTest/QTest>
 #include <QtTest/QSignalSpy>
+#include "modeltest.h"
 
 QAbstractItemModel* createNullModel(QObject* parent){
     Q_UNUSED(parent)
@@ -86,6 +87,7 @@ void tst_InsertProxyModel::testCommitSlot()
     QFETCH(InsertProxyModel::InsertDirections, insertDirection);
     QFETCH(bool, canInsertColumns);
     InsertProxyModel proxy;
+    new ModelTest(&proxy, &proxy);
     proxy.setSourceModel(baseModel);
     proxy.setInsertDirection(insertDirection);
     const int originalColCount = baseModel->columnCount();
@@ -197,6 +199,7 @@ void tst_InsertProxyModel::testSourceInsertCol()
     QFETCH(int, indexToInsert);
     QFETCH(bool, addViaProxy);
     InsertProxyModel proxy;
+    new ModelTest(&proxy, &proxy);
     proxy.setSourceModel(baseModel);
     proxy.setInsertDirection(insertDirection);
     QSignalSpy proxyColsInsertedSpy(&proxy, SIGNAL(columnsInserted(QModelIndex, int, int)));
@@ -280,6 +283,7 @@ void tst_InsertProxyModel::testSourceInsertRow()
     QFETCH(int, indexToInsert);
     QFETCH(bool, addViaProxy);
     InsertProxyModel proxy;
+    new ModelTest(&proxy, &proxy);
     proxy.setSourceModel(baseModel);
     proxy.setInsertDirection(insertDirection);
     QSignalSpy proxyRowsInsertedSpy(&proxy, SIGNAL(rowsInserted(QModelIndex, int, int)));
@@ -444,6 +448,7 @@ void tst_InsertProxyModel::testSourceInsertCol_data()
 void tst_InsertProxyModel::testNullModel()
 {
     InsertProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.setInsertDirection(InsertProxyModel::InsertRow);
     proxyModel.setSourceModel(nullptr);
     QVERIFY(!proxyModel.setData(proxyModel.index(0, 0), QStringLiteral("1")));
@@ -465,6 +470,7 @@ void tst_InsertProxyModel::testNullModel()
 void tst_InsertProxyModel::testProperties()
 {
     InsertProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     QVERIFY(proxyModel.setProperty("insertDirection", QVariant::fromValue(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow)));
     QCOMPARE(proxyModel.property("insertDirection").value<InsertProxyModel::InsertDirections>(), InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
     QVERIFY(proxyModel.setProperty("mergeDisplayEdit", false));
@@ -475,6 +481,7 @@ void tst_InsertProxyModel::testDataForCorner()
 {
     QAbstractItemModel* const baseModel = createListModel(this);
     InsertProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     QSignalSpy cornerChangeSpy(&proxyModel, SIGNAL(dataForCornerChanged(QVector<int>)));
     QSignalSpy cornerDataChangeSpy(&proxyModel, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)));
     QVERIFY(cornerChangeSpy.isValid());
@@ -513,6 +520,7 @@ void tst_InsertProxyModel::testSort()
     QFETCH(bool, sortProxy);
     QStringListModel baseModel(QStringList({ QStringLiteral("b"), QStringLiteral("a"), QStringLiteral("d"), QStringLiteral("c") }));
     InsertProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.setSourceModel(&baseModel);
     proxyModel.setInsertDirection(InsertProxyModel::InsertColumn);
     QVERIFY(proxyModel.setData(proxyModel.index(0, 1), 1));
@@ -551,6 +559,7 @@ void tst_InsertProxyModel::testDisconnectedModel()
     QStringListModel baseModel1(QStringList({ QStringLiteral("London"), QStringLiteral("Berlin"), QStringLiteral("Paris") }));
     QStringListModel baseModel2(QStringList({ QStringLiteral("Rome"), QStringLiteral("Madrid"), QStringLiteral("Prague") }));
     InsertProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.setSourceModel(&baseModel1);
     QSignalSpy proxyDataChangeSpy(&proxyModel, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)));
     baseModel1.setData(baseModel1.index(0, 0), QStringLiteral("New York"));
@@ -573,6 +582,7 @@ void tst_InsertProxyModel::testData()
 {
     QFETCH(QAbstractItemModel*, baseModel);
     InsertProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.setInsertDirection(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
     proxyModel.setSourceModel(baseModel);
     const int sourceRows = baseModel->rowCount();
@@ -607,6 +617,7 @@ void tst_InsertProxyModel::testSetData()
     QFETCH(int, idxRow);
     QFETCH(int, idxCol);
     InsertProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.setMergeDisplayEdit(true);
     proxyModel.setInsertDirection(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
     proxyModel.setSourceModel(baseModel);
@@ -715,6 +726,7 @@ void tst_InsertProxyModel::testSetItemDataDataChanged()
             , std::make_pair<int, QVariant>(Qt::ToolTipRole, QStringLiteral("ToolTip"))
         } };
     InsertProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.setMergeDisplayEdit(true);
     proxyModel.setInsertDirection(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
     proxyModel.setSourceModel(baseModel);
@@ -766,6 +778,7 @@ void tst_InsertProxyModel::testSetItemData()
             , std::make_pair<int, QVariant>(Qt::ToolTipRole, QStringLiteral("ToolTip"))
         }};
     InsertProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.setMergeDisplayEdit(true);
     proxyModel.setInsertDirection(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
     proxyModel.setSourceModel(baseModel);
@@ -818,6 +831,7 @@ void tst_InsertProxyModel::testCommitSubclass()
     QFETCH(InsertProxyModel::InsertDirections, insertDirection);
     QFETCH(bool, canInsertColumns);
     InsertProxyModelCommit proxy;
+    new ModelTest(&proxy, &proxy);
     proxy.setSourceModel(baseModel);
     proxy.setInsertDirection(insertDirection);
     const int originalColCount = baseModel->columnCount();

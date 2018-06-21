@@ -31,9 +31,12 @@ set(tst_InsertProxyModel_INCLUDE ${tst_InsertProxyModel_INCLUDE} ${Qt5Gui_INCLUD
 set(tst_InsertProxyModel_COMPILE_DEFINE ${tst_InsertProxyModel_COMPILE_DEFINE} ${Qt5Gui_COMPILE_DEFINITIONS})
 endif()
 set(tst_InsertProxyModel_INCLUDE ${tst_InsertProxyModel_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR})
+file(DOWNLOAD "https://code.qt.io/cgit/qt-creator/qt-creator.git/plain/src/shared/modeltest/modeltest.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/modeltest.cpp")
+file(DOWNLOAD "https://code.qt.io/cgit/qt-creator/qt-creator.git/plain/src/shared/modeltest/modeltest.h" "${CMAKE_CURRENT_SOURCE_DIR}/modeltest.h")
 set(tst_InsertProxyModel_SRCS
     main.cpp
     tst_insertproxymodel.cpp
+    modeltest.cpp
 )
 add_executable(tst_InsertProxyModel ${tst_InsertProxyModel_SRCS})
 if(BUILD_STATIC_LIBS)
