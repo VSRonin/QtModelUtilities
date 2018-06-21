@@ -8,6 +8,7 @@
 #include <QList>
 #include <QVariant>
 #include "tst_rolemaskproxymodel.h"
+#include "modeltest.h"
 
 QAbstractItemModel* createNullModel(QObject* parent)
 {
@@ -71,6 +72,7 @@ void tst_RoleMaskProxyModel::testUseRoleMask()
     QFETCH(QModelIndexList, magicNumerIndexes);
     QFETCH(bool, userRoleEditable);
     RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.addMaskedRole(Qt::UserRole);
     proxyModel.setSourceModel(baseModel);
     const int magicNumber = 785874;
@@ -103,6 +105,7 @@ void tst_RoleMaskProxyModel::testInsertRow()
     QFETCH(int, insertIndex);
     QFETCH(QModelIndex, parentIndex);
     RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.addMaskedRole(Qt::UserRole);
     proxyModel.setSourceModel(baseModel);
     const int magicNumber = 785874;
@@ -157,6 +160,7 @@ void tst_RoleMaskProxyModel::testInsertRow_data()
 void tst_RoleMaskProxyModel::testProperties()
 {
     RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     QVERIFY(proxyModel.setProperty("maskedRoles", QVariant::fromValue(QList<int>({Qt::UserRole, Qt::DisplayRole}))));
     const auto roleList = proxyModel.property("maskedRoles").value<QList<int> >();
     QVERIFY(roleList.contains(Qt::UserRole));
@@ -175,6 +179,7 @@ void tst_RoleMaskProxyModel::testInsertColumn()
     QFETCH(int, insertIndex);
     QFETCH(QModelIndex, parentIndex);
     RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.addMaskedRole(Qt::UserRole);
     proxyModel.setSourceModel(baseModel);
     const int magicNumber = 785874;
@@ -226,6 +231,7 @@ void tst_RoleMaskProxyModel::testInsertColumn_data()
 void tst_RoleMaskProxyModel::testNullModel()
 {
     RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.addMaskedRole(Qt::UserRole);
     proxyModel.setSourceModel(nullptr);
     QVERIFY(!proxyModel.setData(proxyModel.index(0, 0), 1, Qt::UserRole));
@@ -257,6 +263,7 @@ void tst_RoleMaskProxyModel::testDataChangeSignals()
     QFETCH(QAbstractItemModel*, baseModel);
     QFETCH(bool, implementsRoles);
     RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.setTransparentIfEmpty(true);
     proxyModel.setMergeDisplayEdit(true);
     proxyModel.addMaskedRole(Qt::UserRole);
@@ -382,6 +389,7 @@ void tst_RoleMaskProxyModel::testTransparentIfEmpty()
 {
     QFETCH(QAbstractItemModel*, baseModel);
     RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.setMergeDisplayEdit(true);
     proxyModel.setTransparentIfEmpty(true);
     proxyModel.addMaskedRole(Qt::DisplayRole);
@@ -437,6 +445,7 @@ void tst_RoleMaskProxyModel::testMergeDisplayEdit()
 {
     QFETCH(QAbstractItemModel*, baseModel);
     RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.setMergeDisplayEdit(true);
     proxyModel.setTransparentIfEmpty(false);
     proxyModel.addMaskedRole(Qt::DisplayRole);
@@ -472,6 +481,7 @@ void tst_RoleMaskProxyModel::testMergeDisplayEdit_data()
 void tst_RoleMaskProxyModel::testManageMaskedRoles()
 {
     RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.setMergeDisplayEdit(true);
     QVERIFY(proxyModel.maskedRoles().isEmpty());
     proxyModel.addMaskedRole(Qt::EditRole);
@@ -546,6 +556,7 @@ void tst_RoleMaskProxyModel::testDisconnectedModel()
     QStringListModel baseModel1(QStringList({ QStringLiteral("London"), QStringLiteral("Berlin"), QStringLiteral("Paris") }));
     QStringListModel baseModel2(QStringList({ QStringLiteral("Rome"), QStringLiteral("Madrid"), QStringLiteral("Prague") }));
     RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.setMergeDisplayEdit(true);
     proxyModel.setTransparentIfEmpty(true);
     proxyModel.setSourceModel(&baseModel1);
@@ -637,6 +648,7 @@ void tst_RoleMaskProxyModel::testSetItemDataDataChanged()
             , std::make_pair<int, QVariant>(Qt::ToolTipRole, QStringLiteral("ToolTip"))
         } };
     RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.setMergeDisplayEdit(true);
     proxyModel.setTransparentIfEmpty(true);
     proxyModel.setMaskedRoles({ Qt::UserRole, Qt::ToolTipRole, Qt::TextAlignmentRole });
@@ -697,6 +709,7 @@ void tst_RoleMaskProxyModel::testSetItemData()
             , std::make_pair<int, QVariant>(Qt::ToolTipRole, QStringLiteral("ToolTip"))
         } };
     RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
     proxyModel.setMergeDisplayEdit(true);
     proxyModel.setTransparentIfEmpty(true);
     proxyModel.setSourceModel(baseModel);

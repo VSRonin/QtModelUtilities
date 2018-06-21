@@ -8,7 +8,7 @@ endif()
 if(POLICY CMP0057)
     cmake_policy(SET CMP0057 NEW)
 endif()
-set (CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_AUTOMOC ON)
@@ -31,9 +31,12 @@ set(tst_RoleMaskProxyModel_INCLUDE ${tst_RoleMaskProxyModel_INCLUDE} ${Qt5Gui_IN
 set(tst_RoleMaskProxyModel_COMPILE_DEFINE ${tst_RoleMaskProxyModel_COMPILE_DEFINE} ${Qt5Gui_COMPILE_DEFINITIONS})
 endif()
 set(tst_RoleMaskProxyModel_INCLUDE ${tst_RoleMaskProxyModel_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR})
+file(DOWNLOAD "https://code.qt.io/cgit/qt-creator/qt-creator.git/plain/src/shared/modeltest/modeltest.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/modeltest.cpp")
+file(DOWNLOAD "https://code.qt.io/cgit/qt-creator/qt-creator.git/plain/src/shared/modeltest/modeltest.h" "${CMAKE_CURRENT_SOURCE_DIR}/modeltest.h")
 set(tst_RoleMaskProxyModel_SRCS
     main.cpp
     tst_rolemaskproxymodel.cpp
+    modeltest.cpp
 )
 add_executable(tst_RoleMaskProxyModel ${tst_RoleMaskProxyModel_SRCS})
 if(BUILD_STATIC_LIBS)

@@ -436,3 +436,7 @@ CMakeLists.txt.user*
 
 # Auto License Header files
 *.licenseheader
+
+# Model Test From Qt
+modeltest.cpp 
+modeltest.h 
