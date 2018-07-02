@@ -40,8 +40,11 @@ void RoleMaskProxyModelPrivate::interceptDataChanged(const QModelIndex& topLeft,
     QVector<int> filteredRoles;
     filteredRoles.reserve(roles.size());
     for (int singleRole : roles){
-        if (m_mergeDisplayEdit && singleRole == Qt::EditRole)
+        if (m_mergeDisplayEdit && singleRole == Qt::EditRole) {
+            if (filteredRoles.contains(Qt::DisplayRole))
+                continue;
             singleRole = Qt::DisplayRole;
+        }
         if(m_maskedRoles.contains(singleRole)){
             if(m_transparentIfEmpty){
                 bool allOpaque = true;
