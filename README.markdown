@@ -41,6 +41,7 @@ A reduced suite of tests, to ensure compatibility, is also run on:
 
 + Ubuntu Trusty gcc 6 64bit Qt 5.1
 + Ubuntu Trusty gcc 6 64bit Qt 5.6
++ Windows MSVC 2015 64bit Qt 5.11
 + Windows MinGW 4.7.0 32bit Qt 5.0 (manual)
 + Windows MSVC 2013 32bit Qt 5.8 (manual)
 

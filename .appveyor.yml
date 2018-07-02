@@ -11,6 +11,13 @@ environment:
   global:
     LatestLTSQtVersion: 5.9
   matrix:
+  - QT5: C:\Qt\5.11\msvc2015_64
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
+    platform: amd64
+    use_mingw: "false"
+    use_gui: "true"
+    use_widgets: "true"
+    use_static: "false"
   - QT5: C:\Qt\%LatestLTSQtVersion%\msvc2015
     COMPILER: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
     platform: x86
