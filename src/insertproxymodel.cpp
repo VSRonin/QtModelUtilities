@@ -703,7 +703,7 @@ QModelIndex InsertProxyModel::parent(const QModelIndex &index) const
 */
 QModelIndex InsertProxyModel::index(int row, int column, const QModelIndex &parent) const
 {
-    if (parent.isValid())
+    if (parent.isValid() || row<0 || column<0 || row >= rowCount() || column >= columnCount())
         return QModelIndex();
     return createIndex(row, column);
 }
