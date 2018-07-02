@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
     for (int i = 0; i < tableModel.rowCount(); ++i) {
         for (int j = 0; j < tableModel.columnCount(); ++j) {
             tableModel.setData(tableModel.index(i, j), QStringLiteral("Row: %1, Col: %2").arg(i).arg(j));
+            tableModel.setData(tableModel.index(i, j), QColor::fromHsvF((i + 1) / (2.0 * tableModel.rowCount()), (j + 1) / (2.0 *tableModel.columnCount()), 1.0), Qt::BackgroundColorRole);
         }
     }
 
@@ -32,11 +33,13 @@ int main(int argc, char *argv[])
         for (int j = 0; j < treeModel.columnCount(); ++j) {
             const QModelIndex parentIdx = treeModel.index(i, j);
             treeModel.setData(parentIdx, QStringLiteral("Row: %1, Col: %2").arg(i).arg(j));
+            treeModel.setData(parentIdx, QColor::fromHsvF((i + 1) / (2.0 * treeModel.rowCount()), (j + 1) / (2.0 *treeModel.columnCount()), 1.0), Qt::BackgroundColorRole);
             treeModel.insertRows(0, 2, parentIdx);
             treeModel.insertColumns(0, 2, parentIdx);
             for (int k = 0; k < treeModel.rowCount(parentIdx); ++k) {
                 for (int h = 0; h < treeModel.columnCount(parentIdx); ++h) {
                     treeModel.setData(treeModel.index(k, h, parentIdx), QStringLiteral("Row: %1, Col: %2 [Parent, Row: %3, Col: %4]").arg(k).arg(h).arg(i).arg(j));
+                    treeModel.setData(treeModel.index(k, h, parentIdx), QColor::fromHsvF((i + 1) / (2.0 * treeModel.rowCount()), (j + 1) / (2.0 *treeModel.columnCount()),1- ((k + h + 1) / (2.0*(treeModel.columnCount(parentIdx) + treeModel.rowCount(parentIdx))))), Qt::BackgroundColorRole);
                 }
             }
         }
