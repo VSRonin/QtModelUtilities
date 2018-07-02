@@ -4,7 +4,20 @@
 #ifdef QT_GUI_LIB
 #include <QStandardItemModel>
 #endif
+#ifndef MOC_MODEL_TEST
+class ModelTest : public QObject
+{
+    Q_DISABLE_COPY(ModelTest)
+public:
+    ModelTest(QAbstractItemModel* model, QObject* parent = Q_NULLPTR)
+        :QObject(parent)
+    {
+        Q_UNUSED(model)
+    }
+};
+#else
 #include "modeltest.h"
+#endif
 void tst_TransposeProxyModel::basicTestTable()
 {
 #ifdef QT_GUI_LIB

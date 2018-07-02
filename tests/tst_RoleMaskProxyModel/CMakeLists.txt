@@ -31,12 +31,20 @@ set(tst_RoleMaskProxyModel_INCLUDE ${tst_RoleMaskProxyModel_INCLUDE} ${Qt5Gui_IN
 set(tst_RoleMaskProxyModel_COMPILE_DEFINE ${tst_RoleMaskProxyModel_COMPILE_DEFINE} ${Qt5Gui_COMPILE_DEFINITIONS})
 endif()
 set(tst_RoleMaskProxyModel_INCLUDE ${tst_RoleMaskProxyModel_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR})
-file(DOWNLOAD "https://code.qt.io/cgit/qt-creator/qt-creator.git/plain/src/shared/modeltest/modeltest.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/modeltest.cpp")
-file(DOWNLOAD "https://code.qt.io/cgit/qt-creator/qt-creator.git/plain/src/shared/modeltest/modeltest.h" "${CMAKE_CURRENT_SOURCE_DIR}/modeltest.h")
+file(DOWNLOAD "https://code.qt.io/cgit/qt-creator/qt-creator.git/plain/src/shared/modeltest/modeltest.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/modeltest.cpp" STATUS ModelTestDownloadStatus)
+list(GET ModelTestDownloadStatus 0 ModelTestDownloadStatusCode)
+if(ModelTestDownloadStatusCode EQUAL 0)
+    file(DOWNLOAD "https://code.qt.io/cgit/qt-creator/qt-creator.git/plain/src/shared/modeltest/modeltest.h" "${CMAKE_CURRENT_SOURCE_DIR}/modeltest.h" STATUS ModelTestDownloadStatus)
+    list(GET ModelTestDownloadStatus 0 ModelTestDownloadStatusCode)
+    if(ModelTestDownloadStatusCode EQUAL 0)
+        set(tst_RoleMaskProxyModel_COMPILE_DEFINE ${tst_RoleMaskProxyModel_COMPILE_DEFINE} "MOC_MODEL_TEST")
+        set(tst_RoleMaskProxyModel_SRCS ${tst_RoleMaskProxyModel_SRCS} modeltest.cpp)
+    endif()
+endif()
 set(tst_RoleMaskProxyModel_SRCS
     main.cpp
     tst_rolemaskproxymodel.cpp
-    modeltest.cpp
+    ${tst_RoleMaskProxyModel_SRCS}
 )
 add_executable(tst_RoleMaskProxyModel ${tst_RoleMaskProxyModel_SRCS})
 if(BUILD_STATIC_LIBS)

@@ -6,7 +6,20 @@
 #endif
 #include <QtTest/QTest>
 #include <QtTest/QSignalSpy>
+#ifndef MOC_MODEL_TEST
+class ModelTest : public QObject
+{
+    Q_DISABLE_COPY(ModelTest)
+public:
+    ModelTest(QAbstractItemModel* model, QObject* parent = Q_NULLPTR)
+        :QObject(parent)
+    {
+        Q_UNUSED(model)
+    }
+};
+#else
 #include "modeltest.h"
+#endif
 
 QAbstractItemModel* createNullModel(QObject* parent){
     Q_UNUSED(parent)
