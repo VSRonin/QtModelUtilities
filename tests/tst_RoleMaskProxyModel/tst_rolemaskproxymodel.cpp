@@ -673,9 +673,9 @@ void tst_RoleMaskProxyModel::testSetItemDataDataChanged()
     auto argList = proxyDataChangeSpy.takeFirst();
     QCOMPARE(argList.at(0).value<QModelIndex>(), proxyIdX);
     QCOMPARE(argList.at(1).value<QModelIndex>(), proxyIdX);  
+    auto rolesVector = argList.at(2).value<QVector<int> >();
 #if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
     // bug fixed by Qt commit 1382374deaa4a854aeb542e6c8f7e1841f2abb10
-	auto rolesVector = argList.at(2).value<QVector<int> >();
     QCOMPARE(rolesVector.size(), 2);
     QVERIFY(!rolesVector.contains(Qt::TextAlignmentRole));
     QVERIFY(rolesVector.contains(Qt::ToolTipRole));
