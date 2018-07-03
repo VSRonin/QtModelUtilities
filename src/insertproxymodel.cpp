@@ -729,7 +729,7 @@ bool InsertProxyModel::removeRows(int row, int count, const QModelIndex &parent)
         return false;
     if (!sourceModel())
         return false;
-    if (row < 0 || row >= sourceModel()->rowCount())
+    if (row < 0 || row > sourceModel()->rowCount())
         return false;
     return sourceModel()->removeRows(row, count);
 }
@@ -759,7 +759,7 @@ bool InsertProxyModel::insertColumns(int column, int count, const QModelIndex &p
         return false;
     if (!sourceModel())
         return false;
-    if (column < 0 || column >= sourceModel()->columnCount())
+    if (column < 0 || column > sourceModel()->columnCount())
         return false;
     return sourceModel()->insertColumns(column, count);
 }
@@ -773,7 +773,7 @@ bool InsertProxyModel::removeColumns(int column, int count, const QModelIndex &p
         return false;
     if (!sourceModel())
         return false;
-    if (column<0 || column >= sourceModel()->columnCount())
+    if (column<0 || column > sourceModel()->columnCount())
         return false;
     return sourceModel()->removeColumns(column, count);
 }
