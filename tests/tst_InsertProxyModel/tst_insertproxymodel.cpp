@@ -226,7 +226,8 @@ void tst_InsertProxyModel::testSourceInsertCol()
     if (insertDirection & InsertProxyModel::InsertRow) {
         if (indexToInsert > 0)
             QVERIFY(proxy.setData(proxy.index(originalRowCount, indexToInsert - 1), QStringLiteral("TestRowBefore")));
-        QVERIFY(proxy.setData(proxy.index(originalRowCount, indexToInsert), QStringLiteral("TestRowAfter")));
+        if (indexToInsert<originalColCount)
+            QVERIFY(proxy.setData(proxy.index(originalRowCount, indexToInsert), QStringLiteral("TestRowAfter")));
     }
     if (insertDirection & InsertProxyModel::InsertColumn) {
         QVERIFY(proxy.setData(proxy.index(0, originalColCount), QStringLiteral("TestColumn")));
@@ -263,7 +264,8 @@ void tst_InsertProxyModel::testSourceInsertCol()
         QVERIFY(!baseModel->index(j,indexToInsert).data().isValid());
     }
     if (insertDirection & InsertProxyModel::InsertRow) {
-        QCOMPARE(proxy.index(originalRowCount,indexToInsert + 1).data().toString(), QStringLiteral("TestRowAfter"));
+        if (indexToInsert<originalColCount)
+            QCOMPARE(proxy.index(originalRowCount,indexToInsert + 1).data().toString(), QStringLiteral("TestRowAfter"));
         if (indexToInsert > 0)
             QCOMPARE(proxy.index(originalRowCount, indexToInsert - 1).data().toString(), QStringLiteral("TestRowBefore"));
     }
@@ -280,7 +282,8 @@ void tst_InsertProxyModel::testSourceInsertCol()
             QCOMPARE(proxy.index(i, baseModel->columnCount()).data(), QVariant());
     }
     if (insertDirection & InsertProxyModel::InsertRow) {
-        QCOMPARE(baseModel->index(originalRowCount, indexToInsert + 1).data().toString(), QStringLiteral("TestRowAfter"));
+        if (indexToInsert<originalColCount)
+            QCOMPARE(baseModel->index(originalRowCount, indexToInsert + 1).data().toString(), QStringLiteral("TestRowAfter"));
         if (indexToInsert > 0)
             QCOMPARE(baseModel->index(originalRowCount, indexToInsert - 1).data().toString(), QStringLiteral("TestRowBefore"));
         for (int i = 0; i < proxy.columnCount(); ++i)
@@ -314,7 +317,8 @@ void tst_InsertProxyModel::testSourceInsertRow()
     if (insertDirection & InsertProxyModel::InsertColumn) {
         if (indexToInsert>0)
             QVERIFY(proxy.setData(proxy.index(indexToInsert-1, originalColCount), QStringLiteral("TestColumnBefore")));
-        QVERIFY(proxy.setData(proxy.index(indexToInsert, originalColCount), QStringLiteral("TestColumnAfter")));
+        if (indexToInsert < originalRowCount)
+            QVERIFY(proxy.setData(proxy.index(indexToInsert, originalColCount), QStringLiteral("TestColumnAfter")));
     }
     for (int i = 0; i < originalRowCount;++i){
         for (int j = 0; j < originalColCount; ++j) {
@@ -347,7 +351,8 @@ void tst_InsertProxyModel::testSourceInsertRow()
         QVERIFY(baseModel->index(indexToInsert, j).data().isNull());
     }
     if (insertDirection & InsertProxyModel::InsertColumn) {
-        QCOMPARE(proxy.index(indexToInsert + 1, originalColCount).data().toString(), QStringLiteral("TestColumnAfter"));
+        if (indexToInsert < originalRowCount)
+            QCOMPARE(proxy.index(indexToInsert + 1, originalColCount).data().toString(), QStringLiteral("TestColumnAfter"));
         if (indexToInsert > 0)
             QCOMPARE(proxy.index(indexToInsert - 1, originalColCount).data().toString(), QStringLiteral("TestColumnBefore"));
     }
@@ -364,7 +369,8 @@ void tst_InsertProxyModel::testSourceInsertRow()
             QCOMPARE(proxy.index(baseModel->rowCount(), i).data(), QVariant());
     }
     if (insertDirection & InsertProxyModel::InsertColumn) {
-        QCOMPARE(baseModel->index(indexToInsert + 1, originalColCount).data().toString(), QStringLiteral("TestColumnAfter"));
+        if (indexToInsert < originalRowCount)
+            QCOMPARE(baseModel->index(indexToInsert + 1, originalColCount).data().toString(), QStringLiteral("TestColumnAfter"));
         if (indexToInsert > 0)
             QCOMPARE(baseModel->index(indexToInsert - 1, originalColCount).data().toString(), QStringLiteral("TestColumnBefore"));
         for (int i = 0; i < proxy.rowCount(); ++i)
@@ -385,32 +391,33 @@ void tst_InsertProxyModel::testSourceInsertRow_data()
         std::make_pair<InsertProxyModel::InsertDirections, QByteArray>(InsertProxyModel::InsertRow, QByteArrayLiteral("Extra Row"))
         , std::make_pair<InsertProxyModel::InsertDirections, QByteArray>(InsertProxyModel::InsertColumn, QByteArrayLiteral("Extra Column"))
         , std::make_pair<InsertProxyModel::InsertDirections, QByteArray>(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow, QByteArrayLiteral("Extra Row and Column"))
-    }){
-
+    }) {
         for (auto&& baseModel : {
             std::make_pair(insertDirection.first & InsertProxyModel::InsertColumn ? &createNullModel : &createListModel, QByteArrayLiteral("List"))
             , std::make_pair(&createTableModel, QByteArrayLiteral("Table"))
             , std::make_pair(&createTreeModel, QByteArrayLiteral("Tree"))
-        }){
-            QAbstractItemModel* tempModel = baseModel.first(this);
-            if (tempModel){
-                for (auto&& indexToInsert : {
-                    std::make_pair(0, QByteArrayLiteral("Begin"))
-                    , std::make_pair(tempModel->rowCount(), QByteArrayLiteral("End"))
-                    , std::make_pair(tempModel->rowCount() / 2, QByteArrayLiteral("Middle"))
+        }) {
+            QAbstractItemModel* const tempModel = baseModel.first(this);
+            if (tempModel) {
+                for (auto&& addViaProxy : {
+                    std::make_pair(true, QByteArrayLiteral("via Proxy"))
+                    , std::make_pair(false, QByteArrayLiteral("via Base"))
                 }) {
-                    for (auto&& addViaProxy : {
-                        std::make_pair(true, QByteArrayLiteral("via Proxy"))
-                        , std::make_pair(false, QByteArrayLiteral("via Base"))
+
+                    for (auto&& indexToInsert : {
+                        std::make_pair(0, QByteArrayLiteral("Begin"))
+                        , std::make_pair(tempModel->rowCount(), QByteArrayLiteral("End"))
+                        , std::make_pair(tempModel->rowCount() / 2, QByteArrayLiteral("Middle"))
                     }) {
                         QTest::newRow((baseModel.second + ' ' + insertDirection.second + ' ' + addViaProxy.second + ' ' + indexToInsert.second).constData())
-                            << tempModel
+                            << baseModel.first(this)
                             << insertDirection.first
                             << indexToInsert.first
                             << addViaProxy.first
                             ;
                     }
                 }
+                tempModel->deleteLater();
             }
         }
     }
@@ -434,7 +441,7 @@ void tst_InsertProxyModel::testSourceInsertCol_data()
             std::make_pair(&createTableModel, QByteArrayLiteral("Table"))
             , std::make_pair(&createTreeModel, QByteArrayLiteral("Tree"))
         }) {
-            QAbstractItemModel* tempModel = baseModel.first(this);
+            QAbstractItemModel* const tempModel = baseModel.first(this);
             if (tempModel) {
                 for (auto&& indexToInsert : {
                     std::make_pair(0, QByteArrayLiteral("Begin"))
@@ -446,13 +453,14 @@ void tst_InsertProxyModel::testSourceInsertCol_data()
                         , std::make_pair(false, QByteArrayLiteral("via Base"))
                     }) {
                         QTest::newRow((baseModel.second + ' ' + insertDirection.second + ' ' + addViaProxy.second + ' ' + indexToInsert.second).constData())
-                            << tempModel
+                            << baseModel.first(this)
                             << insertDirection.first
                             << indexToInsert.first
                             << addViaProxy.first
                             ;
                     }
                 }
+                tempModel->deleteLater();
             }
         }
     }
