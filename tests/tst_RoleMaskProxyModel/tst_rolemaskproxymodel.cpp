@@ -78,6 +78,11 @@ QAbstractItemModel* createTreeModel(QObject* parent)
     return result;
 }
 
+void tst_RoleMaskProxyModel::initTestCase()
+{
+    qRegisterMetaType<QVector<int> >();
+}
+
 void tst_RoleMaskProxyModel::testUseRoleMask()
 {
     QFETCH(QAbstractItemModel*, baseModel);
@@ -296,8 +301,7 @@ void tst_RoleMaskProxyModel::testDataChangeSignals()
     QVERIFY(proxyModel.setData(proxyDataIdx, 1, Qt::UserRole));
     QCOMPARE(baseDataChangeSpy.count(), 0);
     QCOMPARE(proxyDataChangeSpy.count(), 1);
-    QList<QVariant> arguments = proxyDataChangeSpy.value(0);
-    proxyDataChangeSpy.clear();
+    QList<QVariant> arguments = proxyDataChangeSpy.takeFirst();
     QCOMPARE(arguments.at(0).value<QModelIndex>(), proxyDataIdx);
     QCOMPARE(arguments.at(1).value<QModelIndex>(), proxyDataIdx);
     QVector<int> rolesVector = arguments.at(2).value<QVector<int> >();

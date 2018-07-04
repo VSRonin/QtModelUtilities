@@ -9,6 +9,7 @@ class RoleMaskProxyModel;
 class tst_RoleMaskProxyModel :public QObject{
     Q_OBJECT
 private Q_SLOTS:
+    void initTestCase();
     void testUseRoleMask();
     void testUseRoleMask_data();
     void testInsertRow();
