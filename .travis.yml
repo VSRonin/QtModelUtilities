@@ -96,8 +96,8 @@ install:
          lsb_release -a
       && sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
       && sudo apt-add-repository -y ppa:beineri/opt-qt${QTVERSIONPATCH}-trusty
-      && sudo apt-get -qq update
-      && sudo apt-get -qq install g++-6 libc6-i386 qt${QTVERSIONMINOR}base qt${QTVERSIONMINOR}tools 
+      && sudo apt-get --allow-unauthenticated -qq update
+      && sudo apt-get --allow-unauthenticated -qq install g++-6 libc6-i386 qt${QTVERSIONMINOR}base qt${QTVERSIONMINOR}tools 
       && export CXX="g++-6"
       && export CC="gcc-6"
       ;
