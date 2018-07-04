@@ -7,7 +7,9 @@
 #include <QtTest/QSignalSpy>
 #include <QList>
 #include <QVariant>
+#include <random>
 #include "tst_rolemaskproxymodel.h"
+
 #ifndef MOC_MODEL_TEST
 class ModelTest : public QObject{
     Q_DISABLE_COPY(ModelTest)
@@ -710,6 +712,40 @@ void tst_RoleMaskProxyModel::testSetItemDataDataChanged()
 	// requures QTBUG-67511 to be fixed before it works on models other than QStandardItemModel
     // QCOMPARE(proxyDataChangeSpy.size(), 0); 
     baseModel->deleteLater();
+}
+
+void tst_RoleMaskProxyModel::testSort_data()
+{
+    QTest::addColumn<bool>("sortViaProxy");
+    QTest::newRow("Sort via Base") << false;
+    QTest::newRow("Sort via Proxy") << true;
+}
+
+void tst_RoleMaskProxyModel::testSort()
+{
+    QFETCH(bool, sortViaProxy);
+    QStringList sequence;
+    sequence.reserve(100);
+    for (int i = 0; i < 100; ++i)
+        sequence.append(QStringLiteral("%1").arg(i, 3, 10, QLatin1Char('0')));
+    std::shuffle(sequence.begin(), sequence.end(), std::mt19937(88));
+    QStringListModel baseModel(sequence);
+    RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, &proxyModel);
+    proxyModel.setSourceModel(&baseModel);
+    proxyModel.addMaskedRole(Qt::UserRole);
+    proxyModel.setTransparentIfEmpty(true);
+    for (int i = 0; i < 100; ++i){
+        QVERIFY(proxyModel.setData(proxyModel.index(i, 0), proxyModel.index(i, 0).data().toString().toInt(), Qt::UserRole));
+    }
+    if (sortViaProxy)
+        proxyModel.sort(0, Qt::AscendingOrder);
+    else
+        baseModel.sort(0, Qt::AscendingOrder);
+    for (int i = 1; i < 100; ++i) {
+        QCOMPARE(proxyModel.index(i, 0).data().toString().toInt(), proxyModel.index(i - 1, 0).data().toString().toInt() + 1);
+        QCOMPARE(proxyModel.index(i, 0).data(Qt::UserRole).toInt(), proxyModel.index(i - 1, 0).data(Qt::UserRole).toInt() + 1);
+    }
 }
 
 void tst_RoleMaskProxyModel::testSetItemData()
