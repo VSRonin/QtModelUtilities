@@ -34,7 +34,9 @@ public:
     ~TreeMapProxyModel();
 protected:
     TreeMapProxyModel(TreeMapProxyModelPrivate& dptr, QObject* parent);
+#ifndef MODEL_UTILITIES_DOCS
     TreeMapProxyModelPrivate* d_ptr;
+#endif
 };
 
 #endif // treemapproxymodel_h__

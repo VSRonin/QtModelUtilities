@@ -14,6 +14,13 @@ And resgister them before using any save/load functionality by calling
     qRegisterMetaType<MyClass>("MyClass");
     qRegisterMetaTypeStreamOperators<MyClass>("MyClass");
 
+### Class Documentation
++ BinaryModelSerialiser
++ CsvModelSerialiser
++ HtmlModelSerialiser
++ JsonModelSerialiser
++ XmlModelSerialiser
+
 ### Dependencies
 
 + Qt Core

@@ -277,7 +277,7 @@ void TreeMapProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
 }
 
 /*!
-\class TransposeProxyModel
+\class TreeMapProxyModel
 \brief Convenience class to map parent indexes.
 \details Qt does not expose an easy way to maintain a mapping between the source model parent indexes and the proxy model ones, this proxy model tries to solve this.
 
