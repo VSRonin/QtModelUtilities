@@ -84,19 +84,19 @@ void tst_InsertProxyModel::testCommitSubclass_data()
     QTest::newRow("List Row") << createListModel(this) << InsertProxyModel::InsertDirections(InsertProxyModel::InsertRow) << false;
     QTest::newRow("List Column") << createListModel(this) << InsertProxyModel::InsertDirections(InsertProxyModel::InsertColumn) << false;
     QTest::newRow("List Row Column") << createListModel(this) << (InsertProxyModel::InsertRow | InsertProxyModel::InsertColumn) << false;
-#ifdef QT_GUI_LIB
     QTest::newRow("Table Row") << createTableModel(this) << InsertProxyModel::InsertDirections(InsertProxyModel::InsertRow) << true;
     QTest::newRow("Table Column") << createTableModel(this) << InsertProxyModel::InsertDirections(InsertProxyModel::InsertColumn) << true;
     QTest::newRow("Table Row Column") << createTableModel(this) << (InsertProxyModel::InsertRow | InsertProxyModel::InsertColumn) << true;
     QTest::newRow("Tree Row") << createTreeModel(this) << InsertProxyModel::InsertDirections(InsertProxyModel::InsertRow) << true;
     QTest::newRow("Tree Column") << createTreeModel(this) << InsertProxyModel::InsertDirections(InsertProxyModel::InsertColumn) << true;
     QTest::newRow("Tree Row Column") << createTreeModel(this) << (InsertProxyModel::InsertRow | InsertProxyModel::InsertColumn) << true;
-#endif
 }
 
 void tst_InsertProxyModel::testCommitSlot()
 {
     QFETCH(QAbstractItemModel*, baseModel);
+    if (!baseModel)
+        return;
     QFETCH(InsertProxyModel::InsertDirections, insertDirection);
     QFETCH(bool, canInsertColumns);
     InsertProxyModel proxy;
@@ -193,20 +193,16 @@ void tst_InsertProxyModel::testCommitSlot_data()
     QTest::newRow("List Row") << createListModel(this) << InsertProxyModel::InsertDirections(InsertProxyModel::InsertRow) << false;
     QTest::newRow("List Column") << createListModel(this) << InsertProxyModel::InsertDirections(InsertProxyModel::InsertColumn) << false;
     QTest::newRow("List Row Column") << createListModel(this) << (InsertProxyModel::InsertRow | InsertProxyModel::InsertColumn) << false;
-#ifdef QT_GUI_LIB
     QTest::newRow("Table Row") << createTableModel(this) << InsertProxyModel::InsertDirections(InsertProxyModel::InsertRow) << true;
     QTest::newRow("Table Column") << createTableModel(this) << InsertProxyModel::InsertDirections(InsertProxyModel::InsertColumn) << true;
     QTest::newRow("Table Row Column") << createTableModel(this) << (InsertProxyModel::InsertRow | InsertProxyModel::InsertColumn) << true;
     QTest::newRow("Tree Row") << createTreeModel(this) << InsertProxyModel::InsertDirections(InsertProxyModel::InsertRow) << true;
     QTest::newRow("Tree Column") << createTreeModel(this) << InsertProxyModel::InsertDirections(InsertProxyModel::InsertColumn) << true;
     QTest::newRow("Tree Row Column") << createTreeModel(this) << (InsertProxyModel::InsertRow | InsertProxyModel::InsertColumn) << true;
-#endif
 }
 void tst_InsertProxyModel::testSourceInsertCol()
 {
-#ifndef QT_GUI_LIB
-    QSKIP("This test requires the Qt GUI module");
-#else
+#if defined(QT_GUI_LIB)
     QFETCH(QAbstractItemModel*, baseModel);
     QFETCH(InsertProxyModel::InsertDirections, insertDirection);
     QFETCH(int, indexToInsert);
@@ -290,6 +286,8 @@ void tst_InsertProxyModel::testSourceInsertCol()
             QCOMPARE(proxy.index(i, baseModel->columnCount()).data(), QVariant());
     }
     baseModel->deleteLater();
+#else
+    QSKIP("This test requires the Qt GUI module");
 #endif
 }
 void tst_InsertProxyModel::testSourceInsertRow()
@@ -602,6 +600,8 @@ void tst_InsertProxyModel::initTestCase()
 void tst_InsertProxyModel::testData()
 {
     QFETCH(QAbstractItemModel*, baseModel);
+    if (!baseModel)
+        return;
     InsertProxyModel proxyModel;
     new ModelTest(&proxyModel, &proxyModel);
     proxyModel.setInsertDirection(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
@@ -626,15 +626,15 @@ void tst_InsertProxyModel::testData_data()
 {
     QTest::addColumn<QAbstractItemModel*>("baseModel");
     QTest::newRow("List") << createListModel(this);
-#ifdef QT_GUI_LIB
     QTest::newRow("Table") << createTableModel(this);
     QTest::newRow("Tree") << createTreeModel(this);
-#endif
 }
 
 void tst_InsertProxyModel::testSetData()
 {
     QFETCH(QAbstractItemModel*, baseModel);
+    if (!baseModel)
+        return;
     QFETCH(int, idxRow);
     QFETCH(int, idxCol);
     InsertProxyModel proxyModel;
@@ -662,22 +662,26 @@ void tst_InsertProxyModel::testSetData_data()
     QTest::newRow("List Extra Col") << baseModel << 0 << baseModel->columnCount();
     baseModel = createListModel(this);
     QTest::newRow("List Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
-#ifdef QT_GUI_LIB
     QTest::newRow("Table Inside Base Model") << createTableModel(this) << 0 << 0;
     baseModel = createTableModel(this);
-    QTest::newRow("Table Extra Row") << baseModel << baseModel->rowCount() << 0;
+    if (baseModel)
+        QTest::newRow("Table Extra Row") << baseModel << baseModel->rowCount() << 0;
     baseModel = createTableModel(this);
-    QTest::newRow("Table Extra Col") << baseModel << 0 << baseModel->columnCount();
+    if (baseModel)
+        QTest::newRow("Table Extra Col") << baseModel << 0 << baseModel->columnCount();
     baseModel = createTableModel(this);
-    QTest::newRow("Table Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
+    if (baseModel)
+        QTest::newRow("Table Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
     QTest::newRow("Tree Inside Base Model") << createTreeModel(this) << 0 << 0;
     baseModel = createTreeModel(this);
-    QTest::newRow("Tree Extra Row") << baseModel << baseModel->rowCount() << 0;
+    if (baseModel)
+        QTest::newRow("Tree Extra Row") << baseModel << baseModel->rowCount() << 0;
     baseModel = createTreeModel(this);
-    QTest::newRow("Tree Extra Col") << baseModel << 0 << baseModel->columnCount();
+    if (baseModel)
+        QTest::newRow("Tree Extra Col") << baseModel << 0 << baseModel->columnCount();
     baseModel = createTreeModel(this);
-    QTest::newRow("Tree Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
-#endif
+    if (baseModel)
+        QTest::newRow("Tree Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
 }
 
 void tst_InsertProxyModel::testSetItemData_data()
@@ -691,22 +695,26 @@ void tst_InsertProxyModel::testSetItemData_data()
     QTest::newRow("List Extra Col") << baseModel << 0 << baseModel->columnCount();
     baseModel = createListModel(this);
     QTest::newRow("List Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
-#ifdef QT_GUI_LIB
     QTest::newRow("Table Inside Base Model") << createTableModel(this) << 0 << 0;
     baseModel = createTableModel(this);
-    QTest::newRow("Table Extra Row") << baseModel << baseModel->rowCount() << 0;
+    if (baseModel)
+        QTest::newRow("Table Extra Row") << baseModel << baseModel->rowCount() << 0;
     baseModel = createTableModel(this);
-    QTest::newRow("Table Extra Col") << baseModel << 0 << baseModel->columnCount();
+    if (baseModel)
+        QTest::newRow("Table Extra Col") << baseModel << 0 << baseModel->columnCount();
     baseModel = createTableModel(this);
-    QTest::newRow("Table Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
+    if (baseModel)
+        QTest::newRow("Table Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
     QTest::newRow("Tree Inside Base Model") << createTreeModel(this) << 0 << 0;
     baseModel = createTreeModel(this);
-    QTest::newRow("Tree Extra Row") << baseModel << baseModel->rowCount() << 0;
+    if (baseModel)
+        QTest::newRow("Tree Extra Row") << baseModel << baseModel->rowCount() << 0;
     baseModel = createTreeModel(this);
-    QTest::newRow("Tree Extra Col") << baseModel << 0 << baseModel->columnCount();
+    if (baseModel)
+        QTest::newRow("Tree Extra Col") << baseModel << 0 << baseModel->columnCount();
     baseModel = createTreeModel(this);
-    QTest::newRow("Tree Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
-#endif
+    if (baseModel)
+        QTest::newRow("Tree Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
 }
 
 void tst_InsertProxyModel::testSetItemDataDataChanged_data()
@@ -720,25 +728,31 @@ void tst_InsertProxyModel::testSetItemDataDataChanged_data()
     QTest::newRow("List Extra Col") << baseModel << 0 << baseModel->columnCount();
     baseModel = createListModel(this);
     QTest::newRow("List Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
-#ifdef QT_GUI_LIB
     baseModel = createTableModel(this);
-    QTest::newRow("Table Extra Row") << baseModel << baseModel->rowCount() << 0;
+    if (baseModel)
+        QTest::newRow("Table Extra Row") << baseModel << baseModel->rowCount() << 0;
     baseModel = createTableModel(this);
-    QTest::newRow("Table Extra Col") << baseModel << 0 << baseModel->columnCount();
+    if (baseModel)
+        QTest::newRow("Table Extra Col") << baseModel << 0 << baseModel->columnCount();
     baseModel = createTableModel(this);
-    QTest::newRow("Table Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
+    if (baseModel)
+        QTest::newRow("Table Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
     baseModel = createTreeModel(this);
-    QTest::newRow("Tree Extra Row") << baseModel << baseModel->rowCount() << 0;
+    if (baseModel)
+        QTest::newRow("Tree Extra Row") << baseModel << baseModel->rowCount() << 0;
     baseModel = createTreeModel(this);
-    QTest::newRow("Tree Extra Col") << baseModel << 0 << baseModel->columnCount();
+    if (baseModel)
+        QTest::newRow("Tree Extra Col") << baseModel << 0 << baseModel->columnCount();
     baseModel = createTreeModel(this);
-    QTest::newRow("Tree Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
-#endif
+    if (baseModel)
+        QTest::newRow("Tree Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
 }
 
 void tst_InsertProxyModel::testSetItemDataDataChanged()
 {
     QFETCH(QAbstractItemModel*, baseModel);
+    if (!baseModel)
+        return;
     QFETCH(int, idxRow);
     QFETCH(int, idxCol);
     QMap<int, QVariant> itemDataSet{ { //TextAlignmentRole
@@ -791,6 +805,8 @@ void tst_InsertProxyModel::testSetItemDataDataChanged()
 void tst_InsertProxyModel::testSetItemData()
 {
     QFETCH(QAbstractItemModel*, baseModel);
+    if (!baseModel)
+        return;
     QFETCH(int, idxRow);
     QFETCH(int, idxCol);
     const QMap<int, QVariant> itemDataSet{{
@@ -849,6 +865,8 @@ void tst_InsertProxyModel::testCommitSubclass()
         }
     };
     QFETCH(QAbstractItemModel*, baseModel);
+    if (!baseModel)
+        return;
     QFETCH(InsertProxyModel::InsertDirections, insertDirection);
     QFETCH(bool, canInsertColumns);
     InsertProxyModelCommit proxy;
