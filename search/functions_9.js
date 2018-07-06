@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['rebuildtreemap',['rebuildTreeMap',['../class_tree_map_proxy_model.html#a310c11cd703b624a0588797c148ab44b',1,'TreeMapProxyModel']]],
   ['removecolumns',['removeColumns',['../class_insert_proxy_model.html#a6a27a80fb2392810d89aa732f84026f0',1,'InsertProxyModel::removeColumns()'],['../class_transpose_proxy_model.html#aa499e32de5a43e25fa16ee564987ab77',1,'TransposeProxyModel::removeColumns()']]],
   ['removeroletosave',['removeRoleToSave',['../class_abstract_multi_role_serialiser.html#aad97dbf5dc90abe927763723f92d1649',1,'AbstractMultiRoleSerialiser']]],
   ['removerows',['removeRows',['../class_insert_proxy_model.html#a5555845f3080f79d1eddeba02dd4eebe',1,'InsertProxyModel::removeRows()'],['../class_transpose_proxy_model.html#a4e120507baaff644e95413a1153e777a',1,'TransposeProxyModel::removeRows()']]],

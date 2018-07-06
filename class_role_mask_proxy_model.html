@@ -139,6 +139,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>clearMaskedRoles</b> 
 <tr class="separator:a06256d369000a3ba97041a8cc3509b5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff8208f0526f9b701cc06609579c45e6"><td class="memItemLeft" align="right" valign="top">QVariant&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_role_mask_proxy_model.html#aff8208f0526f9b701cc06609579c45e6">data</a> (const QModelIndex &amp;proxyIndex, int role=Qt::DisplayRole) const Q_DECL_OVERRIDE</td></tr>
 <tr class="separator:aff8208f0526f9b701cc06609579c45e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a4f2c933484b04a1ef724336f8c9cb1"><td class="memItemLeft" align="right" valign="top">QMap&lt; int, QVariant &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_role_mask_proxy_model.html#a9a4f2c933484b04a1ef724336f8c9cb1">itemData</a> (const QModelIndex &amp;index) const Q_DECL_OVERRIDE</td></tr>
+<tr class="separator:a9a4f2c933484b04a1ef724336f8c9cb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a35426a1ac669b662745149eb35ac9fd3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a35426a1ac669b662745149eb35ac9fd3"></a>
 QList&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>maskedRoles</b> () const </td></tr>
 <tr class="separator:a35426a1ac669b662745149eb35ac9fd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -150,6 +152,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>removeMaskedRole</b> 
 <tr class="separator:a3a1487f83e8e803f95369435b886cec8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a333579e021af6ba4632df7f61221484d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_role_mask_proxy_model.html#a333579e021af6ba4632df7f61221484d">setData</a> (const QModelIndex &amp;index, const QVariant &amp;value, int role=Qt::EditRole) Q_DECL_OVERRIDE</td></tr>
 <tr class="separator:a333579e021af6ba4632df7f61221484d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4da701d876526a498405cccf7c7143cb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_role_mask_proxy_model.html#a4da701d876526a498405cccf7c7143cb">setItemData</a> (const QModelIndex &amp;index, const QMap&lt; int, QVariant &gt; &amp;roles) Q_DECL_OVERRIDE</td></tr>
+<tr class="separator:a4da701d876526a498405cccf7c7143cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7cad47bc796522d2c50862e97dd0bec"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad7cad47bc796522d2c50862e97dd0bec"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setMaskedRoles</b> (const QList&lt; int &gt; &amp;roles)</td></tr>
 <tr class="separator:ad7cad47bc796522d2c50862e97dd0bec"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -169,8 +173,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>transparentIfEmpty</b
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a458cf9a9f36bc5d2b12b176d5bb05dce"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_role_mask_proxy_model.html#a458cf9a9f36bc5d2b12b176d5bb05dce">RoleMaskProxyModel</a> (RoleMaskProxyModelPrivate &amp;dptr, QObject *parent)</td></tr>
 <tr class="separator:a458cf9a9f36bc5d2b12b176d5bb05dce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94bbdeb692cf86ff1cab3f2de615b00b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a94bbdeb692cf86ff1cab3f2de615b00b"></a>
-const QSet&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>maskedRolesSets</b> () const </td></tr>
+<tr class="memitem:a94bbdeb692cf86ff1cab3f2de615b00b"><td class="memItemLeft" align="right" valign="top">const QSet&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_role_mask_proxy_model.html#a94bbdeb692cf86ff1cab3f2de615b00b">maskedRolesSets</a> () const </td></tr>
 <tr class="separator:a94bbdeb692cf86ff1cab3f2de615b00b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="properties"></a>
@@ -178,11 +181,11 @@ Properties</h2></td></tr>
 <tr class="memitem:ac94c9810ea3b3683804d33b24bc959f5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac94c9810ea3b3683804d33b24bc959f5"></a>
 QList&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>maskedRoles</b></td></tr>
 <tr class="separator:ac94c9810ea3b3683804d33b24bc959f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9696b14ae2cf0ecc2a5b03b2f3b4ca88"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9696b14ae2cf0ecc2a5b03b2f3b4ca88"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>mergeDisplayEdit</b></td></tr>
+<tr class="memitem:a9696b14ae2cf0ecc2a5b03b2f3b4ca88"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_role_mask_proxy_model.html#a9696b14ae2cf0ecc2a5b03b2f3b4ca88">mergeDisplayEdit</a></td></tr>
+<tr class="memdesc:a9696b14ae2cf0ecc2a5b03b2f3b4ca88"><td class="mdescLeft">&#160;</td><td class="mdescRight">This property determines if the Qt::DisplayRole and Qt::EditRole should be merged in the extra row/column.  <a href="#a9696b14ae2cf0ecc2a5b03b2f3b4ca88">More...</a><br /></td></tr>
 <tr class="separator:a9696b14ae2cf0ecc2a5b03b2f3b4ca88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3ac3b5856f95ea7a3e2ac45075075f5f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3ac3b5856f95ea7a3e2ac45075075f5f"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>transparentIfEmpty</b></td></tr>
+<tr class="memitem:a3ac3b5856f95ea7a3e2ac45075075f5f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_role_mask_proxy_model.html#a3ac3b5856f95ea7a3e2ac45075075f5f">transparentIfEmpty</a></td></tr>
+<tr class="memdesc:a3ac3b5856f95ea7a3e2ac45075075f5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">This property determines if a mapped role containing no data should be transparent.  <a href="#a3ac3b5856f95ea7a3e2ac45075075f5f">More...</a><br /></td></tr>
 <tr class="separator:a3ac3b5856f95ea7a3e2ac45075075f5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -293,6 +296,47 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>transparentIfEmpty</b
 
 </div>
 </div>
+<a class="anchor" id="a9a4f2c933484b04a1ef724336f8c9cb1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QMap&lt; int, QVariant &gt; RoleMaskProxyModel::itemData </td>
+          <td>(</td>
+          <td class="paramtype">const QModelIndex &amp;&#160;</td>
+          <td class="paramname"><em>index</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Reimplemented from base class </p>
+
+</div>
+</div>
+<a class="anchor" id="a94bbdeb692cf86ff1cab3f2de615b00b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const QSet&lt; int &gt; &amp; RoleMaskProxyModel::maskedRolesSets </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Same as maskedRoles but returns it in the way it is stored internally rather than converting it to QList </p>
+
+</div>
+</div>
 <a class="anchor" id="a333579e021af6ba4632df7f61221484d"></a>
 <div class="memitem">
 <div class="memproto">
@@ -326,6 +370,34 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>transparentIfEmpty</b
 
 </div>
 </div>
+<a class="anchor" id="a4da701d876526a498405cccf7c7143cb"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool RoleMaskProxyModel::setItemData </td>
+          <td>(</td>
+          <td class="paramtype">const QModelIndex &amp;&#160;</td>
+          <td class="paramname"><em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QMap&lt; int, QVariant &gt; &amp;&#160;</td>
+          <td class="paramname"><em>roles</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Reimplemented from base class</p>
+<p>Due to limitations in the architecture, the model might emit 2 separate dataChanged signals, one for the roles that were masked and one for the roles that are managed by the sorce model </p>
+
+</div>
+</div>
 <a class="anchor" id="a0b06e5d88d1996b830100b3138954d1b"></a>
 <div class="memitem">
 <div class="memproto">
@@ -343,10 +415,59 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>transparentIfEmpty</b
 
 </div>
 </div>
+<h2 class="groupheader">Property Documentation</h2>
+<a class="anchor" id="a9696b14ae2cf0ecc2a5b03b2f3b4ca88"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool RoleMaskProxyModel::mergeDisplayEdit</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">read</span><span class="mlabel">write</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>This property determines if the Qt::DisplayRole and Qt::EditRole should be merged in the extra row/column. </p>
+<dl class="section user"><dt>Accessors</dt><dd>mergeDisplayEdit(), setMergeDisplayEdit()</dd></dl>
+<p>By default the two roles are one and the same you can use this property to separate them. If there's any data in the role when you set this property to true it will be duplicated for both roles. If there is data both in Qt::DisplayRole and Qt::EditRole when you set this property to false Qt::DisplayRole will prevail. This property only has effect if Qt::DisplayRole and/or Qt::EditRole are masked by the proxy. Data in the source model is not affected. </p>
+
+</div>
+</div>
+<a class="anchor" id="a3ac3b5856f95ea7a3e2ac45075075f5f"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool RoleMaskProxyModel::transparentIfEmpty</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">read</span><span class="mlabel">write</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>This property determines if a mapped role containing no data should be transparent. </p>
+<dl class="section user"><dt>Accessors</dt><dd>transparentIfEmpty(), setTransparentIfEmpty()</dd></dl>
+<p>If this property is set to true, a </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jun 5 2018 15:26:20 for Qt Model Utilities by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jul 6 2018 11:22:31 for Qt Model Utilities by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

@@ -108,6 +108,7 @@ Inheritance diagram for TransposeProxyModel:</div>
  <div class="center">
   <img src="class_transpose_proxy_model.png" usemap="#TransposeProxyModel_map" alt=""/>
   <map id="TransposeProxyModel_map" name="TransposeProxyModel_map">
+<area href="class_tree_map_proxy_model.html" title="Convenience class to map parent indexes. " alt="TreeMapProxyModel" shape="rect" coords="0,56,139,80"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -170,11 +171,35 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ada6704b6281d3d0e414536eea8c0965a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transpose_proxy_model.html#ada6704b6281d3d0e414536eea8c0965a">sort</a> (int column, Qt::SortOrder order=Qt::AscendingOrder) Q_DECL_OVERRIDE</td></tr>
 <tr class="memdesc:ada6704b6281d3d0e414536eea8c0965a"><td class="mdescLeft">&#160;</td><td class="mdescRight">This method will perform no action.  <a href="#ada6704b6281d3d0e414536eea8c0965a">More...</a><br /></td></tr>
 <tr class="separator:ada6704b6281d3d0e414536eea8c0965a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_class_tree_map_proxy_model"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_tree_map_proxy_model')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_tree_map_proxy_model.html">TreeMapProxyModel</a></td></tr>
+<tr class="memitem:a69ea808d4d509b3cf07da2115345a972 inherit pub_methods_class_tree_map_proxy_model"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tree_map_proxy_model.html#a69ea808d4d509b3cf07da2115345a972">TreeMapProxyModel</a> (QObject *parent=Q_NULLPTR)</td></tr>
+<tr class="separator:a69ea808d4d509b3cf07da2115345a972 inherit pub_methods_class_tree_map_proxy_model"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac188e9ca18f43d6bbf4281d3cc20a15e inherit pub_methods_class_tree_map_proxy_model"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tree_map_proxy_model.html#ac188e9ca18f43d6bbf4281d3cc20a15e">~TreeMapProxyModel</a> ()</td></tr>
+<tr class="separator:ac188e9ca18f43d6bbf4281d3cc20a15e inherit pub_methods_class_tree_map_proxy_model"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6cf36bceaf46032b176bbe78326bb1a5 inherit pub_methods_class_tree_map_proxy_model"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tree_map_proxy_model.html#a6cf36bceaf46032b176bbe78326bb1a5">clearTreeMap</a> ()</td></tr>
+<tr class="separator:a6cf36bceaf46032b176bbe78326bb1a5 inherit pub_methods_class_tree_map_proxy_model"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec2570e78682ffd9783c70774355a2a9 inherit pub_methods_class_tree_map_proxy_model"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tree_map_proxy_model.html#aec2570e78682ffd9783c70774355a2a9">indexToInternalPoiner</a> (const QModelIndex &amp;sourceParent) const </td></tr>
+<tr class="memdesc:aec2570e78682ffd9783c70774355a2a9 inherit pub_methods_class_tree_map_proxy_model"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a pointer that can be used as internalPointer argument for createIndex that maps to <em>sourceIdx</em>.  <a href="#aec2570e78682ffd9783c70774355a2a9">More...</a><br /></td></tr>
+<tr class="separator:aec2570e78682ffd9783c70774355a2a9 inherit pub_methods_class_tree_map_proxy_model"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba84c7bf2e8520e372cdcab455de8675 inherit pub_methods_class_tree_map_proxy_model"><td class="memItemLeft" align="right" valign="top">QModelIndex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tree_map_proxy_model.html#aba84c7bf2e8520e372cdcab455de8675">internalPointerToIndex</a> (void *internalPoiner) const </td></tr>
+<tr class="memdesc:aba84c7bf2e8520e372cdcab455de8675 inherit pub_methods_class_tree_map_proxy_model"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an index of the source model that maps to the data in <em>internalPoiner</em>.  <a href="#aba84c7bf2e8520e372cdcab455de8675">More...</a><br /></td></tr>
+<tr class="separator:aba84c7bf2e8520e372cdcab455de8675 inherit pub_methods_class_tree_map_proxy_model"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a062058f3a8b98fc8c6e4a5583dcb1606 inherit pub_methods_class_tree_map_proxy_model"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tree_map_proxy_model.html#a062058f3a8b98fc8c6e4a5583dcb1606">possibleNewParent</a> (const QModelIndex &amp;parent)</td></tr>
+<tr class="separator:a062058f3a8b98fc8c6e4a5583dcb1606 inherit pub_methods_class_tree_map_proxy_model"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a639a84ce6562d6a014ccd4102365e62d inherit pub_methods_class_tree_map_proxy_model"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tree_map_proxy_model.html#a639a84ce6562d6a014ccd4102365e62d">possibleRemovedParent</a> (const QModelIndex &amp;parent)</td></tr>
+<tr class="separator:a639a84ce6562d6a014ccd4102365e62d inherit pub_methods_class_tree_map_proxy_model"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a310c11cd703b624a0588797c148ab44b inherit pub_methods_class_tree_map_proxy_model"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tree_map_proxy_model.html#a310c11cd703b624a0588797c148ab44b">rebuildTreeMap</a> ()</td></tr>
+<tr class="separator:a310c11cd703b624a0588797c148ab44b inherit pub_methods_class_tree_map_proxy_model"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab7c35d930c6729efe90dadde94c4b2a inherit pub_methods_class_tree_map_proxy_model"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tree_map_proxy_model.html#aab7c35d930c6729efe90dadde94c4b2a">setSourceModel</a> (QAbstractItemModel *newSourceModel) Q_DECL_OVERRIDE</td></tr>
+<tr class="separator:aab7c35d930c6729efe90dadde94c4b2a inherit pub_methods_class_tree_map_proxy_model"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:acac02f9dc9281cc529c2edcbc73714dc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_transpose_proxy_model.html#acac02f9dc9281cc529c2edcbc73714dc">TransposeProxyModel</a> (TransposeProxyModelPrivate &amp;dptr, QObject *<a class="el" href="class_transpose_proxy_model.html#a4e98ebe667f96f87186d9f14b8075437">parent</a>)</td></tr>
 <tr class="separator:acac02f9dc9281cc529c2edcbc73714dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_methods_class_tree_map_proxy_model"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_class_tree_map_proxy_model')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="class_tree_map_proxy_model.html">TreeMapProxyModel</a></td></tr>
+<tr class="memitem:a2d25aa7191636a4a579252a7274e33e7 inherit pro_methods_class_tree_map_proxy_model"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_tree_map_proxy_model.html#a2d25aa7191636a4a579252a7274e33e7">TreeMapProxyModel</a> (TreeMapProxyModelPrivate &amp;dptr, QObject *parent)</td></tr>
+<tr class="separator:a2d25aa7191636a4a579252a7274e33e7 inherit pro_methods_class_tree_map_proxy_model"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This proxy inverts the rows and columns of the source model. </p>
@@ -940,7 +965,7 @@ Protected Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jun 5 2018 15:26:20 for Qt Model Utilities by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jul 6 2018 11:22:31 for Qt Model Utilities by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

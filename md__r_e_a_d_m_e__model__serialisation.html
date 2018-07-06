@@ -87,9 +87,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">Model Serialisation </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Implements a general method to serialise QAbstractItemModel based models to various common formats.</p>
+<div class="textblock"><p>Implements a general method to serialise <code>QAbstractItemModel</code> based models to various common formats.</p>
 <h3>Custom Types</h3>
-<p>To save custom classes stored in the model as <code>QVariant</code>s you will need to define and register their stream operators. For example, for class <code>MyClass</code> you will need to implement ```C++ QDataStream&amp; operator&lt;&lt;(QDataStream &amp;stream, const MyClass&amp; val); QDataStream&amp; operator&gt;&gt;(QDataStream &amp; stream, MyClass&amp; val); ``` And resgister them before using any save/load functionality by calling ```C++ qRegisterMetaType&lt;MyClass&gt;("MyClass"); qRegisterMetaTypeStreamOperators&lt;MyClass&gt;("MyClass"); ```</p>
+<p>To save custom classes stored in the model as <code>QVariant</code>s you will need to define and register their stream operators. For example, for class <code>MyClass</code> you will need to implement </p><pre class="fragment">QDataStream&amp; operator&lt;&lt;(QDataStream &amp;stream, const MyClass&amp; val);
+QDataStream&amp; operator&gt;&gt;(QDataStream &amp; stream, MyClass&amp; val);
+</pre><p>And resgister them before using any save/load functionality by calling </p><pre class="fragment">qRegisterMetaType&lt;MyClass&gt;("MyClass");
+qRegisterMetaTypeStreamOperators&lt;MyClass&gt;("MyClass");
+</pre><h3>Class Documentation</h3>
+<ul>
+<li><a class="el" href="class_binary_model_serialiser.html">BinaryModelSerialiser</a></li>
+<li><a class="el" href="class_csv_model_serialiser.html">CsvModelSerialiser</a></li>
+<li><a class="el" href="class_html_model_serialiser.html">HtmlModelSerialiser</a></li>
+<li>JsonModelSerialiser</li>
+<li><a class="el" href="class_xml_model_serialiser.html">XmlModelSerialiser</a></li>
+</ul>
 <h3>Dependencies</h3>
 <ul>
 <li>Qt Core</li>
@@ -98,7 +109,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jun 5 2018 15:26:20 for Qt Model Utilities by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jul 6 2018 11:22:31 for Qt Model Utilities by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

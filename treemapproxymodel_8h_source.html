@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>Qt Model Utilities: src/htmlmodelserialiser.h Source File</title>
+<title>Qt Model Utilities: src/treemapproxymodel.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -93,7 +93,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">htmlmodelserialiser.h</div>  </div>
+<div class="title">treemapproxymodel.h</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/****************************************************************************\</span></div>
@@ -108,36 +108,36 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment">   See the License for the specific language governing permissions and</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">   limitations under the License.</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">\****************************************************************************/</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#ifndef htmlmodelserialiser_h__</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#define htmlmodelserialiser_h__</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#ifndef treemapproxymodel_h__</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#define treemapproxymodel_h__</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;modelutilities_global.h&quot;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &quot;abstractmultiroleserialiser.h&quot;</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">class </span>HtmlModelSerialiserPrivate;</div>
-<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="class_html_model_serialiser.html">   19</a></span>&#160;<span class="keyword">class </span>MODELUTILITIES_EXPORT <a class="code" href="class_html_model_serialiser.html">HtmlModelSerialiser</a> : <span class="keyword">public</span> <a class="code" href="class_abstract_multi_role_serialiser.html">AbstractMultiRoleSerialiser</a></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;{</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    Q_GADGET</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    Q_PROPERTY(<span class="keywordtype">bool</span> printStartDocument READ printStartDocument WRITE setPrintStartDocument)</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    Q_DECLARE_PRIVATE(<a class="code" href="class_html_model_serialiser.html">HtmlModelSerialiser</a>)</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    Q_DISABLE_COPY(<a class="code" href="class_html_model_serialiser.html">HtmlModelSerialiser</a>)</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;QAbstractProxyModel&gt;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">class </span>TreeMapProxyModelPrivate;</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">class </span>TreeMapProxyNode;</div>
+<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="class_tree_map_proxy_model.html">   20</a></span>&#160;<span class="keyword">class </span>MODELUTILITIES_EXPORT <a class="code" href="class_tree_map_proxy_model.html">TreeMapProxyModel</a> : <span class="keyword">public</span> QAbstractProxyModel</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;{</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    Q_OBJECT</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    Q_DISABLE_COPY(<a class="code" href="class_tree_map_proxy_model.html">TreeMapProxyModel</a>)</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    Q_DECLARE_PRIVATE(<a class="code" href="class_tree_map_proxy_model.html">TreeMapProxyModel</a>)</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <a class="code" href="class_html_model_serialiser.html">HtmlModelSerialiser</a>(QAbstractItemModel* model = Q_NULLPTR);</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <a class="code" href="class_html_model_serialiser.html">HtmlModelSerialiser</a>(<span class="keyword">const</span> QAbstractItemModel* model);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    ~<a class="code" href="class_html_model_serialiser.html">HtmlModelSerialiser</a>();</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordtype">bool</span> printStartDocument() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordtype">void</span> setPrintStartDocument(<span class="keywordtype">bool</span> val);</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    Q_INVOKABLE <span class="keywordtype">bool</span> saveModel(QIODevice* destination) <span class="keyword">const</span> Q_DECL_OVERRIDE;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    Q_INVOKABLE <span class="keywordtype">bool</span> saveModel(QByteArray* destination) <span class="keyword">const</span> Q_DECL_OVERRIDE;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    Q_INVOKABLE <span class="keyword">virtual</span> <span class="keywordtype">bool</span> saveModel(QString* destination) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    Q_INVOKABLE <span class="keywordtype">bool</span> loadModel(QIODevice* source) Q_DECL_OVERRIDE;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    Q_INVOKABLE <span class="keywordtype">bool</span> loadModel(<span class="keyword">const</span> QByteArray&amp; source) Q_DECL_OVERRIDE;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    Q_INVOKABLE <span class="keyword">virtual</span> <span class="keywordtype">bool</span> loadModel(QString* source);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <a class="code" href="class_html_model_serialiser.html">HtmlModelSerialiser</a>(HtmlModelSerialiserPrivate&amp; d);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="class_tree_map_proxy_model.html">TreeMapProxyModel</a>(QObject* parent = Q_NULLPTR);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keywordtype">void</span> setSourceModel(QAbstractItemModel* newSourceModel) Q_DECL_OVERRIDE;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordtype">void</span>* indexToInternalPoiner(<span class="keyword">const</span> QModelIndex&amp; sourceParent) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    QModelIndex internalPointerToIndex(<span class="keywordtype">void</span>* internalPoiner) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordtype">void</span> rebuildTreeMap();</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordtype">void</span> clearTreeMap();</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keywordtype">void</span> possibleNewParent(<span class="keyword">const</span> QModelIndex&amp; parent);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordtype">void</span> possibleRemovedParent(<span class="keyword">const</span> QModelIndex&amp; parent);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    ~<a class="code" href="class_tree_map_proxy_model.html">TreeMapProxyModel</a>();</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <a class="code" href="class_tree_map_proxy_model.html">TreeMapProxyModel</a>(TreeMapProxyModelPrivate&amp; dptr, QObject* parent);</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    TreeMapProxyModelPrivate* d_ptr;</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;};</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">#endif // htmlmodelserialiser_h__</span></div>
-<div class="ttc" id="class_abstract_multi_role_serialiser_html"><div class="ttname"><a href="class_abstract_multi_role_serialiser.html">AbstractMultiRoleSerialiser</a></div><div class="ttdoc">The interface for model serialisers saving multiple roles. </div><div class="ttdef"><b>Definition:</b> abstractmultiroleserialiser.h:20</div></div>
-<div class="ttc" id="class_html_model_serialiser_html"><div class="ttname"><a href="class_html_model_serialiser.html">HtmlModelSerialiser</a></div><div class="ttdef"><b>Definition:</b> htmlmodelserialiser.h:19</div></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#endif // treemapproxymodel_h__</span></div>
+<div class="ttc" id="class_tree_map_proxy_model_html"><div class="ttname"><a href="class_tree_map_proxy_model.html">TreeMapProxyModel</a></div><div class="ttdoc">Convenience class to map parent indexes. </div><div class="ttdef"><b>Definition:</b> treemapproxymodel.h:20</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

@@ -138,9 +138,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>extraDataChanged</b> 
 <tr class="memitem:a59376ce704bb80a167cc7b8dbb1dd04e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a59376ce704bb80a167cc7b8dbb1dd04e"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>insertDirectionChanged</b> (const InsertDirections &amp;direction)</td></tr>
 <tr class="separator:a59376ce704bb80a167cc7b8dbb1dd04e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7f7ee0225168bec24c6530376d9d2751"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7f7ee0225168bec24c6530376d9d2751"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>separateEditDisplayChanged</b> (bool separate)</td></tr>
-<tr class="separator:a7f7ee0225168bec24c6530376d9d2751"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b650b7281900de5b7c2f3dbe556b451"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0b650b7281900de5b7c2f3dbe556b451"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>mergeDisplayEditChanged</b> (bool separate)</td></tr>
+<tr class="separator:a0b650b7281900de5b7c2f3dbe556b451"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -178,6 +178,9 @@ QMap&lt; int, QVariant &gt;&#160;</td><td class="memItemRight" valign="bottom"><
 <tr class="separator:a4e2bd8163337f90fb7cad0360dff70ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4b2e8da5d66ac198d0e4acb7259eec7e"><td class="memItemLeft" align="right" valign="top">QModelIndex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_insert_proxy_model.html#a4b2e8da5d66ac198d0e4acb7259eec7e">mapToSource</a> (const QModelIndex &amp;proxyIndex) const Q_DECL_OVERRIDE</td></tr>
 <tr class="separator:a4b2e8da5d66ac198d0e4acb7259eec7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef23441419250553e62805ea292a9a83"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aef23441419250553e62805ea292a9a83"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>mergeDisplayEdit</b> () const </td></tr>
+<tr class="separator:aef23441419250553e62805ea292a9a83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42730d234d5b6150619d5008e4b46d7f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_insert_proxy_model.html#a42730d234d5b6150619d5008e4b46d7f">moveColumns</a> (const QModelIndex &amp;sourceParent, int sourceColumn, int count, const QModelIndex &amp;destinationParent, int destinationChild) Q_DECL_OVERRIDE</td></tr>
 <tr class="separator:a42730d234d5b6150619d5008e4b46d7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abeb734994dcb190c367533af3aa5aa03"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_insert_proxy_model.html#abeb734994dcb190c367533af3aa5aa03">moveRows</a> (const QModelIndex &amp;sourceParent, int sourceRow, int count, const QModelIndex &amp;destinationParent, int destinationChild) Q_DECL_OVERRIDE</td></tr>
@@ -190,9 +193,6 @@ QMap&lt; int, QVariant &gt;&#160;</td><td class="memItemRight" valign="bottom"><
 <tr class="separator:a5555845f3080f79d1eddeba02dd4eebe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a824c9783a484233d635e259dcafa24af"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_insert_proxy_model.html#a824c9783a484233d635e259dcafa24af">rowCount</a> (const QModelIndex &amp;<a class="el" href="class_insert_proxy_model.html#a2ec189c57ab814598e89c0e02d9b1e22">parent</a>=QModelIndex()) const Q_DECL_OVERRIDE</td></tr>
 <tr class="separator:a824c9783a484233d635e259dcafa24af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ade88f29f4f9262e945afdf67c45a3b1c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ade88f29f4f9262e945afdf67c45a3b1c"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>separateEditDisplay</b> () const </td></tr>
-<tr class="separator:ade88f29f4f9262e945afdf67c45a3b1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a369343a2b7b30d165f9fb08f5efef1d8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_insert_proxy_model.html#a369343a2b7b30d165f9fb08f5efef1d8">setData</a> (const QModelIndex &amp;<a class="el" href="class_insert_proxy_model.html#a568df312bfbbee45da5c6937cb6fd176">index</a>, const QVariant &amp;value, int role=Qt::EditRole) Q_DECL_OVERRIDE</td></tr>
 <tr class="separator:a369343a2b7b30d165f9fb08f5efef1d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a22bdedcb8c45e3f5be1c102bfd3008fd"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_insert_proxy_model.html#a22bdedcb8c45e3f5be1c102bfd3008fd">setDataForCorner</a> (const QVariant &amp;value, int role=Qt::EditRole)</td></tr>
@@ -204,9 +204,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setInsertDirection</b
 <tr class="separator:a94d9cb9245bfc916083f2425c0722935"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a139d7a56e35678d0b5fd27eb8964e865"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_insert_proxy_model.html#a139d7a56e35678d0b5fd27eb8964e865">setItemData</a> (const QModelIndex &amp;<a class="el" href="class_insert_proxy_model.html#a568df312bfbbee45da5c6937cb6fd176">index</a>, const QMap&lt; int, QVariant &gt; &amp;roles) Q_DECL_OVERRIDE</td></tr>
 <tr class="separator:a139d7a56e35678d0b5fd27eb8964e865"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5bc20d7f9d334011b0f76c608bf4e089"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5bc20d7f9d334011b0f76c608bf4e089"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setSeparateEditDisplay</b> (bool val)</td></tr>
-<tr class="separator:a5bc20d7f9d334011b0f76c608bf4e089"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ddf73b9a015c263de45641f02692e07"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6ddf73b9a015c263de45641f02692e07"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setMergeDisplayEdit</b> (bool val)</td></tr>
+<tr class="separator:a6ddf73b9a015c263de45641f02692e07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac070c20c663c7430584b18f0067aeaff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_insert_proxy_model.html#ac070c20c663c7430584b18f0067aeaff">setSourceModel</a> (QAbstractItemModel *newSourceModel) Q_DECL_OVERRIDE</td></tr>
 <tr class="separator:ac070c20c663c7430584b18f0067aeaff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a941c50a0abc8c33441c35dddfe852eac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_insert_proxy_model.html#a941c50a0abc8c33441c35dddfe852eac">sort</a> (int column, Qt::SortOrder order=Qt::AscendingOrder) Q_DECL_OVERRIDE</td></tr>
@@ -231,9 +231,9 @@ Properties</h2></td></tr>
 <tr class="memitem:aecb8843a989cb587d4fe5d5cf8a5b238"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aecb8843a989cb587d4fe5d5cf8a5b238"></a>
 InsertDirections&#160;</td><td class="memItemRight" valign="bottom"><b>insertDirection</b></td></tr>
 <tr class="separator:aecb8843a989cb587d4fe5d5cf8a5b238"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4308a079b4888333f139e9ee164b27c0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4308a079b4888333f139e9ee164b27c0"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>separateEditDisplay</b></td></tr>
-<tr class="separator:a4308a079b4888333f139e9ee164b27c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5f28f5c10c4a90404741817349a2cae"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad5f28f5c10c4a90404741817349a2cae"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>mergeDisplayEdit</b></td></tr>
+<tr class="separator:ad5f28f5c10c4a90404741817349a2cae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="abe73020e91293ea8cde8a9fa45f07650"></a>
@@ -1004,7 +1004,8 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>separateEditDisplay</
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Reimplemented from base class </p>
+<p>Reimplemented from base class</p>
+<p>If the map contains both Qt::DisplayRole and Qt::EditRole and separateEditDisplay is set to false, the value of Qt::DisplayRole will prevail. </p>
 
 </div>
 </div>
@@ -1055,7 +1056,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>separateEditDisplay</
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jun 5 2018 15:26:20 for Qt Model Utilities by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jul 6 2018 11:22:31 for Qt Model Utilities by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>
