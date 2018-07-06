@@ -17,8 +17,9 @@ Using, again, Windows MSVC as an example, a minimal CMake invocation would look 
 `cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX="./installed" ../`
 
 You can also specify an number of arguments to customise the build even further:
+
 | Argument | Effect |
-|---|---|
+|----------|--------|
 | `-DBUILD_STATIC_LIBS=ON` | Builds a statically linked library instead of a dynamic one |
 | `-DBUILD_TESTING=ON` | Compiles the unit tests included in the sources |
 | `-DBUILD_EXAMPLES=ON` | Compiles the examples of use included in the sources |

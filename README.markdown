@@ -22,7 +22,7 @@ If your system is compatible with one of the 5 main platforms you can download t
 
 #### Build from Source
 This library uses [CMake](https://cmake.org/) as build system and allows usage both using static and dynamic linking. 
-See INSTALL for detailed build instructions.
+See [INSTALL](https://vsronin.github.io/QtModelUtilities/md__i_n_s_t_a_l_l.html) for detailed build instructions.
 
 #### Use the source directly
 If you use `qmake` (Qt Creator), you can include the entire source of the library directly in your code by adding `include(path/to/source/modelutilities.pri)` in your `.pro` file.
