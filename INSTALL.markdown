@@ -34,5 +34,5 @@ You can also specify an number of arguments to customise the build even further:
 | `-DTEST_OUTPUT_XML=ON` | This is mainly used by the CI. If this option is set, the tests will generate an xml file with results rather than printing them to the console |
 
 After running CMake you can call `cmake --build .` to compile the project.
-You can call `- cmake --build . --target test` or `ctest` to run the unit tests.
-Finally you can call `- cmake --build . --target install` to install the library in the destination specified by `-DCMAKE_INSTALL_PREFIX=`.
+You can call `cmake --build . --target test` or `ctest` to run the unit tests.
+Finally you can call `cmake --build . --target install` to install the library in the destination specified by `-DCMAKE_INSTALL_PREFIX=`.
