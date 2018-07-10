@@ -140,3 +140,164 @@ void tst_TransposeProxyModel::testSort()
     baseModel.sort(0, Qt::AscendingOrder);
     testTransposed(&baseModel, &proxyModel);
 }
+void tst_TransposeProxyModel::testInsertRowBase_data()
+{
+    QTest::addColumn<QAbstractItemModel*>("model");
+    QTest::addColumn<QModelIndex>("parent");
+    QTest::newRow("List") << createListModel(this) << QModelIndex();
+    QTest::newRow("Table") << createTableModel(this) << QModelIndex();
+    QTest::newRow("Tree Root Item") << createTreeModel(this) << QModelIndex();
+    QAbstractItemModel* model = createTreeModel(this);
+    if (model)
+        QTest::newRow("Tree Child Item") << model << model->index(0, 0);
+}
+
+void tst_TransposeProxyModel::testInsertColumnBase_data()
+{
+    QTest::addColumn<QAbstractItemModel*>("model");
+    QTest::addColumn<QModelIndex>("parent");
+    QTest::newRow("Table") << createTableModel(this) << QModelIndex();
+    QTest::newRow("Tree Root Item") << createTreeModel(this) << QModelIndex();
+    QAbstractItemModel* model = createTreeModel(this);
+    if (model)
+        QTest::newRow("Tree Child Item") << model << model->index(0, 0);
+}
+
+void tst_TransposeProxyModel::testInsertColumnBase()
+{
+#if defined(QT_GUI_LIB)
+    QFETCH(QAbstractItemModel*, model);
+    if (!model)
+        return;
+    QFETCH(QModelIndex, parent);
+    TransposeProxyModel proxy;
+    new ModelTest(&proxy, &proxy);
+    proxy.setSourceModel(model);
+    QVERIFY(model->insertColumn(1, parent));
+    testTransposed(model, &proxy);
+    model->deleteLater();
+#else
+    QSKIP("This test requires the Qt GUI module");
+#endif
+}
+
+void tst_TransposeProxyModel::testInsertRowBase()
+{
+    QFETCH(QAbstractItemModel*, model);
+    if (!model)
+        return;
+    QFETCH(QModelIndex, parent);
+    TransposeProxyModel proxy;
+    new ModelTest(&proxy, &proxy);
+    proxy.setSourceModel(model);
+    QVERIFY(model->insertRow(1, parent));
+    testTransposed(model, &proxy);
+    model->deleteLater();
+}
+void tst_TransposeProxyModel::testInsertColumnProxy_data()
+{
+    QTest::addColumn<QAbstractItemModel*>("model");
+    QTest::addColumn<bool>("rootItem");
+    QTest::newRow("List") << createListModel(this) << true;
+    QTest::newRow("Table") << createTableModel(this) << true;
+    QTest::newRow("Tree Root Item") << createTreeModel(this) << true;
+    QTest::newRow("Tree Child Item") << createTreeModel(this) << false;
+}
+
+void tst_TransposeProxyModel::testInsertColumnProxy()
+{
+    QFETCH(QAbstractItemModel*, model);
+    if (!model)
+        return;
+    QFETCH(bool, rootItem);
+    TransposeProxyModel proxy;
+    new ModelTest(&proxy, &proxy);
+    proxy.setSourceModel(model);
+    if (rootItem)
+        QVERIFY(proxy.insertColumn(1));
+    else
+        QVERIFY(proxy.insertColumn(1, proxy.index(1, 0)));
+    testTransposed(model, &proxy);
+    model->deleteLater();
+}
+void tst_TransposeProxyModel::testInsertRowProxy_data()
+{
+    QTest::addColumn<QAbstractItemModel*>("model");
+    QTest::addColumn<bool>("rootItem");
+    QTest::newRow("Table") << createTableModel(this) << true;
+    QTest::newRow("Tree Root Item") << createTreeModel(this) << true;
+    QTest::newRow("Tree Child Item") << createTreeModel(this) << false;
+}
+
+
+
+void tst_TransposeProxyModel::testInsertRowProxy()
+{
+#if defined(QT_GUI_LIB)
+    QFETCH(QAbstractItemModel*, model);
+    if (!model)
+        return;
+    QFETCH(bool, rootItem);
+    TransposeProxyModel proxy;
+    new ModelTest(&proxy, &proxy);
+    proxy.setSourceModel(model);
+    if (rootItem)
+        QVERIFY(proxy.insertRow(1));
+    else
+        QVERIFY(proxy.insertRow(1, proxy.index(1, 0)));
+    testTransposed(model, &proxy);
+    model->deleteLater();
+#else
+    QSKIP("This test requires the Qt GUI module");
+#endif
+}
+
+void tst_TransposeProxyModel::testSetData_data()
+{
+    QTest::addColumn<QAbstractItemModel*>("model");
+    QTest::addColumn<bool>("rootItem");
+    QTest::addColumn<bool>("viaProxy");
+    QTest::newRow("List via Base") << createListModel(this) << true << false;
+    QTest::newRow("Table via Base") << createTableModel(this) << true << false;
+    QTest::newRow("Tree via Base Root Item") << createTreeModel(this) << true << false;
+    QTest::newRow("Tree via Base Child Item") << createTreeModel(this) << false << false;
+    QTest::newRow("List via Proxy") << createListModel(this) << true << true;
+    QTest::newRow("Table via Proxy") << createTableModel(this) << true << true;
+    QTest::newRow("Tree via Proxy Root Item") << createTreeModel(this) << true << true;
+    QTest::newRow("Tree via Proxy Child Item") << createTreeModel(this) << false << true;
+}
+
+void tst_TransposeProxyModel::testSetData()
+{
+    QFETCH(QAbstractItemModel*, model);
+    if (!model)
+        return;
+    QFETCH(bool, rootItem);
+    QFETCH(bool, viaProxy);
+    TransposeProxyModel proxy;
+    new ModelTest(&proxy, &proxy);
+    proxy.setSourceModel(model);
+    const QString testData = QStringLiteral("TestingSetData");
+    if (viaProxy){
+        if (rootItem) {
+            QVERIFY(proxy.setData(proxy.index(0, 1), testData));
+            QCOMPARE(model->index(1, 0).data().toString(), testData);
+        }
+        else {
+            QVERIFY(proxy.setData(proxy.index(0, 1, proxy.index(0, 1)), testData));
+            QCOMPARE(model->index(1, 0, model->index(1, 0)).data().toString(), testData);
+        }
+    }
+    else{
+        if (rootItem) {
+            QVERIFY(model->setData(model->index(1, 0), testData));
+            QCOMPARE(proxy.index(0, 1).data().toString(), testData);
+        }
+        else {
+            QVERIFY(model->setData(model->index(1, 0, model->index(1, 0)), testData));
+            QCOMPARE(proxy.index(0, 1, proxy.index(0, 1)).data().toString(), testData);
+        }
+    }
+    testTransposed(model, &proxy);
+    model->deleteLater();
+}
