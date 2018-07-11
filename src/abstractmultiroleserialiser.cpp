@@ -126,7 +126,6 @@ void AbstractMultiRoleSerialiser::resetRoleToSave()
 QList<int> AbstractMultiRoleSerialiser::modelDefaultRoles()
 {
     return QList<int>()
-        << Qt::DisplayRole
         << Qt::EditRole
         << Qt::DecorationRole
         << Qt::ToolTipRole
