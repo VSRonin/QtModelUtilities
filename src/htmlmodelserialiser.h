@@ -25,7 +25,6 @@ class MODELUTILITIES_EXPORT HtmlModelSerialiser : public AbstractMultiRoleSerial
 public:
     HtmlModelSerialiser(QAbstractItemModel* model = Q_NULLPTR);
     HtmlModelSerialiser(const QAbstractItemModel* model);
-    ~HtmlModelSerialiser();
     bool printStartDocument() const;
     void setPrintStartDocument(bool val);
     Q_INVOKABLE bool saveModel(QIODevice* destination) const Q_DECL_OVERRIDE;

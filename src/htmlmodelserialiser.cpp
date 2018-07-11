@@ -15,20 +15,29 @@
 #include "private/htmlmodelserialiser_p.h"
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
+
+/*!
+\internal
+*/
 HtmlModelSerialiserPrivate::HtmlModelSerialiserPrivate(HtmlModelSerialiser* q)
     :AbstractMultiRoleSerialiserPrivate(q)
     , m_printStartDocument(true)
 {}
 
+/*!
+\internal
+*/
 void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter& destination, const QModelIndex& parent) const
 {
     Q_ASSERT(m_constModel);
-    if (m_constModel->rowCount(parent) + m_constModel->columnCount(parent) == 0)
+    const int rowCount = m_constModel->rowCount(parent);
+    const int colCount = m_constModel->columnCount(parent);
+    if (rowCount + colCount == 0)
         return;
     bool foundVhead = false;
     bool foundHhead = false;
     if (!parent.isValid()) {
-        for (int i = 0; i < m_constModel->rowCount() && !foundVhead; ++i) {
+        for (int i = 0; i < rowCount && !foundVhead; ++i) {
             for (QList<int>::const_iterator roleIter = m_rolesToSave.constBegin(); roleIter != m_rolesToSave.constEnd(); ++roleIter) {
                 if (!m_constModel->headerData(i, Qt::Vertical, *roleIter).isNull()) {
                     foundVhead = true;
@@ -36,7 +45,7 @@ void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter& destination,
                 }
             }
         }
-        for (int i = 0; i < m_constModel->columnCount() && !foundHhead; ++i) {
+        for (int i = 0; i < colCount && !foundHhead; ++i) {
             for (QList<int>::const_iterator roleIter = m_rolesToSave.constBegin(); roleIter != m_rolesToSave.constEnd(); ++roleIter) {
                 if (!m_constModel->headerData(i, Qt::Horizontal, *roleIter).isNull()) {
                     foundHhead = true;
@@ -47,8 +56,8 @@ void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter& destination,
     }
 
     destination.writeStartElement(QStringLiteral("table"));
-    destination.writeAttribute(QStringLiteral("data-rowcount"), QString::number(m_constModel->rowCount(parent)));
-    destination.writeAttribute(QStringLiteral("data-colcount"), QString::number(m_constModel->columnCount(parent)));
+    destination.writeAttribute(QStringLiteral("data-rowcount"), QString::number(rowCount));
+    destination.writeAttribute(QStringLiteral("data-colcount"), QString::number(colCount));
 #ifdef QT_DEBUG
     destination.writeAttribute("border", "1");
 #endif // QT_DEBUG
@@ -56,7 +65,7 @@ void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter& destination,
         destination.writeStartElement(QStringLiteral("tr"));
         if (foundVhead) {
             destination.writeStartElement(QStringLiteral("th"));
-            destination.writeAttribute(QStringLiteral("scope"), QStringLiteral("col"));
+            destination.writeAttribute(QStringLiteral("scope"), QStringLiteral("empty"));
             destination.writeEndElement(); //th
         }
         for (int i = 0; i < m_constModel->columnCount(); ++i) {
@@ -76,7 +85,7 @@ void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter& destination,
         }
         destination.writeEndElement(); //tr
     }
-    for (int i = 0; i < m_constModel->rowCount(parent); ++i) {
+    for (int i = 0; i < rowCount; ++i) {
         destination.writeStartElement(QStringLiteral("tr"));
         if (foundVhead) {
 
@@ -94,7 +103,7 @@ void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter& destination,
             }
             destination.writeEndElement(); //th
         }
-        for (int j = 0; j < m_constModel->columnCount(parent); ++j) {
+        for (int j = 0; j < colCount; ++j) {
             destination.writeStartElement(QStringLiteral("td"));
             const QModelIndex currIndex = m_constModel->index(i, j, parent);
             for (QList<int>::const_iterator roleIter = m_rolesToSave.constBegin(); roleIter != m_rolesToSave.constEnd(); ++roleIter) {
@@ -116,6 +125,9 @@ void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter& destination,
     destination.writeEndElement(); // table
 }
 
+/*!
+\internal
+*/
 bool HtmlModelSerialiserPrivate::readHtmlElement(QXmlStreamReader& source, const QModelIndex& parent)
 {
     enum SableHeadCode
@@ -166,7 +178,7 @@ bool HtmlModelSerialiserPrivate::readHtmlElement(QXmlStreamReader& source, const
                     headCode = Row;
                 else if (headScope.compare(QStringLiteral("col")) == 0)
                     headCode = Col;
-                else
+                else if(headScope.compare(QStringLiteral("empty")) != 0)
                     return false;
             }
             else if (rowStarted && source.name() == QStringLiteral("td")) {
@@ -232,6 +244,9 @@ bool HtmlModelSerialiserPrivate::readHtmlElement(QXmlStreamReader& source, const
     return false;
 }
 
+/*!
+\internal
+*/
 bool HtmlModelSerialiserPrivate::writeHtml(QXmlStreamWriter& writer) const
 {
     if (!m_constModel)
@@ -252,7 +267,9 @@ bool HtmlModelSerialiserPrivate::writeHtml(QXmlStreamWriter& writer) const
     return !writer.hasError();
 }
 
-
+/*!
+\internal
+*/
 bool HtmlModelSerialiserPrivate::readHtml(QXmlStreamReader& reader)
 {
     if (!m_model)
@@ -293,7 +310,9 @@ bool HtmlModelSerialiserPrivate::readHtml(QXmlStreamReader& reader)
     return true;
 }
 
-
+/*!
+\internal
+*/
 void HtmlModelSerialiserPrivate::writeHtmlVariant(QXmlStreamWriter& writer, const QVariant& val)
 {
     if (isImageType(val.type())) {
@@ -305,6 +324,9 @@ void HtmlModelSerialiserPrivate::writeHtmlVariant(QXmlStreamWriter& writer, cons
     writer.writeCharacters(saveVariant(val));
 }
 
+/*!
+\internal
+*/
 QVariant HtmlModelSerialiserPrivate::readHtmlVariant(QXmlStreamReader& reader, int valType)
 {
     if (isImageType(valType)) {
@@ -320,26 +342,41 @@ QVariant HtmlModelSerialiserPrivate::readHtmlVariant(QXmlStreamReader& reader, i
     return loadVariant(valType, reader.readElementText());
 }
 
-
+/*!
+Construct a read/write serialiser
+*/
 HtmlModelSerialiser::HtmlModelSerialiser(QAbstractItemModel* model)
     : AbstractMultiRoleSerialiser(*new HtmlModelSerialiserPrivate(this))
 {
     setModel(model);
 }
+
+/*!
+Construct a write-only serialiser
+*/
 HtmlModelSerialiser::HtmlModelSerialiser(const QAbstractItemModel* model)
     : AbstractMultiRoleSerialiser(*new HtmlModelSerialiserPrivate(this))
 {
     setModel(model);
 }
 
+
+/*!
+Constructor used only while subclassing the private class.
+Not part of the public API
+*/
 HtmlModelSerialiser::HtmlModelSerialiser(HtmlModelSerialiserPrivate& d)
     :AbstractMultiRoleSerialiser(d)
 {}
 
-
-HtmlModelSerialiser::~HtmlModelSerialiser() = default;
-
-
+/*!
+\property HtmlModelSerialiser::printStartDocument
+\accessors %printStartDocument(), setPrintStartDocument()
+\brief Should the first column contain headers
+\details If this property is set to true (the default), the serialisation will the write
+the vertical headerData of the model as the first column of the csv file
+and will load the first column of the csv file as the model's vertical headerData
+*/
 bool HtmlModelSerialiser::printStartDocument() const
 {
     Q_D(const HtmlModelSerialiser);
@@ -354,7 +391,9 @@ void HtmlModelSerialiser::setPrintStartDocument(bool val)
     d->m_printStartDocument = val;
 }
 
-
+/*!
+Saves the model in html format to the \a destination string
+*/
 bool HtmlModelSerialiser::saveModel(QString* destination) const
 {
     if (!destination)
@@ -367,6 +406,9 @@ bool HtmlModelSerialiser::saveModel(QString* destination) const
     return d->writeHtml(witer);
 }
 
+/*!
+Saves the model in html format to the \a destination device
+*/
 bool HtmlModelSerialiser::saveModel(QIODevice* destination) const
 {
     if (!destination)
@@ -385,6 +427,9 @@ bool HtmlModelSerialiser::saveModel(QIODevice* destination) const
     return d->writeHtml(witer);
 }
 
+/*!
+Saves the model in html format to the \a destination byte array
+*/
 bool HtmlModelSerialiser::saveModel(QByteArray* destination) const
 {
     if (!destination)
@@ -397,6 +442,9 @@ bool HtmlModelSerialiser::saveModel(QByteArray* destination) const
     return d->writeHtml(witer);
 }
 
+/*!
+Loads the model from a \a source device containing html data
+*/
 bool HtmlModelSerialiser::loadModel(QIODevice* source)
 {
     if (!source)
@@ -414,6 +462,10 @@ bool HtmlModelSerialiser::loadModel(QIODevice* source)
     QXmlStreamReader reader(source);
     return d->readHtml(reader);
 }
+
+/*!
+Loads the model from a \a source byte array containing html data
+*/
 bool HtmlModelSerialiser::loadModel(const QByteArray& source)
 {
     Q_D(HtmlModelSerialiser);
@@ -423,6 +475,10 @@ bool HtmlModelSerialiser::loadModel(const QByteArray& source)
     QXmlStreamReader reader(source);
     return d->readHtml(reader);
 }
+
+/*!
+Loads the model from a \a string array containing html data
+*/
 bool HtmlModelSerialiser::loadModel(QString* source)
 {
     if (!source)
