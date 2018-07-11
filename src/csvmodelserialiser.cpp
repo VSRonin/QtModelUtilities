@@ -18,28 +18,34 @@
 #include <QTextCodec>
 #include <QStringList>
 
+/*!
+\internal
+*/
 CsvModelSerialiserPrivate::CsvModelSerialiserPrivate(CsvModelSerialiser* q)
     :AbstractSingleRoleSerialiserPrivate(q)
-    , m_csvSeparator(QStringLiteral(","))
+    , m_csvSeparator(QLatin1Char(','))
     , m_firstRowIsHeader(true)
     , m_firstColumnIsHeader(true)
 {}
 
+/*!
+\internal
+*/
 QString CsvModelSerialiserPrivate::escapedCSV(QString unexc) const
 {
     if (!unexc.contains(m_csvSeparator))
         return unexc;
-    if (unexc.contains(QChar('\"')))
-        unexc.replace(QChar('\"'), QStringLiteral("\"\""));
-    return '\"' % unexc % '\"';
-
+    return '\"' % unexc.replace(QLatin1Char('\"'), QStringLiteral("\"\"")) % '\"';
 }
 
+/*!
+\internal
+*/
 QString CsvModelSerialiserPrivate::unescapedCSV(QString exc) const
 {
     if (exc.isEmpty())
         return exc;
-    if (*exc.constBegin() == QChar('\"') && *(exc.constEnd() - 1) == QChar('\"')) {
+    if (*exc.constBegin() == QLatin1Char('\"') && *(exc.constEnd() - 1) == QLatin1Char('\"')) {
         exc.chop(1);
         exc.remove(0, 1);
         exc.replace(QStringLiteral("\"\""), QStringLiteral("\""));
@@ -47,6 +53,9 @@ QString CsvModelSerialiserPrivate::unescapedCSV(QString exc) const
     return exc;
 }
 
+/*!
+\internal
+*/
 int CsvModelSerialiserPrivate::guessVarType(const QString& val)
 {
     bool checkConversion;
@@ -65,16 +74,17 @@ int CsvModelSerialiserPrivate::guessVarType(const QString& val)
     return QMetaType::QString;
 }
 
+/*!
+\internal
+*/
 bool CsvModelSerialiserPrivate::writeCsv(QTextStream& writer) const
 {
     if (!m_constModel)
         return false;
-    QTextCodec* const oldCodec = writer.codec();
-    Q_ASSERT(QTextCodec::availableCodecs().contains("UTF-8"));
-    writer.setCodec("UTF-8");
+    Q_Q(const CsvModelSerialiser);
     if (m_firstRowIsHeader) {
         for (int j = 0; j < m_constModel->columnCount(); ++j) {
-            const QVariant headData = m_constModel->headerData(j, Qt::Horizontal, m_roleToSave);
+            const QVariant headData = m_constModel->headerData(j, Qt::Horizontal, q->roleToSave());
             if(j>0 || m_firstColumnIsHeader)
                 writer << m_csvSeparator;
             if (!headData.isNull())
@@ -82,27 +92,27 @@ bool CsvModelSerialiserPrivate::writeCsv(QTextStream& writer) const
         }
         writer << '\n';
     }
-    for (int i = 0; i < m_constModel->rowCount(); ++i) {
+    for (int i = 0, maxRow = m_constModel->rowCount(); i <maxRow; ++i) {
         if (m_firstColumnIsHeader) {
-            const QVariant headData = m_constModel->headerData(i, Qt::Vertical, m_roleToSave);
+            const QVariant headData = m_constModel->headerData(i, Qt::Vertical, q->roleToSave());
             if (!headData.isNull())
                 writer << escapedCSV(saveVariant(headData));
         }
-        for (int j = 0; j < m_constModel->columnCount(); ++j) {
-            const QVariant roleData = m_constModel->data(m_constModel->index(i, j), m_roleToSave);
+        for (int j = 0, maxCol = m_constModel->columnCount(); j <maxCol; ++j) {
+            const QVariant roleData = m_constModel->index(i, j).data(q->roleToSave());
             if (j>0 || m_firstColumnIsHeader)
                 writer << m_csvSeparator;
-            if (!roleData.isNull()) {
+            if (!roleData.isNull())
                 writer << escapedCSV(saveVariant(roleData));
-            }
         }
         writer << '\n';
     }
-    writer.setCodec(oldCodec);
     return writer.status() == QTextStream::Ok;
 }
 
-
+/*!
+\internal
+*/
 bool CsvModelSerialiserPrivate::readCsv(QTextStream& reader)
 {
     if (!m_model)
@@ -152,18 +162,19 @@ bool CsvModelSerialiserPrivate::readCsv(QTextStream& reader)
             reader.setCodec(oldCodec);
             return false;
         }
+        Q_Q(const CsvModelSerialiser);
         if (firstRow && m_firstRowIsHeader) {
             for (int i = startI; i < fields.size(); ++i)
-                m_model->setHeaderData(i - startI, Qt::Horizontal, loadVariant(guessVarType(fields.at(i)), unescapedCSV(fields.at(i))), m_roleToSave);
+                m_model->setHeaderData(i - startI, Qt::Horizontal, loadVariant(guessVarType(fields.at(i)), unescapedCSV(fields.at(i))), q->roleToSave());
         }
         else {
             const int newRow = m_model->rowCount();
             m_model->insertRow(newRow);
             for (int i = 0; i < fields.size(); ++i) {
                 if (i == 0 && m_firstColumnIsHeader)
-                    m_model->setHeaderData(newRow, Qt::Vertical, loadVariant(guessVarType(fields.at(i)), unescapedCSV(fields.at(i))), m_roleToSave);
+                    m_model->setHeaderData(newRow, Qt::Vertical, loadVariant(guessVarType(fields.at(i)), unescapedCSV(fields.at(i))), q->roleToSave());
                 else
-                    m_model->setData(m_model->index(newRow, i - startI), loadVariant(guessVarType(fields.at(i)), unescapedCSV(fields.at(i))), m_roleToSave);
+                    m_model->setData(m_model->index(newRow, i - startI), loadVariant(guessVarType(fields.at(i)), unescapedCSV(fields.at(i))), q->roleToSave());
             }
         }
     }
@@ -171,6 +182,14 @@ bool CsvModelSerialiserPrivate::readCsv(QTextStream& reader)
     return true;
 }
 
+/*!
+\property CsvModelSerialiser::csvSeparator
+\accessors %csvSeparator(), setCsvSeparator()
+\brief The column separator used in the CSV
+\details This is the string that will be used to separate items in the same row but different columns
+
+By default the separator is set to a comma: ,
+*/
 const QString& CsvModelSerialiser::csvSeparator() const
 {
     Q_D(const CsvModelSerialiser);
@@ -185,19 +204,19 @@ void CsvModelSerialiser::setCsvSeparator(const QString& val)
     d->m_csvSeparator = val;
 }
 
-
+/*!
+\property CsvModelSerialiser::firstRowIsHeader
+\accessors %firstRowIsHeader(), setFirstRowIsHeader()
+\brief Should the first row contain headers
+\details If this property is set to true (the default), the serialisation will the write
+ the horizontal headerData of the model as the first row of the csv file
+ and will load the first row of the csv file as the model's horizontal headerData
+*/
 bool CsvModelSerialiser::firstRowIsHeader()
 {
     Q_D(const CsvModelSerialiser);
     
     return d->m_firstRowIsHeader;
-}
-
-bool CsvModelSerialiser::firstColumnIsHeader()
-{
-    Q_D(const CsvModelSerialiser);
-    
-    return d->m_firstColumnIsHeader;
 }
 
 void CsvModelSerialiser::setFirstRowIsHeader(bool val)
@@ -207,6 +226,21 @@ void CsvModelSerialiser::setFirstRowIsHeader(bool val)
     d->m_firstRowIsHeader = val;
 }
 
+/*!
+\property CsvModelSerialiser::firstColumnIsHeader
+\accessors %firstColumnIsHeader(), setFirstColumnIsHeader()
+\brief Should the first column contain headers
+\details If this property is set to true (the default), the serialisation will the write
+ the vertical headerData of the model as the first column of the csv file
+ and will load the first column of the csv file as the model's vertical headerData
+*/
+bool CsvModelSerialiser::firstColumnIsHeader()
+{
+    Q_D(const CsvModelSerialiser);
+
+    return d->m_firstColumnIsHeader;
+}
+
 void CsvModelSerialiser::setFirstColumnIsHeader(bool val)
 {
     Q_D(CsvModelSerialiser);
@@ -214,28 +248,35 @@ void CsvModelSerialiser::setFirstColumnIsHeader(bool val)
     d->m_firstColumnIsHeader = val;
 }
 
-
+/*!
+Construct a read/write serialiser
+*/
 CsvModelSerialiser::CsvModelSerialiser(QAbstractItemModel* model)
     : AbstractSingleRoleSerialiser(*new CsvModelSerialiserPrivate(this))
 {
     setModel(model);
 }
+
+/*!
+Construct a write-only serialiser
+*/
 CsvModelSerialiser::CsvModelSerialiser(const QAbstractItemModel* model)
     : AbstractSingleRoleSerialiser(*new CsvModelSerialiserPrivate(this))
 {
     setModel(model);
 }
 
+/*!
+Constructor used only while subclassing the private class.
+Not part of the public API
+*/
 CsvModelSerialiser::CsvModelSerialiser(CsvModelSerialiserPrivate& d)
     :AbstractSingleRoleSerialiser(d)
 {}
 
-
-CsvModelSerialiser::~CsvModelSerialiser() = default;
-
-
-
-
+/*!
+Saves the model in csv format to the \a destination string
+*/
 bool CsvModelSerialiser::saveModel(QString* destination) const
 {
     if (!destination)
@@ -244,10 +285,15 @@ bool CsvModelSerialiser::saveModel(QString* destination) const
     
     if (!d->m_model)
         return false;
-    QTextStream witer(destination, QIODevice::WriteOnly | QIODevice::Text);
-    return d->writeCsv(witer);
+    QTextStream writer(destination, QIODevice::WriteOnly | QIODevice::Text);
+    Q_ASSERT(QTextCodec::availableCodecs().contains("UTF-8"));
+    writer.setCodec("UTF-8");
+    return d->writeCsv(writer);
 }
 
+/*!
+Saves the model in csv format to the \a destination device
+*/
 bool CsvModelSerialiser::saveModel(QIODevice* destination) const
 {
     if (!destination)
@@ -263,10 +309,15 @@ bool CsvModelSerialiser::saveModel(QIODevice* destination) const
     if (!d->m_model)
         return false;
     destination->setTextModeEnabled(true);
-    QTextStream witer(destination);
-    return d->writeCsv(witer);
+    QTextStream writer(destination);
+    Q_ASSERT(QTextCodec::availableCodecs().contains("UTF-8"));
+    writer.setCodec("UTF-8");
+    return d->writeCsv(writer);
 }
 
+/*!
+Saves the model in csv format to the \a destination byte array
+*/
 bool CsvModelSerialiser::saveModel(QByteArray* destination) const
 {
     if (!destination)
@@ -276,9 +327,14 @@ bool CsvModelSerialiser::saveModel(QByteArray* destination) const
     if (!d->m_model)
         return false;
     QTextStream witer(destination, QIODevice::WriteOnly | QIODevice::Text);
+    Q_ASSERT(QTextCodec::availableCodecs().contains("UTF-8"));
+    witer.setCodec("UTF-8");
     return d->writeCsv(witer);
 }
 
+/*!
+Loads the model from a \a source device containing csv data in 
+*/
 bool CsvModelSerialiser::loadModel(QIODevice* source)
 {
     if (!source)
@@ -295,8 +351,14 @@ bool CsvModelSerialiser::loadModel(QIODevice* source)
         return false;
     source->setTextModeEnabled(true);
     QTextStream reader(source);
+    Q_ASSERT(QTextCodec::availableCodecs().contains("UTF-8"));
+    reader.setCodec("UTF-8");
     return d->readCsv(reader);
 }
+
+/*!
+Loads the model from a \a source byte array containing csv data
+*/
 bool CsvModelSerialiser::loadModel(const QByteArray& source)
 {
     Q_D(CsvModelSerialiser);
@@ -306,6 +368,10 @@ bool CsvModelSerialiser::loadModel(const QByteArray& source)
     QTextStream reader(source, QIODevice::ReadOnly | QIODevice::Text);
     return d->readCsv(reader);
 }
+
+/*!
+Loads the model from a \a source string containing csv data
+*/
 bool CsvModelSerialiser::loadModel(QString* source)
 {
     if (!source)
@@ -320,6 +386,9 @@ bool CsvModelSerialiser::loadModel(QString* source)
 
 
 #ifdef MS_DECLARE_STREAM_OPERATORS
+/*!
+Text stream operator to write a model
+*/
 QTextStream& operator<<(QTextStream & stream, const QAbstractItemModel& model)
 {
     const QModelSerialiser mSer(&model);
@@ -327,6 +396,9 @@ QTextStream& operator<<(QTextStream & stream, const QAbstractItemModel& model)
     return stream;
 }
 
+/*!
+Text stream operator to read a model
+*/
 QTextStream& operator>>(QTextStream & stream, QAbstractItemModel& model)
 {
     QModelSerialiser mSer(&model);

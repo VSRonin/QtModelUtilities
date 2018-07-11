@@ -29,7 +29,6 @@ class MODELUTILITIES_EXPORT CsvModelSerialiser : public AbstractSingleRoleSerial
 public:
     CsvModelSerialiser(QAbstractItemModel* model = Q_NULLPTR);
     CsvModelSerialiser(const QAbstractItemModel* model);
-    ~CsvModelSerialiser();
     const QString& csvSeparator() const;
     void setCsvSeparator(const QString& val);
     bool firstRowIsHeader();
