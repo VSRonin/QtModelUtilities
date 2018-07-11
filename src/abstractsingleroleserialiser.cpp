@@ -19,70 +19,108 @@
 \brief The interface for model serialisers saving only one role.
 */
 AbstractSingleRoleSerialiserPrivate::AbstractSingleRoleSerialiserPrivate(AbstractSingleRoleSerialiser* q)
-    : AbstractModelSerialiserPrivate(q)
-    , m_roleToSave(Qt::DisplayRole)
+    : AbstractMultiRoleSerialiserPrivate(q)
 {
     Q_ASSERT(q_ptr);
 }
 
 /*!
-Constructs a serialiser operating over \a model
-
-\sa isEmpty()
+Construct a read/write serialiser
 */
 AbstractSingleRoleSerialiser::AbstractSingleRoleSerialiser(QAbstractItemModel* model)
-    : AbstractModelSerialiser(*new AbstractSingleRoleSerialiserPrivate(this))
+    : AbstractMultiRoleSerialiser(*new AbstractSingleRoleSerialiserPrivate(this))
 {
+    setRoleToSave(Qt::DisplayRole);
     setModel(model);
 }
-/*!
-\overload
 
-loadModel will always fail as the model is not editable
+/*!
+Construct a write-only serialiser
 */
 AbstractSingleRoleSerialiser::AbstractSingleRoleSerialiser(const QAbstractItemModel* model)
-    : AbstractModelSerialiser(*new AbstractSingleRoleSerialiserPrivate(this))
+    : AbstractMultiRoleSerialiser(*new AbstractSingleRoleSerialiserPrivate(this))
 {
+    setRoleToSave(Qt::DisplayRole);
     setModel(model);
 }
+
 /*!
-\internal
+Constructor used only while subclassing the private class.
+Not part of the public API
 */
 AbstractSingleRoleSerialiser::AbstractSingleRoleSerialiser(AbstractSingleRoleSerialiserPrivate& d)
-    :AbstractModelSerialiser(d)
+    :AbstractMultiRoleSerialiser(d)
 {}
 
-
-
 /*!
-Destroys the object.
+Destructor
 */
 AbstractSingleRoleSerialiser::~AbstractSingleRoleSerialiser() = default;
 
 
 /*!
 \property AbstractSingleRoleSerialiser::roleToSave
-\brief the role that will be serialised
+\accessors %roleToSave(), setRoleToSave()
+\brief The role that will be serialised
 
-by default this property is set to Qt::DisplayRole
+By default this property is set to Qt::DisplayRole
 */
 
-/*!
-\brief getter of roleToSave property
-*/
 int AbstractSingleRoleSerialiser::roleToSave() const
 {
-    Q_D(const AbstractSingleRoleSerialiser);
-    
-    return d->m_roleToSave;
+    return rolesToSave().first();
+}
+
+void AbstractSingleRoleSerialiser::setRoleToSave(int val)
+{
+    setRoleToSave(QList<int>{{val}});
 }
 
 /*!
-\brief setter of roleToSave property
+\reimp
+If \a val contains more than one value only the first one is considered
 */
-void AbstractSingleRoleSerialiser::setRoleToSave(int val)
+void AbstractSingleRoleSerialiser::setRoleToSave(const QList<int>& val)
 {
-    Q_D(AbstractSingleRoleSerialiser);
-    
-    d->m_roleToSave = val;
+    if (val.size() > 1)
+        return AbstractMultiRoleSerialiser::setRoleToSave(QList<int>{{val.first()}});
+    return AbstractMultiRoleSerialiser::setRoleToSave(val);
+}
+
+/*!
+\reimp
+Equivalent to setRoleToSave
+*/
+void AbstractSingleRoleSerialiser::addRoleToSave(int role)
+{
+    setRoleToSave(role);
+}
+
+/*!
+\reimp
+If \a role is the currently saved role, resets the role to save to Qt::DisplayRole
+*/
+void AbstractSingleRoleSerialiser::removeRoleToSave(int role)
+{
+    AbstractMultiRoleSerialiser::removeRoleToSave(role);
+    if (rolesToSave().isEmpty())
+        setRoleToSave(Qt::DisplayRole);
+}
+
+/*!
+\reimp
+Resets the role to save to Qt::DisplayRole
+*/
+void AbstractSingleRoleSerialiser::clearRoleToSave()
+{
+    setRoleToSave(Qt::DisplayRole);
+}
+
+/*!
+\reimp
+Resets the role to save to Qt::DisplayRole
+*/
+void AbstractSingleRoleSerialiser::resetRoleToSave()
+{
+    setRoleToSave(Qt::DisplayRole);
 }

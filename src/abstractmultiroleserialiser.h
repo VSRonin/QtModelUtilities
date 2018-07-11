@@ -27,12 +27,12 @@ public:
     AbstractMultiRoleSerialiser(QAbstractItemModel* model = Q_NULLPTR);
     AbstractMultiRoleSerialiser(const QAbstractItemModel* model);
     ~AbstractMultiRoleSerialiser() = 0;
-    const QList<int>& rolesToSave() const;
-    void setRoleToSave(const QList<int>& val);
-    Q_INVOKABLE void addRoleToSave(int role);
-    Q_INVOKABLE void removeRoleToSave(int role);
-    Q_INVOKABLE void clearRoleToSave();
-    void resetRoleToSave();
+    virtual const QList<int>& rolesToSave() const;
+    virtual void setRoleToSave(const QList<int>& val);
+    Q_INVOKABLE virtual void addRoleToSave(int role);
+    Q_INVOKABLE virtual void removeRoleToSave(int role);
+    Q_INVOKABLE virtual void clearRoleToSave();
+    virtual void resetRoleToSave();
     static QList<int> modelDefaultRoles();
 protected:
     AbstractMultiRoleSerialiser(AbstractMultiRoleSerialiserPrivate& d);
