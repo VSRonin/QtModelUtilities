@@ -40,6 +40,10 @@ AbstractModelSerialiserPrivate::AbstractModelSerialiserPrivate(AbstractModelSeri
 {
     Q_ASSERT(q_ptr);
 }
+
+/*!
+\internal
+*/
 int AbstractModelSerialiserPrivate::guessDecimals(double val)
 {
     int precision = 0;
@@ -47,12 +51,20 @@ int AbstractModelSerialiserPrivate::guessDecimals(double val)
         val *= 10.0;
     return precision;
 }
+
+/*!
+\internal
+*/
 QString AbstractModelSerialiserPrivate::guessDecimalsString(double val, QLocale* loca)
 {
     if (loca)
         return loca->toString(val, 'f', guessDecimals(val));
     return QString::number(val, 'f', guessDecimals(val));
 }
+
+/*!
+\internal
+*/
 QString AbstractModelSerialiserPrivate::variantToString(const QVariant& val)
 {
     QString result;
@@ -66,6 +78,9 @@ QString AbstractModelSerialiserPrivate::variantToString(const QVariant& val)
     return QString::fromLatin1(data.toBase64());
 }
 
+/*!
+\internal
+*/
 QVariant AbstractModelSerialiserPrivate::stringToVariant(const QString& val)
 {
     QByteArray data = QByteArray::fromBase64(val.toLatin1());
@@ -79,6 +94,9 @@ QVariant AbstractModelSerialiserPrivate::stringToVariant(const QString& val)
     return result;
 }
 
+/*!
+\internal
+*/
 QVariant AbstractModelSerialiserPrivate::loadVariant(int type, const QString& val)
 {
     if (val.isEmpty())
@@ -117,6 +135,10 @@ QVariant AbstractModelSerialiserPrivate::loadVariant(int type, const QString& va
     }
 }
 #ifdef QT_GUI_LIB
+
+/*!
+\internal
+*/
 QString AbstractModelSerialiserPrivate::saveImageVariant(const QImage& imageData)
 {
     QByteArray byteArray;
@@ -124,6 +146,10 @@ QString AbstractModelSerialiserPrivate::saveImageVariant(const QImage& imageData
     imageData.save(&buffer, "PNG");
     return QString::fromLatin1(byteArray.toBase64().constData());
 }
+
+/*!
+\internal
+*/
 QImage AbstractModelSerialiserPrivate::loadImageVariant(int type, const QString& val)
 {
     Q_UNUSED(type)
@@ -134,6 +160,10 @@ QImage AbstractModelSerialiserPrivate::loadImageVariant(int type, const QString&
     return imageData;
 }
 #endif
+
+/*!
+\internal
+*/
 QString AbstractModelSerialiserPrivate::saveVariant(const QVariant& val)
 {
     if (val.isNull())
@@ -171,35 +201,35 @@ QString AbstractModelSerialiserPrivate::saveVariant(const QVariant& val)
         return variantToString(val);
     }
 }
-/*!
-    Constructs a serialiser operating over \a model
 
-    \sa isEmpty()
+/*!
+Construct a read/write serialiser
 */
 AbstractModelSerialiser::AbstractModelSerialiser(QAbstractItemModel* model)
     :d_ptr(new AbstractModelSerialiserPrivate(this))
 {
     setModel(model);
 }
-/*!
-    \overload
 
-    loadModel will always fail as the model is not editable
+/*!
+Construct a write-only serialiser
 */
 AbstractModelSerialiser::AbstractModelSerialiser(const QAbstractItemModel* model)
     : d_ptr(new AbstractModelSerialiserPrivate(this))
 {
     setModel(model);
 }
-/*! 
-    \internal
+
+/*!
+Constructor used only while subclassing the private class.
+Not part of the public API
 */
 AbstractModelSerialiser::AbstractModelSerialiser(AbstractModelSerialiserPrivate& d)
     :d_ptr(&d)
 {}
 
 /*!
-    Destroys the object.
+Destructor
 */
 AbstractModelSerialiser::~AbstractModelSerialiser()
 {
