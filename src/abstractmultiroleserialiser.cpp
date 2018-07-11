@@ -125,21 +125,21 @@ void AbstractMultiRoleSerialiser::resetRoleToSave()
 */
 QList<int> AbstractMultiRoleSerialiser::modelDefaultRoles()
 {
-    return QList<int>()
-        << Qt::EditRole
-        << Qt::DecorationRole
-        << Qt::ToolTipRole
-        << Qt::StatusTipRole
-        << Qt::WhatsThisRole
-        << Qt::SizeHintRole
-        << Qt::FontRole
-        << Qt::TextAlignmentRole
-        << Qt::BackgroundRole
-        << Qt::ForegroundRole
-        << Qt::CheckStateRole
-        << Qt::InitialSortOrderRole
-        << Qt::AccessibleTextRole
-        << Qt::AccessibleDescriptionRole
-        << Qt::UserRole
-        ;
+    return QList<int>{{
+            Qt::EditRole
+            , Qt::DecorationRole
+            , Qt::ToolTipRole
+            , Qt::StatusTipRole
+            , Qt::WhatsThisRole
+            , Qt::SizeHintRole
+            , Qt::FontRole
+            , Qt::TextAlignmentRole
+            , Qt::BackgroundRole
+            , Qt::ForegroundRole
+            , Qt::CheckStateRole
+            , Qt::InitialSortOrderRole
+            , Qt::AccessibleTextRole
+            , Qt::AccessibleDescriptionRole
+            , Qt::UserRole
+        }};
 }
