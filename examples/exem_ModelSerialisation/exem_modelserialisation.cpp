@@ -26,6 +26,9 @@ int main(int argc, char *argv[])
     baseModel.insertColumns(0, 2);
     baseModel.setHeaderData(0, Qt::Horizontal, "Col1");
     baseModel.setHeaderData(1, Qt::Horizontal, "Col2");
+    baseModel.setHeaderData(0, Qt::Vertical, "Row1");
+    baseModel.setHeaderData(1, Qt::Vertical, "Row2");
+    baseModel.setHeaderData(2, Qt::Vertical, "Row3");
     baseModel.setData(baseModel.index(0, 0), "0.0");
     baseModel.setData(baseModel.index(0, 0), bluePix, Qt::DecorationRole);
     baseModel.setData(baseModel.index(0, 1), "0.1");
@@ -50,6 +53,7 @@ int main(int argc, char *argv[])
     // displays the model that gets loaded from file
     QTreeView* loadedView = new QTreeView(&mainWidget);
     loadedView->setModel(&loadedModel);
+    loadedView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     // displays the content of the saved file as rich text (Qt HTML)
     QTextBrowser* savedViewer = new QTextBrowser(&mainWidget);
     // displays the content of the saved file as plain text
