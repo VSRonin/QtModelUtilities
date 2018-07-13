@@ -253,7 +253,7 @@ bool HtmlModelSerialiserPrivate::writeHtml(QXmlStreamWriter& writer) const
         return false;
     if (m_printStartDocument) {
         writer.writeStartDocument();
-        writer.writeDTD(QStringLiteral(R"(<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">)"));
+        writer.writeDTD(QStringLiteral("<!DOCTYPE html>"));
         writer.writeStartElement(QStringLiteral("html"));
         writer.writeStartElement(QStringLiteral("head"));
         writer.writeEmptyElement(QStringLiteral("meta"));

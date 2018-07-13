@@ -95,6 +95,12 @@ bool BinaryModelSerialiserPrivate::readBinary(QDataStream& reader)
     reader.setVersion(QDataStream::Qt_5_0);
     qint32 steramVersion;
     reader >> steramVersion;
+    if (steramVersion > QDataStream().version()){
+#if QT_VERSION >= 0x050700
+        reader.rollbackTransaction();
+#endif
+        return false;
+    }
     reader.setVersion(steramVersion);
     QString header;
     reader >> header;

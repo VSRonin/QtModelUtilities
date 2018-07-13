@@ -88,7 +88,7 @@ endif()
 if(BUILD_MODELSERIALISATION)
     set(modelutilities_SRCS
         src/abstractmodelserialiser.cpp
-        src/abstractmultiroleserialiser.cpp
+        src/abstractstringserialiser.cpp
         src/abstractsingleroleserialiser.cpp
         src/binarymodelserialiser.cpp
         src/csvmodelserialiser.cpp
@@ -99,7 +99,7 @@ if(BUILD_MODELSERIALISATION)
     )
     set(modelutilities_INSTALL_INCLUDE 
         src/abstractmodelserialiser.h
-        src/abstractmultiroleserialiser.h
+        src/abstractstringserialiser.h
         src/abstractsingleroleserialiser.h
         src/binarymodelserialiser.h
         src/csvmodelserialiser.h
