@@ -20,15 +20,15 @@ class CsvModelSerialiserPrivate;
 class QTextStream;
 class MODELUTILITIES_EXPORT CsvModelSerialiser : public AbstractSingleRoleSerialiser
 {
-    Q_GADGET
+    Q_OBJECT
     Q_PROPERTY(QString csvSeparator READ csvSeparator WRITE setCsvSeparator)
     Q_PROPERTY(bool firstRowIsHeader READ firstRowIsHeader WRITE setFirstRowIsHeader)
     Q_PROPERTY(bool firstColumnIsHeader READ firstColumnIsHeader WRITE setFirstColumnIsHeader)
     Q_DECLARE_PRIVATE(CsvModelSerialiser)
     Q_DISABLE_COPY(CsvModelSerialiser)
 public:
-    CsvModelSerialiser(QAbstractItemModel* model = Q_NULLPTR);
-    CsvModelSerialiser(const QAbstractItemModel* model);
+    CsvModelSerialiser(QAbstractItemModel* model = Q_NULLPTR, QObject* parent = Q_NULLPTR);
+    CsvModelSerialiser(const QAbstractItemModel* model, QObject* parent = Q_NULLPTR);
     const QString& csvSeparator() const;
     void setCsvSeparator(const QString& val);
     bool firstRowIsHeader();
@@ -42,7 +42,7 @@ public:
     Q_INVOKABLE bool loadModel(const QByteArray& source) Q_DECL_OVERRIDE;
     Q_INVOKABLE virtual bool loadModel(QString* source);
 protected:
-    CsvModelSerialiser(CsvModelSerialiserPrivate& d);
+    CsvModelSerialiser(CsvModelSerialiserPrivate& d, QObject* parent);
 
 #ifdef MS_DECLARE_STREAM_OPERATORS
     friend QTextStream& operator<<(QTextStream & stream, const QAbstractItemModel& model);

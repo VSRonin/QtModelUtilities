@@ -15,10 +15,10 @@
 #ifndef xmlmodelserialiser_p_h__
 #define xmlmodelserialiser_p_h__
 
-#include "private/abstractmultiroleserialiser_p.h"
+#include "private/abstractstringserialiser_p.h"
 #include "xmlmodelserialiser.h"
 #include <QModelIndex>
-class XmlModelSerialiserPrivate : public AbstractMultiRoleSerialiserPrivate
+class XmlModelSerialiserPrivate : public AbstractStringSerialiserPrivate
 {
     Q_DISABLE_COPY(XmlModelSerialiserPrivate);
     Q_DECLARE_PUBLIC(XmlModelSerialiser)

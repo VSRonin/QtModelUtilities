@@ -251,8 +251,8 @@ void CsvModelSerialiser::setFirstColumnIsHeader(bool val)
 /*!
 Construct a read/write serialiser
 */
-CsvModelSerialiser::CsvModelSerialiser(QAbstractItemModel* model)
-    : AbstractSingleRoleSerialiser(*new CsvModelSerialiserPrivate(this))
+CsvModelSerialiser::CsvModelSerialiser(QAbstractItemModel* model, QObject* parent)
+    : AbstractSingleRoleSerialiser(*new CsvModelSerialiserPrivate(this), parent)
 {
     setModel(model);
 }
@@ -260,8 +260,8 @@ CsvModelSerialiser::CsvModelSerialiser(QAbstractItemModel* model)
 /*!
 Construct a write-only serialiser
 */
-CsvModelSerialiser::CsvModelSerialiser(const QAbstractItemModel* model)
-    : AbstractSingleRoleSerialiser(*new CsvModelSerialiserPrivate(this))
+CsvModelSerialiser::CsvModelSerialiser(const QAbstractItemModel* model, QObject* parent )
+    : AbstractSingleRoleSerialiser(*new CsvModelSerialiserPrivate(this), parent)
 {
     setModel(model);
 }
@@ -270,8 +270,8 @@ CsvModelSerialiser::CsvModelSerialiser(const QAbstractItemModel* model)
 Constructor used only while subclassing the private class.
 Not part of the public API
 */
-CsvModelSerialiser::CsvModelSerialiser(CsvModelSerialiserPrivate& d)
-    :AbstractSingleRoleSerialiser(d)
+CsvModelSerialiser::CsvModelSerialiser(CsvModelSerialiserPrivate& d, QObject* parent)
+    :AbstractSingleRoleSerialiser(d, parent)
 {}
 
 /*!
@@ -286,8 +286,7 @@ bool CsvModelSerialiser::saveModel(QString* destination) const
     if (!d->m_model)
         return false;
     QTextStream writer(destination, QIODevice::WriteOnly | QIODevice::Text);
-    Q_ASSERT(QTextCodec::availableCodecs().contains("UTF-8"));
-    writer.setCodec("UTF-8");
+    writer.setCodec(textCodec());
     return d->writeCsv(writer);
 }
 
@@ -310,8 +309,7 @@ bool CsvModelSerialiser::saveModel(QIODevice* destination) const
         return false;
     destination->setTextModeEnabled(true);
     QTextStream writer(destination);
-    Q_ASSERT(QTextCodec::availableCodecs().contains("UTF-8"));
-    writer.setCodec("UTF-8");
+    writer.setCodec(textCodec());
     return d->writeCsv(writer);
 }
 
@@ -327,8 +325,7 @@ bool CsvModelSerialiser::saveModel(QByteArray* destination) const
     if (!d->m_model)
         return false;
     QTextStream witer(destination, QIODevice::WriteOnly | QIODevice::Text);
-    Q_ASSERT(QTextCodec::availableCodecs().contains("UTF-8"));
-    witer.setCodec("UTF-8");
+    witer.setCodec(textCodec());
     return d->writeCsv(witer);
 }
 
@@ -351,8 +348,7 @@ bool CsvModelSerialiser::loadModel(QIODevice* source)
         return false;
     source->setTextModeEnabled(true);
     QTextStream reader(source);
-    Q_ASSERT(QTextCodec::availableCodecs().contains("UTF-8"));
-    reader.setCodec("UTF-8");
+    reader.setCodec(textCodec());
     return d->readCsv(reader);
 }
 
@@ -366,6 +362,7 @@ bool CsvModelSerialiser::loadModel(const QByteArray& source)
     if (!d->m_model)
         return false;
     QTextStream reader(source, QIODevice::ReadOnly | QIODevice::Text);
+    reader.setCodec(textCodec());
     return d->readCsv(reader);
 }
 
@@ -381,6 +378,7 @@ bool CsvModelSerialiser::loadModel(QString* source)
     if (!d->m_model)
         return false;
     QTextStream reader(source, QIODevice::ReadOnly | QIODevice::Text);
+    reader.setCodec(textCodec());
     return d->readCsv(reader);
 }
 

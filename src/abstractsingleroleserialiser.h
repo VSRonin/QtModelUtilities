@@ -15,17 +15,17 @@
 #define abstractsingleroleserialiser_h__
 
 #include "modelutilities_global.h"
-#include "abstractmultiroleserialiser.h"
+#include "abstractstringserialiser.h"
 class AbstractSingleRoleSerialiserPrivate;
-class MODELUTILITIES_EXPORT AbstractSingleRoleSerialiser : public AbstractMultiRoleSerialiser
+class MODELUTILITIES_EXPORT AbstractSingleRoleSerialiser : public AbstractStringSerialiser
 {
-    Q_GADGET
+    Q_OBJECT
     Q_PROPERTY(int roleToSave READ roleToSave WRITE setRoleToSave)
     Q_DECLARE_PRIVATE(AbstractSingleRoleSerialiser)
     Q_DISABLE_COPY(AbstractSingleRoleSerialiser)
 public:
-    AbstractSingleRoleSerialiser(QAbstractItemModel* model = Q_NULLPTR);
-    AbstractSingleRoleSerialiser(const QAbstractItemModel* model);
+    AbstractSingleRoleSerialiser(QAbstractItemModel* model = Q_NULLPTR, QObject* parent = Q_NULLPTR);
+    AbstractSingleRoleSerialiser(const QAbstractItemModel* model, QObject* parent = Q_NULLPTR);
     ~AbstractSingleRoleSerialiser() = 0;
     int roleToSave() const;
     void setRoleToSave(int val);
@@ -35,6 +35,6 @@ public:
     void clearRoleToSave() Q_DECL_OVERRIDE;
     void resetRoleToSave() Q_DECL_OVERRIDE;
 protected:
-    AbstractSingleRoleSerialiser(AbstractSingleRoleSerialiserPrivate& d);
+    AbstractSingleRoleSerialiser(AbstractSingleRoleSerialiserPrivate& d, QObject* parent);
 };
 #endif // abstractsingleroleserialiser_h__

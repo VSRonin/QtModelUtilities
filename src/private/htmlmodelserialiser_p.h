@@ -14,12 +14,12 @@
 #ifndef htmlmodelserialiser_p_h__
 #define htmlmodelserialiser_p_h__
 
-#include "private/abstractmultiroleserialiser_p.h"
+#include "private/abstractstringserialiser_p.h"
 #include "htmlmodelserialiser.h"
 #include <QModelIndex>
 class QXmlStreamWriter;
 class QXmlStreamReader;
-class HtmlModelSerialiserPrivate : public AbstractMultiRoleSerialiserPrivate
+class HtmlModelSerialiserPrivate : public AbstractStringSerialiserPrivate
 {
     Q_DISABLE_COPY(HtmlModelSerialiserPrivate);
     Q_DECLARE_PUBLIC(HtmlModelSerialiser)

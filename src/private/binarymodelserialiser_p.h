@@ -14,10 +14,10 @@
 #ifndef binarymodelserialiser_p_h__
 #define binarymodelserialiser_p_h__
 
-#include "private/abstractmultiroleserialiser_p.h"
+#include "private/abstractmodelserialiser_p.h"
 #include "binarymodelserialiser.h"
 #include <QModelIndex>
-class BinaryModelSerialiserPrivate : public AbstractMultiRoleSerialiserPrivate
+class BinaryModelSerialiserPrivate : public AbstractModelSerialiserPrivate
 {
     Q_DISABLE_COPY(BinaryModelSerialiserPrivate);
     Q_DECLARE_PUBLIC(BinaryModelSerialiser)

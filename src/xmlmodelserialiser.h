@@ -16,19 +16,19 @@
 #define xmlmodelserialiser_h__
 
 #include "modelutilities_global.h"
-#include "abstractmultiroleserialiser.h"
+#include "abstractstringserialiser.h"
 class XmlModelSerialiserPrivate;
 class QXmlStreamWriter;
 class QXmlStreamReader;
-class MODELUTILITIES_EXPORT XmlModelSerialiser : public AbstractMultiRoleSerialiser
+class MODELUTILITIES_EXPORT XmlModelSerialiser : public AbstractStringSerialiser
 {
-    Q_GADGET
+    Q_OBJECT
     Q_PROPERTY(bool printStartDocument READ printStartDocument WRITE setPrintStartDocument)
     Q_DECLARE_PRIVATE(XmlModelSerialiser)
     Q_DISABLE_COPY(XmlModelSerialiser)
 public:
-    XmlModelSerialiser(QAbstractItemModel* model = Q_NULLPTR);
-    XmlModelSerialiser(const QAbstractItemModel* model);
+    XmlModelSerialiser(QAbstractItemModel* model = Q_NULLPTR, QObject* parent = Q_NULLPTR);
+    XmlModelSerialiser(const QAbstractItemModel* model, QObject* parent = Q_NULLPTR);
     ~XmlModelSerialiser();
     bool printStartDocument() const;
     void setPrintStartDocument(bool val);
@@ -39,7 +39,7 @@ public:
     Q_INVOKABLE bool loadModel(const QByteArray& source) Q_DECL_OVERRIDE;
     Q_INVOKABLE virtual bool loadModel(QString* source);
 protected:
-    XmlModelSerialiser(XmlModelSerialiserPrivate& d);
+    XmlModelSerialiser(XmlModelSerialiserPrivate& d, QObject* parent);
 
 #ifdef MS_DECLARE_STREAM_OPERATORS
     friend QXmlStreamWriter&  operator<<(QXmlStreamWriter & stream, const QAbstractItemModel& model);

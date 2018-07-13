@@ -15,24 +15,24 @@
 #define binarymodelserialiser_h__
 
 #include "modelutilities_global.h"
-#include "abstractmultiroleserialiser.h"
+#include "abstractmodelserialiser.h"
 class BinaryModelSerialiserPrivate;
 class QDataStream;
-class MODELUTILITIES_EXPORT BinaryModelSerialiser : public AbstractMultiRoleSerialiser
+class MODELUTILITIES_EXPORT BinaryModelSerialiser : public AbstractModelSerialiser
 {
-    Q_GADGET
+    Q_OBJECT
     Q_DECLARE_PRIVATE(BinaryModelSerialiser)
     Q_DISABLE_COPY(BinaryModelSerialiser)
 public:
-    BinaryModelSerialiser(QAbstractItemModel* model = Q_NULLPTR);
-    BinaryModelSerialiser(const QAbstractItemModel* model);
+    BinaryModelSerialiser(QAbstractItemModel* model = Q_NULLPTR, QObject* parent = Q_NULLPTR);
+    BinaryModelSerialiser(const QAbstractItemModel* model, QObject* parent = Q_NULLPTR);
     ~BinaryModelSerialiser();
     Q_INVOKABLE bool saveModel(QIODevice* destination) const Q_DECL_OVERRIDE;
     Q_INVOKABLE bool saveModel(QByteArray* destination) const Q_DECL_OVERRIDE;
     Q_INVOKABLE bool loadModel(QIODevice* source) Q_DECL_OVERRIDE;
     Q_INVOKABLE bool loadModel(const QByteArray& source) Q_DECL_OVERRIDE;
 protected:
-    BinaryModelSerialiser(BinaryModelSerialiserPrivate& d);
+    BinaryModelSerialiser(BinaryModelSerialiserPrivate& d, QObject* parent = Q_NULLPTR);
 
 #ifdef MS_DECLARE_STREAM_OPERATORS
     friend QDataStream& operator<<(QDataStream & stream, const QAbstractItemModel& model);

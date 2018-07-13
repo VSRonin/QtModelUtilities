@@ -20,7 +20,7 @@
 \internal
 */
 HtmlModelSerialiserPrivate::HtmlModelSerialiserPrivate(HtmlModelSerialiser* q)
-    :AbstractMultiRoleSerialiserPrivate(q)
+    :AbstractStringSerialiserPrivate(q)
     , m_printStartDocument(true)
 {}
 
@@ -252,8 +252,13 @@ bool HtmlModelSerialiserPrivate::writeHtml(QXmlStreamWriter& writer) const
     if (!m_constModel)
         return false;
     if (m_printStartDocument) {
-        writer.writeDTD(QStringLiteral("<!DOCTYPE html>"));
+        writer.writeStartDocument();
+        writer.writeDTD(QStringLiteral(R"(<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">)"));
         writer.writeStartElement(QStringLiteral("html"));
+        writer.writeStartElement(QStringLiteral("head"));
+        writer.writeEmptyElement(QStringLiteral("meta"));
+        writer.writeAttribute(QStringLiteral("charset"), writer.codec()->name());
+        writer.writeEndElement(); //head
         writer.writeStartElement(QStringLiteral("body"));
     }
     writer.writeStartElement("div");
@@ -345,8 +350,8 @@ QVariant HtmlModelSerialiserPrivate::readHtmlVariant(QXmlStreamReader& reader, i
 /*!
 Construct a read/write serialiser
 */
-HtmlModelSerialiser::HtmlModelSerialiser(QAbstractItemModel* model)
-    : AbstractMultiRoleSerialiser(*new HtmlModelSerialiserPrivate(this))
+HtmlModelSerialiser::HtmlModelSerialiser(QAbstractItemModel* model, QObject* parent)
+    : AbstractStringSerialiser(*new HtmlModelSerialiserPrivate(this), parent)
 {
     setModel(model);
 }
@@ -354,8 +359,8 @@ HtmlModelSerialiser::HtmlModelSerialiser(QAbstractItemModel* model)
 /*!
 Construct a write-only serialiser
 */
-HtmlModelSerialiser::HtmlModelSerialiser(const QAbstractItemModel* model)
-    : AbstractMultiRoleSerialiser(*new HtmlModelSerialiserPrivate(this))
+HtmlModelSerialiser::HtmlModelSerialiser(const QAbstractItemModel* model, QObject* parent)
+    : AbstractStringSerialiser(*new HtmlModelSerialiserPrivate(this), parent)
 {
     setModel(model);
 }
@@ -365,8 +370,8 @@ HtmlModelSerialiser::HtmlModelSerialiser(const QAbstractItemModel* model)
 Constructor used only while subclassing the private class.
 Not part of the public API
 */
-HtmlModelSerialiser::HtmlModelSerialiser(HtmlModelSerialiserPrivate& d)
-    :AbstractMultiRoleSerialiser(d)
+HtmlModelSerialiser::HtmlModelSerialiser(HtmlModelSerialiserPrivate& d, QObject* parent)
+    :AbstractStringSerialiser(d, parent)
 {}
 
 /*!
@@ -402,8 +407,9 @@ bool HtmlModelSerialiser::saveModel(QString* destination) const
     
     if (!d->m_model)
         return false;
-    QXmlStreamWriter witer(destination);
-    return d->writeHtml(witer);
+    QXmlStreamWriter writer(destination);
+    writer.setCodec(textCodec());
+    return d->writeHtml(writer);
 }
 
 /*!
@@ -423,8 +429,9 @@ bool HtmlModelSerialiser::saveModel(QIODevice* destination) const
     
     if (!d->m_model)
         return false;
-    QXmlStreamWriter witer(destination);
-    return d->writeHtml(witer);
+    QXmlStreamWriter writer(destination);
+    writer.setCodec(textCodec());
+    return d->writeHtml(writer);
 }
 
 /*!
@@ -438,8 +445,9 @@ bool HtmlModelSerialiser::saveModel(QByteArray* destination) const
     
     if (!d->m_model)
         return false;
-    QXmlStreamWriter witer(destination);
-    return d->writeHtml(witer);
+    QXmlStreamWriter writer(destination);
+    writer.setCodec(textCodec());
+    return d->writeHtml(writer);
 }
 
 /*!

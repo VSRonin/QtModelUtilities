@@ -13,9 +13,9 @@
 
 #ifndef abstractsingleroleserialiser_p_h__
 #define abstractsingleroleserialiser_p_h__
-#include "private/abstractmultiroleserialiser_p.h"
+#include "private/abstractstringserialiser_p.h"
 #include "abstractsingleroleserialiser.h"
-class AbstractSingleRoleSerialiserPrivate : public AbstractMultiRoleSerialiserPrivate
+class AbstractSingleRoleSerialiserPrivate : public AbstractStringSerialiserPrivate
 {
     Q_DISABLE_COPY(AbstractSingleRoleSerialiserPrivate);
     Q_DECLARE_PUBLIC(AbstractSingleRoleSerialiser)

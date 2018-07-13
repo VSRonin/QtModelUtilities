@@ -16,7 +16,7 @@
 #include <QDataStream>
 
 BinaryModelSerialiserPrivate::BinaryModelSerialiserPrivate(BinaryModelSerialiser* q)
-    :AbstractMultiRoleSerialiserPrivate(q)
+    :AbstractModelSerialiserPrivate(q)
 {}
 
 void BinaryModelSerialiserPrivate::writeBinaryElement(QDataStream& destination, const QModelIndex& parent) const
@@ -176,7 +176,6 @@ bool BinaryModelSerialiserPrivate::writeBinary(QDataStream& writer) const
             const QVariant roleData = m_constModel->headerData(i, Qt::Vertical, *singleRole);
             if (roleData.isNull())
                 continue;
-            const QString roleString = saveVariant(roleData);
             writer << static_cast<qint32>(*singleRole) << roleData;
         }
         writer << static_cast<qint32>(-1);
@@ -255,20 +254,20 @@ bool BinaryModelSerialiser::loadModel(const QByteArray& source)
 
 
 
-BinaryModelSerialiser::BinaryModelSerialiser(QAbstractItemModel* model)
-    : AbstractMultiRoleSerialiser(*new BinaryModelSerialiserPrivate(this))
+BinaryModelSerialiser::BinaryModelSerialiser(QAbstractItemModel* model, QObject* parent)
+    : AbstractModelSerialiser(*new BinaryModelSerialiserPrivate(this), parent)
 {
     setModel(model);
 }
-BinaryModelSerialiser::BinaryModelSerialiser(const QAbstractItemModel* model)
-    : AbstractMultiRoleSerialiser(*new BinaryModelSerialiserPrivate(this))
+BinaryModelSerialiser::BinaryModelSerialiser(const QAbstractItemModel* model, QObject* parent )
+    : AbstractModelSerialiser(*new BinaryModelSerialiserPrivate(this), parent)
 {
     setModel(model);
 }
 
 
-BinaryModelSerialiser::BinaryModelSerialiser(BinaryModelSerialiserPrivate& d)
-    :AbstractMultiRoleSerialiser(d)
+BinaryModelSerialiser::BinaryModelSerialiser(BinaryModelSerialiserPrivate& d, QObject* parent )
+    :AbstractModelSerialiser(d, parent)
 {}
 
 

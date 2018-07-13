@@ -17,7 +17,7 @@
 #include <QXmlStreamReader>
 
 XmlModelSerialiserPrivate::XmlModelSerialiserPrivate(XmlModelSerialiser* q)
-    :AbstractMultiRoleSerialiserPrivate(q)
+    :AbstractStringSerialiserPrivate(q)
     , m_printStartDocument(true)
 {}
 
@@ -307,8 +307,9 @@ bool XmlModelSerialiser::saveModel(QString* destination) const
     
     if (!d->m_model)
         return false;
-    QXmlStreamWriter witer(destination);
-    return d->writeXml(witer);
+    QXmlStreamWriter writer(destination);
+    writer.setCodec(textCodec());
+    return d->writeXml(writer);
 }
 
 bool XmlModelSerialiser::saveModel(QIODevice* destination) const
@@ -325,8 +326,9 @@ bool XmlModelSerialiser::saveModel(QIODevice* destination) const
     
     if (!d->m_model)
         return false;
-    QXmlStreamWriter witer(destination);
-    return d->writeXml(witer);
+    QXmlStreamWriter writer(destination);
+    writer.setCodec(textCodec());
+    return d->writeXml(writer);
 }
 
 bool XmlModelSerialiser::saveModel(QByteArray* destination) const
@@ -337,8 +339,9 @@ bool XmlModelSerialiser::saveModel(QByteArray* destination) const
     
     if (!d->m_model)
         return false;
-    QXmlStreamWriter witer(destination);
-    return d->writeXml(witer);
+    QXmlStreamWriter writer(destination);
+    writer.setCodec(textCodec());
+    return d->writeXml(writer);
 }
 
 bool XmlModelSerialiser::loadModel(QIODevice* source)
@@ -377,20 +380,20 @@ bool XmlModelSerialiser::loadModel(QString* source)
     return d->readXml(reader);
 }
 
-XmlModelSerialiser::XmlModelSerialiser(QAbstractItemModel* model)
-    : AbstractMultiRoleSerialiser(*new XmlModelSerialiserPrivate(this))
+XmlModelSerialiser::XmlModelSerialiser(QAbstractItemModel* model, QObject* parent)
+    : AbstractStringSerialiser(*new XmlModelSerialiserPrivate(this), parent)
 {
     setModel(model);
 }
-XmlModelSerialiser::XmlModelSerialiser(const QAbstractItemModel* model)
-    : AbstractMultiRoleSerialiser(*new XmlModelSerialiserPrivate(this))
+XmlModelSerialiser::XmlModelSerialiser(const QAbstractItemModel* model, QObject* parent)
+    : AbstractStringSerialiser(*new XmlModelSerialiserPrivate(this), parent)
 {
     setModel(model);
 }
 
 
-XmlModelSerialiser::XmlModelSerialiser(XmlModelSerialiserPrivate& d)
-    :AbstractMultiRoleSerialiser(d)
+XmlModelSerialiser::XmlModelSerialiser(XmlModelSerialiserPrivate& d, QObject* parent)
+    :AbstractStringSerialiser(d, parent)
 {}
 
 

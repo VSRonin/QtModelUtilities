@@ -14,17 +14,17 @@
 #define htmlmodelserialiser_h__
 
 #include "modelutilities_global.h"
-#include "abstractmultiroleserialiser.h"
+#include "abstractstringserialiser.h"
 class HtmlModelSerialiserPrivate;
-class MODELUTILITIES_EXPORT HtmlModelSerialiser : public AbstractMultiRoleSerialiser
+class MODELUTILITIES_EXPORT HtmlModelSerialiser : public AbstractStringSerialiser
 {
-    Q_GADGET
+    Q_OBJECT
     Q_PROPERTY(bool printStartDocument READ printStartDocument WRITE setPrintStartDocument)
     Q_DECLARE_PRIVATE(HtmlModelSerialiser)
     Q_DISABLE_COPY(HtmlModelSerialiser)
 public:
-    HtmlModelSerialiser(QAbstractItemModel* model = Q_NULLPTR);
-    HtmlModelSerialiser(const QAbstractItemModel* model);
+    HtmlModelSerialiser(QAbstractItemModel* model = Q_NULLPTR, QObject* parent=Q_NULLPTR);
+    HtmlModelSerialiser(const QAbstractItemModel* model, QObject* parent = Q_NULLPTR);
     bool printStartDocument() const;
     void setPrintStartDocument(bool val);
     Q_INVOKABLE bool saveModel(QIODevice* destination) const Q_DECL_OVERRIDE;
@@ -34,6 +34,6 @@ public:
     Q_INVOKABLE bool loadModel(const QByteArray& source) Q_DECL_OVERRIDE;
     Q_INVOKABLE virtual bool loadModel(QString* source);
 protected:
-    HtmlModelSerialiser(HtmlModelSerialiserPrivate& d);
+    HtmlModelSerialiser(HtmlModelSerialiserPrivate& d, QObject* parent);
 };
 #endif // htmlmodelserialiser_h__

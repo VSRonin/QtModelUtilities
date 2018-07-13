@@ -13,277 +13,171 @@
 
 #include "abstractmodelserialiser.h"
 #include "private/abstractmodelserialiser_p.h"
-#include <QDataStream>
-#include <QVariant>
-#include <QDateTime>
-#include <cmath>
-#ifdef QT_GUI_LIB
-#include <QImage>
-#include <QPixmap>
-#include <QBitmap>
-#endif
-#include <QBuffer>
-#include <QLocale>
-
+#include <QAbstractItemModel>
 /*!
-\class AbstractModelSerialiser
+\class AbstractMultiRoleSerialiser
 
-\brief The interface for model serialisers.
-
-This class serve as a base for all serialisers
+\brief The interface for model serialisers saving multiple roles.
 */
 
 AbstractModelSerialiserPrivate::AbstractModelSerialiserPrivate(AbstractModelSerialiser* q)
     : q_ptr(q)
     , m_model(Q_NULLPTR)
     , m_constModel(Q_NULLPTR)
+    , m_rolesToSave(AbstractModelSerialiser::modelDefaultRoles())
 {
     Q_ASSERT(q_ptr);
 }
 
 /*!
-\internal
-*/
-int AbstractModelSerialiserPrivate::guessDecimals(double val)
-{
-    int precision = 0;
-    for (double junk = 0; !qFuzzyIsNull(std::modf(val, &junk)); ++precision)
-        val *= 10.0;
-    return precision;
-}
+Constructs a serialiser operating over \a model
 
-/*!
-\internal
+\sa isEmpty()
 */
-QString AbstractModelSerialiserPrivate::guessDecimalsString(double val, QLocale* loca)
-{
-    if (loca)
-        return loca->toString(val, 'f', guessDecimals(val));
-    return QString::number(val, 'f', guessDecimals(val));
-}
-
-/*!
-\internal
-*/
-QString AbstractModelSerialiserPrivate::variantToString(const QVariant& val)
-{
-    QString result;
-    QByteArray data;
-    QDataStream outStream(&data, QIODevice::WriteOnly);
-#ifdef MS_DATASTREAM_VERSION
-    outStream.setVersion(MS_DATASTREAM_VERSION);
-#endif // MS_DATASTREAM_VERSION
-    outStream << val;
-    data = qCompress(data);
-    return QString::fromLatin1(data.toBase64());
-}
-
-/*!
-\internal
-*/
-QVariant AbstractModelSerialiserPrivate::stringToVariant(const QString& val)
-{
-    QByteArray data = QByteArray::fromBase64(val.toLatin1());
-    data = qUncompress(data);
-    QDataStream inStream(data);
-#ifdef MS_DATASTREAM_VERSION
-    inStream.setVersion(MS_DATASTREAM_VERSION);
-#endif // MS_DATASTREAM_VERSION
-    QVariant result;
-    inStream >> result;
-    return result;
-}
-
-/*!
-\internal
-*/
-QVariant AbstractModelSerialiserPrivate::loadVariant(int type, const QString& val)
-{
-    if (val.isEmpty())
-        return QVariant();
-    switch (type) {
-    case QMetaType::UnknownType:
-        Q_ASSERT_X(false, "ModelSerialisation::loadVariant", "Trying to load unregistered type.");
-        return QVariant();
-    case QMetaType::Bool: return val.toInt() == 1;
-    case QMetaType::Long:
-    case QMetaType::Int: return val.toInt();
-    case QMetaType::ULong:
-    case QMetaType::UInt: return val.toUInt();
-    case QMetaType::LongLong: return val.toLongLong();
-    case QMetaType::ULongLong: return val.toULongLong();
-    case QMetaType::Double: return val.toDouble();
-    case QMetaType::Short: return static_cast<short>(val.toInt());
-    case QMetaType::SChar:
-    case QMetaType::Char: return static_cast<char>(val.toInt());
-    case QMetaType::UShort: return static_cast<unsigned short>(val.toUInt());
-    case QMetaType::UChar: return static_cast<unsigned char>(val.toUInt());
-    case QMetaType::Float: return val.toFloat();
-    case QMetaType::QChar: return val.at(0);
-    case QMetaType::QString: return val;
-    case QMetaType::QByteArray: return QByteArray::fromBase64(val.toLatin1());
-    case QMetaType::QDate: return QDate::fromString(val, Qt::ISODate);
-    case QMetaType::QTime: return QTime::fromString(val, Qt::ISODate);
-    case QMetaType::QDateTime: return QDateTime::fromString(val, Qt::ISODate);
-#ifdef QT_GUI_LIB
-    case QMetaType::QImage: return loadImageVariant(type, val);
-    case QMetaType::QPixmap: return QPixmap::fromImage(loadImageVariant(type, val));
-    case QMetaType::QBitmap: return QBitmap::fromImage(loadImageVariant(type, val));
-#endif
-    default:
-        return stringToVariant(val);
-    }
-}
-#ifdef QT_GUI_LIB
-
-/*!
-\internal
-*/
-QString AbstractModelSerialiserPrivate::saveImageVariant(const QImage& imageData)
-{
-    QByteArray byteArray;
-    QBuffer buffer(&byteArray);
-    imageData.save(&buffer, "PNG");
-    return QString::fromLatin1(byteArray.toBase64().constData());
-}
-
-/*!
-\internal
-*/
-QImage AbstractModelSerialiserPrivate::loadImageVariant(int type, const QString& val)
-{
-    Q_UNUSED(type)
-    QByteArray byteArray = QByteArray::fromBase64(val.toLatin1());
-    QBuffer buffer(&byteArray);
-    QImage imageData;
-    imageData.load(&buffer, "PNG");
-    return imageData;
-}
-#endif
-
-/*!
-\internal
-*/
-QString AbstractModelSerialiserPrivate::saveVariant(const QVariant& val)
-{
-    if (val.isNull())
-        return QString();
-    switch (val.type()) {
-    case QMetaType::UnknownType:
-        Q_ASSERT_X(false, "ModelSerialisation::saveVariant", "Trying to save unregistered type.");
-        return QString();
-    case QMetaType::Bool: return val.toBool() ? QStringLiteral("1") : QStringLiteral("0");
-    case QMetaType::Long:
-    case QMetaType::Short:
-    case QMetaType::Char:
-    case QMetaType::SChar:
-    case QMetaType::Int: return QString::number(val.toInt());
-    case QMetaType::ULong:
-    case QMetaType::UShort:
-    case QMetaType::UChar:
-    case QMetaType::UInt: return QString::number(val.toUInt());
-    case QMetaType::LongLong: return QString::number(val.toLongLong());
-    case QMetaType::ULongLong:  return QString::number(val.toULongLong());
-    case QMetaType::Double:  
-    case QMetaType::Float: return guessDecimalsString(val.toDouble());
-    case QMetaType::QChar: return QString(val.toChar());
-    case QMetaType::QString: return val.toString();
-    case QMetaType::QByteArray: return QString::fromLatin1(val.toByteArray().toBase64());
-    case QMetaType::QDate: return val.toDate().toString(Qt::ISODate);
-    case QMetaType::QTime: return val.toTime().toString(Qt::ISODate);
-    case QMetaType::QDateTime: return val.toDateTime().toString(Qt::ISODate);
-#ifdef QT_GUI_LIB
-    case QMetaType::QImage: return saveImageVariant(val.value<QImage>());
-    case QMetaType::QPixmap: return saveImageVariant(val.value<QPixmap>().toImage());
-    case QMetaType::QBitmap: return saveImageVariant(val.value<QBitmap>().toImage());
-#endif
-    default:
-        return variantToString(val);
-    }
-}
-
-/*!
-Construct a read/write serialiser
-*/
-AbstractModelSerialiser::AbstractModelSerialiser(QAbstractItemModel* model)
-    :d_ptr(new AbstractModelSerialiserPrivate(this))
+AbstractModelSerialiser::AbstractModelSerialiser(QAbstractItemModel* model, QObject* parent)
+    : QObject(parent)
+    , d_ptr(new AbstractModelSerialiserPrivate(this))
 {
     setModel(model);
 }
-
 /*!
-Construct a write-only serialiser
+\overload
+
+loadModel will always fail as the model is not editable
 */
-AbstractModelSerialiser::AbstractModelSerialiser(const QAbstractItemModel* model)
-    : d_ptr(new AbstractModelSerialiserPrivate(this))
+AbstractModelSerialiser::AbstractModelSerialiser(const QAbstractItemModel* model, QObject* parent)
+    : QObject(parent)
+    , d_ptr(new AbstractModelSerialiserPrivate(this))
 {
     setModel(model);
 }
-
 /*!
-Constructor used only while subclassing the private class.
-Not part of the public API
+\internal
 */
-AbstractModelSerialiser::AbstractModelSerialiser(AbstractModelSerialiserPrivate& d)
+AbstractModelSerialiser::AbstractModelSerialiser(AbstractModelSerialiserPrivate& d, QObject* parent)
     :d_ptr(&d)
 {}
 
 /*!
 Destructor
 */
-AbstractModelSerialiser::~AbstractModelSerialiser()
-{
-    if (d_ptr)
-        delete d_ptr;
-}
+AbstractModelSerialiser::~AbstractModelSerialiser() = default;
 
 /*!
-    \property AbstractModelSerialiser::model
-    \brief the model over which the serialiser will operate
+\property AbstractSingleRoleSerialiser::rolesToSave
+\brief the roles that will be serialised
+
+by default this property is set to all non obsolete Qt::ItemDataRole values
 */
 
 /*!
-    \brief getter of model property
+\brief getter of rolesToSave property
 */
-QAbstractItemModel* AbstractModelSerialiser::model() const
+const QList<int>& AbstractModelSerialiser::rolesToSave() const
 {
     Q_D(const AbstractModelSerialiser);
     
-    return d->m_model;
+    return d->m_rolesToSave;
 }
-
 /*!
-    \brief the model over which the serialiser will operate
-
-    loadModel will always fail as the model is not editable
+\brief setter of rolesToSave property
 */
-const QAbstractItemModel* AbstractModelSerialiser::constModel() const
-{
-    Q_D(const AbstractModelSerialiser);
-    
-    return d->m_constModel;
-}
-
-/*! 
-    \brief setter of model property
-*/
-void AbstractModelSerialiser::setModel(QAbstractItemModel* val)
+void AbstractModelSerialiser::setRoleToSave(const QList<int>& val)
 {
     Q_D(AbstractModelSerialiser);
     
+    d->m_rolesToSave = val;
+}
+/*!
+\brief appends \a role to the list of roles to save
+*/
+void AbstractModelSerialiser::addRoleToSave(int role)
+{
+    Q_D(AbstractModelSerialiser);
+    
+    if (!d->m_rolesToSave.contains(role))
+        d->m_rolesToSave.append(role);
+}
+/*!
+\brief removes \a role from the list of roles to save
+*/
+void AbstractModelSerialiser::removeRoleToSave(int role)
+{
+    Q_D(AbstractModelSerialiser);
+    
+    d->m_rolesToSave.removeAll(role);
+}
+/*!
+\brief empties the list of roles to save
+*/
+void AbstractModelSerialiser::clearRoleToSave()
+{
+    Q_D(AbstractModelSerialiser);
+    
+    d->m_rolesToSave.clear();
+}
+/*!
+\brief resetter of rolesToSave property
+
+fills the list fo roles to save with all non obsolete Qt::ItemDataRole values
+*/
+void AbstractModelSerialiser::resetRoleToSave()
+{
+    Q_D(AbstractModelSerialiser);
+    
+    d->m_rolesToSave = AbstractModelSerialiser::modelDefaultRoles();
+}
+/*!
+Returns a list of all non obsolete Qt::ItemDataRole values
+*/
+QList<int> AbstractModelSerialiser::modelDefaultRoles()
+{
+    return QList<int>{{
+            Qt::EditRole
+            , Qt::DecorationRole
+            , Qt::ToolTipRole
+            , Qt::StatusTipRole
+            , Qt::WhatsThisRole
+            , Qt::SizeHintRole
+            , Qt::FontRole
+            , Qt::TextAlignmentRole
+            , Qt::BackgroundRole
+            , Qt::ForegroundRole
+            , Qt::CheckStateRole
+            , Qt::InitialSortOrderRole
+            , Qt::AccessibleTextRole
+            , Qt::AccessibleDescriptionRole
+            , Qt::UserRole
+        }};
+}
+
+QAbstractItemModel* AbstractModelSerialiser::model() const
+{
+    Q_D(const AbstractModelSerialiser);
+
+    return d->m_model;
+}
+
+
+const QAbstractItemModel* AbstractModelSerialiser::constModel() const
+{
+    Q_D(const AbstractModelSerialiser);
+
+    return d->m_constModel;
+}
+
+void AbstractModelSerialiser::setModel(QAbstractItemModel* val)
+{
+    Q_D(AbstractModelSerialiser);
+
     d->m_model = val;
     d->m_constModel = val;
 }
 
-/*!
-    \brief set the model over which the serialiser will operate
-
-    loadModel will always fail as the model is not editable
-*/
 void AbstractModelSerialiser::setModel(const QAbstractItemModel* val)
 {
     Q_D(AbstractModelSerialiser);
-    
+
     d->m_model = Q_NULLPTR;
     d->m_constModel = val;
 }

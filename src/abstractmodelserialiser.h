@@ -11,24 +11,34 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef abstractmodelserialiser_h__
-#define abstractmodelserialiser_h__
+#ifndef abstractmultiroleserialiser_h__
+#define abstractmultiroleserialiser_h__
+
 #include "modelutilities_global.h"
 #include <QObject>
+#include <QScopedPointer>
 class AbstractModelSerialiserPrivate;
-class QAbstractItemModel;
 class QIODevice;
-class MODELUTILITIES_EXPORT AbstractModelSerialiser
+class QAbstractItemModel;
+class MODELUTILITIES_EXPORT AbstractModelSerialiser : public QObject
 {
-    Q_GADGET
+    Q_OBJECT
+    Q_PROPERTY(QList<int> rolesToSave READ rolesToSave WRITE setRoleToSave RESET resetRoleToSave)
     Q_PROPERTY(QAbstractItemModel* model READ model WRITE setModel)
     Q_PROPERTY(const QAbstractItemModel* constModel READ constModel WRITE setModel)
     Q_DECLARE_PRIVATE(AbstractModelSerialiser)
     Q_DISABLE_COPY(AbstractModelSerialiser)
 public:
-    AbstractModelSerialiser(QAbstractItemModel* model = Q_NULLPTR);
-    AbstractModelSerialiser(const QAbstractItemModel* model);
+    AbstractModelSerialiser(QAbstractItemModel* model = Q_NULLPTR, QObject* parent = Q_NULLPTR);
+    AbstractModelSerialiser(const QAbstractItemModel* model, QObject* parent = Q_NULLPTR);
     virtual ~AbstractModelSerialiser() = 0;
+    virtual const QList<int>& rolesToSave() const;
+    virtual void setRoleToSave(const QList<int>& val);
+    Q_INVOKABLE virtual void addRoleToSave(int role);
+    Q_INVOKABLE virtual void removeRoleToSave(int role);
+    Q_INVOKABLE virtual void clearRoleToSave();
+    virtual void resetRoleToSave();
+    static QList<int> modelDefaultRoles();
     virtual QAbstractItemModel* model() const;
     virtual const QAbstractItemModel* constModel() const;
     void setModel(QAbstractItemModel* val);
@@ -38,8 +48,7 @@ public:
     Q_INVOKABLE virtual bool loadModel(QIODevice* source) = 0;
     Q_INVOKABLE virtual bool loadModel(const QByteArray& source) = 0;
 protected:
-    AbstractModelSerialiserPrivate* d_ptr;
-    AbstractModelSerialiser(AbstractModelSerialiserPrivate& d);
+    AbstractModelSerialiser(AbstractModelSerialiserPrivate& d, QObject* parent);
+    QScopedPointer<AbstractModelSerialiserPrivate> d_ptr;
 };
-
-#endif // abstractmodelserialiser_h__
+#endif // abstractmultiroleserialiser_h__
