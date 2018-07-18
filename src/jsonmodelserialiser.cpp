@@ -34,13 +34,23 @@ bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject& source, const
     QJsonValue tempValue = source.value(QLatin1String("rows"));
     if (tempValue.isUndefined() || !tempValue.isDouble())
         return false;
-    const int maxRow = tempValue.toInt();
+    const int maxRow =
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
+        tempValue.toInt();
+#else
+        static_cast<int>(tempValue.toDouble());
+#endif
     if(!m_model->insertRows(0, maxRow, parent))
         return false;
     tempValue = source.value(QLatin1String("columns"));
     if (tempValue.isUndefined() || !tempValue.isDouble())
         return false;
-    const int maxCol = tempValue.toInt();
+    const int maxCol = 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
+        tempValue.toInt();
+#else
+        static_cast<int>(tempValue.toDouble());
+#endif
     if (!m_model->insertColumns(0, maxCol, parent))
         return false;
     if (!parent.isValid()) {
@@ -58,7 +68,12 @@ bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject& source, const
                     tempValue = sectionObject.value(QLatin1String("section"));
                     if (tempValue.isUndefined() || !tempValue.isDouble())
                         return false;
-                    const int sectIdx = tempValue.toInt();
+                    const int sectIdx = 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
+                        tempValue.toInt();
+#else
+                        static_cast<int>(tempValue.toDouble());
+#endif
                     tempValue = sectionObject.value(QLatin1String("values"));
                     if (tempValue.isUndefined() || !tempValue.isArray())
                         return false;
@@ -71,11 +86,21 @@ bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject& source, const
                         tempValue = roleObject.value(QLatin1String("role"));
                         if (tempValue.isUndefined() || !tempValue.isDouble())
                             return false;
-                        const int tempRole = tempValue.toInt();
+                        const int tempRole = 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
+                            tempValue.toInt();
+#else
+                            static_cast<int>(tempValue.toDouble());
+#endif
                         tempValue = roleObject.value(QLatin1String("type"));
                         if (tempValue.isUndefined() || !tempValue.isDouble())
                             return false;
-                        const int tempType = tempValue.toInt();
+                        const int tempType = 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
+                            tempValue.toInt();
+#else
+                            static_cast<int>(tempValue.toDouble());
+#endif
                         tempValue = roleObject.value(QLatin1String("value"));
                         if (tempValue.isUndefined() || !tempValue.isString())
                             return false;
@@ -102,13 +127,23 @@ bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject& source, const
         tempValue = dataObject.value(QLatin1String("row"));
         if (tempValue.isUndefined() || !tempValue.isDouble())
             return false;
-        const int currRow = tempValue.toInt();
+        const int currRow = 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
+            tempValue.toInt();
+#else
+            static_cast<int>(tempValue.toDouble());
+#endif
         if (currRow >= maxRow || currRow < 0)
             return false;
         tempValue = dataObject.value(QLatin1String("col"));
         if (tempValue.isUndefined() || !tempValue.isDouble())
             return false;
-        const int currCol = tempValue.toInt();
+        const int currCol = 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
+            tempValue.toInt();
+#else
+            static_cast<int>(tempValue.toDouble());
+#endif
         if (currCol >= maxCol || currCol < 0)
             return false;
         const QModelIndex currIdx = m_model->index(currRow, currCol, parent);
@@ -147,11 +182,21 @@ bool JsonModelSerialiserPrivate::roleForObject(const QJsonObject& source, const 
     QJsonValue tempValue = source.value(QLatin1String("role"));
     if (tempValue.isUndefined() || !tempValue.isDouble())
         return false;
-    const int tempRole = tempValue.toInt();
+    const int tempRole = 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
+        tempValue.toInt();
+#else
+        static_cast<int>(tempValue.toDouble());
+#endif
     tempValue = source.value(QLatin1String("type"));
     if (tempValue.isUndefined() || !tempValue.isDouble())
         return false;
-    const int tempType = tempValue.toInt();
+    const int tempType = 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
+        tempValue.toInt();
+#else
+        static_cast<int>(tempValue.toDouble());
+#endif
     tempValue = source.value(QLatin1String("value"));
     if (tempValue.isUndefined() || !tempValue.isString())
         return false;
