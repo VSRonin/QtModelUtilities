@@ -28,6 +28,8 @@ public:
     virtual ~AbstractStringSerialiser() = 0;
     QTextCodec* textCodec() const;
     bool setTextCodec(QTextCodec* val);
+    Q_INVOKABLE virtual bool saveModel(QString* destination) const =0;
+    Q_INVOKABLE virtual bool loadModel(QString* source) = 0;
 protected:
     AbstractStringSerialiser(AbstractStringSerialiserPrivate& d, QObject* parent);
 };

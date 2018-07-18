@@ -32,12 +32,12 @@ public:
     ~XmlModelSerialiser();
     bool printStartDocument() const;
     void setPrintStartDocument(bool val);
-    Q_INVOKABLE bool saveModel(QIODevice* destination) const Q_DECL_OVERRIDE;
-    Q_INVOKABLE bool saveModel(QByteArray* destination) const Q_DECL_OVERRIDE;
-    Q_INVOKABLE virtual bool saveModel(QString* destination) const;
-    Q_INVOKABLE bool loadModel(QIODevice* source) Q_DECL_OVERRIDE;
-    Q_INVOKABLE bool loadModel(const QByteArray& source) Q_DECL_OVERRIDE;
-    Q_INVOKABLE virtual bool loadModel(QString* source);
+    bool saveModel(QIODevice* destination) const Q_DECL_OVERRIDE;
+    bool saveModel(QByteArray* destination) const Q_DECL_OVERRIDE;
+    bool saveModel(QString* destination) const Q_DECL_OVERRIDE;
+    bool loadModel(QString* source) Q_DECL_OVERRIDE;
+    bool loadModel(QIODevice* source) Q_DECL_OVERRIDE;
+    bool loadModel(const QByteArray& source) Q_DECL_OVERRIDE;
 protected:
     XmlModelSerialiser(XmlModelSerialiserPrivate& d, QObject* parent);
 
