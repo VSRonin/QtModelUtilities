@@ -14,6 +14,7 @@
 #include <XmlModelSerialiser>
 #include <HtmlModelSerialiser>
 #include <CsvModelSerialiser>
+#include <JsonModelSerialiser>
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -72,7 +73,7 @@ int main(int argc, char *argv[])
     mainLay->addWidget(sourceViewer, 2, 3);
     // save and load the model when the combo changes
     QObject::connect(formatSelector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&mainWidget, &baseModel, &loadedModel, sourceViewer, savedViewer](int idx)->void {
-        AbstractModelSerialiser* serial=nullptr;
+        AbstractModelSerialiser* serial = nullptr;
         switch (idx){
         case 0:
             serial = new BinaryModelSerialiser;
@@ -85,6 +86,9 @@ int main(int argc, char *argv[])
             break;
         case 3:
             serial = new CsvModelSerialiser;
+            break;
+        case 4:
+            serial = new JsonModelSerialiser;
             break;
         default:
             Q_UNREACHABLE();
@@ -104,9 +108,9 @@ int main(int argc, char *argv[])
         tempFile.seek(0); // go back to the beginning of the file
         sourceViewer->setPlainText(QTextStream(&tempFile).readAll()); // load the plain text 
         savedViewer->setSource(QUrl::fromLocalFile(QFileInfo(tempFile).absoluteFilePath())); // load the rich text (Qt HTML)
-        delete serial;
+        serial->deleteLater();
     });
-    formatSelector->addItems(QStringList() << QStringLiteral("Binary") << QStringLiteral("XML") << QStringLiteral("HTML") << QStringLiteral("CSV"));
+    formatSelector->addItems(QStringList() << QStringLiteral("Binary") << QStringLiteral("XML") << QStringLiteral("HTML") << QStringLiteral("CSV") << QStringLiteral("JSON"));
     mainWidget.show();
     return a.exec();
 }
