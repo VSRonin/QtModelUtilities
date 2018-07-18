@@ -245,3 +245,9 @@ bool AbstractStringSerialiser::setTextCodec(QTextCodec* val)
     return true;
 }
 
+bool AbstractStringSerialiser::loadModel(const QString& source)
+{
+    QString sourceCopy(source);
+    return loadModel(&sourceCopy);
+}
+

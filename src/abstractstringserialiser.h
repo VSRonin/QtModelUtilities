@@ -30,6 +30,7 @@ public:
     bool setTextCodec(QTextCodec* val);
     Q_INVOKABLE virtual bool saveModel(QString* destination) const =0;
     Q_INVOKABLE virtual bool loadModel(QString* source) = 0;
+    Q_INVOKABLE bool loadModel(const QString& source);
 protected:
     AbstractStringSerialiser(AbstractStringSerialiserPrivate& d, QObject* parent);
 };
