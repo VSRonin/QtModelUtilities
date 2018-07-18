@@ -16,7 +16,6 @@
 #include <QTextStream>
 #include <QJsonParseError>
 #include <QJsonArray>
-#include <QDebug> // #TODO remove me
 
 /*!
 \internal
@@ -168,7 +167,7 @@ QJsonObject JsonModelSerialiserPrivate::objectForRole(int role, const QVariant& 
 {
     QJsonObject roleObject;
     roleObject[QLatin1String("role")] = role;
-    roleObject[QLatin1String("type")] = value.type();
+    roleObject[QLatin1String("type")] = static_cast<int>(value.type());
     roleObject[QLatin1String("value")] = saveVariant(value);
     return roleObject;
 }

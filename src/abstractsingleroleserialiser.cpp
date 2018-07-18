@@ -73,7 +73,7 @@ int AbstractSingleRoleSerialiser::roleToSave() const
 
 void AbstractSingleRoleSerialiser::setRoleToSave(int val)
 {
-    setRoleToSave(QList<int>{{val}});
+    setRoleToSave(QList<int>{val});
 }
 
 /*!
