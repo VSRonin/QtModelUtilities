@@ -22,7 +22,9 @@ class JsonModelSerialiserPrivate;
 class MODELUTILITIES_EXPORT JsonModelSerialiser : public AbstractStringSerialiser
 {
     Q_OBJECT
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 1, 0))
     Q_PROPERTY(QJsonDocument::JsonFormat format READ format WRITE setFormat)
+#endif
     Q_DECLARE_PRIVATE(JsonModelSerialiser)
     Q_DISABLE_COPY(JsonModelSerialiser)
 public:
@@ -36,8 +38,10 @@ public:
     bool loadModel(const QByteArray& source) Q_DECL_OVERRIDE;
     bool loadModel(QString* source) Q_DECL_OVERRIDE;
     Q_INVOKABLE virtual bool fromJsonObject(const QJsonObject& source);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 1, 0))
     QJsonDocument::JsonFormat format() const;
     void setFormat(QJsonDocument::JsonFormat val);
+#endif
 protected:
     JsonModelSerialiser(JsonModelSerialiserPrivate& d, QObject* parent);
 };

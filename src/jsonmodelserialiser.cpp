@@ -22,6 +22,9 @@
 */
 JsonModelSerialiserPrivate::JsonModelSerialiserPrivate(JsonModelSerialiser* q)
     :AbstractStringSerialiserPrivate(q)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 1, 0))
+    , m_format(QJsonDocument::Compact)
+#endif
 {}
 
 /*!
@@ -329,7 +332,11 @@ bool JsonModelSerialiser::saveModel(QString* destination) const
     const QJsonDocument jDoc(toJsonObject());
     if (jDoc.isNull())
         return false;
-    *destination = QString::fromUtf8(jDoc.toJson(d->m_format));
+    *destination = QString::fromUtf8(jDoc.toJson(
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 1, 0))
+        d->m_format
+#endif
+        ));
     return true;
 }
 
@@ -428,7 +435,7 @@ bool JsonModelSerialiser::fromJsonObject(const QJsonObject& source)
     d->m_model->removeRows(0, d->m_model->rowCount());
     return d->fromJsonObject(source);
 }
-
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 1, 0))
 QJsonDocument::JsonFormat JsonModelSerialiser::format() const
 {
     Q_D(const JsonModelSerialiser);
@@ -440,3 +447,4 @@ void JsonModelSerialiser::setFormat(QJsonDocument::JsonFormat val)
     Q_D(JsonModelSerialiser);
     d->m_format = val;
 }
+#endif
