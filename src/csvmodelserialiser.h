@@ -35,12 +35,14 @@ public:
     bool firstColumnIsHeader();
     void setFirstRowIsHeader(bool val);
     void setFirstColumnIsHeader(bool val);
+    virtual bool saveModel(QTextStream& stream) const;
     bool saveModel(QIODevice* destination) const Q_DECL_OVERRIDE;
     bool saveModel(QByteArray* destination) const Q_DECL_OVERRIDE;
     bool saveModel(QString* destination) const Q_DECL_OVERRIDE;
     bool loadModel(QString* source) Q_DECL_OVERRIDE;
     bool loadModel(QIODevice* source) Q_DECL_OVERRIDE;
     bool loadModel(const QByteArray& source) Q_DECL_OVERRIDE;
+    virtual bool loadModel(QTextStream& stream);
 protected:
     CsvModelSerialiser(CsvModelSerialiserPrivate& d, QObject* parent);
 

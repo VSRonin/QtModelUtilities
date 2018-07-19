@@ -344,6 +344,12 @@ bool XmlModelSerialiser::saveModel(QByteArray* destination) const
     return d->writeXml(writer);
 }
 
+bool XmlModelSerialiser::saveModel(QXmlStreamWriter& stream) const
+{
+    Q_D(const XmlModelSerialiser);
+    return d->writeXml(stream);
+}
+
 bool XmlModelSerialiser::loadModel(QIODevice* source)
 {
     if (!source)
@@ -378,6 +384,12 @@ bool XmlModelSerialiser::loadModel(QString* source)
     
     QXmlStreamReader reader(*source);
     return d->readXml(reader);
+}
+
+bool XmlModelSerialiser::loadModel(QXmlStreamReader& stream)
+{
+    Q_D(XmlModelSerialiser);
+    return d->readXml(stream);
 }
 
 XmlModelSerialiser::XmlModelSerialiser(QAbstractItemModel* model, QObject* parent)

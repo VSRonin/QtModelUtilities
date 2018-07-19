@@ -329,6 +329,12 @@ bool CsvModelSerialiser::saveModel(QByteArray* destination) const
     return d->writeCsv(witer);
 }
 
+bool CsvModelSerialiser::saveModel(QTextStream& stream) const
+{
+    Q_D(const CsvModelSerialiser);
+    return d->writeCsv(stream);
+}
+
 /*!
 Loads the model from a \a source device containing csv data in 
 */
@@ -382,6 +388,12 @@ bool CsvModelSerialiser::loadModel(QString* source)
     return d->readCsv(reader);
 }
 
+
+bool CsvModelSerialiser::loadModel(QTextStream& stream)
+{
+    Q_D(CsvModelSerialiser);
+    return d->readCsv(stream);
+}
 
 #ifdef MS_DECLARE_STREAM_OPERATORS
 /*!

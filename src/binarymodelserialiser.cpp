@@ -225,6 +225,12 @@ bool BinaryModelSerialiser::saveModel(QByteArray* destination) const
     return d->writeBinary(witer);
 }
 
+bool BinaryModelSerialiser::saveModel(QDataStream& steram) const
+{
+    Q_D(const BinaryModelSerialiser);
+    return d->writeBinary(steram);
+}
+
 bool BinaryModelSerialiser::loadModel(QIODevice* source)
 {
     if (!source)
@@ -259,6 +265,12 @@ bool BinaryModelSerialiser::loadModel(const QByteArray& source)
 }
 
 
+
+bool BinaryModelSerialiser::loadModel(QDataStream& steram)
+{
+    Q_D(BinaryModelSerialiser);
+    return d->readBinary(steram);
+}
 
 BinaryModelSerialiser::BinaryModelSerialiser(QAbstractItemModel* model, QObject* parent)
     : AbstractModelSerialiser(*new BinaryModelSerialiserPrivate(this), parent)
