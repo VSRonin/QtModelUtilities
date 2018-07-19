@@ -106,6 +106,7 @@ if(BUILD_MODELSERIALISATION)
         src/htmlmodelserialiser.h
         src/jsonmodelserialiser.h
         src/xmlmodelserialiser.h
+        src/modelutilities_global.h
         src/includes/BinaryModelSerialiser
         src/includes/CsvModelSerialiser
         src/includes/HtmlModelSerialiser
