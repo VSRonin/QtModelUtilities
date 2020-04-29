@@ -29,45 +29,45 @@ if(BUILD_DOCS)
 endif()
 
 if(BUILD_ROLEMASKPROXY)
-    set(modelutilities_SRCS src/rolemaskproxymodel.cpp ${modelutilities_SRCS})
-    set(modelutilities_INSTALL_INCLUDE src/rolemaskproxymodel.h src/includes/RoleMaskProxyModel ${modelutilities_INSTALL_INCLUDE})
+    set(modelutilities_SRCS rolemaskproxymodel.cpp ${modelutilities_SRCS})
+    set(modelutilities_INSTALL_INCLUDE rolemaskproxymodel.h includes/RoleMaskProxyModel ${modelutilities_INSTALL_INCLUDE})
 endif()
 if(BUILD_INSERTPROXY)
-    set(modelutilities_SRCS src/insertproxymodel.cpp ${modelutilities_SRCS})
-    set(modelutilities_INSTALL_INCLUDE src/insertproxymodel.h src/includes/InsertProxyModel ${modelutilities_INSTALL_INCLUDE})
+    set(modelutilities_SRCS insertproxymodel.cpp ${modelutilities_SRCS})
+    set(modelutilities_INSTALL_INCLUDE insertproxymodel.h includes/InsertProxyModel ${modelutilities_INSTALL_INCLUDE})
 endif()
 if(BUILD_TRANSPOSEPROXY)
-    set(modelutilities_SRCS src/transposeproxymodel.cpp src/treemapproxymodel.cpp ${modelutilities_SRCS})
-    set(modelutilities_INSTALL_INCLUDE src/transposeproxymodel.h src/treemapproxymodel.h src/includes/TransposeProxyModel ${modelutilities_INSTALL_INCLUDE})
+    set(modelutilities_SRCS transposeproxymodel.cpp treemapproxymodel.cpp ${modelutilities_SRCS})
+    set(modelutilities_INSTALL_INCLUDE transposeproxymodel.h treemapproxymodel.h includes/TransposeProxyModel ${modelutilities_INSTALL_INCLUDE})
 endif()
 if(BUILD_MODELSERIALISATION)
     set(modelutilities_SRCS
-        src/abstractmodelserialiser.cpp
-        src/abstractstringserialiser.cpp
-        src/abstractsingleroleserialiser.cpp
-        src/binarymodelserialiser.cpp
-        src/csvmodelserialiser.cpp
-        src/htmlmodelserialiser.cpp
-        src/jsonmodelserialiser.cpp
-        src/xmlmodelserialiser.cpp
+        abstractmodelserialiser.cpp
+        abstractstringserialiser.cpp
+        abstractsingleroleserialiser.cpp
+        binarymodelserialiser.cpp
+        csvmodelserialiser.cpp
+        htmlmodelserialiser.cpp
+        jsonmodelserialiser.cpp
+        xmlmodelserialiser.cpp
         ${modelutilities_SRCS}
     )
     set(modelutilities_INSTALL_INCLUDE 
-        src/abstractmodelserialiser.h
-        src/abstractstringserialiser.h
-        src/abstractsingleroleserialiser.h
-        src/binarymodelserialiser.h
-        src/csvmodelserialiser.h
-        src/htmlmodelserialiser.h
-        src/jsonmodelserialiser.h
-        src/xmlmodelserialiser.h
-        src/modelutilities_global.h
-        src/includes/BinaryModelSerialiser
-        src/includes/CsvModelSerialiser
-        src/includes/HtmlModelSerialiser
-        src/includes/JsonModelSerialiser
-        src/includes/ModelSerialisers
-        src/includes/XmlModelSerialiser
+        abstractmodelserialiser.h
+        abstractstringserialiser.h
+        abstractsingleroleserialiser.h
+        binarymodelserialiser.h
+        csvmodelserialiser.h
+        htmlmodelserialiser.h
+        jsonmodelserialiser.h
+        xmlmodelserialiser.h
+        modelutilities_global.h
+        includes/BinaryModelSerialiser
+        includes/CsvModelSerialiser
+        includes/HtmlModelSerialiser
+        includes/JsonModelSerialiser
+        includes/ModelSerialisers
+        includes/XmlModelSerialiser
         ${modelutilities_INSTALL_INCLUDE}
     )
 endif()
@@ -131,9 +131,6 @@ install(EXPORT modelutilitiesTargets
 	NAMESPACE QtModelUtilities::
 	DESTINATION lib/cmake/QtModelUtilities
 )
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file("QtModelUtilitiesVersion.cmake" VERSION ${VERSION_SHORT} COMPATIBILITY ${VERSION_MAJOR})
-install(FILES "QtModelUtilitiesConfig.cmake" "QtModelUtilitiesVersion.cmake" DESTINATION lib/cmake/QtModelUtilitiesQ)
 SET(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
 SET(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
 SET(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
