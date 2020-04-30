@@ -5,91 +5,91 @@ branches:
     - dev
     - appveyor
 
-image: Visual Studio 2015
+image: Visual Studio 2017
 clone_depth: 1
 environment:
   global:
     LatestQtVersion: 5.13
   matrix:
   - QT5: C:\Qt\%LatestQtVersion%\msvc2017
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
     platform: x86
     use_mingw: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "true"
   - QT5: C:\Qt\%LatestQtVersion%\msvc2017
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
     platform: x86
     use_mingw: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "false"
   - QT5: C:\Qt\%LatestQtVersion%\msvc2017
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
     platform: x86
     use_mingw: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "true"
   - QT5: C:\Qt\%LatestQtVersion%\msvc2017
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
     platform: x86
     use_mingw: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "false"
   - QT5: C:\Qt\%LatestQtVersion%\msvc2017
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
     platform: x86
     use_mingw: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "true"
   - QT5: C:\Qt\%LatestQtVersion%\msvc2017
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
     platform: x86
     use_mingw: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "false"
   - QT5: C:\Qt\%LatestQtVersion%\msvc2017_64
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
     platform: amd64
     use_mingw: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "true"
   - QT5: C:\Qt\%LatestQtVersion%\msvc2017_64
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
     platform: amd64
     use_mingw: "false"
     use_gui: "true"
     use_widgets: "true"
     use_static: "false"
   - QT5: C:\Qt\%LatestQtVersion%\msvc2017_64
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
     platform: amd64
     use_mingw: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "true"
   - QT5: C:\Qt\%LatestQtVersion%\msvc2017_64
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
     platform: amd64
     use_mingw: "false"
     use_gui: "true"
     use_widgets: "false"
     use_static: "false"
   - QT5: C:\Qt\%LatestQtVersion%\msvc2017_64
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
     platform: amd64
     use_mingw: "false"
     use_gui: "false"
     use_widgets: "false"
     use_static: "true"
   - QT5: C:\Qt\%LatestQtVersion%\msvc2017_64
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
     platform: amd64
     use_mingw: "false"
     use_gui: "false"
@@ -142,7 +142,9 @@ matrix:
   fast_finish: true
 
 before_build:
-- call "%QT5%\qtenv2.bat"
+- set SOURCEDIR=%cd%
+- call "%QT5%\bin\qtenv2.bat"
+- cd /D %SOURCEDIR%
 - if not %use_mingw%==true call "%COMPILER%\vcvarsall.bat" %platform%
 - if %use_static%==true (set USESTATIC=ON) else (set USESTATIC=OFF)
 - if %use_gui%==true (set USEGUI=OFF) else (set USEGUI=ON)
