@@ -16,6 +16,7 @@ option(OPTIMISE_FOR_MANY_ROLES "Set this property to ON if you plan to store mor
 include(CTest)
 include(GetGitRevisionDescription)
 git_describe(GitTagVersion --tags)
+message("Version in git tag: ${GitTagVersion}")
 string(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" VERSION_MAJOR "${GitTagVersion}")
 string(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" VERSION_MINOR "${GitTagVersion}")
 string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" VERSION_PATCH "${GitTagVersion}")
