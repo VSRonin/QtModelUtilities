@@ -1,5 +1,6 @@
 #ifndef MODELTESTMANAGER_H
 #define MODELTESTMANAGER_H
+#include <QtGlobal>
 #if QT_VERSION < QT_VERSION_CHECK(5, 11, 0)
     #ifndef MOC_MODEL_TEST
         class ModelTest : public QObject
@@ -22,7 +23,7 @@
         Q_DISABLE_COPY(ModelTest)
     public:
         ModelTest(QAbstractItemModel* model, QObject* parent)
-            : QAbstractItemModelTester(model, QAbstractItemModelTester::FailureReportingMode::Fatal,parent)
+            : QAbstractItemModelTester(model, QAbstractItemModelTester::FailureReportingMode::QtTest, parent)
         {}
     };
 #endif

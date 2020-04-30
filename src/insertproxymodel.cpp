@@ -353,7 +353,7 @@ QModelIndex InsertProxyModel::buddy(const QModelIndex &index) const
 */
 bool InsertProxyModel::hasChildren(const QModelIndex &parent) const
 {
-    return !parent.isValid();
+    return rowCount(parent) > 0;
 }
 
 /*!

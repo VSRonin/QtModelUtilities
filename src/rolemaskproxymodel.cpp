@@ -125,6 +125,8 @@ bool RoleMaskProxyModelPrivate::removeRole(const QHash<QPersistentModelIndex, Ro
 void RoleMaskProxyModelPrivate::signalAllChanged(const QVector<int>& roles, const QModelIndex& parent)
 {
     Q_Q(RoleMaskProxyModel);
+    if (!q->sourceModel())
+        return;
     const int rowCnt = q->rowCount(parent);
     const int colCnt = q->columnCount(parent);
     for (int i = 0; i < rowCnt;++i){
@@ -134,7 +136,7 @@ void RoleMaskProxyModelPrivate::signalAllChanged(const QVector<int>& roles, cons
                 signalAllChanged(roles, currPar);
         }
     }
-    q->dataChanged(q->index(0, 0, parent), q->index(rowCnt, colCnt, parent), roles);
+    q->dataChanged(q->index(0, 0, parent), q->index(rowCnt - 1, colCnt - 1, parent), roles);
 }
 
 /*!
