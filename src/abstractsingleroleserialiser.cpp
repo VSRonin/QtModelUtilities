@@ -83,7 +83,7 @@ If \a val contains more than one value only the first one is considered
 void AbstractSingleRoleSerialiser::setRoleToSave(const QList<int>& val)
 {
     if (val.size() > 1)
-        return AbstractModelSerialiser::setRoleToSave(QList<int>{{val.first()}});
+        return AbstractModelSerialiser::setRoleToSave(QList<int>{val.first()});
     return AbstractModelSerialiser::setRoleToSave(val);
 }
 

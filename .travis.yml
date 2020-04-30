@@ -32,6 +32,8 @@ matrix:
         - libgl-dev
         - libgl1-mesa-dev
         - mesa-common-dev
+        - libdbus-1-3
+        - libxkbcommon-x11-0
     script:
         - PATH="/opt/qt514/bin:$PATH"
         - CXX="g++-6"
@@ -70,6 +72,8 @@ matrix:
         - libgl-dev
         - libgl1-mesa-dev
         - mesa-common-dev
+        - libdbus-1-3
+        - libxkbcommon-x11-0
     script:
         - PATH="/opt/qt514/bin:$PATH"
         - CXX="g++-6"
@@ -108,6 +112,8 @@ matrix:
         - libgl-dev
         - libgl1-mesa-dev
         - mesa-common-dev
+        - libdbus-1-3
+        - libxkbcommon-x11-0
     script:
         - PATH="/opt/qt514/bin:$PATH"
         - CXX="g++-6"
@@ -146,6 +152,8 @@ matrix:
         - libgl-dev
         - libgl1-mesa-dev
         - mesa-common-dev
+        - libdbus-1-3
+        - libxkbcommon-x11-0
     script:
         - PATH="/opt/qt514/bin:$PATH"
         - CXX="g++-6"
@@ -184,6 +192,8 @@ matrix:
         - libgl-dev
         - libgl1-mesa-dev
         - mesa-common-dev
+        - libdbus-1-3
+        - libxkbcommon-x11-0
     script:
         - PATH="/opt/qt514/bin:$PATH"
         - CXX="g++-6"
@@ -222,6 +232,8 @@ matrix:
         - libgl-dev
         - libgl1-mesa-dev
         - mesa-common-dev
+        - libdbus-1-3
+        - libxkbcommon-x11-0
     script:
         - PATH="/opt/qt514/bin:$PATH"
         - CXX="g++-6"
@@ -316,7 +328,7 @@ matrix:
         - cmake --build .
         - cmake --build . --target install
         - ctest --verbose   
-  - name: macOS Static
+  - name: MacOS Static
     os: osx
     osx_image: xcode11.3
     compiler: clang
@@ -340,7 +352,7 @@ matrix:
         - cmake --build .
         - cmake --build . --target install
         - ctest --verbose
-  - name: macOS Dynamic
+  - name: MacOS Dynamic
     os: osx
     osx_image: xcode11.3
     compiler: clang
@@ -361,6 +373,150 @@ matrix:
         - cmake --build . --target install
         - ctest --verbose
         - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=OFF -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+  - name: MacOS Static Many Roles
+    os: osx
+    osx_image: xcode11.3
+    compiler: clang
+    addons:
+      homebrew:
+        packages:
+        - qt
+        update: true
+    script:
+        - PATH="/usr/local/opt/qt5/bin:$PATH"
+        - mkdir ./build
+        - cd ./build
+        - export PATH=$PATH:$PWD/x64/lib
+        - export PATH=$PATH:$PWD/x64/bin
+        - cmake --version
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=OFF -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=ON ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=OFF -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+  - name: MacOS Dynamic Many Roles
+    os: osx
+    osx_image: xcode11.3
+    compiler: clang
+    addons:
+      homebrew:
+        packages:
+        - qt
+        update: true
+    script:
+        - PATH="/usr/local/opt/qt5/bin:$PATH"
+        - mkdir ./build
+        - cd ./build
+        - export PATH=$PATH:$PWD/x64/lib
+        - export PATH=$PATH:$PWD/x64/bin
+        - cmake --version
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=OFF -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=ON ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=OFF -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=ON ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+  - name: MacOS Static No Widgets
+    os: osx
+    osx_image: xcode11.3
+    compiler: clang
+    addons:
+      homebrew:
+        packages:
+        - qt
+        update: true
+    script:
+        - PATH="/usr/local/opt/qt5/bin:$PATH"
+        - mkdir ./build
+        - cd ./build
+        - export PATH=$PATH:$PWD/x64/lib
+        - export PATH=$PATH:$PWD/x64/bin
+        - cmake --version
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+  - name: MacOS Dynamic No Widgets
+    os: osx
+    osx_image: xcode11.3
+    compiler: clang
+    addons:
+      homebrew:
+        packages:
+        - qt
+        update: true
+    script:
+        - PATH="/usr/local/opt/qt5/bin:$PATH"
+        - mkdir ./build
+        - cd ./build
+        - export PATH=$PATH:$PWD/x64/lib
+        - export PATH=$PATH:$PWD/x64/bin
+        - cmake --version
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+  - name: MacOS Static No GUI
+    os: osx
+    osx_image: xcode11.3
+    compiler: clang
+    addons:
+      homebrew:
+        packages:
+        - qt
+        update: true
+    script:
+        - PATH="/usr/local/opt/qt5/bin:$PATH"
+        - mkdir ./build
+        - cd ./build
+        - export PATH=$PATH:$PWD/x64/lib
+        - export PATH=$PATH:$PWD/x64/bin
+        - cmake --version
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=ON -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+  - name: MacOS Dynamic No GUI
+    os: osx
+    osx_image: xcode11.3
+    compiler: clang
+    addons:
+      homebrew:
+        packages:
+        - qt
+        update: true
+    script:
+        - PATH="/usr/local/opt/qt5/bin:$PATH"
+        - mkdir ./build
+        - cd ./build
+        - export PATH=$PATH:$PWD/x64/lib
+        - export PATH=$PATH:$PWD/x64/bin
+        - cmake --version
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=ON -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
         - cmake --build .
         - cmake --build . --target install
         - ctest --verbose

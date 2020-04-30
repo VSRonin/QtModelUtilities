@@ -170,13 +170,21 @@ RoleMaskProxyModel::~RoleMaskProxyModel()
 QList<int> RoleMaskProxyModel::maskedRoles() const
 {
     Q_D(const RoleMaskProxyModel);
+    #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
     return d->m_maskedRoles.toList();
+    #else
+    return QList<int>(d->m_maskedRoles.begin(), d->m_maskedRoles.end());
+    #endif
 }
 
 void RoleMaskProxyModel::setMaskedRoles(const QList<int>& newRoles)
 {
     Q_D(RoleMaskProxyModel);
+    #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
     const QSet<int> roles = newRoles.toSet();
+    #else
+    const QSet<int> roles(newRoles.begin(), newRoles.end());
+    #endif
     if (d->m_maskedRoles!=roles){
         QVector<int> changedRoles;
         QSet<int> changedRolesSet = roles;

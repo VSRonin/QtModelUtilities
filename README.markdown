@@ -13,7 +13,7 @@ This library is a collection of utilities for Qt's Model/View framework.
 + [Role Mask Proxy Model](https://vsronin.github.io/QtModelUtilities/md__r_e_a_d_m_e__role__mask__proxy__model.html): A proxy that will act as a mask on top of the source model to intercept data.
 + [Insert Proxy Model](https://vsronin.github.io/QtModelUtilities/md__r_e_a_d_m_e__insert__proxy__model.html): A proxy to add an extra row, column or both to allow users to insert new sections with a familiar interface.
 + [Model Serialisation](https://vsronin.github.io/QtModelUtilities/md__r_e_a_d_m_e__model__serialisation.html): Implements a general method to serialise QAbstractItemModel based models to various common formats.
-+ [Transpose Proxy Model](https://vsronin.github.io/QtModelUtilities/md__r_e_a_d_m_e__transpose__proxy__model.html): A proxy model to [transpose](https://en.wikipedia.org/wiki/Transpose#Examples) the original model.
++ ~~Transpose Proxy Model: A proxy model to [transpose](https://en.wikipedia.org/wiki/Transpose#Examples) the original model.~~ Now part of Qt: QTransposeProxyModel
 
 ### Installation
 
