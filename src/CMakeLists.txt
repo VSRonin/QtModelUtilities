@@ -20,12 +20,12 @@ if(NOT NO_WIDGETS)
     message(STATUS "Found Qt Widgets ${Qt5Widgets_VERSION}")
 endif()
 if(BUILD_DOCS)
-	find_package(Doxygen OPTIONAL_COMPONENTS mscgen dia dot)
-	if(DOXYGEN_FOUND)
-		message(STATUS "Found Doxygen ${DOXYGEN_VERSION}")
-	else()  
-		set(BUILD_DOCS OFF)
-	endif()
+    find_package(Doxygen OPTIONAL_COMPONENTS mscgen dia dot)
+    if(DOXYGEN_FOUND)
+        message(STATUS "Found Doxygen ${DOXYGEN_VERSION}")
+    else()
+        set(BUILD_DOCS OFF)
+    endif()
 endif()
 
 if(BUILD_ROLEMASKPROXY)
@@ -73,9 +73,9 @@ if(BUILD_MODELSERIALISATION)
 endif()
 
 if(BUILD_STATIC_LIBS)
-	set(CMAKE_STATIC_LIBRARY_SUFFIX "_static${CMAKE_STATIC_LIBRARY_SUFFIX}")
+    set(CMAKE_STATIC_LIBRARY_SUFFIX "_static${CMAKE_STATIC_LIBRARY_SUFFIX}")
     add_library(modelutilities STATIC ${modelutilities_SRCS})
-    target_compile_definitions(modelutilities PRIVATE MODELUTILITIES_STATIC)
+    target_compile_definitions(modelutilities PUBLIC MODELUTILITIES_STATIC)
 else()
     add_library(modelutilities SHARED ${modelutilities_SRCS})
 endif()
@@ -115,16 +115,16 @@ set_target_properties(modelutilities PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin"
 )
 
-#install(FILES ${modelutilities_INSTALL_INCLUDE}
-#    DESTINATION include 
-#    COMPONENT headers
-#)
+install(FILES ${modelutilities_INSTALL_INCLUDE}
+    DESTINATION include
+    COMPONENT headers
+)
 install(TARGETS modelutilities
     EXPORT modelutilitiesTargets
     RUNTIME DESTINATION bin COMPONENT library
     LIBRARY DESTINATION lib COMPONENT library
     ARCHIVE DESTINATION lib COMPONENT library
-	INCLUDES DESTINATION include COMPONENT library
+    INCLUDES DESTINATION include COMPONENT library
 )
 install(EXPORT modelutilitiesTargets
 	FILE QtModelUtilitiesTargets.cmake
