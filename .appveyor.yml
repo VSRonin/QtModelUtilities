@@ -154,7 +154,6 @@ before_build:
 build_script:
 - mkdir .\build 
 - cd .\build
-- git describe --tags
 - set PATH=%cd%\x86\lib;%cd%\x64\lib;%cd%\x86\bin;%cd%\x64\bin;%PATH%
 - cmake --version
 - cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../

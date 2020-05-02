@@ -15,8 +15,6 @@ matrix:
     group: stable
     services:
         - xvfb
-    services:
-        - xvfb
     compiler: gcc
     addons:
       apt:
@@ -55,8 +53,6 @@ matrix:
     os: linux
     dist: bionic
     group: stable
-    services:
-        - xvfb
     services:
         - xvfb
     compiler: gcc
