@@ -141,6 +141,7 @@ matrix:
   fast_finish: true
 
 before_build:
+- choco install doxygen.install
 - set SOURCEDIR=%cd%
 - call "%QT5%\bin\qtenv2.bat"
 - cd /D %SOURCEDIR%

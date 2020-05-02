@@ -329,7 +329,7 @@ matrix:
         - cmake --build .
         - cmake --build . --target install
         - ctest --verbose
-          - name: Ubuntu Static No GUI
+  - name: Ubuntu Static No GUI
     os: linux
     dist: bionic
     group: stable
