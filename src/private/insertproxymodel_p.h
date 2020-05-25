@@ -52,6 +52,7 @@ class InsertProxyModelPrivate
     void afterSort(bool isRow);
     void beforeLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint);
     void afetrLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint);
+    void afterReset();
     QVector<int> setDataInContainer(RolesContainer& baseHash, int role, const QVariant& value);
     InsertProxyModel* q_ptr;
 };

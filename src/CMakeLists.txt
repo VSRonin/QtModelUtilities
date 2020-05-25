@@ -109,33 +109,40 @@ set_target_properties(modelutilities PROPERTIES
     CXX_STANDARD 11
     CXX_STANDARD_REQUIRED ON
     VERSION ${VERSION_SHORT}
-    EXPORT_NAME "ModelUtilities"
+    EXPORT_NAME "modelutilities"
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin"
 )
-
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file("modelutilitiesConfigVersion.cmake"
+    VERSION ${VERSION_SHORT}
+    COMPATIBILITY SameMajorVersion
+)
 install(FILES ${modelutilities_INSTALL_INCLUDE}
     DESTINATION include
-    COMPONENT headers
 )
 install(TARGETS modelutilities
     EXPORT modelutilitiesTargets
-    RUNTIME DESTINATION bin COMPONENT library
-    LIBRARY DESTINATION lib COMPONENT library
-    ARCHIVE DESTINATION lib COMPONENT library
-    INCLUDES DESTINATION include COMPONENT library
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    INCLUDES DESTINATION include
 )
+install(FILES $<TARGET_PDB_FILE:modelutilities> DESTINATION bin OPTIONAL)
 install(EXPORT modelutilitiesTargets
 	FILE QtModelUtilitiesTargets.cmake
-	NAMESPACE QtModelUtilities::
-	DESTINATION lib/cmake/QtModelUtilities
+	NAMESPACE qmu::
+	DESTINATION lib/cmake/modelutilities
+)
+install(FILES "modelutilitiesConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/modelutilitiesConfigVersion.cmake"
+    DESTINATION lib/cmake/modelutilities
 )
 SET(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
 SET(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
 SET(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
-SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../README.markdown")
-SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/README.markdown")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 SET(CPACK_PACKAGE_FILE_NAME "QtModelUtilities-${VERSION_SHORT}-${CMAKE_SYSTEM_NAME}-${modelutilities_PlatformDir}")
 include(CPack)
 

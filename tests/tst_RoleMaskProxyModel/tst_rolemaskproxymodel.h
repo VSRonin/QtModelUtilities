@@ -32,6 +32,7 @@ private Q_SLOTS:
     void testSetItemDataDataChanged();
     void testSort_data();
     void testSort();
+    void testEmptyProxy();
 private:
     void testTransparentIfEmptyRecurse(const QAbstractItemModel* const baseModel, const RoleMaskProxyModel* const proxyModel, const QModelIndex& maskedIdx, const QVariant& maskedVal, bool nonMaskedIsNull, const QModelIndex& sourceParent = QModelIndex());
     int countChildren(const QAbstractItemModel* const baseModel, const QModelIndex& parIdx = QModelIndex());

@@ -4,6 +4,7 @@
 #ifdef QT_GUI_LIB
 #include <QStandardItemModel>
 #endif
+#include <QSortFilterProxyModel>
 #include <QtTest/QSignalSpy>
 #include <QList>
 #include <QVariant>
@@ -739,6 +740,20 @@ void tst_RoleMaskProxyModel::testSort()
         QCOMPARE(proxyModel.index(i, 0).data().toString().toInt(), proxyModel.index(i - 1, 0).data().toString().toInt() + 1);
         QCOMPARE(proxyModel.index(i, 0).data(Qt::UserRole).toInt(), proxyModel.index(i - 1, 0).data(Qt::UserRole).toInt() + 1);
     }
+}
+
+void tst_RoleMaskProxyModel::testEmptyProxy()
+{
+    QSortFilterProxyModel emptyProxy;
+    RoleMaskProxyModel maskProxyModel;
+    new ModelTest(&maskProxyModel, this);
+    maskProxyModel.setMaskedRoles({Qt::DisplayRole, Qt::ToolTipRole, Qt::BackgroundRole});
+    maskProxyModel.setMergeDisplayEdit(true);
+    maskProxyModel.setTransparentIfEmpty(true);
+    maskProxyModel.setSourceModel(&emptyProxy);
+    QCOMPARE(maskProxyModel.rowCount(), 0);
+    QCOMPARE(maskProxyModel.columnCount(), 0);
+    QCOMPARE(maskProxyModel.sourceModel(), &emptyProxy);
 }
 
 void tst_RoleMaskProxyModel::testSetItemData()

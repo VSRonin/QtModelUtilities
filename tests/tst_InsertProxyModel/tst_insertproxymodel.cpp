@@ -6,7 +6,8 @@
 #endif
 #include <QtTest/QTest>
 #include <QtTest/QSignalSpy>
-#include <../modeltestmanager.h>
+#include "../modeltestmanager.h"
+#include <QSortFilterProxyModel>
 
 QAbstractItemModel* createNullModel(QObject* parent){
     Q_UNUSED(parent)
@@ -558,6 +559,76 @@ void tst_InsertProxyModel::testSort_data()
     QTest::addColumn<bool>("sortProxy");
     QTest::newRow("Sort via Proxy") << true;
     QTest::newRow("Sort via Base") << false;
+}
+
+void tst_InsertProxyModel::testInsertOnEmptyModel()
+{
+    QStringListModel baseModel1;
+    InsertProxyModel proxyModel1;
+    new ModelTest(&proxyModel1, this);
+    proxyModel1.setSourceModel(&baseModel1);
+    proxyModel1.setInsertDirection(InsertProxyModel::InsertRow);
+    proxyModel1.setData(proxyModel1.index(0,0),QStringLiteral("London"));
+    QCOMPARE(proxyModel1.rowCount(), 1);
+    QCOMPARE(proxyModel1.index(0,0).data().toString(), QStringLiteral("London"));
+    proxyModel1.commitRow();
+    QCOMPARE(baseModel1.rowCount(), 1);
+    QCOMPARE(baseModel1.index(0,0).data().toString(), QStringLiteral("London"));
+#if defined(QT_GUI_LIB)
+    QStandardItemModel baseModel2;
+    baseModel2.insertColumns(0,2);
+    InsertProxyModel proxyModel2;
+    new ModelTest(&proxyModel2, this);
+    proxyModel2.setSourceModel(&baseModel2);
+    proxyModel2.setInsertDirection(InsertProxyModel::InsertRow);
+    proxyModel2.setData(proxyModel2.index(0,1),QStringLiteral("London"));
+    QCOMPARE(proxyModel2.rowCount(), 1);
+    QCOMPARE(proxyModel2.index(0,1).data().toString(), QStringLiteral("London"));
+    QVERIFY(!proxyModel2.index(0,0).data().isValid());
+    proxyModel2.commitRow();
+    QCOMPARE(baseModel2.rowCount(), 1);
+    QCOMPARE(baseModel2.index(0,1).data().toString(), QStringLiteral("London"));
+    QVERIFY(!baseModel2.index(0,0).data().isValid());
+
+    QStandardItemModel baseModel3;
+    InsertProxyModel proxyModel3;
+    new ModelTest(&proxyModel3, this);
+    proxyModel3.setSourceModel(&baseModel3);
+    proxyModel3.setInsertDirection(InsertProxyModel::InsertRow);
+    baseModel3.insertColumns(0,2);
+    proxyModel3.setData(proxyModel3.index(0,1),QStringLiteral("London"));
+    QCOMPARE(proxyModel3.rowCount(), 1);
+    QCOMPARE(proxyModel3.index(0,1).data().toString(), QStringLiteral("London"));
+    QVERIFY(!proxyModel3.index(0,0).data().isValid());
+    proxyModel3.commitRow();
+    QCOMPARE(baseModel3.rowCount(), 1);
+    QCOMPARE(baseModel3.index(0,1).data().toString(), QStringLiteral("London"));
+    QVERIFY(!baseModel3.index(0,0).data().isValid());
+#endif
+}
+
+void tst_InsertProxyModel::testResetModel()
+{
+    QStringListModel baseModel1(QStringList({ QStringLiteral("London"), QStringLiteral("Berlin"), QStringLiteral("Paris") }));
+    QStringListModel baseModel2(QStringList({ QStringLiteral("Rome"), QStringLiteral("Madrid") }));
+    QSortFilterProxyModel middleProxy;
+    middleProxy.setSourceModel(&baseModel1);
+    InsertProxyModel insertProxy;
+    new ModelTest(&insertProxy, this);
+    insertProxy.setSourceModel(&middleProxy);
+    insertProxy.setInsertDirection(InsertProxyModel::InsertRow);
+    insertProxy.setData(insertProxy.index(3,0),QStringLiteral("Tokyo"));
+    QSignalSpy insertProxyAboutToResetSpy(&insertProxy, SIGNAL(modelAboutToBeReset()));
+    QVERIFY(insertProxyAboutToResetSpy.isValid());
+    QSignalSpy insertProxyResetSpy(&insertProxy, SIGNAL(modelReset()));
+    QVERIFY(insertProxyResetSpy.isValid());
+    middleProxy.setSourceModel(&baseModel2);
+    QCOMPARE(insertProxy.rowCount(),3);
+    QCOMPARE(insertProxy.index(0,0).data(0).toString(),QStringLiteral("Rome"));
+    QCOMPARE(insertProxy.index(1,0).data(0).toString(),QStringLiteral("Madrid"));
+    QVERIFY(!insertProxy.index(2,0).data(0).isValid());
+    QCOMPARE(insertProxyAboutToResetSpy.count(),1);
+    QCOMPARE(insertProxyResetSpy.count(),1);
 }
 
 void tst_InsertProxyModel::testDisconnectedModel()

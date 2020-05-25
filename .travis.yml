@@ -6,7 +6,7 @@ branches:
   - dev
   - travis
 
-matrix:
+jobs:
   fast_finish: true
   include:
   - name: Ubuntu Static
@@ -329,46 +329,6 @@ matrix:
         - cmake --build .
         - cmake --build . --target install
         - ctest --verbose
-  - name: Ubuntu Static No GUI
-    os: linux
-    dist: bionic
-    group: stable
-    services:
-        - xvfb
-    compiler: gcc
-    addons:
-      apt:
-        sources:
-        - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/opt-qt-5.14.2-bionic'
-        update: true
-        packages:
-        - qt514base
-        - qt514tools
-        - gcc-6
-        - g++-6
-        - libc6-i386
-        - libgl-dev
-        - libgl1-mesa-dev
-        - mesa-common-dev
-    script:
-        - PATH="/opt/qt514/bin:$PATH"
-        - CXX="g++-6"
-        - CC="gcc-6"
-        - qt514-env.sh
-        - mkdir ./build
-        - cd ./build
-        - export PATH=$PATH:$PWD/x64/lib
-        - export PATH=$PATH:$PWD/x64/bin
-        - cmake --version
-        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=ON -DOPTIMISE_FOR_MANY_ROLES=OFF ../
-        - cmake --build .
-        - cmake --build . --target install
-        - ctest --verbose
-        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=ON -DOPTIMISE_FOR_MANY_ROLES=OFF ../
-        - cmake --build .
-        - cmake --build . --target install
-        - ctest --verbose
   - name: Ubuntu Qt Version 5.0
     os: linux
     dist: precise
@@ -380,7 +340,7 @@ matrix:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/ppa:beineri/opt-qt502'
+        - sourceline: 'ppa:beineri/opt-qt502'
         update: true
         packages:
         - qtbase
@@ -388,9 +348,6 @@ matrix:
         - gcc-6
         - g++-6
         - libc6-i386
-        - libgl-dev
-        - libgl1-mesa-dev
-        - mesa-common-dev
     script:
         - PATH="/opt/qt5/bin:$PATH"
         - CXX="g++-6"
@@ -606,18 +563,14 @@ before_deploy:
 - cpack -G TGZ
 
 deploy:
-  skip_cleanup: true
-  api_key: "${GitHubToken}"
+  token: "${GitHubToken}"
   provider: releases
   file_glob: true
   file: "build/*.tar.gz"
   on:
     tags: true
     branch: master
-    condition: $USESTATIC=OFF
-    condition: $NOWIDGETS=OFF
-    condition: $NOGUI=OFF
-    
+    condition: $USESTATIC=OFF $NOWIDGETS=OFF
 notifications:
   email: false
 

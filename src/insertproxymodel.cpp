@@ -271,8 +271,6 @@ void InsertProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
     if (sourceModel()) {
         d->m_sourceConnections
             << QObject::connect(sourceModel(), &QAbstractItemModel::destroyed, [this]()->void { setSourceModel(Q_NULLPTR); })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::modelAboutToBeReset,  [this]()->void { beginResetModel(); })
-            << QObject::connect(sourceModel(), &QAbstractItemModel::modelReset,  [this]()->void { endResetModel(); })
             << QObject::connect(sourceModel(), &QAbstractItemModel::dataChanged,  [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles) {
                 dataChanged(mapFromSource(topLeft), mapFromSource(bottomRight), roles);
             })
@@ -321,6 +319,8 @@ void InsertProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
             << QObject::connect(sourceModel(), &QAbstractItemModel::rowsInserted, [d](const QModelIndex &parent, int first, int last)->void {d->onRowsInserted(parent, first, last); })
             << QObject::connect(sourceModel(), &QAbstractItemModel::rowsRemoved, [d](const QModelIndex &parent, int first, int last)->void {d->onRowsRemoved(parent, first, last); })
             << QObject::connect(sourceModel(), &QAbstractItemModel::rowsMoved, [d](const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)->void {d->onRowsMoved(parent, start, end, destination, row); })
+            << QObject::connect(sourceModel(), &QAbstractItemModel::modelAboutToBeReset, [this]()->void {beginResetModel();})
+            << QObject::connect(sourceModel(), &QAbstractItemModel::modelReset, [d]()->void {d->afterReset();})
         ;
         const int sourceCols = sourceModel()->columnCount();
         const int sourceRows = sourceModel()->rowCount();
@@ -331,6 +331,23 @@ void InsertProxyModel::setSourceModel(QAbstractItemModel* newSourceModel)
     }
    
     endResetModel();
+}
+
+/*!
+\internal
+*/
+void InsertProxyModelPrivate::afterReset()
+{
+    Q_Q(InsertProxyModel);
+    for(auto& extraData : m_extraData)
+        extraData.clear();
+    const int sourceCols = q->sourceModel()->columnCount();
+    const int sourceRows = q->sourceModel()->rowCount();
+    for (int i = 0; i < sourceRows; ++i)
+        m_extraData[0].append(RolesContainer());
+    for (int i = 0; i < sourceCols; ++i)
+        m_extraData[1].append(RolesContainer());
+    q->endResetModel();
 }
 
 /*!
@@ -353,7 +370,7 @@ QModelIndex InsertProxyModel::buddy(const QModelIndex &index) const
 */
 bool InsertProxyModel::hasChildren(const QModelIndex &parent) const
 {
-    return rowCount(parent) > 0;
+    return rowCount(parent) > 0 && columnCount(parent) > 0;
 }
 
 /*!
