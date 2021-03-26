@@ -16,7 +16,9 @@
 
 #include "abstractstringserialiser.h"
 #include "abstractmodelserialiser_p.h"
-class QTextCodec;
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    class QTextCodec;
+#endif
 class AbstractStringSerialiserPrivate : public AbstractModelSerialiserPrivate
 {
     Q_DISABLE_COPY(AbstractStringSerialiserPrivate);
@@ -33,7 +35,9 @@ protected:
     static QString saveVariant(const QVariant& val);  
     static int guessDecimals(double val);
     static QString guessDecimalsString(double val, QLocale* loca = Q_NULLPTR);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     QTextCodec* m_textCodec;
+#endif
 };
 
 #endif // abstractmodelserialiser_p_h__

@@ -76,7 +76,7 @@ void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter& destination,
                 if (!headData.isNull()) {
                     destination.writeStartElement("div");
                     destination.writeAttribute(QStringLiteral("data-rolecode"), QString::number(*roleIter));
-                    destination.writeAttribute(QStringLiteral("data-varianttype"), QString::number(headData.type()));
+                    destination.writeAttribute(QStringLiteral("data-varianttype"), QString::number(headData.userType()));
                     writeHtmlVariant(destination, headData);
                     destination.writeEndElement(); //div
                 }
@@ -96,7 +96,7 @@ void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter& destination,
                 if (!headData.isNull()) {
                     destination.writeStartElement("div");
                     destination.writeAttribute(QStringLiteral("data-rolecode"), QString::number(*roleIter));
-                    destination.writeAttribute(QStringLiteral("data-varianttype"), QString::number(headData.type()));
+                    destination.writeAttribute(QStringLiteral("data-varianttype"), QString::number(headData.userType()));
                     writeHtmlVariant(destination, headData);
                     destination.writeEndElement(); //div
                 }
@@ -111,7 +111,7 @@ void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter& destination,
                 if (!roleData.isNull()) {
                     destination.writeStartElement("div");
                     destination.writeAttribute(QStringLiteral("data-rolecode"), QString::number(*roleIter));
-                    destination.writeAttribute(QStringLiteral("data-varianttype"), QString::number(roleData.type()));
+                    destination.writeAttribute(QStringLiteral("data-varianttype"), QString::number(roleData.userType()));
                     writeHtmlVariant(destination, roleData);
                     destination.writeEndElement(); //div
                 }
@@ -173,7 +173,7 @@ bool HtmlModelSerialiserPrivate::readHtmlElement(QXmlStreamReader& source, const
                 const QXmlStreamAttributes headAttributes = source.attributes();
                 if (!headAttributes.hasAttribute(QStringLiteral("scope")))
                     return false;
-                const QStringRef headScope = headAttributes.value(QStringLiteral("scope"));
+                const auto headScope = headAttributes.value(QStringLiteral("scope"));
                 if (headScope.compare(QStringLiteral("row")) == 0)
                     headCode = Row;
                 else if (headScope.compare(QStringLiteral("col")) == 0)
@@ -257,7 +257,11 @@ bool HtmlModelSerialiserPrivate::writeHtml(QXmlStreamWriter& writer) const
         writer.writeStartElement(QStringLiteral("html"));
         writer.writeStartElement(QStringLiteral("head"));
         writer.writeEmptyElement(QStringLiteral("meta"));
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
         writer.writeAttribute(QStringLiteral("charset"), writer.codec()->name());
+#else
+        writer.writeAttribute(QStringLiteral("charset"), QStringLiteral("UTF-8"));
+#endif
         writer.writeEndElement(); //head
         writer.writeStartElement(QStringLiteral("body"));
     }
@@ -320,7 +324,7 @@ bool HtmlModelSerialiserPrivate::readHtml(QXmlStreamReader& reader)
 */
 void HtmlModelSerialiserPrivate::writeHtmlVariant(QXmlStreamWriter& writer, const QVariant& val)
 {
-    if (isImageType(val.type())) {
+    if (isImageType(val.userType())) {
         writer.writeEmptyElement(QStringLiteral("img"));
         writer.writeAttribute(QStringLiteral("src"), "data:image/png;base64," + saveVariant(val));
         writer.writeAttribute(QStringLiteral("alt"), QStringLiteral("modelimage.png"));
@@ -408,7 +412,9 @@ bool HtmlModelSerialiser::saveModel(QString* destination) const
     if (!d->m_model)
         return false;
     QXmlStreamWriter writer(destination);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     writer.setCodec(textCodec());
+#endif
     return d->writeHtml(writer);
 }
 
@@ -430,7 +436,9 @@ bool HtmlModelSerialiser::saveModel(QIODevice* destination) const
     if (!d->m_model)
         return false;
     QXmlStreamWriter writer(destination);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     writer.setCodec(textCodec());
+#endif
     return d->writeHtml(writer);
 }
 
@@ -446,7 +454,9 @@ bool HtmlModelSerialiser::saveModel(QByteArray* destination) const
     if (!d->m_model)
         return false;
     QXmlStreamWriter writer(destination);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     writer.setCodec(textCodec());
+#endif
     return d->writeHtml(writer);
 }
 

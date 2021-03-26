@@ -5,134 +5,57 @@ branches:
     - dev
     - appveyor
 
-image: Visual Studio 2017
+image: Visual Studio 2019
 environment:
   global:
-    LatestQtVersion: 5.13
+    LatestQtVersion: 6.0
+    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build
   matrix:
-  - QT5: C:\Qt\%LatestQtVersion%\msvc2017
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
-    platform: x86
-    use_mingw: "false"
+  - QTLOCATION: C:\Qt\%LatestQtVersion%\msvc2019_64
     use_gui: "true"
     use_widgets: "true"
     use_static: "true"
-  - QT5: C:\Qt\%LatestQtVersion%\msvc2017
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
-    platform: x86
-    use_mingw: "false"
+  - QTLOCATION: C:\Qt\%LatestQtVersion%\msvc2019_64
     use_gui: "true"
     use_widgets: "true"
     use_static: "false"
-  - QT5: C:\Qt\%LatestQtVersion%\msvc2017
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
-    platform: x86
-    use_mingw: "false"
+  - QTLOCATION: C:\Qt\%LatestQtVersion%\msvc2019_64
     use_gui: "true"
     use_widgets: "false"
     use_static: "true"
-  - QT5: C:\Qt\%LatestQtVersion%\msvc2017
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
-    platform: x86
-    use_mingw: "false"
+  - QTLOCATION: C:\Qt\%LatestQtVersion%\msvc2019_64
     use_gui: "true"
     use_widgets: "false"
     use_static: "false"
-  - QT5: C:\Qt\%LatestQtVersion%\msvc2017
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
-    platform: x86
-    use_mingw: "false"
+  - QTLOCATION: C:\Qt\%LatestQtVersion%\msvc2019_64
     use_gui: "false"
     use_widgets: "false"
     use_static: "true"
-  - QT5: C:\Qt\%LatestQtVersion%\msvc2017
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
-    platform: x86
-    use_mingw: "false"
+  - QTLOCATION: C:\Qt\%LatestQtVersion%\msvc2019_64
     use_gui: "false"
     use_widgets: "false"
     use_static: "false"
-  - QT5: C:\Qt\%LatestQtVersion%\msvc2017_64
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
-    platform: amd64
-    use_mingw: "false"
+  - QTLOCATION: C:\Qt\5.15\msvc2019_64
     use_gui: "true"
     use_widgets: "true"
     use_static: "true"
-  - QT5: C:\Qt\%LatestQtVersion%\msvc2017_64
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
-    platform: amd64
-    use_mingw: "false"
+  - QTLOCATION: C:\Qt\5.15\msvc2019_64
     use_gui: "true"
     use_widgets: "true"
     use_static: "false"
-  - QT5: C:\Qt\%LatestQtVersion%\msvc2017_64
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
-    platform: amd64
-    use_mingw: "false"
+  - QTLOCATION: C:\Qt\5.15\msvc2019_64
     use_gui: "true"
     use_widgets: "false"
     use_static: "true"
-  - QT5: C:\Qt\%LatestQtVersion%\msvc2017_64
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
-    platform: amd64
-    use_mingw: "false"
+  - QTLOCATION: C:\Qt\5.15\msvc2019_64
     use_gui: "true"
     use_widgets: "false"
     use_static: "false"
-  - QT5: C:\Qt\%LatestQtVersion%\msvc2017_64
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
-    platform: amd64
-    use_mingw: "false"
+  - QTLOCATION: C:\Qt\5.15\msvc2019_64
     use_gui: "false"
     use_widgets: "false"
     use_static: "true"
-  - QT5: C:\Qt\%LatestQtVersion%\msvc2017_64
-    COMPILER: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
-    platform: amd64
-    use_mingw: "false"
-    use_gui: "false"
-    use_widgets: "false"
-    use_static: "false"
-  - QT5: C:\Qt\%LatestQtVersion%\mingw73_32
-    COMPILER: C:\Qt\Tools\mingw730_32
-    platform: x86
-    use_mingw: "true"
-    use_gui: "true"
-    use_widgets: "true"
-    use_static: "true"
-  - QT5: C:\Qt\%LatestQtVersion%\mingw73_32
-    COMPILER: C:\Qt\Tools\mingw730_32
-    platform: x86
-    use_mingw: "true"
-    use_gui: "true"
-    use_widgets: "true"
-    use_static: "false"
-  - QT5: C:\Qt\%LatestQtVersion%\mingw73_32
-    COMPILER: C:\Qt\Tools\mingw730_32
-    platform: x86
-    use_mingw: "true"
-    use_gui: "true"
-    use_widgets: "false"
-    use_static: "true"
-  - QT5: C:\Qt\%LatestQtVersion%\mingw73_32
-    COMPILER: C:\Qt\Tools\mingw730_32
-    platform: x86
-    use_mingw: "true"
-    use_gui: "true"
-    use_widgets: "false"
-    use_static: "false"
-  - QT5: C:\Qt\%LatestQtVersion%\mingw73_32
-    COMPILER: C:\Qt\Tools\mingw730_32
-    platform: x86
-    use_mingw: "true"
-    use_gui: "false"
-    use_widgets: "false"
-    use_static: "true"
-  - QT5: C:\Qt\%LatestQtVersion%\mingw73_32
-    COMPILER: C:\Qt\Tools\mingw730_32
-    platform: x86
-    use_mingw: "true"
+  - QTLOCATION: C:\Qt\5.15\msvc2019_64
     use_gui: "false"
     use_widgets: "false"
     use_static: "false"
@@ -143,19 +66,18 @@ matrix:
 before_build:
 - choco install doxygen.install
 - set SOURCEDIR=%cd%
-- call "%QT5%\bin\qtenv2.bat"
+- call "%QTLOCATION%\bin\qtenv2.bat"
 - cd /D %SOURCEDIR%
-- if not %use_mingw%==true call "%COMPILER%\vcvarsall.bat" %platform%
+- call "%COMPILER%\vcvarsall.bat" amd64
 - if %use_static%==true (set USESTATIC=ON) else (set USESTATIC=OFF)
 - if %use_gui%==true (set USEGUI=OFF) else (set USEGUI=ON)
 - if %use_widgets%==true (set USEWIDGETS=OFF) else (set USEWIDGETS=ON)
-- if %use_mingw%==true (set CMAKEGENERATOR="MinGW Makefiles") else (set CMAKEGENERATOR="NMake Makefiles")
-- if %use_mingw%==true set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
+- set CMAKEGENERATOR="NMake Makefiles"
 
 build_script:
 - mkdir .\build 
 - cd .\build
-- set PATH=%cd%\x86\lib;%cd%\x64\lib;%cd%\x86\bin;%cd%\x64\bin;%PATH%
+- set PATH=%cd%\x64\lib;%cd%\x64\bin;%PATH%
 - cmake --version
 - cmake -G %CMAKEGENERATOR% -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=%USESTATIC% -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=%USEWIDGETS% -DNO_GUI=%USEGUI% ../
 - cmake --build .
@@ -167,9 +89,7 @@ build_script:
 - cmake --build . --target test & set preventFail = 1
 
 after_build:
-- if %use_mingw%==true set PATH=C:\Program Files\Git\usr\bin;%PATH%
-- if %use_mingw%==true (set archivename=mingw) else (set archivename=msvc2017)
-- if %platform%==x86 (set archivename=%archivename%_x86) else (set archivename=%archivename%_x64)
+- set archivename=msvc2019_x64
 - if %use_gui%==true if %use_widgets%==true if %use_static%==false cpack -G ZIP
 
 test_script:

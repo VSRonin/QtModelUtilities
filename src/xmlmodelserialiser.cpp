@@ -47,7 +47,7 @@ void XmlModelSerialiserPrivate::writeXmlElement(QXmlStreamWriter& destination, c
                     continue; // Skip unhandled types
                 destination.writeStartElement(QStringLiteral("DataPoint"));
                 destination.writeAttribute(QStringLiteral("Role"), QString::number(*singleRole));
-                destination.writeAttribute(QStringLiteral("Type"), QString::number(roleData.type()));
+                destination.writeAttribute(QStringLiteral("Type"), QString::number(roleData.userType()));
                 destination.writeCharacters(roleString);
                 destination.writeEndElement(); // DataPoint
             }
@@ -170,7 +170,7 @@ bool XmlModelSerialiserPrivate::writeXml(QXmlStreamWriter& writer) const
             writer.writeStartElement(QStringLiteral("HeaderDataPoint"));
             writer.writeAttribute(QStringLiteral("Section"), QString::number(i));
             writer.writeAttribute(QStringLiteral("Role"), QString::number(*singleRole));
-            writer.writeAttribute(QStringLiteral("Type"), QString::number(roleData.type()));
+            writer.writeAttribute(QStringLiteral("Type"), QString::number(roleData.userType()));
             writer.writeCharacters(roleString);
             writer.writeEndElement(); // HeaderDataPoint
         }
@@ -188,7 +188,7 @@ bool XmlModelSerialiserPrivate::writeXml(QXmlStreamWriter& writer) const
             writer.writeStartElement(QStringLiteral("HeaderDataPoint"));
             writer.writeAttribute(QStringLiteral("Section"), QString::number(i));
             writer.writeAttribute(QStringLiteral("Role"), QString::number(*singleRole));
-            writer.writeAttribute(QStringLiteral("Type"), QString::number(roleData.type()));
+            writer.writeAttribute(QStringLiteral("Type"), QString::number(roleData.userType()));
             writer.writeCharacters(roleString);
             writer.writeEndElement(); // HeaderDataPoint
         }
@@ -308,7 +308,9 @@ bool XmlModelSerialiser::saveModel(QString* destination) const
     if (!d->m_model)
         return false;
     QXmlStreamWriter writer(destination);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     writer.setCodec(textCodec());
+#endif
     return d->writeXml(writer);
 }
 
@@ -327,7 +329,9 @@ bool XmlModelSerialiser::saveModel(QIODevice* destination) const
     if (!d->m_model)
         return false;
     QXmlStreamWriter writer(destination);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     writer.setCodec(textCodec());
+#endif
     return d->writeXml(writer);
 }
 
@@ -340,7 +344,9 @@ bool XmlModelSerialiser::saveModel(QByteArray* destination) const
     if (!d->m_model)
         return false;
     QXmlStreamWriter writer(destination);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     writer.setCodec(textCodec());
+#endif
     return d->writeXml(writer);
 }
 

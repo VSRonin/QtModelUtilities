@@ -15,17 +15,20 @@
 #include <QTextStream>
 #include <QDateTime>
 #include <QStringBuilder>
-#include <QTextCodec>
 #include <QStringList>
+#include <QIODevice>
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    #include <QTextCodec>
+#endif
 
 /*!
 \internal
 */
 CsvModelSerialiserPrivate::CsvModelSerialiserPrivate(CsvModelSerialiser* q)
     :AbstractSingleRoleSerialiserPrivate(q)
-    , m_csvSeparator(QLatin1Char(','))
     , m_firstRowIsHeader(true)
     , m_firstColumnIsHeader(true)
+    , m_csvSeparator(QLatin1Char(','))
 {}
 
 /*!
@@ -117,9 +120,11 @@ bool CsvModelSerialiserPrivate::readCsv(QTextStream& reader)
 {
     if (!m_model)
         return false;
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     QTextCodec* const oldCodec = reader.codec();
     Q_ASSERT(QTextCodec::availableCodecs().contains("UTF-8"));
     reader.setCodec("UTF-8");
+#endif
     m_model->removeColumns(0, m_model->columnCount());
     m_model->removeRows(0, m_model->rowCount());
     QString line;
@@ -132,7 +137,9 @@ bool CsvModelSerialiserPrivate::readCsv(QTextStream& reader)
         if (line.count(QChar('\"')) % 2 > 0) {
             m_model->removeColumns(0, m_model->columnCount());
             m_model->removeRows(0, m_model->rowCount());
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
             reader.setCodec(oldCodec);
+#endif
             return false;
         }
         fields.clear();
@@ -143,7 +150,7 @@ bool CsvModelSerialiserPrivate::readCsv(QTextStream& reader)
                 inQuoted = !inQuoted;
             currentField.append(*i);
             if (!inQuoted) {
-                if (currentField.rightRef(m_csvSeparator.size()).compare(m_csvSeparator) == 0) {
+                if (currentField.right(m_csvSeparator.size()).compare(m_csvSeparator) == 0) {
                     currentField.chop(m_csvSeparator.size());
                     fields.append(currentField);
                     currentField.clear();
@@ -159,7 +166,9 @@ bool CsvModelSerialiserPrivate::readCsv(QTextStream& reader)
         else if (m_model->columnCount() != fields.size() - startI) {
             m_model->removeColumns(0, m_model->columnCount());
             m_model->removeRows(0, m_model->rowCount());
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
             reader.setCodec(oldCodec);
+#endif
             return false;
         }
         Q_Q(const CsvModelSerialiser);
@@ -178,7 +187,9 @@ bool CsvModelSerialiserPrivate::readCsv(QTextStream& reader)
             }
         }
     }
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     reader.setCodec(oldCodec);
+#endif
     return true;
 }
 
@@ -286,7 +297,9 @@ bool CsvModelSerialiser::saveModel(QString* destination) const
     if (!d->m_model)
         return false;
     QTextStream writer(destination, QIODevice::WriteOnly | QIODevice::Text);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     writer.setCodec(textCodec());
+#endif
     return d->writeCsv(writer);
 }
 
@@ -309,7 +322,9 @@ bool CsvModelSerialiser::saveModel(QIODevice* destination) const
         return false;
     destination->setTextModeEnabled(true);
     QTextStream writer(destination);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     writer.setCodec(textCodec());
+#endif
     return d->writeCsv(writer);
 }
 
@@ -324,9 +339,11 @@ bool CsvModelSerialiser::saveModel(QByteArray* destination) const
     
     if (!d->m_model)
         return false;
-    QTextStream witer(destination, QIODevice::WriteOnly | QIODevice::Text);
-    witer.setCodec(textCodec());
-    return d->writeCsv(witer);
+    QTextStream writer(destination, QIODevice::WriteOnly | QIODevice::Text);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    writer.setCodec(textCodec());
+#endif
+    return d->writeCsv(writer);
 }
 
 bool CsvModelSerialiser::saveModel(QTextStream& stream) const
@@ -354,7 +371,9 @@ bool CsvModelSerialiser::loadModel(QIODevice* source)
         return false;
     source->setTextModeEnabled(true);
     QTextStream reader(source);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     reader.setCodec(textCodec());
+#endif
     return d->readCsv(reader);
 }
 
@@ -368,7 +387,9 @@ bool CsvModelSerialiser::loadModel(const QByteArray& source)
     if (!d->m_model)
         return false;
     QTextStream reader(source, QIODevice::ReadOnly | QIODevice::Text);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     reader.setCodec(textCodec());
+#endif
     return d->readCsv(reader);
 }
 
@@ -384,7 +405,9 @@ bool CsvModelSerialiser::loadModel(QString* source)
     if (!d->m_model)
         return false;
     QTextStream reader(source, QIODevice::ReadOnly | QIODevice::Text);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     reader.setCodec(textCodec());
+#endif
     return d->readCsv(reader);
 }
 

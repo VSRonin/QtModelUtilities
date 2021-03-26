@@ -38,6 +38,8 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) Q_DECL_OVERRIDE;
     bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles) Q_DECL_OVERRIDE;
     QMap<int, QVariant> itemData(const QModelIndex &index) const Q_DECL_OVERRIDE;
+    QMap<int, QVariant> maskedItemData(const QModelIndex &index) const;
+    void clearMaskedData(const QModelIndex &index);
     bool transparentIfEmpty() const;
     void setTransparentIfEmpty(bool val);
     bool mergeDisplayEdit() const;
@@ -46,6 +48,7 @@ Q_SIGNALS:
     void mergeDisplayEditChanged(bool val);
     void transparentIfEmptyChanged(bool val);
     void maskedRolesChanged();
+    void maskedDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int>& roles);
 protected:
     const QSet<int>& maskedRolesSets() const;
     RoleMaskProxyModel(RoleMaskProxyModelPrivate& dptr, QObject* parent);

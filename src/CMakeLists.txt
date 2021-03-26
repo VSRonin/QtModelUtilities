@@ -1,23 +1,23 @@
 cmake_minimum_required(VERSION 3.3)
 project(ModelUtilitiesLib LANGUAGES CXX)
 
-find_package(Qt5 COMPONENTS Core REQUIRED)
-find_package(Qt5 COMPONENTS Widgets Gui)
-
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Gui)
 message(STATUS "Found Qt Core ${Qt5Core_VERSION}")
 
 
-if(NOT Qt5Gui_FOUND)
+if(NOT "${Qt${QT_VERSION_MAJOR}Gui_FOUND}")
     set(NO_GUI ON)
 endif()
-if(NOT Qt5Widgets_FOUND) 
+if(NOT "${Qt${QT_VERSION_MAJOR}Widgets_FOUND}")
     set(NO_WIDGETS ON)
 endif()
 if(NOT NO_GUI)
-    message(STATUS "Found Qt Gui ${Qt5Gui_VERSION}")
+    message(STATUS "Found Qt Gui ${Qt${QT_VERSION_MAJOR}Gui_VERSION}")
 endif()
 if(NOT NO_WIDGETS)
-    message(STATUS "Found Qt Widgets ${Qt5Widgets_VERSION}")
+    message(STATUS "Found Qt Widgets ${Qt${QT_VERSION_MAJOR}Widgets_VERSION}")
 endif()
 if(BUILD_DOCS)
     find_package(Doxygen OPTIONAL_COMPONENTS mscgen dia dot)
@@ -83,12 +83,12 @@ target_compile_definitions(modelutilities PRIVATE MODELUTILITIES_LIB)
 if(OPTIMISE_FOR_MANY_ROLES)
     target_compile_definitions(modelutilities PRIVATE OPTIMISE_FOR_MANY_ROLES)
 endif()
-target_link_libraries(modelutilities PUBLIC Qt5::Core)
+target_link_libraries(modelutilities PUBLIC Qt${QT_VERSION_MAJOR}::Core)
 if(NOT NO_GUI)
-	target_link_libraries(modelutilities PUBLIC Qt5::Gui)
+        target_link_libraries(modelutilities PUBLIC Qt${QT_VERSION_MAJOR}::Gui)
 endif()
 if(NOT NO_WIDGETS)
-	target_link_libraries(modelutilities PUBLIC Qt5::Widgets)
+        target_link_libraries(modelutilities PUBLIC Qt${QT_VERSION_MAJOR}::Widgets)
 endif()
 
 if(BUILD_DOCS)
@@ -129,7 +129,9 @@ install(TARGETS modelutilities
     ARCHIVE DESTINATION lib
     INCLUDES DESTINATION include
 )
-install(FILES $<TARGET_PDB_FILE:modelutilities> DESTINATION bin OPTIONAL)
+if(NOT BUILD_STATIC_LIBS)
+    install(FILES $<TARGET_PDB_FILE:modelutilities> DESTINATION bin OPTIONAL)
+endif()
 install(EXPORT modelutilitiesTargets
 	FILE QtModelUtilitiesTargets.cmake
 	NAMESPACE qmu::

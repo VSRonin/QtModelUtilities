@@ -15,7 +15,9 @@
 #define abstractmodelserialiser_h__
 #include "modelutilities_global.h"
 #include "abstractmodelserialiser.h"
-#include <QTextCodec>
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    #include <QTextCodec>
+#endif
 class AbstractStringSerialiserPrivate;
 class MODELUTILITIES_EXPORT AbstractStringSerialiser : public AbstractModelSerialiser
 {
@@ -26,8 +28,10 @@ public:
     AbstractStringSerialiser(QAbstractItemModel* model = Q_NULLPTR, QObject* parent = Q_NULLPTR);
     AbstractStringSerialiser(const QAbstractItemModel* model, QObject* parent = Q_NULLPTR);
     virtual ~AbstractStringSerialiser() = 0;
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     QTextCodec* textCodec() const;
     bool setTextCodec(QTextCodec* val);
+#endif
     Q_INVOKABLE virtual bool saveModel(QString* destination) const =0;
     Q_INVOKABLE virtual bool loadModel(QString* source) = 0;
     Q_INVOKABLE bool loadModel(const QString& source);

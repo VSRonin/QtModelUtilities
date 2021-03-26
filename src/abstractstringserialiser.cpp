@@ -35,7 +35,9 @@ This class serve as a base for all serialisers
 
 AbstractStringSerialiserPrivate::AbstractStringSerialiserPrivate(AbstractStringSerialiser* q)
     : AbstractModelSerialiserPrivate(q)
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     , m_textCodec(QTextCodec::codecForName("UTF-8"))
+#endif
 {}
 
 /*!
@@ -165,7 +167,7 @@ QString AbstractStringSerialiserPrivate::saveVariant(const QVariant& val)
 {
     if (val.isNull())
         return QString();
-    switch (val.type()) {
+    switch (val.userType()) {
     case QMetaType::UnknownType:
         Q_ASSERT_X(false, "ModelSerialisation::saveVariant", "Trying to save unregistered type.");
         return QString();
@@ -230,6 +232,7 @@ Destructor
 */
 AbstractStringSerialiser::~AbstractStringSerialiser() = default;
 
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 QTextCodec* AbstractStringSerialiser::textCodec() const
 {
     Q_D(const AbstractStringSerialiser); 
@@ -244,7 +247,7 @@ bool AbstractStringSerialiser::setTextCodec(QTextCodec* val)
     d->m_textCodec = val; 
     return true;
 }
-
+#endif
 bool AbstractStringSerialiser::loadModel(const QString& source)
 {
     QString sourceCopy(source);

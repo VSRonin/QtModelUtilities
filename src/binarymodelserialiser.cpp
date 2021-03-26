@@ -14,7 +14,7 @@
 #include "binarymodelserialiser.h"
 #include "private/binarymodelserialiser_p.h"
 #include <QDataStream>
-
+#include <QIODevice>
 BinaryModelSerialiserPrivate::BinaryModelSerialiserPrivate(BinaryModelSerialiser* q)
     :AbstractModelSerialiserPrivate(q)
 {}

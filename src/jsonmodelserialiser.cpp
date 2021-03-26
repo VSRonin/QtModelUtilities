@@ -16,7 +16,7 @@
 #include <QTextStream>
 #include <QJsonParseError>
 #include <QJsonArray>
-
+#include <QIODevice>
 /*!
 \internal
 */
@@ -215,7 +215,7 @@ QJsonObject JsonModelSerialiserPrivate::objectForRole(int role, const QVariant& 
 {
     QJsonObject roleObject;
     roleObject[QLatin1String("role")] = role;
-    roleObject[QLatin1String("type")] = static_cast<int>(value.type());
+    roleObject[QLatin1String("type")] = static_cast<int>(value.userType());
     roleObject[QLatin1String("value")] = saveVariant(value);
     return roleObject;
 }
@@ -349,7 +349,9 @@ bool JsonModelSerialiser::saveModel(QByteArray* destination) const
     if (!saveModel(&tempString))
         return false;
     QTextStream writer(destination);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     writer.setCodec(textCodec());
+#endif
     writer << tempString;
     return true;
 }
@@ -363,7 +365,9 @@ bool JsonModelSerialiser::saveModel(QIODevice* destination) const
     if (!saveModel(&tempString))
         return false;
     QTextStream writer(destination);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     writer.setCodec(textCodec());
+#endif
     writer << tempString;
     return true;
 }
@@ -407,7 +411,9 @@ bool JsonModelSerialiser::loadModel(QIODevice* source)
         return false;
     source->setTextModeEnabled(true);
     QTextStream reader(source);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     reader.setCodec(textCodec());
+#endif
     QString loadString = reader.readAll();
     return loadModel(&loadString);
 }
@@ -418,7 +424,9 @@ Loads the model from a \a source byte array containing JSON data
 bool JsonModelSerialiser::loadModel(const QByteArray& source)
 {
     QTextStream reader(source, QIODevice::ReadOnly | QIODevice::Text);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     reader.setCodec(textCodec());
+#endif
     QString loadString = reader.readAll();
     return loadModel(&loadString);
 }

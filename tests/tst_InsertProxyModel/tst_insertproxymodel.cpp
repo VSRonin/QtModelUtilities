@@ -13,9 +13,25 @@ QAbstractItemModel* createNullModel(QObject* parent){
     Q_UNUSED(parent)
     return nullptr;
 }
+
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    using StringListModel = QStringListModel;
+#else
+class StringListModel : public QStringListModel{
+public:
+    using QStringListModel::QStringListModel;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override{
+        const QVariant baseData = QStringListModel::data(index, role);
+        if(baseData.toString().isEmpty())
+            return QVariant();
+        return baseData;
+    }
+};
+#endif
+
 QAbstractItemModel* createListModel(QObject* parent) 
 {
-    return new QStringListModel(QStringList() << QStringLiteral("1") << QStringLiteral("2") << QStringLiteral("3") << QStringLiteral("4") << QStringLiteral("5"), parent);
+    return new StringListModel(QStringList() << QStringLiteral("1") << QStringLiteral("2") << QStringLiteral("3") << QStringLiteral("4") << QStringLiteral("5"), parent);
 }
 
 QAbstractItemModel* createTableModel(QObject* parent)

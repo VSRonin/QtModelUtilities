@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(exam_RoleMaskProxyModel LANGUAGES CXX)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-find_package(Qt5 COMPONENTS Core Gui Widgets Sql REQUIRED)
-find_package(Qt5 COMPONENTS Sql)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Gui Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Gui Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Sql)
 
 set(exam_RoleMaskProxyModel_EditableSQL_SRCS
     exam_rolemaskeditablesql.cpp
@@ -15,7 +16,7 @@ if(BUILD_STATIC_LIBS)
 endif()
 
 target_include_directories(exam_RoleMaskProxyModel_Highlight PRIVATE ../../src ../../src/includes)
-target_link_libraries(exam_RoleMaskProxyModel_Highlight PRIVATE Qt5::Core Qt5::Gui Qt5::Widgets modelutilities)
+target_link_libraries(exam_RoleMaskProxyModel_Highlight PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets modelutilities)
 set_target_properties(exam_RoleMaskProxyModel_Highlight PROPERTIES 
     AUTOMOC ON
     CXX_STANDARD 11
@@ -32,10 +33,10 @@ install(TARGETS exam_RoleMaskProxyModel_Highlight
     ARCHIVE DESTINATION lib
 )
 
-if(Qt5Sql_FOUND)
+if("${Qt${QT_VERSION_MAJOR}Sql_FOUND}")
     add_executable(exam_RoleMaskProxyModel_EditableSQL WIN32 exam_rolemaskeditablesql.cpp dbresource.qrc)
     target_include_directories(exam_RoleMaskProxyModel_EditableSQL PRIVATE ../../src ../../src/includes)
-    target_link_libraries(exam_RoleMaskProxyModel_EditableSQL PRIVATE Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Sql modelutilities)
+    target_link_libraries(exam_RoleMaskProxyModel_EditableSQL PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql modelutilities)
     set_target_properties(exam_RoleMaskProxyModel_EditableSQL PROPERTIES 
         AUTOMOC ON
         AUTORCC ON

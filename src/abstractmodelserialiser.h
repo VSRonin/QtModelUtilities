@@ -17,9 +17,9 @@
 #include "modelutilities_global.h"
 #include <QObject>
 #include <QScopedPointer>
+#include <QAbstractItemModel>
 class AbstractModelSerialiserPrivate;
 class QIODevice;
-class QAbstractItemModel;
 class MODELUTILITIES_EXPORT AbstractModelSerialiser : public QObject
 {
     Q_OBJECT
