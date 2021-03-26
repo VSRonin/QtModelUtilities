@@ -20,11 +20,11 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/opt-qt-5.14.2-bionic'
+        - sourceline: 'ppa:beineri/opt-qt-5.15.2-bionic'
         update: true
         packages:
-        - qt514base
-        - qt514tools
+        - qt515base
+        - qt515tools
         - gcc-9
         - g++-9
         - libc6-i386
@@ -32,10 +32,10 @@ jobs:
         - libgl1-mesa-dev
         - mesa-common-dev
     script:
-        - PATH="/opt/qt514/bin:$PATH"
+        - PATH="/opt/qt515/bin:$PATH"
         - CXX="g++-9"
         - CC="gcc-9"
-        - qt514-env.sh
+        - qt515-env.sh
         - mkdir ./build
         - cd ./build
         - export PATH=$PATH:$PWD/x64/lib
@@ -60,11 +60,11 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/opt-qt-5.14.2-bionic'
+        - sourceline: 'ppa:beineri/opt-qt-5.15.2-bionic'
         update: true
         packages:
-        - qt514base
-        - qt514tools
+        - qt515base
+        - qt515tools
         - gcc-6
         - g++-6
         - libc6-i386
@@ -72,10 +72,10 @@ jobs:
         - libgl1-mesa-dev
         - mesa-common-dev
     script:
-        - PATH="/opt/qt514/bin:$PATH"
+        - PATH="/opt/qt515/bin:$PATH"
         - CXX="g++-6"
         - CC="gcc-6"
-        - qt514-env.sh
+        - qt515-env.sh
         - mkdir ./build
         - cd ./build
         - export PATH=$PATH:$PWD/x64/lib
@@ -100,11 +100,11 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/opt-qt-5.14.2-bionic'
+        - sourceline: 'ppa:beineri/opt-qt-5.15.2-bionic'
         update: true
         packages:
-        - qt514base
-        - qt514tools
+        - qt515base
+        - qt515tools
         - gcc-6
         - g++-6
         - libc6-i386
@@ -112,10 +112,10 @@ jobs:
         - libgl1-mesa-dev
         - mesa-common-dev
     script:
-        - PATH="/opt/qt514/bin:$PATH"
+        - PATH="/opt/qt515/bin:$PATH"
         - CXX="g++-6"
         - CC="gcc-6"
-        - qt514-env.sh
+        - qt515-env.sh
         - mkdir ./build
         - cd ./build
         - export PATH=$PATH:$PWD/x64/lib
@@ -140,11 +140,11 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/opt-qt-5.14.2-bionic'
+        - sourceline: 'ppa:beineri/opt-qt-5.15.2-bionic'
         update: true
         packages:
-        - qt514base
-        - qt514tools
+        - qt515base
+        - qt515tools
         - gcc-6
         - g++-6
         - libc6-i386
@@ -152,10 +152,10 @@ jobs:
         - libgl1-mesa-dev
         - mesa-common-dev
     script:
-        - PATH="/opt/qt514/bin:$PATH"
+        - PATH="/opt/qt515/bin:$PATH"
         - CXX="g++-6"
         - CC="gcc-6"
-        - qt514-env.sh
+        - qt515-env.sh
         - mkdir ./build
         - cd ./build
         - export PATH=$PATH:$PWD/x64/lib
@@ -180,11 +180,11 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/opt-qt-5.14.2-bionic'
+        - sourceline: 'ppa:beineri/opt-qt-5.15.2-bionic'
         update: true
         packages:
-        - qt514base
-        - qt514tools
+        - qt515base
+        - qt515tools
         - gcc-6
         - g++-6
         - libc6-i386
@@ -192,10 +192,10 @@ jobs:
         - libgl1-mesa-dev
         - mesa-common-dev
     script:
-        - PATH="/opt/qt514/bin:$PATH"
+        - PATH="/opt/qt515/bin:$PATH"
         - CXX="g++-6"
         - CC="gcc-6"
-        - qt514-env.sh
+        - qt515-env.sh
         - mkdir ./build
         - cd ./build
         - export PATH=$PATH:$PWD/x64/lib
@@ -220,11 +220,11 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/opt-qt-5.14.2-bionic'
+        - sourceline: 'ppa:beineri/opt-qt-5.15.2-bionic'
         update: true
         packages:
-        - qt514base
-        - qt514tools
+        - qt515base
+        - qt515tools
         - gcc-6
         - g++-6
         - libc6-i386
@@ -232,10 +232,10 @@ jobs:
         - libgl1-mesa-dev
         - mesa-common-dev
     script:
-        - PATH="/opt/qt514/bin:$PATH"
+        - PATH="/opt/qt515/bin:$PATH"
         - CXX="g++-6"
         - CC="gcc-6"
-        - qt514-env.sh
+        - qt515-env.sh
         - mkdir ./build
         - cd ./build
         - export PATH=$PATH:$PWD/x64/lib
@@ -260,11 +260,11 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/opt-qt-5.14.2-bionic'
+        - sourceline: 'ppa:beineri/opt-qt-5.15.2-bionic'
         update: true
         packages:
-        - qt514base
-        - qt514tools
+        - qt515base
+        - qt515tools
         - gcc-6
         - g++-6
         - libc6-i386
@@ -272,10 +272,10 @@ jobs:
         - libgl1-mesa-dev
         - mesa-common-dev
     script:
-        - PATH="/opt/qt514/bin:$PATH"
+        - PATH="/opt/qt515/bin:$PATH"
         - CXX="g++-6"
         - CC="gcc-6"
-        - qt514-env.sh
+        - qt515-env.sh
         - mkdir ./build
         - cd ./build
         - export PATH=$PATH:$PWD/x64/lib
@@ -300,11 +300,11 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/opt-qt-5.14.2-bionic'
+        - sourceline: 'ppa:beineri/opt-qt-5.15.2-bionic'
         update: true
         packages:
-        - qt514base
-        - qt514tools
+        - qt515base
+        - qt515tools
         - gcc-6
         - g++-6
         - libc6-i386
@@ -312,10 +312,10 @@ jobs:
         - libgl1-mesa-dev
         - mesa-common-dev
     script:
-        - PATH="/opt/qt514/bin:$PATH"
+        - PATH="/opt/qt515/bin:$PATH"
         - CXX="g++-6"
         - CC="gcc-6"
-        - qt514-env.sh
+        - qt515-env.sh
         - mkdir ./build
         - cd ./build
         - export PATH=$PATH:$PWD/x64/lib
