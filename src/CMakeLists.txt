@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.2)
 project(ModelUtilitiesLib LANGUAGES CXX)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
@@ -129,7 +129,7 @@ install(TARGETS modelutilities
     ARCHIVE DESTINATION lib
     INCLUDES DESTINATION include
 )
-if(NOT BUILD_STATIC_LIBS)
+if((NOT BUILD_STATIC_LIBS) AND WIN32 AND MSVC AND (NOT MSVC_VERSION LESS 1600))
     install(FILES $<TARGET_PDB_FILE:modelutilities> DESTINATION bin OPTIONAL)
 endif()
 install(EXPORT modelutilitiesTargets

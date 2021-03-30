@@ -11,7 +11,7 @@ jobs:
   include:
   - name: Ubuntu Static
     os: linux
-    dist: bionic
+    dist: focal
     group: stable
     services:
         - xvfb
@@ -20,7 +20,7 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/opt-qt-5.15.2-bionic'
+        - sourceline: 'ppa:beineri/opt-qt-5.15.2-focal'
         update: true
         packages:
         - qt515base
@@ -51,7 +51,7 @@ jobs:
         - ctest --verbose
   - name: Ubuntu Dynamic
     os: linux
-    dist: bionic
+    dist: focal
     group: stable
     services:
         - xvfb
@@ -60,7 +60,7 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/opt-qt-5.15.2-bionic'
+        - sourceline: 'ppa:beineri/opt-qt-5.15.2-focal'
         update: true
         packages:
         - qt515base
@@ -91,7 +91,7 @@ jobs:
         - ctest --verbose
   - name: Ubuntu Static Many Roles
     os: linux
-    dist: bionic
+    dist: focal
     group: stable
     services:
         - xvfb
@@ -100,7 +100,7 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/opt-qt-5.15.2-bionic'
+        - sourceline: 'ppa:beineri/opt-qt-5.15.2-focal'
         update: true
         packages:
         - qt515base
@@ -131,7 +131,7 @@ jobs:
         - ctest --verbose
   - name: Ubuntu Dynamic Many Roles
     os: linux
-    dist: bionic
+    dist: focal
     group: stable
     services:
         - xvfb
@@ -140,7 +140,7 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/opt-qt-5.15.2-bionic'
+        - sourceline: 'ppa:beineri/opt-qt-5.15.2-focal'
         update: true
         packages:
         - qt515base
@@ -171,7 +171,7 @@ jobs:
         - ctest --verbose
   - name: Ubuntu Static No Widgets
     os: linux
-    dist: bionic
+    dist: focal
     group: stable
     services:
         - xvfb
@@ -180,7 +180,7 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/opt-qt-5.15.2-bionic'
+        - sourceline: 'ppa:beineri/opt-qt-5.15.2-focal'
         update: true
         packages:
         - qt515base
@@ -211,7 +211,7 @@ jobs:
         - ctest --verbose
   - name: Ubuntu Dynamic  No Widgets
     os: linux
-    dist: bionic
+    dist: focal
     group: stable
     services:
         - xvfb
@@ -220,7 +220,7 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/opt-qt-5.15.2-bionic'
+        - sourceline: 'ppa:beineri/opt-qt-5.15.2-focal'
         update: true
         packages:
         - qt515base
@@ -251,7 +251,7 @@ jobs:
         - ctest --verbose
   - name: Ubuntu Static No GUI
     os: linux
-    dist: bionic
+    dist: focal
     group: stable
     services:
         - xvfb
@@ -260,7 +260,7 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/opt-qt-5.15.2-bionic'
+        - sourceline: 'ppa:beineri/opt-qt-5.15.2-focal'
         update: true
         packages:
         - qt515base
@@ -291,7 +291,7 @@ jobs:
         - ctest --verbose
   - name: Ubuntu Dynamic  No GUI
     os: linux
-    dist: bionic
+    dist: focal
     group: stable
     services:
         - xvfb
@@ -300,7 +300,7 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - sourceline: 'ppa:beineri/opt-qt-5.15.2-bionic'
+        - sourceline: 'ppa:beineri/opt-qt-5.15.2-focal'
         update: true
         packages:
         - qt515base
@@ -340,6 +340,7 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
+        - george-edison55-precise-backports
         - sourceline: 'ppa:beineri/opt-qt502'
         update: true
         packages:
@@ -348,6 +349,8 @@ jobs:
         - gcc-6
         - g++-6
         - libc6-i386
+        - cmake-data
+        - cmake
     script:
         - PATH="/opt/qt5/bin:$PATH"
         - CXX="g++-6"
@@ -366,14 +369,14 @@ jobs:
         - cmake --build .
         - cmake --build . --target install
         - ctest --verbose
-  - name: MacOS Static
+  - name: MacOS Qt5 Static
     os: osx
     osx_image: xcode11.3
     compiler: clang
     addons:
       homebrew:
         packages:
-        - qt
+        - qt5
         update: true
     script:
         - PATH="/usr/local/opt/qt5/bin:$PATH"
@@ -390,14 +393,14 @@ jobs:
         - cmake --build .
         - cmake --build . --target install
         - ctest --verbose
-  - name: MacOS Dynamic
+  - name: MacOS Qt5 Dynamic
     os: osx
     osx_image: xcode11.3
     compiler: clang
     addons:
       homebrew:
         packages:
-        - qt
+        - qt5
         update: true
     script:
         - PATH="/usr/local/opt/qt5/bin:$PATH"
@@ -414,14 +417,14 @@ jobs:
         - cmake --build .
         - cmake --build . --target install
         - ctest --verbose
-  - name: MacOS Static Many Roles
+  - name: MacOS Qt5 Static Many Roles
     os: osx
     osx_image: xcode11.3
     compiler: clang
     addons:
       homebrew:
         packages:
-        - qt
+        - qt5
         update: true
     script:
         - PATH="/usr/local/opt/qt5/bin:$PATH"
@@ -438,14 +441,14 @@ jobs:
         - cmake --build .
         - cmake --build . --target install
         - ctest --verbose
-  - name: MacOS Dynamic Many Roles
+  - name: MacOS Qt5 Dynamic Many Roles
     os: osx
     osx_image: xcode11.3
     compiler: clang
     addons:
       homebrew:
         packages:
-        - qt
+        - qt5
         update: true
     script:
         - PATH="/usr/local/opt/qt5/bin:$PATH"
@@ -462,14 +465,14 @@ jobs:
         - cmake --build .
         - cmake --build . --target install
         - ctest --verbose
-  - name: MacOS Static No Widgets
+  - name: MacOS Qt5 Static No Widgets
     os: osx
     osx_image: xcode11.3
     compiler: clang
     addons:
       homebrew:
         packages:
-        - qt
+        - qt5
         update: true
     script:
         - PATH="/usr/local/opt/qt5/bin:$PATH"
@@ -486,14 +489,14 @@ jobs:
         - cmake --build .
         - cmake --build . --target install
         - ctest --verbose
-  - name: MacOS Dynamic No Widgets
+  - name: MacOS Qt5 Dynamic No Widgets
     os: osx
     osx_image: xcode11.3
     compiler: clang
     addons:
       homebrew:
         packages:
-        - qt
+        - qt5
         update: true
     script:
         - PATH="/usr/local/opt/qt5/bin:$PATH"
@@ -510,14 +513,14 @@ jobs:
         - cmake --build .
         - cmake --build . --target install
         - ctest --verbose
-  - name: MacOS Static No GUI
+  - name: MacOS Qt5 Static No GUI
     os: osx
     osx_image: xcode11.3
     compiler: clang
     addons:
       homebrew:
         packages:
-        - qt
+        - qt5
         update: true
     script:
         - PATH="/usr/local/opt/qt5/bin:$PATH"
@@ -534,17 +537,209 @@ jobs:
         - cmake --build .
         - cmake --build . --target install
         - ctest --verbose
-  - name: MacOS Dynamic No GUI
+  - name: MacOS Qt5 Dynamic No GUI
     os: osx
     osx_image: xcode11.3
     compiler: clang
     addons:
       homebrew:
         packages:
-        - qt
+        - qt5
         update: true
     script:
         - PATH="/usr/local/opt/qt5/bin:$PATH"
+        - mkdir ./build
+        - cd ./build
+        - export PATH=$PATH:$PWD/x64/lib
+        - export PATH=$PATH:$PWD/x64/bin
+        - cmake --version
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=ON -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+  - name: MacOS Qt6 Static
+    os: osx
+    osx_image: xcode11.3
+    compiler: clang
+    addons:
+      homebrew:
+        packages:
+        - qt6
+        update: true
+    script:
+        - PATH="/usr/local/opt/qt6/bin:$PATH"
+        - mkdir ./build
+        - cd ./build
+        - export PATH=$PATH:$PWD/x64/lib
+        - export PATH=$PATH:$PWD/x64/bin
+        - cmake --version
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=OFF -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=OFF -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+  - name: MacOS Qt6 Dynamic
+    os: osx
+    osx_image: xcode11.3
+    compiler: clang
+    addons:
+      homebrew:
+        packages:
+        - qt6
+        update: true
+    script:
+        - PATH="/usr/local/opt/qt6/bin:$PATH"
+        - mkdir ./build
+        - cd ./build
+        - export PATH=$PATH:$PWD/x64/lib
+        - export PATH=$PATH:$PWD/x64/bin
+        - cmake --version
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=OFF -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=OFF -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+  - name: MacOS Qt6 Static Many Roles
+    os: osx
+    osx_image: xcode11.3
+    compiler: clang
+    addons:
+      homebrew:
+        packages:
+        - qt6
+        update: true
+    script:
+        - PATH="/usr/local/opt/qt6/bin:$PATH"
+        - mkdir ./build
+        - cd ./build
+        - export PATH=$PATH:$PWD/x64/lib
+        - export PATH=$PATH:$PWD/x64/bin
+        - cmake --version
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=OFF -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=ON ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=OFF -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+  - name: MacOS Qt6 Dynamic Many Roles
+    os: osx
+    osx_image: xcode11.3
+    compiler: clang
+    addons:
+      homebrew:
+        packages:
+        - qt6
+        update: true
+    script:
+        - PATH="/usr/local/opt/qt6/bin:$PATH"
+        - mkdir ./build
+        - cd ./build
+        - export PATH=$PATH:$PWD/x64/lib
+        - export PATH=$PATH:$PWD/x64/bin
+        - cmake --version
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=OFF -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=ON ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=OFF -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=ON ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+  - name: MacOS Qt6 Static No Widgets
+    os: osx
+    osx_image: xcode11.3
+    compiler: clang
+    addons:
+      homebrew:
+        packages:
+        - qt6
+        update: true
+    script:
+        - PATH="/usr/local/opt/qt6/bin:$PATH"
+        - mkdir ./build
+        - cd ./build
+        - export PATH=$PATH:$PWD/x64/lib
+        - export PATH=$PATH:$PWD/x64/bin
+        - cmake --version
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+  - name: MacOS Qt6 Dynamic No Widgets
+    os: osx
+    osx_image: xcode11.3
+    compiler: clang
+    addons:
+      homebrew:
+        packages:
+        - qt6
+        update: true
+    script:
+        - PATH="/usr/local/opt/qt6/bin:$PATH"
+        - mkdir ./build
+        - cd ./build
+        - export PATH=$PATH:$PWD/x64/lib
+        - export PATH=$PATH:$PWD/x64/bin
+        - cmake --version
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+  - name: MacOS Qt6 Static No GUI
+    os: osx
+    osx_image: xcode11.3
+    compiler: clang
+    addons:
+      homebrew:
+        packages:
+        - qt6
+        update: true
+    script:
+        - PATH="/usr/local/opt/qt6/bin:$PATH"
+        - mkdir ./build
+        - cd ./build
+        - export PATH=$PATH:$PWD/x64/lib
+        - export PATH=$PATH:$PWD/x64/bin
+        - cmake --version
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=ON -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DBUILD_STATIC_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=ON -DNO_GUI=OFF -DOPTIMISE_FOR_MANY_ROLES=OFF ../
+        - cmake --build .
+        - cmake --build . --target install
+        - ctest --verbose
+  - name: MacOS Qt6 Dynamic No GUI
+    os: osx
+    osx_image: xcode11.3
+    compiler: clang
+    addons:
+      homebrew:
+        packages:
+        - qt6
+        update: true
+    script:
+        - PATH="/usr/local/opt/qt6/bin:$PATH"
         - mkdir ./build
         - cd ./build
         - export PATH=$PATH:$PWD/x64/lib

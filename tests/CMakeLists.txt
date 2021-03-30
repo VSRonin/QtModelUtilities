@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.5)
-project(QtModelUtilitiesTests LANGUAGES CXX)
 if(BUILD_ROLEMASKPROXY)
     add_subdirectory(tst_RoleMaskProxyModel)
 endif()
