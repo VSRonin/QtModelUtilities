@@ -11,7 +11,7 @@ jobs:
   include:
   - name: Ubuntu Qt Version 5.0
     os: linux
-    dist: precise
+    dist: trusty
     group: stable
     services:
         - xvfb
@@ -20,8 +20,7 @@ jobs:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - george-edison55-precise-backports
-        - sourceline: 'ppa:beineri/opt-qt511'
+        - sourceline: 'ppa:beineri/opt-qt511-trusty'
         update: true
         packages:
         - qt51base
@@ -29,8 +28,6 @@ jobs:
         - gcc-6
         - g++-6
         - libc6-i386
-        - cmake-data
-        - cmake
     script:
         - PATH="/opt/qt51/bin:$PATH"
         - CXX="g++-6"
