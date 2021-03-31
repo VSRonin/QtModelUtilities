@@ -167,6 +167,12 @@ RoleMaskProxyModel::~RoleMaskProxyModel()
     delete d_ptr;
 }
 
+
+/*!
+\property RoleMaskProxyModel::maskedRoles
+\accessors %maskedRoles()
+\brief Returns the list of roles managed by the proxy model
+*/
 QList<int> RoleMaskProxyModel::maskedRoles() const
 {
     Q_D(const RoleMaskProxyModel);
@@ -177,6 +183,9 @@ QList<int> RoleMaskProxyModel::maskedRoles() const
     #endif
 }
 
+/*!
+Set the list of roles managed by the proxy model
+*/
 void RoleMaskProxyModel::setMaskedRoles(const QList<int>& newRoles)
 {
     Q_D(RoleMaskProxyModel);
@@ -205,6 +214,9 @@ void RoleMaskProxyModel::setMaskedRoles(const QList<int>& newRoles)
     }
 }
 
+/*!
+Removes all roles managed by the proxy model
+*/
 void RoleMaskProxyModel::clearMaskedRoles()
 {
     Q_D(RoleMaskProxyModel);
@@ -224,6 +236,9 @@ void RoleMaskProxyModel::clearMaskedRoles()
     }
 }
 
+/*!
+Adds \a role to the list of roles managed by the proxy model
+*/
 void RoleMaskProxyModel::addMaskedRole(int role)
 {
     Q_D(RoleMaskProxyModel);
@@ -240,6 +255,9 @@ void RoleMaskProxyModel::addMaskedRole(int role)
     }
 }
 
+/*!
+Removes \a role from the list of roles managed by the proxy model
+*/
 void RoleMaskProxyModel::removeMaskedRole(int role)
 {
     Q_D(RoleMaskProxyModel);
@@ -435,6 +453,9 @@ QMap<int, QVariant> RoleMaskProxyModel::itemData(const QModelIndex &index) const
     return convertFromContainer<QMap<int, QVariant> >(result);
 }
 
+/*!
+Returns all the data managed by the proxy model for a certain \a index. The key of the map is the corresponding role
+*/
 QMap<int, QVariant> RoleMaskProxyModel::maskedItemData(const QModelIndex &index) const
 {
     Q_D(const RoleMaskProxyModel);
@@ -444,6 +465,9 @@ QMap<int, QVariant> RoleMaskProxyModel::maskedItemData(const QModelIndex &index)
     return convertFromContainer<QMap<int, QVariant> >(maskedIter.value());
 }
 
+/*!
+Removes all the data managed by the proxy model for a certain \a index.
+*/
 void RoleMaskProxyModel::clearMaskedData(const QModelIndex &index)
 {
     Q_D(RoleMaskProxyModel);
@@ -461,9 +485,9 @@ void RoleMaskProxyModel::clearMaskedData(const QModelIndex &index)
 /*!
 \property RoleMaskProxyModel::transparentIfEmpty
 \accessors %transparentIfEmpty(), setTransparentIfEmpty()
+\notifier transparentIfEmptyChanged()
 \brief This property determines if a mapped role containing no data should be transparent
-\details If this property is set to true, a 
-
+\details If this property is set to true, roles managed by the proxy will show the source model data unless it gets ovewritten in the proxy
 */
 bool RoleMaskProxyModel::transparentIfEmpty() const
 {
@@ -484,6 +508,7 @@ void RoleMaskProxyModel::setTransparentIfEmpty(bool val)
 /*!
 \property RoleMaskProxyModel::mergeDisplayEdit
 \accessors %mergeDisplayEdit(), setMergeDisplayEdit()
+\notifier mergeDisplayEditChanged()
 \brief This property determines if the Qt::DisplayRole and Qt::EditRole should be merged in the extra row/column
 \details By default the two roles are one and the same you can use this property to separate them.
 If there's any data in the role when you set this property to true it will be duplicated for both roles.
@@ -545,6 +570,16 @@ const QSet<int>& RoleMaskProxyModel::maskedRolesSets() const
 /*!
 \class RoleMaskProxyModel
 \brief This proxy will act as a mask on top of the source model to intercept data.
-\details This proxy model will mask 
+\details This proxy model can be used to manage data in roles not supported by the source model.
+The user can select what roles should be managed by the proxy model and the rest will be left to the source model.
+*/
 
+/*!
+\fn RoleMaskProxyModel::maskedDataChanged()
+This signal is emitted whenever a dataChanged() signal is emitted for a role managed by the proxy
+*/
+
+/*!
+\fn RoleMaskProxyModel::maskedRolesChanged()
+This signal is emitted whenever the list of roles managed by the proxy changes
 */

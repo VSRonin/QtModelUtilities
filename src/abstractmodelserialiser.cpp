@@ -40,10 +40,11 @@ AbstractModelSerialiser::AbstractModelSerialiser(QAbstractItemModel* model, QObj
 {
     setModel(model);
 }
+
 /*!
 \overload
 
-loadModel will always fail as the model is not editable
+the model will only be allowed to be saved, not loaded
 */
 AbstractModelSerialiser::AbstractModelSerialiser(const QAbstractItemModel* model, QObject* parent)
     : QObject(parent)
@@ -51,6 +52,7 @@ AbstractModelSerialiser::AbstractModelSerialiser(const QAbstractItemModel* model
 {
     setModel(model);
 }
+
 /*!
 \internal
 */
@@ -128,7 +130,7 @@ void AbstractModelSerialiser::resetRoleToSave()
     d->m_rolesToSave = AbstractModelSerialiser::modelDefaultRoles();
 }
 /*!
-Returns a list of all non obsolete Qt::ItemDataRole values
+Returns a list of all non-obsolete Qt::ItemDataRole values
 */
 QList<int> AbstractModelSerialiser::modelDefaultRoles()
 {
@@ -151,6 +153,11 @@ QList<int> AbstractModelSerialiser::modelDefaultRoles()
         }};
 }
 
+/*!
+Returns the model over which the serialiser will operate.
+
+If setModel(const QAbstractItemModel*) was used to se the model, this method will return \c nullptr
+*/
 QAbstractItemModel* AbstractModelSerialiser::model() const
 {
     Q_D(const AbstractModelSerialiser);
@@ -158,7 +165,9 @@ QAbstractItemModel* AbstractModelSerialiser::model() const
     return d->m_model;
 }
 
-
+/*!
+Returns the model over which the serialiser will operate.
+*/
 const QAbstractItemModel* AbstractModelSerialiser::constModel() const
 {
     Q_D(const AbstractModelSerialiser);
@@ -166,6 +175,9 @@ const QAbstractItemModel* AbstractModelSerialiser::constModel() const
     return d->m_constModel;
 }
 
+/*!
+Sets the model over which the serialiser will operate.
+*/
 void AbstractModelSerialiser::setModel(QAbstractItemModel* val)
 {
     Q_D(AbstractModelSerialiser);
@@ -174,6 +186,11 @@ void AbstractModelSerialiser::setModel(QAbstractItemModel* val)
     d->m_constModel = val;
 }
 
+/*!
+Sets the model over which the serialiser will operate.
+
+Using this method will only allow the model to be saved, not loaded
+*/
 void AbstractModelSerialiser::setModel(const QAbstractItemModel* val)
 {
     Q_D(AbstractModelSerialiser);
@@ -181,3 +198,27 @@ void AbstractModelSerialiser::setModel(const QAbstractItemModel* val)
     d->m_model = Q_NULLPTR;
     d->m_constModel = val;
 }
+
+/*!
+    \fn int AbstractModelSerialiser::loadModel(const QByteArray &source)
+    Loads the model from the given \a source
+
+    Data previously stored in the model will be removed
+*/
+
+/*!
+    \fn int AbstractModelSerialiser::loadModel(QIODevice *source)
+    Loads the model from the given \a source
+
+    Data previously stored in the model will be removed
+*/
+
+/*!
+    \fn int AbstractModelSerialiser::saveModel(QByteArray *destination)
+    Saves the model to the given \a destination
+*/
+
+/*!
+    \fn int AbstractModelSerialiser::saveModel(QIODevice *destination)
+    Saves the model to the given \a destination
+*/

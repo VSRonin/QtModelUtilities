@@ -201,7 +201,7 @@ bool BinaryModelSerialiser::saveModel(QIODevice* destination) const
         return false;
     Q_D(const BinaryModelSerialiser);
     
-    if (!d->m_model)
+    if (!d->m_constModel)
         return false;
     QDataStream witer(destination);
 #ifdef MS_DATASTREAM_VERSION
@@ -216,7 +216,7 @@ bool BinaryModelSerialiser::saveModel(QByteArray* destination) const
         return false;
     Q_D(const BinaryModelSerialiser);
     
-    if (!d->m_model)
+    if (!d->m_constModel)
         return false;
     QDataStream witer(destination, QIODevice::WriteOnly);
 #ifdef MS_DATASTREAM_VERSION

@@ -1141,7 +1141,7 @@ for (int i = 0; i < sourceCols; ++i) {
         return true;
 }
 return false;
-\code
+\endcode
 */
 bool InsertProxyModel::validRow() const
 {
@@ -1163,7 +1163,7 @@ for (int i = 0; i < sourceRows; ++i) {
         return true;
 }
 return false;
-\code
+\endcode
 */
 bool InsertProxyModel::validColumn() const
 {
@@ -1184,13 +1184,13 @@ You can either call commitRow/commitColumn or reimplement validRow/validColumn t
 */
 
 /*!
-\fn void dataForCornerChanged(int role)
+\fn void InsertProxyModel::dataForCornerChanged(int role)
 
 This signal is emitted whenever the data for the corner at the intersection of the extra row and column is changed
 */
 
 /*!
-\fn void extraDataChanged(int role)
+\fn void InsertProxyModel::extraDataChanged(int role)
 
 Same as dataChanged but is emitted only for the extra row/column
 */
