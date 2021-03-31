@@ -21,21 +21,21 @@ jobs:
         sources:
         - ubuntu-toolchain-r-test
         - george-edison55-precise-backports
-        - sourceline: 'ppa:beineri/opt-qt502'
+        - sourceline: 'ppa:beineri/opt-qt511'
         update: true
         packages:
-        - qtbase
-        - qttools
+        - qt51base
+        - qt51tools
         - gcc-6
         - g++-6
         - libc6-i386
         - cmake-data
         - cmake
     script:
-        - PATH="/opt/qt5/bin:$PATH"
+        - PATH="/opt/qt51/bin:$PATH"
         - CXX="g++-6"
         - CC="gcc-6"
-        - qt5-env.sh
+        - qt51-env.sh
         - mkdir ./build
         - cd ./build
         - export PATH=$PATH:$PWD/x64/lib
