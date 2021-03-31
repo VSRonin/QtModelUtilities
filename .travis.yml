@@ -9,12 +9,10 @@ branches:
 jobs:
   fast_finish: true
   include:
-  - name: Ubuntu Qt Version 5.0
+  - name: Ubuntu Qt Version 5.1
     os: linux
     dist: trusty
     group: stable
-    services:
-        - xvfb
     compiler: gcc
     addons:
       apt:
@@ -28,6 +26,10 @@ jobs:
         - gcc-6
         - g++-6
         - libc6-i386
+    before_script:
+        - "export DISPLAY=:99.0"
+        - "sh -e /etc/init.d/xvfb start"
+        - sleep 3 # give xvfb some time to start
     script:
         - PATH="/opt/qt51/bin:$PATH"
         - CXX="g++-6"
