@@ -22,8 +22,11 @@
 #endif
 
 /*!
-\internal
+\class CsvModelSerialiser
+
+\brief Serialiser to save and load models in csv (comma separated values) format
 */
+
 CsvModelSerialiserPrivate::CsvModelSerialiserPrivate(CsvModelSerialiser *q)
     : AbstractSingleRoleSerialiserPrivate(q)
     , m_firstRowIsHeader(true)
@@ -31,9 +34,6 @@ CsvModelSerialiserPrivate::CsvModelSerialiserPrivate(CsvModelSerialiser *q)
     , m_csvSeparator(QLatin1Char(','))
 { }
 
-/*!
-\internal
-*/
 QString CsvModelSerialiserPrivate::escapedCSV(QString unexc) const
 {
     if (!unexc.contains(m_csvSeparator))
@@ -41,9 +41,6 @@ QString CsvModelSerialiserPrivate::escapedCSV(QString unexc) const
     return '\"' % unexc.replace(QLatin1Char('\"'), QStringLiteral("\"\"")) % '\"';
 }
 
-/*!
-\internal
-*/
 QString CsvModelSerialiserPrivate::unescapedCSV(QString exc) const
 {
     if (exc.isEmpty())
@@ -56,9 +53,6 @@ QString CsvModelSerialiserPrivate::unescapedCSV(QString exc) const
     return exc;
 }
 
-/*!
-\internal
-*/
 int CsvModelSerialiserPrivate::guessVarType(const QString &val)
 {
     bool checkConversion;
@@ -77,9 +71,6 @@ int CsvModelSerialiserPrivate::guessVarType(const QString &val)
     return QMetaType::QString;
 }
 
-/*!
-\internal
-*/
 bool CsvModelSerialiserPrivate::writeCsv(QTextStream &writer) const
 {
     if (!m_constModel)
@@ -113,9 +104,6 @@ bool CsvModelSerialiserPrivate::writeCsv(QTextStream &writer) const
     return writer.status() == QTextStream::Ok;
 }
 
-/*!
-\internal
-*/
 bool CsvModelSerialiserPrivate::readCsv(QTextStream &reader)
 {
     if (!m_model)
@@ -261,7 +249,7 @@ void CsvModelSerialiser::setFirstColumnIsHeader(bool val)
 }
 
 /*!
-Construct a read/write serialiser
+Constructs a serialiser operating over \a model
 */
 CsvModelSerialiser::CsvModelSerialiser(QAbstractItemModel *model, QObject *parent)
     : AbstractSingleRoleSerialiser(*new CsvModelSerialiserPrivate(this), parent)
@@ -270,8 +258,10 @@ CsvModelSerialiser::CsvModelSerialiser(QAbstractItemModel *model, QObject *paren
 }
 
 /*!
-Construct a write-only serialiser
-*/
+\overload
+
+the model will only be allowed to be saved, not loaded
+        */
 CsvModelSerialiser::CsvModelSerialiser(const QAbstractItemModel *model, QObject *parent)
     : AbstractSingleRoleSerialiser(*new CsvModelSerialiserPrivate(this), parent)
 {
@@ -279,15 +269,14 @@ CsvModelSerialiser::CsvModelSerialiser(const QAbstractItemModel *model, QObject 
 }
 
 /*!
-Constructor used only while subclassing the private class.
-Not part of the public API
+\internal
 */
 CsvModelSerialiser::CsvModelSerialiser(CsvModelSerialiserPrivate &d, QObject *parent)
     : AbstractSingleRoleSerialiser(d, parent)
 { }
 
 /*!
-Saves the model in csv format to the \a destination string
+\reimp
 */
 bool CsvModelSerialiser::saveModel(QString *destination) const
 {
@@ -305,7 +294,7 @@ bool CsvModelSerialiser::saveModel(QString *destination) const
 }
 
 /*!
-Saves the model in csv format to the \a destination device
+\reimp
 */
 bool CsvModelSerialiser::saveModel(QIODevice *destination) const
 {
@@ -330,7 +319,7 @@ bool CsvModelSerialiser::saveModel(QIODevice *destination) const
 }
 
 /*!
-Saves the model in csv format to the \a destination byte array
+\reimp
 */
 bool CsvModelSerialiser::saveModel(QByteArray *destination) const
 {
@@ -347,6 +336,9 @@ bool CsvModelSerialiser::saveModel(QByteArray *destination) const
     return d->writeCsv(writer);
 }
 
+/*!
+Saves the model to the given \a stream
+*/
 bool CsvModelSerialiser::saveModel(QTextStream &stream) const
 {
     Q_D(const CsvModelSerialiser);
@@ -354,7 +346,7 @@ bool CsvModelSerialiser::saveModel(QTextStream &stream) const
 }
 
 /*!
-Loads the model from a \a source device containing csv data in
+\reimp
 */
 bool CsvModelSerialiser::loadModel(QIODevice *source)
 {
@@ -379,7 +371,7 @@ bool CsvModelSerialiser::loadModel(QIODevice *source)
 }
 
 /*!
-Loads the model from a \a source byte array containing csv data
+\reimp
 */
 bool CsvModelSerialiser::loadModel(const QByteArray &source)
 {
@@ -395,7 +387,7 @@ bool CsvModelSerialiser::loadModel(const QByteArray &source)
 }
 
 /*!
-Loads the model from a \a source string containing csv data
+\reimp
 */
 bool CsvModelSerialiser::loadModel(QString *source)
 {
@@ -412,6 +404,11 @@ bool CsvModelSerialiser::loadModel(QString *source)
     return d->readCsv(reader);
 }
 
+/*!
+Loads the model from the given \a stream
+
+Data previously stored in the model will be removed
+*/
 bool CsvModelSerialiser::loadModel(QTextStream &stream)
 {
     Q_D(CsvModelSerialiser);

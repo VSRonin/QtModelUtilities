@@ -15,6 +15,7 @@
 #include "private/binarymodelserialiser_p.h"
 #include <QDataStream>
 #include <QIODevice>
+
 BinaryModelSerialiserPrivate::BinaryModelSerialiserPrivate(BinaryModelSerialiser *q)
     : AbstractModelSerialiserPrivate(q)
 { }
@@ -188,6 +189,9 @@ bool BinaryModelSerialiserPrivate::writeBinary(QDataStream &writer) const
     return writer.status() == QDataStream::Ok;
 }
 
+/*!
+\reimp
+*/
 bool BinaryModelSerialiser::saveModel(QIODevice *destination) const
 {
     if (!destination)
@@ -209,6 +213,9 @@ bool BinaryModelSerialiser::saveModel(QIODevice *destination) const
     return d->writeBinary(witer);
 }
 
+/*!
+\reimp
+*/
 bool BinaryModelSerialiser::saveModel(QByteArray *destination) const
 {
     if (!destination)
@@ -224,12 +231,18 @@ bool BinaryModelSerialiser::saveModel(QByteArray *destination) const
     return d->writeBinary(witer);
 }
 
-bool BinaryModelSerialiser::saveModel(QDataStream &steram) const
+/*!
+Saves the model to the given \a stream
+*/
+bool BinaryModelSerialiser::saveModel(QDataStream &stream) const
 {
     Q_D(const BinaryModelSerialiser);
-    return d->writeBinary(steram);
+    return d->writeBinary(stream);
 }
 
+/*!
+\reimp
+*/
 bool BinaryModelSerialiser::loadModel(QIODevice *source)
 {
     if (!source)
@@ -250,6 +263,10 @@ bool BinaryModelSerialiser::loadModel(QIODevice *source)
 #endif // MS_DATASTREAM_VERSION
     return d->readBinary(reader);
 }
+
+/*!
+\reimp
+*/
 bool BinaryModelSerialiser::loadModel(const QByteArray &source)
 {
     Q_D(BinaryModelSerialiser);
@@ -263,27 +280,47 @@ bool BinaryModelSerialiser::loadModel(const QByteArray &source)
     return d->readBinary(reader);
 }
 
-bool BinaryModelSerialiser::loadModel(QDataStream &steram)
+/*!
+Loads the model from the given \a stream
+
+Data previously stored in the model will be removed
+*/
+bool BinaryModelSerialiser::loadModel(QDataStream &stream)
 {
     Q_D(BinaryModelSerialiser);
-    return d->readBinary(steram);
+    return d->readBinary(stream);
 }
 
+/*!
+Constructs a serialiser operating over \a model
+*/
 BinaryModelSerialiser::BinaryModelSerialiser(QAbstractItemModel *model, QObject *parent)
     : AbstractModelSerialiser(*new BinaryModelSerialiserPrivate(this), parent)
 {
     setModel(model);
 }
+
+/*!
+\overload
+
+the model will only be allowed to be saved, not loaded
+*/
 BinaryModelSerialiser::BinaryModelSerialiser(const QAbstractItemModel *model, QObject *parent)
     : AbstractModelSerialiser(*new BinaryModelSerialiserPrivate(this), parent)
 {
     setModel(model);
 }
 
+/*!
+\internal
+*/
 BinaryModelSerialiser::BinaryModelSerialiser(BinaryModelSerialiserPrivate &d, QObject *parent)
     : AbstractModelSerialiser(d, parent)
 { }
 
+/*!
+Destructor
+*/
 BinaryModelSerialiser::~BinaryModelSerialiser() = default;
 
 #ifdef MS_DECLARE_STREAM_OPERATORS
@@ -303,3 +340,9 @@ QDataStream &operator>>(QDataStream &stream, QAbstractItemModel &model)
 }
 
 #endif
+
+/*!
+\class BinaryModelSerialiser
+
+\brief Serialiser to save and load models in binary format
+*/

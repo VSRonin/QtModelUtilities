@@ -14,11 +14,6 @@
 #include "abstractmodelserialiser.h"
 #include "private/abstractmodelserialiser_p.h"
 #include <QAbstractItemModel>
-/*!
-\class AbstractMultiRoleSerialiser
-
-\brief The interface for model serialisers saving multiple roles.
-*/
 
 AbstractModelSerialiserPrivate::AbstractModelSerialiserPrivate(AbstractModelSerialiser *q)
     : q_ptr(q)
@@ -31,8 +26,6 @@ AbstractModelSerialiserPrivate::AbstractModelSerialiserPrivate(AbstractModelSeri
 
 /*!
 Constructs a serialiser operating over \a model
-
-\sa isEmpty()
 */
 AbstractModelSerialiser::AbstractModelSerialiser(QAbstractItemModel *model, QObject *parent)
     : QObject(parent)
@@ -72,24 +65,20 @@ AbstractModelSerialiser::~AbstractModelSerialiser() = default;
 by default this property is set to all non obsolete Qt::ItemDataRole values
 */
 
-/*!
-\brief getter of rolesToSave property
-*/
 const QList<int> &AbstractModelSerialiser::rolesToSave() const
 {
     Q_D(const AbstractModelSerialiser);
 
     return d->m_rolesToSave;
 }
-/*!
-\brief setter of rolesToSave property
-*/
+
 void AbstractModelSerialiser::setRoleToSave(const QList<int> &val)
 {
     Q_D(AbstractModelSerialiser);
 
     d->m_rolesToSave = val;
 }
+
 /*!
 \brief appends \a role to the list of roles to save
 */
@@ -198,25 +187,32 @@ void AbstractModelSerialiser::setModel(const QAbstractItemModel *val)
 }
 
 /*!
-    \fn int AbstractModelSerialiser::loadModel(const QByteArray &source)
+\class AbstractModelSerialiser
+\brief The interface for model serialisers.
+
+This class serve as a base for all serialisers
+*/
+
+/*!
+    \fn bool AbstractModelSerialiser::loadModel(const QByteArray &source)
     Loads the model from the given \a source
 
     Data previously stored in the model will be removed
 */
 
 /*!
-    \fn int AbstractModelSerialiser::loadModel(QIODevice *source)
+    \fn bool AbstractModelSerialiser::loadModel(QIODevice *source)
     Loads the model from the given \a source
 
     Data previously stored in the model will be removed
 */
 
 /*!
-    \fn int AbstractModelSerialiser::saveModel(QByteArray *destination)
+    \fn bool AbstractModelSerialiser::saveModel(QByteArray *destination) const
     Saves the model to the given \a destination
 */
 
 /*!
-    \fn int AbstractModelSerialiser::saveModel(QIODevice *destination)
+    \fn bool AbstractModelSerialiser::saveModel(QIODevice *destination) const
     Saves the model to the given \a destination
 */

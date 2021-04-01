@@ -17,9 +17,6 @@
 #include <QVector>
 #include <QByteArray>
 
-/*!
-\internal
-*/
 QVector<int> InsertProxyModelPrivate::setDataInContainer(RolesContainer &baseHash, int role, const QVariant &value)
 {
     QVector<int> changedRoles;
@@ -52,9 +49,6 @@ QVector<int> InsertProxyModelPrivate::setDataInContainer(RolesContainer &baseHas
     return changedRoles;
 }
 
-/*!
-\internal
-*/
 void InsertProxyModelPrivate::checkExtraDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
     Q_UNUSED(topLeft)
@@ -75,17 +69,11 @@ void InsertProxyModelPrivate::checkExtraDataChanged(const QModelIndex &topLeft, 
     }
 }
 
-/*!
-\internal
-*/
 bool InsertProxyModelPrivate::commitRow()
 {
     return commitToSource(true);
 }
 
-/*!
-\internal
-*/
 bool InsertProxyModelPrivate::commitToSource(const bool isRow)
 {
     Q_Q(InsertProxyModel);
@@ -120,9 +108,6 @@ bool InsertProxyModelPrivate::commitToSource(const bool isRow)
     return true;
 }
 
-/*!
-\internal
-*/
 int InsertProxyModelPrivate::mergeEditDisplayHash(RolesContainer &singleHash)
 {
     const auto displayIter = singleHash.constFind(Qt::DisplayRole);
@@ -146,9 +131,6 @@ int InsertProxyModelPrivate::mergeEditDisplayHash(RolesContainer &singleHash)
     return -1;
 }
 
-/*!
-\internal
-*/
 void InsertProxyModelPrivate::onInserted(bool isRow, const QModelIndex &parent, int first, int last)
 {
     if (parent.isValid())
@@ -159,9 +141,6 @@ void InsertProxyModelPrivate::onInserted(bool isRow, const QModelIndex &parent, 
     isRow ? q->endInsertRows() : q->endInsertColumns();
 }
 
-/*!
-\internal
-*/
 void InsertProxyModelPrivate::onMoved(bool isRow, const QModelIndex &parent, int start, int end, const QModelIndex &destination, int destIdx)
 {
     if (parent.isValid())
@@ -174,9 +153,6 @@ void InsertProxyModelPrivate::onMoved(bool isRow, const QModelIndex &parent, int
     isRow ? q->endMoveRows() : q->endMoveColumns();
 }
 
-/*!
-\internal
-*/
 void InsertProxyModelPrivate::onRemoved(bool isRow, const QModelIndex &parent, int first, int last)
 {
     if (parent.isValid())
@@ -187,17 +163,11 @@ void InsertProxyModelPrivate::onRemoved(bool isRow, const QModelIndex &parent, i
     isRow ? q->endRemoveRows() : q->endRemoveColumns();
 }
 
-/*!
-\internal
-*/
 bool InsertProxyModelPrivate::commitColumn()
 {
     return commitToSource(false);
 }
 
-/*!
-\internal
-*/
 InsertProxyModelPrivate::InsertProxyModelPrivate(InsertProxyModel *q)
     : q_ptr(q)
     , m_insertDirection(InsertProxyModel::NoInsert)
@@ -679,22 +649,10 @@ Qt::ItemFlags InsertProxyModel::flags(const QModelIndex &index) const
     if (isExtraRow && isExtraCol)
         return Qt::NoItemFlags;
     if (isExtraRow)
-        return flagForExtra(true, index.column())
-#if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
-                | Qt::ItemNeverHasChildren
-#endif
-                ;
+        return flagForExtra(true, index.column()) | Qt::ItemNeverHasChildren;
     if (isExtraCol)
-        return flagForExtra(false, index.row())
-#if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
-                | Qt::ItemNeverHasChildren
-#endif
-                ;
-    return sourceModel()->flags(sourceModel()->index(index.row(), index.column()))
-#if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
-            | Qt::ItemNeverHasChildren
-#endif
-            ;
+        return flagForExtra(false, index.row()) | Qt::ItemNeverHasChildren;
+    return sourceModel()->flags(sourceModel()->index(index.row(), index.column())) | Qt::ItemNeverHasChildren;
 }
 
 /*!

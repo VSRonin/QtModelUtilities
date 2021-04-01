@@ -37,6 +37,7 @@ The library should be compatible with all platform supported by Qt, the CI will 
 + Windows MSVC 2019 64bit Qt 6.0
 + Ubuntu 64bit Qt 5.15
 + Ubuntu 64bit Qt 6.0
++ Mac OS X 64bit Qt 5.15
 + Mac OS X 64bit Qt 6.0
 
 A reduced suite of tests, to ensure compatibility, is also run on:

@@ -27,12 +27,12 @@ public:
     BinaryModelSerialiser(QAbstractItemModel *model = Q_NULLPTR, QObject *parent = Q_NULLPTR);
     BinaryModelSerialiser(const QAbstractItemModel *model, QObject *parent = Q_NULLPTR);
     ~BinaryModelSerialiser();
-    virtual bool saveModel(QDataStream &steram) const;
+    virtual bool saveModel(QDataStream &stream) const;
     Q_INVOKABLE bool saveModel(QIODevice *destination) const Q_DECL_OVERRIDE;
     Q_INVOKABLE bool saveModel(QByteArray *destination) const Q_DECL_OVERRIDE;
     Q_INVOKABLE bool loadModel(QIODevice *source) Q_DECL_OVERRIDE;
     Q_INVOKABLE bool loadModel(const QByteArray &source) Q_DECL_OVERRIDE;
-    virtual bool loadModel(QDataStream &steram);
+    virtual bool loadModel(QDataStream &stream);
 
 protected:
     BinaryModelSerialiser(BinaryModelSerialiserPrivate &d, QObject *parent = Q_NULLPTR);

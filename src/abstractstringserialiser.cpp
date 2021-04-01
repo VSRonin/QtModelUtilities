@@ -25,14 +25,6 @@
 #include <QBuffer>
 #include <QLocale>
 
-/*!
-\class AbstractModelSerialiser
-
-\brief The interface for model serialisers.
-
-This class serve as a base for all serialisers
-*/
-
 AbstractStringSerialiserPrivate::AbstractStringSerialiserPrivate(AbstractStringSerialiser *q)
     : AbstractModelSerialiserPrivate(q)
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
@@ -40,9 +32,6 @@ AbstractStringSerialiserPrivate::AbstractStringSerialiserPrivate(AbstractStringS
 #endif
 { }
 
-/*!
-\internal
-*/
 int AbstractStringSerialiserPrivate::guessDecimals(double val)
 {
     int precision = 0;
@@ -51,9 +40,6 @@ int AbstractStringSerialiserPrivate::guessDecimals(double val)
     return precision;
 }
 
-/*!
-\internal
-*/
 QString AbstractStringSerialiserPrivate::guessDecimalsString(double val, QLocale *loca)
 {
     if (loca)
@@ -61,9 +47,6 @@ QString AbstractStringSerialiserPrivate::guessDecimalsString(double val, QLocale
     return QString::number(val, 'f', guessDecimals(val));
 }
 
-/*!
-\internal
-*/
 QString AbstractStringSerialiserPrivate::variantToString(const QVariant &val)
 {
     QByteArray data;
@@ -76,9 +59,6 @@ QString AbstractStringSerialiserPrivate::variantToString(const QVariant &val)
     return QString::fromLatin1(data.toBase64());
 }
 
-/*!
-\internal
-*/
 QVariant AbstractStringSerialiserPrivate::stringToVariant(const QString &val)
 {
     QByteArray data = QByteArray::fromBase64(val.toLatin1());
@@ -92,9 +72,6 @@ QVariant AbstractStringSerialiserPrivate::stringToVariant(const QString &val)
     return result;
 }
 
-/*!
-\internal
-*/
 QVariant AbstractStringSerialiserPrivate::loadVariant(int type, const QString &val)
 {
     if (val.isEmpty())
@@ -154,9 +131,6 @@ QVariant AbstractStringSerialiserPrivate::loadVariant(int type, const QString &v
 }
 #ifdef QT_GUI_LIB
 
-/*!
-\internal
-*/
 QString AbstractStringSerialiserPrivate::saveImageVariant(const QImage &imageData)
 {
     QByteArray byteArray;
@@ -165,9 +139,6 @@ QString AbstractStringSerialiserPrivate::saveImageVariant(const QImage &imageDat
     return QString::fromLatin1(byteArray.toBase64().constData());
 }
 
-/*!
-\internal
-*/
 QImage AbstractStringSerialiserPrivate::loadImageVariant(int type, const QString &val)
 {
     Q_UNUSED(type)
@@ -179,9 +150,6 @@ QImage AbstractStringSerialiserPrivate::loadImageVariant(int type, const QString
 }
 #endif
 
-/*!
-\internal
-*/
 QString AbstractStringSerialiserPrivate::saveVariant(const QVariant &val)
 {
     if (val.isNull())
@@ -282,8 +250,32 @@ bool AbstractStringSerialiser::setTextCodec(QTextCodec *val)
     return true;
 }
 #endif
+
+/*!
+Loads the model from the given \a source
+
+Data previously stored in the model will be removed
+*/
 bool AbstractStringSerialiser::loadModel(const QString &source)
 {
     QString sourceCopy(source);
     return loadModel(&sourceCopy);
 }
+
+/*!
+\class AbstractStringSerialiser
+
+\brief The interface for model serialisers saving to strings
+*/
+
+/*!
+\fn bool AbstractStringSerialiser::loadModel(QString *source)
+Loads the model from the given \a source
+
+Data previously stored in the model will be removed
+*/
+
+/*!
+\fn bool AbstractStringSerialiser::saveModel(QString *destination)
+Saves the model to the given \a destination
+*/

@@ -27,9 +27,7 @@ protected:
     bool fromJsonObject(const QJsonObject &source, const QModelIndex &parent = QModelIndex());
     QJsonObject objectForRole(int role, const QVariant &value) const;
     bool roleForObject(const QJsonObject &source, const QModelIndex &destination);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 1, 0))
     QJsonDocument::JsonFormat m_format;
-#endif
 };
 
 #endif // jsonmodelserialiser_p_h__

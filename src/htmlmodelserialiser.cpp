@@ -58,14 +58,11 @@ void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter &destination,
     destination.writeStartElement(QStringLiteral("table"));
     destination.writeAttribute(QStringLiteral("data-rowcount"), QString::number(rowCount));
     destination.writeAttribute(QStringLiteral("data-colcount"), QString::number(colCount));
-#ifdef QT_DEBUG
-    destination.writeAttribute("border", "1");
-#endif // QT_DEBUG
     if (foundHhead) {
         destination.writeStartElement(QStringLiteral("tr"));
         if (foundVhead) {
             destination.writeStartElement(QStringLiteral("th"));
-            destination.writeAttribute(QStringLiteral("scope"), QStringLiteral("empty"));
+            destination.writeCharacters(QString());
             destination.writeEndElement(); // th
         }
         for (int i = 0; i < m_constModel->columnCount(); ++i) {
@@ -137,22 +134,8 @@ bool HtmlModelSerialiserPrivate::readHtmlElement(QXmlStreamReader &source, const
     const QXmlStreamAttributes tableAttributes = source.attributes();
     if (!tableAttributes.hasAttribute(QStringLiteral("data-rowcount")) || !tableAttributes.hasAttribute(QStringLiteral("data-colcount")))
         return false;
-    m_model->insertRows(0,
-                        tableAttributes
-                                .value(QStringLiteral("data-rowcount"))
-#if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
-                                .toString()
-#endif
-                                .toInt(),
-                        parent);
-    m_model->insertColumns(0,
-                           tableAttributes
-                                   .value(QStringLiteral("data-colcount"))
-#if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
-                                   .toString()
-#endif
-                                   .toInt(),
-                           parent);
+    m_model->insertRows(0, tableAttributes.value(QStringLiteral("data-rowcount")).toInt(), parent);
+    m_model->insertColumns(0, tableAttributes.value(QStringLiteral("data-colcount")).toInt(), parent);
     bool rowStarted = false;
     bool cellStarted = false;
     int currentRow = 0;
@@ -168,15 +151,13 @@ bool HtmlModelSerialiserPrivate::readHtmlElement(QXmlStreamReader &source, const
                 rowStarted = true;
             } else if (rowStarted && !parent.isValid() && source.name() == QStringLiteral("th")) {
                 const QXmlStreamAttributes headAttributes = source.attributes();
-                if (!headAttributes.hasAttribute(QStringLiteral("scope")))
-                    return false;
-                const auto headScope = headAttributes.value(QStringLiteral("scope"));
-                if (headScope.compare(QStringLiteral("row")) == 0)
-                    headCode = Row;
-                else if (headScope.compare(QStringLiteral("col")) == 0)
-                    headCode = Col;
-                else if (headScope.compare(QStringLiteral("empty")) != 0)
-                    return false;
+                if (headAttributes.hasAttribute(QStringLiteral("scope"))) {
+                    const auto headScope = headAttributes.value(QStringLiteral("scope"));
+                    if (headScope.compare(QStringLiteral("row")) == 0)
+                        headCode = Row;
+                    else if (headScope.compare(QStringLiteral("col")) == 0)
+                        headCode = Col;
+                }
             } else if (rowStarted && source.name() == QStringLiteral("td")) {
                 tdFound = true;
                 if (currentCol >= m_model->columnCount(parent))
@@ -186,18 +167,8 @@ bool HtmlModelSerialiserPrivate::readHtmlElement(QXmlStreamReader &source, const
                 const QXmlStreamAttributes cellAttributes = source.attributes();
                 if (!cellAttributes.hasAttribute(QStringLiteral("data-varianttype")) || !cellAttributes.hasAttribute(QStringLiteral("data-rolecode")))
                     return false;
-                const int cellRole = cellAttributes
-                                             .value(QStringLiteral("data-rolecode"))
-#if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
-                                             .toString()
-#endif
-                                             .toInt();
-                const int cellType = cellAttributes
-                                             .value(QStringLiteral("data-varianttype"))
-#if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
-                                             .toString()
-#endif
-                                             .toInt();
+                const int cellRole = cellAttributes.value(QStringLiteral("data-rolecode")).toInt();
+                const int cellType = cellAttributes.value(QStringLiteral("data-varianttype")).toInt();
                 if (cellStarted) {
                     m_model->setData(m_model->index(currentRow, currentCol, parent), readHtmlVariant(source, cellType), cellRole);
                 } else if (headCode == Row) {
@@ -239,7 +210,6 @@ bool HtmlModelSerialiserPrivate::writeHtml(QXmlStreamWriter &writer) const
     if (!m_constModel)
         return false;
     if (m_printStartDocument) {
-        writer.writeStartDocument();
         writer.writeDTD(QStringLiteral("<!DOCTYPE html>"));
         writer.writeStartElement(QStringLiteral("html"));
         writer.writeStartElement(QStringLiteral("head"));
@@ -249,6 +219,13 @@ bool HtmlModelSerialiserPrivate::writeHtml(QXmlStreamWriter &writer) const
 #else
         writer.writeAttribute(QStringLiteral("charset"), QStringLiteral("UTF-8"));
 #endif
+        writer.writeStartElement(QStringLiteral("title"));
+        const QString modelName = m_constModel->objectName();
+        writer.writeCharacters(modelName.isEmpty() ? QStringLiteral("Model") : modelName);
+        writer.writeEndElement(); // title
+        writer.writeStartElement(QStringLiteral("style"));
+        writer.writeCharacters(QStringLiteral("table, th, td { border: 1px solid black; } table { border-collapse: collapse; width: 100%; }"));
+        writer.writeEndElement(); // style
         writer.writeEndElement(); // head
         writer.writeStartElement(QStringLiteral("body"));
     }

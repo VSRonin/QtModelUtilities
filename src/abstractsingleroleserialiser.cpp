@@ -13,11 +13,7 @@
 
 #include "abstractsingleroleserialiser.h"
 #include "private/abstractsingleroleserialiser_p.h"
-/*!
-\class AbstractSingleRoleSerialiser
 
-\brief The interface for model serialisers saving only one role.
-*/
 AbstractSingleRoleSerialiserPrivate::AbstractSingleRoleSerialiserPrivate(AbstractSingleRoleSerialiser *q)
     : AbstractStringSerialiserPrivate(q)
 {
@@ -30,7 +26,7 @@ Construct a read/write serialiser
 AbstractSingleRoleSerialiser::AbstractSingleRoleSerialiser(QAbstractItemModel *model, QObject *parent)
     : AbstractStringSerialiser(*new AbstractSingleRoleSerialiserPrivate(this), parent)
 {
-    setRoleToSave(Qt::DisplayRole);
+    AbstractSingleRoleSerialiser::setRoleToSave(Qt::DisplayRole);
     setModel(model);
 }
 
@@ -72,7 +68,7 @@ int AbstractSingleRoleSerialiser::roleToSave() const
 
 void AbstractSingleRoleSerialiser::setRoleToSave(int val)
 {
-    setRoleToSave(QList<int>{val});
+    AbstractSingleRoleSerialiser::setRoleToSave(QList<int>{val});
 }
 
 /*!
@@ -123,3 +119,9 @@ void AbstractSingleRoleSerialiser::resetRoleToSave()
 {
     setRoleToSave(Qt::DisplayRole);
 }
+
+/*!
+\class AbstractSingleRoleSerialiser
+
+\brief The interface for model serialisers saving only one role.
+*/
