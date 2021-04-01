@@ -1,6 +1,6 @@
 #include <QtTest/QTest>
 #include "tst_binarymodelserialiser.h"
-#include <..\serialisers_common.hpp>
+#include <../serialisers_common.hpp>
 #include <binarymodelserialiser.h>
 #include <QByteArray>
 #include <QBuffer>
