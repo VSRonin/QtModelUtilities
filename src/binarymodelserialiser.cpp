@@ -15,11 +15,11 @@
 #include "private/binarymodelserialiser_p.h"
 #include <QDataStream>
 #include <QIODevice>
-BinaryModelSerialiserPrivate::BinaryModelSerialiserPrivate(BinaryModelSerialiser* q)
-    :AbstractModelSerialiserPrivate(q)
-{}
+BinaryModelSerialiserPrivate::BinaryModelSerialiserPrivate(BinaryModelSerialiser *q)
+    : AbstractModelSerialiserPrivate(q)
+{ }
 
-void BinaryModelSerialiserPrivate::writeBinaryElement(QDataStream& destination, const QModelIndex& parent) const
+void BinaryModelSerialiserPrivate::writeBinaryElement(QDataStream &destination, const QModelIndex &parent) const
 {
     Q_ASSERT(m_constModel);
     if (m_constModel->rowCount(parent) + m_constModel->columnCount(parent) == 0)
@@ -42,7 +42,7 @@ void BinaryModelSerialiserPrivate::writeBinaryElement(QDataStream& destination, 
     }
 }
 
-bool BinaryModelSerialiserPrivate::readBinaryElement(QDataStream& source, const QModelIndex& parent)
+bool BinaryModelSerialiserPrivate::readBinaryElement(QDataStream &source, const QModelIndex &parent)
 {
     Q_ASSERT(m_model);
     qint32 rowCount, colCount;
@@ -52,8 +52,8 @@ bool BinaryModelSerialiserPrivate::readBinaryElement(QDataStream& source, const 
     qint32 tempRole = -1;
     QVariant tempData;
     bool hasChild = false;
-    for (int i = 0; i < rowCount&& source.status() == QDataStream::Ok; ++i) {
-        for (int j = 0; j < colCount&& source.status() == QDataStream::Ok; ++j) {
+    for (int i = 0; i < rowCount && source.status() == QDataStream::Ok; ++i) {
+        for (int j = 0; j < colCount && source.status() == QDataStream::Ok; ++j) {
             const QModelIndex currIdx = m_model->index(i, j, parent);
             for (source >> tempRole; tempRole != -1 && source.status() == QDataStream::Ok; source >> tempRole) {
                 source >> tempData;
@@ -82,8 +82,7 @@ bool BinaryModelSerialiserPrivate::readBinaryElement(QDataStream& source, const 
     return true;
 }
 
-
-bool BinaryModelSerialiserPrivate::readBinary(QDataStream& reader)
+bool BinaryModelSerialiserPrivate::readBinary(QDataStream &reader)
 {
     if (!m_model)
         return false;
@@ -95,7 +94,7 @@ bool BinaryModelSerialiserPrivate::readBinary(QDataStream& reader)
     reader.setVersion(QDataStream::Qt_5_0);
     qint32 steramVersion;
     reader >> steramVersion;
-    if (steramVersion > QDataStream().version()){
+    if (steramVersion > QDataStream().version()) {
 #if QT_VERSION >= 0x050700
         reader.rollbackTransaction();
 #endif
@@ -158,11 +157,11 @@ bool BinaryModelSerialiserPrivate::readBinary(QDataStream& reader)
 #endif
 }
 
-bool BinaryModelSerialiserPrivate::writeBinary(QDataStream& writer) const
+bool BinaryModelSerialiserPrivate::writeBinary(QDataStream &writer) const
 {
     if (!m_constModel)
         return false;
-    const qint32 writerVersion = writer.version(); 
+    const qint32 writerVersion = writer.version();
     writer.setVersion(QDataStream::Qt_5_0);
     writer << writerVersion;
     writer.setVersion(writerVersion);
@@ -189,7 +188,7 @@ bool BinaryModelSerialiserPrivate::writeBinary(QDataStream& writer) const
     return writer.status() == QDataStream::Ok;
 }
 
-bool BinaryModelSerialiser::saveModel(QIODevice* destination) const
+bool BinaryModelSerialiser::saveModel(QIODevice *destination) const
 {
     if (!destination)
         return false;
@@ -200,7 +199,7 @@ bool BinaryModelSerialiser::saveModel(QIODevice* destination) const
     if (!destination->isWritable())
         return false;
     Q_D(const BinaryModelSerialiser);
-    
+
     if (!d->m_constModel)
         return false;
     QDataStream witer(destination);
@@ -210,12 +209,12 @@ bool BinaryModelSerialiser::saveModel(QIODevice* destination) const
     return d->writeBinary(witer);
 }
 
-bool BinaryModelSerialiser::saveModel(QByteArray* destination) const
+bool BinaryModelSerialiser::saveModel(QByteArray *destination) const
 {
     if (!destination)
         return false;
     Q_D(const BinaryModelSerialiser);
-    
+
     if (!d->m_constModel)
         return false;
     QDataStream witer(destination, QIODevice::WriteOnly);
@@ -225,13 +224,13 @@ bool BinaryModelSerialiser::saveModel(QByteArray* destination) const
     return d->writeBinary(witer);
 }
 
-bool BinaryModelSerialiser::saveModel(QDataStream& steram) const
+bool BinaryModelSerialiser::saveModel(QDataStream &steram) const
 {
     Q_D(const BinaryModelSerialiser);
     return d->writeBinary(steram);
 }
 
-bool BinaryModelSerialiser::loadModel(QIODevice* source)
+bool BinaryModelSerialiser::loadModel(QIODevice *source)
 {
     if (!source)
         return false;
@@ -242,7 +241,7 @@ bool BinaryModelSerialiser::loadModel(QIODevice* source)
     if (!source->isReadable())
         return false;
     Q_D(BinaryModelSerialiser);
-    
+
     if (!d->m_model)
         return false;
     QDataStream reader(source);
@@ -251,10 +250,10 @@ bool BinaryModelSerialiser::loadModel(QIODevice* source)
 #endif // MS_DATASTREAM_VERSION
     return d->readBinary(reader);
 }
-bool BinaryModelSerialiser::loadModel(const QByteArray& source)
+bool BinaryModelSerialiser::loadModel(const QByteArray &source)
 {
     Q_D(BinaryModelSerialiser);
-    
+
     if (!d->m_model)
         return false;
     QDataStream reader(source);
@@ -264,45 +263,39 @@ bool BinaryModelSerialiser::loadModel(const QByteArray& source)
     return d->readBinary(reader);
 }
 
-
-
-bool BinaryModelSerialiser::loadModel(QDataStream& steram)
+bool BinaryModelSerialiser::loadModel(QDataStream &steram)
 {
     Q_D(BinaryModelSerialiser);
     return d->readBinary(steram);
 }
 
-BinaryModelSerialiser::BinaryModelSerialiser(QAbstractItemModel* model, QObject* parent)
+BinaryModelSerialiser::BinaryModelSerialiser(QAbstractItemModel *model, QObject *parent)
     : AbstractModelSerialiser(*new BinaryModelSerialiserPrivate(this), parent)
 {
     setModel(model);
 }
-BinaryModelSerialiser::BinaryModelSerialiser(const QAbstractItemModel* model, QObject* parent )
+BinaryModelSerialiser::BinaryModelSerialiser(const QAbstractItemModel *model, QObject *parent)
     : AbstractModelSerialiser(*new BinaryModelSerialiserPrivate(this), parent)
 {
     setModel(model);
 }
 
-
-BinaryModelSerialiser::BinaryModelSerialiser(BinaryModelSerialiserPrivate& d, QObject* parent )
-    :AbstractModelSerialiser(d, parent)
-{}
-
+BinaryModelSerialiser::BinaryModelSerialiser(BinaryModelSerialiserPrivate &d, QObject *parent)
+    : AbstractModelSerialiser(d, parent)
+{ }
 
 BinaryModelSerialiser::~BinaryModelSerialiser() = default;
 
-
-
 #ifdef MS_DECLARE_STREAM_OPERATORS
 
-QDataStream& operator<<(QDataStream & stream, const QAbstractItemModel& model)
+QDataStream &operator<<(QDataStream &stream, const QAbstractItemModel &model)
 {
     const QModelSerialiser mSer(&model);
     mSer.d_func()->writeBinary(stream);
     return stream;
 }
 
-QDataStream& operator>>(QDataStream & stream, QAbstractItemModel& model)
+QDataStream &operator>>(QDataStream &stream, QAbstractItemModel &model)
 {
     QModelSerialiser mSer(&model);
     mSer.d_func()->readBinary(stream);

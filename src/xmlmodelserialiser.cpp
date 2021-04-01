@@ -16,12 +16,12 @@
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 
-XmlModelSerialiserPrivate::XmlModelSerialiserPrivate(XmlModelSerialiser* q)
-    :AbstractStringSerialiserPrivate(q)
+XmlModelSerialiserPrivate::XmlModelSerialiserPrivate(XmlModelSerialiser *q)
+    : AbstractStringSerialiserPrivate(q)
     , m_printStartDocument(true)
-{}
+{ }
 
-void XmlModelSerialiserPrivate::writeXmlElement(QXmlStreamWriter& destination, const QModelIndex& parent) const
+void XmlModelSerialiserPrivate::writeXmlElement(QXmlStreamWriter &destination, const QModelIndex &parent) const
 {
     Q_ASSERT(m_constModel);
     if (m_constModel->rowCount(parent) + m_constModel->columnCount(parent) == 0)
@@ -60,28 +60,27 @@ void XmlModelSerialiserPrivate::writeXmlElement(QXmlStreamWriter& destination, c
     destination.writeEndElement(); // Element
 }
 
-bool XmlModelSerialiserPrivate::readXmlElement(QXmlStreamReader& source, const QModelIndex& parent)
+bool XmlModelSerialiserPrivate::readXmlElement(QXmlStreamReader &source, const QModelIndex &parent)
 {
     Q_ASSERT(m_model);
     if (source.name() != QStringLiteral("Element"))
         return false;
     int rowCount, colCount;
     const QXmlStreamAttributes tableSizeAttribute = source.attributes();
-    if (!(
-        tableSizeAttribute.hasAttribute(QStringLiteral("RowCount"))
-        && tableSizeAttribute.hasAttribute(QStringLiteral("ColumnCount"))
-        ))
+    if (!(tableSizeAttribute.hasAttribute(QStringLiteral("RowCount")) && tableSizeAttribute.hasAttribute(QStringLiteral("ColumnCount"))))
         return false;
-    rowCount = tableSizeAttribute.value(QStringLiteral("RowCount"))
-        #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
-        .toString()
-        #endif
-        .toInt();
-    colCount = tableSizeAttribute.value(QStringLiteral("ColumnCount"))
-        #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
-        .toString()
-        #endif
-        .toInt();
+    rowCount = tableSizeAttribute
+                       .value(QStringLiteral("RowCount"))
+#if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+                       .toString()
+#endif
+                       .toInt();
+    colCount = tableSizeAttribute
+                       .value(QStringLiteral("ColumnCount"))
+#if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+                       .toString()
+#endif
+                       .toInt();
     if (rowCount <= 0 || colCount <= 0)
         return false;
     if (m_model->rowCount(parent) < rowCount)
@@ -96,60 +95,51 @@ bool XmlModelSerialiserPrivate::readXmlElement(QXmlStreamReader& source, const Q
         if (source.isStartElement()) {
             if (source.name() == QStringLiteral("Cell")) {
                 cellStarted = true;
-            }
-            else if (source.name() == QStringLiteral("Row") && cellStarted) {
+            } else if (source.name() == QStringLiteral("Row") && cellStarted) {
                 rowIndex = source.readElementText().toInt();
-            }
-            else if (source.name() == QStringLiteral("Column") && cellStarted) {
+            } else if (source.name() == QStringLiteral("Column") && cellStarted) {
                 colIndex = source.readElementText().toInt();
-            }
-            else if (source.name() == QStringLiteral("DataPoint") && cellStarted) {
+            } else if (source.name() == QStringLiteral("DataPoint") && cellStarted) {
                 if (rowIndex < 0 || colIndex < 0)
                     return false;
                 const QXmlStreamAttributes dataPointTattributes = source.attributes();
-                if (!(
-                    dataPointTattributes.hasAttribute(QStringLiteral("Role"))
-                    && dataPointTattributes.hasAttribute(QStringLiteral("Type"))
-                    ))
+                if (!(dataPointTattributes.hasAttribute(QStringLiteral("Role")) && dataPointTattributes.hasAttribute(QStringLiteral("Type"))))
                     return false;
-                int dataRole = dataPointTattributes.value(QStringLiteral("Role"))
-                    #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
-                    .toString()
-                    #endif
-                    .toInt();
-                int dataType = dataPointTattributes.value(QStringLiteral("Type"))
-                    #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
-                    .toString()
-                    #endif
-                    .toInt();
+                int dataRole = dataPointTattributes
+                                       .value(QStringLiteral("Role"))
+#if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+                                       .toString()
+#endif
+                                       .toInt();
+                int dataType = dataPointTattributes
+                                       .value(QStringLiteral("Type"))
+#if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+                                       .toString()
+#endif
+                                       .toInt();
                 const QVariant roleVariant = loadVariant(dataType, source.readElementText());
                 if (!roleVariant.isNull()) // skip unhandled types
                     m_model->setData(m_model->index(rowIndex, colIndex, parent), roleVariant, dataRole);
-            }
-            else if (source.name() == QStringLiteral("Element") && cellStarted) {
+            } else if (source.name() == QStringLiteral("Element") && cellStarted) {
                 if (rowIndex < 0 || colIndex < 0)
                     return false;
                 readXmlElement(source, m_model->index(rowIndex, colIndex, parent));
             }
-        }
-        else if (source.isEndElement()) {
+        } else if (source.isEndElement()) {
             if (source.name() == QStringLiteral("Cell")) {
                 cellStarted = false;
                 rowIndex = -1;
                 colIndex = -1;
-            }
-            else if (source.name() == QStringLiteral("Element")) {
+            } else if (source.name() == QStringLiteral("Element")) {
                 if (!cellStarted)
                     return true;
             }
         }
-
     }
     return false;
 }
 
-
-bool XmlModelSerialiserPrivate::writeXml(QXmlStreamWriter& writer) const
+bool XmlModelSerialiserPrivate::writeXml(QXmlStreamWriter &writer) const
 {
     if (!m_constModel)
         return false;
@@ -201,7 +191,7 @@ bool XmlModelSerialiserPrivate::writeXml(QXmlStreamWriter& writer) const
     return !writer.hasError();
 }
 
-bool XmlModelSerialiserPrivate::readXml(QXmlStreamReader& reader)
+bool XmlModelSerialiserPrivate::readXml(QXmlStreamReader &reader)
 {
     if (!m_model)
         return false;
@@ -219,59 +209,52 @@ bool XmlModelSerialiserPrivate::readXml(QXmlStreamReader& reader)
                     m_model->removeRows(0, m_model->rowCount());
                     return false;
                 }
-            }
-            else if (reader.name() == QStringLiteral("HeaderData")) {
+            } else if (reader.name() == QStringLiteral("HeaderData")) {
                 headerDataStarted = true;
-            }
-            else if (reader.name() == QStringLiteral("Vertical") && headerDataStarted) {
+            } else if (reader.name() == QStringLiteral("Vertical") && headerDataStarted) {
                 if (hHeaderDataStarted)
                     return false;
                 vHeaderDataStarted = true;
-            }
-            else if (reader.name() == QStringLiteral("Horizontal") && headerDataStarted) {
+            } else if (reader.name() == QStringLiteral("Horizontal") && headerDataStarted) {
                 if (vHeaderDataStarted)
                     return false;
                 hHeaderDataStarted = true;
-            }
-            else if (reader.name() == QStringLiteral("HeaderDataPoint") && headerDataStarted) {
+            } else if (reader.name() == QStringLiteral("HeaderDataPoint") && headerDataStarted) {
                 if (!(vHeaderDataStarted || hHeaderDataStarted))
                     return false;
                 const QXmlStreamAttributes headDataAttribute = reader.attributes();
-                if (!(
-                    headDataAttribute.hasAttribute(QStringLiteral("Section"))
-                    && headDataAttribute.hasAttribute(QStringLiteral("Role"))
-                    && headDataAttribute.hasAttribute(QStringLiteral("Type"))
-                    ))
+                if (!(headDataAttribute.hasAttribute(QStringLiteral("Section")) && headDataAttribute.hasAttribute(QStringLiteral("Role"))
+                      && headDataAttribute.hasAttribute(QStringLiteral("Type"))))
                     return false;
-                int headerSection = headDataAttribute.value(QStringLiteral("Section"))
-                    #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
-                    .toString()
-                    #endif
-                    .toInt();
-                int headerRole = headDataAttribute.value(QStringLiteral("Role"))
-                    #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
-                    .toString()
-                    #endif
-                    .toInt();
-                int headerType = headDataAttribute.value(QStringLiteral("Type"))
-                    #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
-                    .toString()
-                    #endif
-                    .toInt();
+                int headerSection = headDataAttribute
+                                            .value(QStringLiteral("Section"))
+#if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+                                            .toString()
+#endif
+                                            .toInt();
+                int headerRole = headDataAttribute
+                                         .value(QStringLiteral("Role"))
+#if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+                                         .toString()
+#endif
+                                         .toInt();
+                int headerType = headDataAttribute
+                                         .value(QStringLiteral("Type"))
+#if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
+                                         .toString()
+#endif
+                                         .toInt();
                 const QVariant roleVariant = loadVariant(headerType, reader.readElementText());
                 if (!roleVariant.isNull()) // skip unhandled types
                     m_model->setHeaderData(headerSection, (vHeaderDataStarted ? Qt::Vertical : Qt::Horizontal), roleVariant, headerRole);
             }
 
-        }
-        else if (reader.isEndElement()) {
+        } else if (reader.isEndElement()) {
             if (reader.name() == QStringLiteral("HeaderData")) {
                 headerDataStarted = false;
-            }
-            else if (reader.name() == QStringLiteral("Vertical") && headerDataStarted) {
+            } else if (reader.name() == QStringLiteral("Vertical") && headerDataStarted) {
                 vHeaderDataStarted = false;
-            }
-            else if (reader.name() == QStringLiteral("Horizontal") && headerDataStarted) {
+            } else if (reader.name() == QStringLiteral("Horizontal") && headerDataStarted) {
                 hHeaderDataStarted = false;
             }
         }
@@ -287,24 +270,23 @@ bool XmlModelSerialiserPrivate::readXml(QXmlStreamReader& reader)
 bool XmlModelSerialiser::printStartDocument() const
 {
     Q_D(const XmlModelSerialiser);
-    
+
     return d->m_printStartDocument;
 }
 
 void XmlModelSerialiser::setPrintStartDocument(bool val)
 {
     Q_D(XmlModelSerialiser);
-    
+
     d->m_printStartDocument = val;
 }
 
-
-bool XmlModelSerialiser::saveModel(QString* destination) const
+bool XmlModelSerialiser::saveModel(QString *destination) const
 {
     if (!destination)
         return false;
     Q_D(const XmlModelSerialiser);
-    
+
     if (!d->m_model)
         return false;
     QXmlStreamWriter writer(destination);
@@ -314,7 +296,7 @@ bool XmlModelSerialiser::saveModel(QString* destination) const
     return d->writeXml(writer);
 }
 
-bool XmlModelSerialiser::saveModel(QIODevice* destination) const
+bool XmlModelSerialiser::saveModel(QIODevice *destination) const
 {
     if (!destination)
         return false;
@@ -325,7 +307,7 @@ bool XmlModelSerialiser::saveModel(QIODevice* destination) const
     if (!destination->isWritable())
         return false;
     Q_D(const XmlModelSerialiser);
-    
+
     if (!d->m_model)
         return false;
     QXmlStreamWriter writer(destination);
@@ -335,12 +317,12 @@ bool XmlModelSerialiser::saveModel(QIODevice* destination) const
     return d->writeXml(writer);
 }
 
-bool XmlModelSerialiser::saveModel(QByteArray* destination) const
+bool XmlModelSerialiser::saveModel(QByteArray *destination) const
 {
     if (!destination)
         return false;
     Q_D(const XmlModelSerialiser);
-    
+
     if (!d->m_model)
         return false;
     QXmlStreamWriter writer(destination);
@@ -350,13 +332,13 @@ bool XmlModelSerialiser::saveModel(QByteArray* destination) const
     return d->writeXml(writer);
 }
 
-bool XmlModelSerialiser::saveModel(QXmlStreamWriter& stream) const
+bool XmlModelSerialiser::saveModel(QXmlStreamWriter &stream) const
 {
     Q_D(const XmlModelSerialiser);
     return d->writeXml(stream);
 }
 
-bool XmlModelSerialiser::loadModel(QIODevice* source)
+bool XmlModelSerialiser::loadModel(QIODevice *source)
 {
     if (!source)
         return false;
@@ -367,67 +349,64 @@ bool XmlModelSerialiser::loadModel(QIODevice* source)
     if (!source->isReadable())
         return false;
     Q_D(XmlModelSerialiser);
-    
+
     if (!d->m_model)
         return false;
     QXmlStreamReader reader(source);
     return d->readXml(reader);
 }
-bool XmlModelSerialiser::loadModel(const QByteArray& source)
+bool XmlModelSerialiser::loadModel(const QByteArray &source)
 {
     Q_D(XmlModelSerialiser);
-    
+
     if (!d->m_model)
         return false;
     QXmlStreamReader reader(source);
     return d->readXml(reader);
 }
-bool XmlModelSerialiser::loadModel(QString* source)
+bool XmlModelSerialiser::loadModel(QString *source)
 {
     if (!source)
         return false;
     Q_D(XmlModelSerialiser);
-    
+
     QXmlStreamReader reader(*source);
     return d->readXml(reader);
 }
 
-bool XmlModelSerialiser::loadModel(QXmlStreamReader& stream)
+bool XmlModelSerialiser::loadModel(QXmlStreamReader &stream)
 {
     Q_D(XmlModelSerialiser);
     return d->readXml(stream);
 }
 
-XmlModelSerialiser::XmlModelSerialiser(QAbstractItemModel* model, QObject* parent)
+XmlModelSerialiser::XmlModelSerialiser(QAbstractItemModel *model, QObject *parent)
     : AbstractStringSerialiser(*new XmlModelSerialiserPrivate(this), parent)
 {
     setModel(model);
 }
-XmlModelSerialiser::XmlModelSerialiser(const QAbstractItemModel* model, QObject* parent)
+XmlModelSerialiser::XmlModelSerialiser(const QAbstractItemModel *model, QObject *parent)
     : AbstractStringSerialiser(*new XmlModelSerialiserPrivate(this), parent)
 {
     setModel(model);
 }
 
-
-XmlModelSerialiser::XmlModelSerialiser(XmlModelSerialiserPrivate& d, QObject* parent)
-    :AbstractStringSerialiser(d, parent)
-{}
-
+XmlModelSerialiser::XmlModelSerialiser(XmlModelSerialiserPrivate &d, QObject *parent)
+    : AbstractStringSerialiser(d, parent)
+{ }
 
 XmlModelSerialiser::~XmlModelSerialiser() = default;
 
-
 #ifdef MS_DECLARE_STREAM_OPERATORS
 
-QXmlStreamWriter& operator<<(QXmlStreamWriter & stream, const QAbstractItemModel& model)
+QXmlStreamWriter &operator<<(QXmlStreamWriter &stream, const QAbstractItemModel &model)
 {
     const QModelSerialiser mSer(&model);
     mSer.d_func()->writeXml(stream);
     return stream;
 }
 
-QXmlStreamReader& operator>>(QXmlStreamReader & stream, QAbstractItemModel& model)
+QXmlStreamReader &operator>>(QXmlStreamReader &stream, QAbstractItemModel &model)
 {
     QModelSerialiser mSer(&model);
     mSer.d_func()->readXml(stream);

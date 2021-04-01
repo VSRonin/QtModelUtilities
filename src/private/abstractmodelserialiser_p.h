@@ -21,10 +21,10 @@ class AbstractModelSerialiserPrivate
     Q_DISABLE_COPY(AbstractModelSerialiserPrivate);
     Q_DECLARE_PUBLIC(AbstractModelSerialiser)
 protected:
-    AbstractModelSerialiserPrivate(AbstractModelSerialiser* q);
+    AbstractModelSerialiserPrivate(AbstractModelSerialiser *q);
     QList<int> m_rolesToSave;
-    QAbstractItemModel* m_model;
-    const QAbstractItemModel* m_constModel;
-    AbstractModelSerialiser* q_ptr;
+    QAbstractItemModel *m_model;
+    const QAbstractItemModel *m_constModel;
+    AbstractModelSerialiser *q_ptr;
 };
 #endif // abstractmultiroleserialiser_p_h__

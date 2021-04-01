@@ -11,7 +11,6 @@
    limitations under the License.
 \****************************************************************************/
 
-
 #ifndef jsonmodelserialiser_p_h__
 #define jsonmodelserialiser_p_h__
 #include "private/abstractstringserialiser_p.h"
@@ -23,16 +22,14 @@ class JsonModelSerialiserPrivate : public AbstractStringSerialiserPrivate
     Q_DISABLE_COPY(JsonModelSerialiserPrivate);
     Q_DECLARE_PUBLIC(JsonModelSerialiser)
 protected:
-    JsonModelSerialiserPrivate(JsonModelSerialiser* q);
-    QJsonObject toJsonObject(const QModelIndex& parent = QModelIndex()) const;
-    bool fromJsonObject(const QJsonObject& source, const QModelIndex& parent = QModelIndex());
-    QJsonObject objectForRole(int role, const QVariant& value) const;
-    bool roleForObject(const QJsonObject& source, const QModelIndex& destination);
+    JsonModelSerialiserPrivate(JsonModelSerialiser *q);
+    QJsonObject toJsonObject(const QModelIndex &parent = QModelIndex()) const;
+    bool fromJsonObject(const QJsonObject &source, const QModelIndex &parent = QModelIndex());
+    QJsonObject objectForRole(int role, const QVariant &value) const;
+    bool roleForObject(const QJsonObject &source, const QModelIndex &destination);
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 1, 0))
-    QJsonDocument::JsonFormat m_format;    
+    QJsonDocument::JsonFormat m_format;
 #endif
 };
-
-
 
 #endif // jsonmodelserialiser_p_h__

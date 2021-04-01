@@ -11,15 +11,14 @@
 #include <QHeaderView>
 
 // We subclass RoleMaskProxyModel and reimplement the flags() method to allow editing
-class EditableFlagMask : public RoleMaskProxyModel{
+class EditableFlagMask : public RoleMaskProxyModel
+{
     Q_DISABLE_COPY(EditableFlagMask)
 public:
-    explicit EditableFlagMask(QObject* parent = Q_NULLPTR)
-        :RoleMaskProxyModel(parent)
-    {}
-    Qt::ItemFlags flags(const QModelIndex &index) const Q_DECL_OVERRIDE{
-        return RoleMaskProxyModel::flags(index) | Qt::ItemIsEditable;
-    }
+    explicit EditableFlagMask(QObject *parent = Q_NULLPTR)
+        : RoleMaskProxyModel(parent)
+    { }
+    Qt::ItemFlags flags(const QModelIndex &index) const Q_DECL_OVERRIDE { return RoleMaskProxyModel::flags(index) | Qt::ItemIsEditable; }
 };
 
 int main(int argc, char *argv[])
@@ -55,13 +54,13 @@ int main(int argc, char *argv[])
     // we create the ui to show both the source and the proxy model in 2 table views
     QWidget mainWid;
     mainWid.setWindowTitle(QStringLiteral("RoleMaskProxyModel Example - Editable SqlQueryModel"));
-    QTableView* sourceView = new QTableView(&mainWid);
+    QTableView *sourceView = new QTableView(&mainWid);
     sourceView->setModel(&baseModel);
     sourceView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    QTableView* proxyView = new QTableView(&mainWid);
+    QTableView *proxyView = new QTableView(&mainWid);
     proxyView->setModel(&proxyModel);
     proxyView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    QGridLayout* mainLay = new QGridLayout(&mainWid);
+    QGridLayout *mainLay = new QGridLayout(&mainWid);
     mainLay->addWidget(new QLabel(QStringLiteral("Original Model")), 0, 0);
     mainLay->addWidget(sourceView, 1, 0);
     mainLay->addWidget(new QLabel(QStringLiteral("Editable Model")), 0, 1);

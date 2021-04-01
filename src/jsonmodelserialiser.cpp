@@ -20,17 +20,17 @@
 /*!
 \internal
 */
-JsonModelSerialiserPrivate::JsonModelSerialiserPrivate(JsonModelSerialiser* q)
-    :AbstractStringSerialiserPrivate(q)
+JsonModelSerialiserPrivate::JsonModelSerialiserPrivate(JsonModelSerialiser *q)
+    : AbstractStringSerialiserPrivate(q)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 1, 0))
     , m_format(QJsonDocument::Compact)
 #endif
-{}
+{ }
 
 /*!
 \internal
 */
-bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject& source, const QModelIndex& parent)
+bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject &source, const QModelIndex &parent)
 {
     if (source.isEmpty())
         return false;
@@ -39,25 +39,26 @@ bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject& source, const
         return false;
     const int maxRow =
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
-        tempValue.toInt();
+            tempValue.toInt();
 #else
-        static_cast<int>(tempValue.toDouble());
+            static_cast<int>(tempValue.toDouble());
 #endif
-    if(!m_model->insertRows(0, maxRow, parent))
+    if (!m_model->insertRows(0, maxRow, parent))
         return false;
     tempValue = source.value(QLatin1String("columns"));
     if (tempValue.isUndefined() || !tempValue.isDouble())
         return false;
-    const int maxCol = 
+    const int maxCol =
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
-        tempValue.toInt();
+            tempValue.toInt();
 #else
-        static_cast<int>(tempValue.toDouble());
+            static_cast<int>(tempValue.toDouble());
 #endif
     if (!m_model->insertColumns(0, maxCol, parent))
         return false;
     if (!parent.isValid()) {
-        for (auto orientat : { std::make_pair(QLatin1String("verticalHeader"), Qt::Vertical), std::make_pair(QLatin1String("horizontalHeader"), Qt::Horizontal) }) {
+        for (auto orientat :
+             {std::make_pair(QLatin1String("verticalHeader"), Qt::Vertical), std::make_pair(QLatin1String("horizontalHeader"), Qt::Horizontal)}) {
             tempValue = source.value(orientat.first);
             if (!tempValue.isUndefined()) {
                 if (!tempValue.isArray())
@@ -71,11 +72,11 @@ bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject& source, const
                     tempValue = sectionObject.value(QLatin1String("section"));
                     if (tempValue.isUndefined() || !tempValue.isDouble())
                         return false;
-                    const int sectIdx = 
+                    const int sectIdx =
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
-                        tempValue.toInt();
+                            tempValue.toInt();
 #else
-                        static_cast<int>(tempValue.toDouble());
+                            static_cast<int>(tempValue.toDouble());
 #endif
                     tempValue = sectionObject.value(QLatin1String("values"));
                     if (tempValue.isUndefined() || !tempValue.isArray())
@@ -89,20 +90,20 @@ bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject& source, const
                         tempValue = roleObject.value(QLatin1String("role"));
                         if (tempValue.isUndefined() || !tempValue.isDouble())
                             return false;
-                        const int tempRole = 
+                        const int tempRole =
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
-                            tempValue.toInt();
+                                tempValue.toInt();
 #else
-                            static_cast<int>(tempValue.toDouble());
+                                static_cast<int>(tempValue.toDouble());
 #endif
                         tempValue = roleObject.value(QLatin1String("type"));
                         if (tempValue.isUndefined() || !tempValue.isDouble())
                             return false;
-                        const int tempType = 
+                        const int tempType =
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
-                            tempValue.toInt();
+                                tempValue.toInt();
 #else
-                            static_cast<int>(tempValue.toDouble());
+                                static_cast<int>(tempValue.toDouble());
 #endif
                         tempValue = roleObject.value(QLatin1String("value"));
                         if (tempValue.isUndefined() || !tempValue.isString())
@@ -110,7 +111,6 @@ bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject& source, const
                         if (!m_model->setHeaderData(sectIdx, orientat.second, loadVariant(tempType, tempValue.toString()), tempRole))
                             return false;
                     }
-                    
                 }
             }
         }
@@ -122,7 +122,7 @@ bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject& source, const
     if (!tempValue.isArray())
         return false;
     const QJsonArray dataArray = tempValue.toArray();
-    for (int i = 0, maxDataArray = dataArray.size(); i <maxDataArray; ++i){
+    for (int i = 0, maxDataArray = dataArray.size(); i < maxDataArray; ++i) {
         tempValue = dataArray.at(i);
         if (tempValue.isUndefined() || !tempValue.isObject())
             return false;
@@ -130,22 +130,22 @@ bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject& source, const
         tempValue = dataObject.value(QLatin1String("row"));
         if (tempValue.isUndefined() || !tempValue.isDouble())
             return false;
-        const int currRow = 
+        const int currRow =
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
-            tempValue.toInt();
+                tempValue.toInt();
 #else
-            static_cast<int>(tempValue.toDouble());
+                static_cast<int>(tempValue.toDouble());
 #endif
         if (currRow >= maxRow || currRow < 0)
             return false;
         tempValue = dataObject.value(QLatin1String("col"));
         if (tempValue.isUndefined() || !tempValue.isDouble())
             return false;
-        const int currCol = 
+        const int currCol =
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
-            tempValue.toInt();
+                tempValue.toInt();
 #else
-            static_cast<int>(tempValue.toDouble());
+                static_cast<int>(tempValue.toDouble());
 #endif
         if (currCol >= maxCol || currCol < 0)
             return false;
@@ -155,7 +155,7 @@ bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject& source, const
             if (!tempValue.isArray())
                 return false;
             const QJsonArray valuesArray = tempValue.toArray();
-            for (int j = 0, maxValuesArray = valuesArray.size(); j <maxValuesArray; ++j) {
+            for (int j = 0, maxValuesArray = valuesArray.size(); j < maxValuesArray; ++j) {
                 tempValue = valuesArray.at(j);
                 if (tempValue.isUndefined() || !tempValue.isObject())
                     return false;
@@ -173,32 +173,31 @@ bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject& source, const
         }
     }
 
-
     return true;
 }
 
 /*!
 \internal
 */
-bool JsonModelSerialiserPrivate::roleForObject(const QJsonObject& source, const QModelIndex& destination)
+bool JsonModelSerialiserPrivate::roleForObject(const QJsonObject &source, const QModelIndex &destination)
 {
     QJsonValue tempValue = source.value(QLatin1String("role"));
     if (tempValue.isUndefined() || !tempValue.isDouble())
         return false;
-    const int tempRole = 
+    const int tempRole =
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
-        tempValue.toInt();
+            tempValue.toInt();
 #else
-        static_cast<int>(tempValue.toDouble());
+            static_cast<int>(tempValue.toDouble());
 #endif
     tempValue = source.value(QLatin1String("type"));
     if (tempValue.isUndefined() || !tempValue.isDouble())
         return false;
-    const int tempType = 
+    const int tempType =
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 2, 0))
-        tempValue.toInt();
+            tempValue.toInt();
 #else
-        static_cast<int>(tempValue.toDouble());
+            static_cast<int>(tempValue.toDouble());
 #endif
     tempValue = source.value(QLatin1String("value"));
     if (tempValue.isUndefined() || !tempValue.isString())
@@ -211,7 +210,7 @@ bool JsonModelSerialiserPrivate::roleForObject(const QJsonObject& source, const 
 /*!
 \internal
 */
-QJsonObject JsonModelSerialiserPrivate::objectForRole(int role, const QVariant& value) const 
+QJsonObject JsonModelSerialiserPrivate::objectForRole(int role, const QVariant &value) const
 {
     QJsonObject roleObject;
     roleObject[QLatin1String("role")] = role;
@@ -223,7 +222,7 @@ QJsonObject JsonModelSerialiserPrivate::objectForRole(int role, const QVariant& 
 /*!
 \internal
 */
-QJsonObject JsonModelSerialiserPrivate::toJsonObject(const QModelIndex& parent) const
+QJsonObject JsonModelSerialiserPrivate::toJsonObject(const QModelIndex &parent) const
 {
     QJsonObject result;
     if (!m_model)
@@ -237,7 +236,7 @@ QJsonObject JsonModelSerialiserPrivate::toJsonObject(const QModelIndex& parent) 
         for (int i = 0; i < maxRow; ++i) {
             QJsonObject headerObject;
             QJsonArray rolesArray;
-            for (auto roleIter = m_rolesToSave.constBegin(); roleIter != m_rolesToSave.constEnd(); ++roleIter){
+            for (auto roleIter = m_rolesToSave.constBegin(); roleIter != m_rolesToSave.constEnd(); ++roleIter) {
                 const QVariant roleVariant = m_model->headerData(i, Qt::Vertical, *roleIter);
                 if (roleVariant.isValid())
                     rolesArray.append(objectForRole(*roleIter, roleVariant));
@@ -269,14 +268,14 @@ QJsonObject JsonModelSerialiserPrivate::toJsonObject(const QModelIndex& parent) 
             result[QLatin1String("horizontalHeader")] = horizontalHeadData;
     }
     QJsonArray dataArray;
-    for (int i = 0; i < maxRow;++i){
+    for (int i = 0; i < maxRow; ++i) {
         for (int j = 0; j < maxCol; ++j) {
             QJsonObject dataObject;
             dataObject[QLatin1String("row")] = i;
             dataObject[QLatin1String("col")] = j;
             const QModelIndex currIdx = m_model->index(i, j, parent);
             QJsonArray valuesArray;
-            for (auto roleIter = m_rolesToSave.constBegin(); roleIter != m_rolesToSave.constEnd(); ++roleIter){
+            for (auto roleIter = m_rolesToSave.constBegin(); roleIter != m_rolesToSave.constEnd(); ++roleIter) {
                 const QVariant roleVariant = currIdx.data(*roleIter);
                 if (roleVariant.isValid())
                     valuesArray.append(objectForRole(*roleIter, roleVariant));
@@ -296,7 +295,7 @@ QJsonObject JsonModelSerialiserPrivate::toJsonObject(const QModelIndex& parent) 
 /*!
 Construct a read/write serialiser
 */
-JsonModelSerialiser::JsonModelSerialiser(QAbstractItemModel* model, QObject* parent)
+JsonModelSerialiser::JsonModelSerialiser(QAbstractItemModel *model, QObject *parent)
     : AbstractStringSerialiser(*new JsonModelSerialiserPrivate(this), parent)
 {
     setModel(model);
@@ -305,26 +304,24 @@ JsonModelSerialiser::JsonModelSerialiser(QAbstractItemModel* model, QObject* par
 /*!
 Construct a write-only serialiser
 */
-JsonModelSerialiser::JsonModelSerialiser(const QAbstractItemModel* model, QObject* parent)
+JsonModelSerialiser::JsonModelSerialiser(const QAbstractItemModel *model, QObject *parent)
     : AbstractStringSerialiser(*new JsonModelSerialiserPrivate(this), parent)
 {
     setModel(model);
 }
 
-
 /*!
 Constructor used only while subclassing the private class.
 Not part of the public API
 */
-JsonModelSerialiser::JsonModelSerialiser(JsonModelSerialiserPrivate& d, QObject* parent)
-    :AbstractStringSerialiser(d, parent)
-{}
-
+JsonModelSerialiser::JsonModelSerialiser(JsonModelSerialiserPrivate &d, QObject *parent)
+    : AbstractStringSerialiser(d, parent)
+{ }
 
 /*!
 Saves the model in JSON format to the \a destination string
 */
-bool JsonModelSerialiser::saveModel(QString* destination) const
+bool JsonModelSerialiser::saveModel(QString *destination) const
 {
     Q_D(const JsonModelSerialiser);
     if (!d->m_model || !destination)
@@ -334,16 +331,16 @@ bool JsonModelSerialiser::saveModel(QString* destination) const
         return false;
     *destination = QString::fromUtf8(jDoc.toJson(
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 1, 0))
-        d->m_format
+            d->m_format
 #endif
-        ));
+            ));
     return true;
 }
 
 /*!
 Saves the model in JSON format to the \a destination byte array
 */
-bool JsonModelSerialiser::saveModel(QByteArray* destination) const
+bool JsonModelSerialiser::saveModel(QByteArray *destination) const
 {
     QString tempString;
     if (!saveModel(&tempString))
@@ -359,7 +356,7 @@ bool JsonModelSerialiser::saveModel(QByteArray* destination) const
 /*!
 Saves the model in JSON format to the \a destination device
 */
-bool JsonModelSerialiser::saveModel(QIODevice* destination) const
+bool JsonModelSerialiser::saveModel(QIODevice *destination) const
 {
     QString tempString;
     if (!saveModel(&tempString))
@@ -384,7 +381,7 @@ QJsonObject JsonModelSerialiser::toJsonObject() const
 /*!
 Loads the model from a \a source string containing JSON data
 */
-bool JsonModelSerialiser::loadModel(QString* source)
+bool JsonModelSerialiser::loadModel(QString *source)
 {
     Q_D(const JsonModelSerialiser);
     if (!d->m_model || !source)
@@ -399,7 +396,7 @@ bool JsonModelSerialiser::loadModel(QString* source)
 /*!
 Loads the model from a \a source device containing JSON data
 */
-bool JsonModelSerialiser::loadModel(QIODevice* source)
+bool JsonModelSerialiser::loadModel(QIODevice *source)
 {
     if (!source)
         return false;
@@ -421,7 +418,7 @@ bool JsonModelSerialiser::loadModel(QIODevice* source)
 /*!
 Loads the model from a \a source byte array containing JSON data
 */
-bool JsonModelSerialiser::loadModel(const QByteArray& source)
+bool JsonModelSerialiser::loadModel(const QByteArray &source)
 {
     QTextStream reader(source, QIODevice::ReadOnly | QIODevice::Text);
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
@@ -434,7 +431,7 @@ bool JsonModelSerialiser::loadModel(const QByteArray& source)
 /*!
 Loads the model from a \a source JSON object
 */
-bool JsonModelSerialiser::fromJsonObject(const QJsonObject& source)
+bool JsonModelSerialiser::fromJsonObject(const QJsonObject &source)
 {
     Q_D(JsonModelSerialiser);
     if (!d->m_model)

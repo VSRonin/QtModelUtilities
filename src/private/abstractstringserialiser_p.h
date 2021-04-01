@@ -17,26 +17,26 @@
 #include "abstractstringserialiser.h"
 #include "abstractmodelserialiser_p.h"
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-    class QTextCodec;
+class QTextCodec;
 #endif
 class AbstractStringSerialiserPrivate : public AbstractModelSerialiserPrivate
 {
     Q_DISABLE_COPY(AbstractStringSerialiserPrivate);
     Q_DECLARE_PUBLIC(AbstractStringSerialiser)
 protected:
-    AbstractStringSerialiserPrivate(AbstractStringSerialiser* q);
-    static QString variantToString(const QVariant& val);
-    static QVariant stringToVariant(const QString& val);
+    AbstractStringSerialiserPrivate(AbstractStringSerialiser *q);
+    static QString variantToString(const QVariant &val);
+    static QVariant stringToVariant(const QString &val);
 #ifdef QT_GUI_LIB
-    static QImage loadImageVariant(int type, const QString& val);
-    static QString saveImageVariant(const QImage& val);
+    static QImage loadImageVariant(int type, const QString &val);
+    static QString saveImageVariant(const QImage &val);
 #endif
-    static QVariant loadVariant(int type, const QString& val);
-    static QString saveVariant(const QVariant& val);  
+    static QVariant loadVariant(int type, const QString &val);
+    static QString saveVariant(const QVariant &val);
     static int guessDecimals(double val);
-    static QString guessDecimalsString(double val, QLocale* loca = Q_NULLPTR);
+    static QString guessDecimalsString(double val, QLocale *loca = Q_NULLPTR);
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-    QTextCodec* m_textCodec;
+    QTextCodec *m_textCodec;
 #endif
 };
 

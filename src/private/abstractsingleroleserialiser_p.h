@@ -20,6 +20,6 @@ class AbstractSingleRoleSerialiserPrivate : public AbstractStringSerialiserPriva
     Q_DISABLE_COPY(AbstractSingleRoleSerialiserPrivate);
     Q_DECLARE_PUBLIC(AbstractSingleRoleSerialiser)
 protected:
-    AbstractSingleRoleSerialiserPrivate(AbstractSingleRoleSerialiser* q);
+    AbstractSingleRoleSerialiserPrivate(AbstractSingleRoleSerialiser *q);
 };
 #endif // abstractsingleroleserialiser_p_h__

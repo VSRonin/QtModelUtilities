@@ -47,20 +47,20 @@ int main(int argc, char *argv[])
 
     QWidget mainWidget;
     // selector for the format to use to serialise
-    QComboBox* formatSelector = new QComboBox(&mainWidget);
+    QComboBox *formatSelector = new QComboBox(&mainWidget);
     // displays our dummy model that will be saved to file
-    QTreeView* savedView = new QTreeView(&mainWidget);
+    QTreeView *savedView = new QTreeView(&mainWidget);
     savedView->setModel(&baseModel);
     // displays the model that gets loaded from file
-    QTreeView* loadedView = new QTreeView(&mainWidget);
+    QTreeView *loadedView = new QTreeView(&mainWidget);
     loadedView->setModel(&loadedModel);
     loadedView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     // displays the content of the saved file as rich text (Qt HTML)
-    QTextBrowser* savedViewer = new QTextBrowser(&mainWidget);
+    QTextBrowser *savedViewer = new QTextBrowser(&mainWidget);
     // displays the content of the saved file as plain text
-    QPlainTextEdit* sourceViewer = new QPlainTextEdit(&mainWidget);
+    QPlainTextEdit *sourceViewer = new QPlainTextEdit(&mainWidget);
     sourceViewer->setReadOnly(true);
-    QGridLayout* mainLay = new QGridLayout(&mainWidget);
+    QGridLayout *mainLay = new QGridLayout(&mainWidget);
     mainLay->addWidget(new QLabel(QStringLiteral("Select Format"), &mainWidget), 0, 0);
     mainLay->addWidget(formatSelector, 0, 1);
     mainLay->addWidget(new QLabel(QStringLiteral("Saved Model"), &mainWidget), 1, 0);
@@ -72,45 +72,47 @@ int main(int argc, char *argv[])
     mainLay->addWidget(savedViewer, 2, 2);
     mainLay->addWidget(sourceViewer, 2, 3);
     // save and load the model when the combo changes
-    QObject::connect(formatSelector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&mainWidget, &baseModel, &loadedModel, sourceViewer, savedViewer](int idx)->void {
-        AbstractModelSerialiser* serial = nullptr;
-        switch (idx){
-        case 0:
-            serial = new BinaryModelSerialiser;
-            break;
-        case 1:
-            serial = new XmlModelSerialiser;
-            break;
-        case 2:
-            serial = new HtmlModelSerialiser;
-            break;
-        case 3:
-            serial = new CsvModelSerialiser;
-            break;
-        case 4:
-            serial = new JsonModelSerialiser;
-            break;
-        default:
-            Q_UNREACHABLE();
-        }
-        serial->setModel(&baseModel); // set the model to save
-        QTemporaryFile tempFile("TestSave"); // prepare the file to save
-        if (tempFile.exists())
-            tempFile.remove();
-        if (!tempFile.open()) // open the file
-            QMessageBox::critical(&mainWidget, QStringLiteral("Error"), QStringLiteral("Impossible to open the file"));
-        if (!serial->saveModel(&tempFile)) // save the model to fille
-            QMessageBox::critical(&mainWidget, QStringLiteral("Error"), QStringLiteral("Model Saving Failed"));
-        tempFile.seek(0); // go back to the beginning of the file
-        serial->setModel(&loadedModel); // set the model to load
-        if (!serial->loadModel(&tempFile)) // load the model
-            QMessageBox::critical(&mainWidget, QStringLiteral("Error"), QStringLiteral("Model Loading Failed"));
-        tempFile.seek(0); // go back to the beginning of the file
-        sourceViewer->setPlainText(QTextStream(&tempFile).readAll()); // load the plain text 
-        savedViewer->setSource(QUrl::fromLocalFile(QFileInfo(tempFile).absoluteFilePath())); // load the rich text (Qt HTML)
-        serial->deleteLater();
-    });
-    formatSelector->addItems(QStringList() << QStringLiteral("Binary") << QStringLiteral("XML") << QStringLiteral("HTML") << QStringLiteral("CSV") << QStringLiteral("JSON"));
+    QObject::connect(formatSelector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+                     [&mainWidget, &baseModel, &loadedModel, sourceViewer, savedViewer](int idx) -> void {
+                         AbstractModelSerialiser *serial = nullptr;
+                         switch (idx) {
+                         case 0:
+                             serial = new BinaryModelSerialiser;
+                             break;
+                         case 1:
+                             serial = new XmlModelSerialiser;
+                             break;
+                         case 2:
+                             serial = new HtmlModelSerialiser;
+                             break;
+                         case 3:
+                             serial = new CsvModelSerialiser;
+                             break;
+                         case 4:
+                             serial = new JsonModelSerialiser;
+                             break;
+                         default:
+                             Q_UNREACHABLE();
+                         }
+                         serial->setModel(&baseModel); // set the model to save
+                         QTemporaryFile tempFile("TestSave"); // prepare the file to save
+                         if (tempFile.exists())
+                             tempFile.remove();
+                         if (!tempFile.open()) // open the file
+                             QMessageBox::critical(&mainWidget, QStringLiteral("Error"), QStringLiteral("Impossible to open the file"));
+                         if (!serial->saveModel(&tempFile)) // save the model to fille
+                             QMessageBox::critical(&mainWidget, QStringLiteral("Error"), QStringLiteral("Model Saving Failed"));
+                         tempFile.seek(0); // go back to the beginning of the file
+                         serial->setModel(&loadedModel); // set the model to load
+                         if (!serial->loadModel(&tempFile)) // load the model
+                             QMessageBox::critical(&mainWidget, QStringLiteral("Error"), QStringLiteral("Model Loading Failed"));
+                         tempFile.seek(0); // go back to the beginning of the file
+                         sourceViewer->setPlainText(QTextStream(&tempFile).readAll()); // load the plain text
+                         savedViewer->setSource(QUrl::fromLocalFile(QFileInfo(tempFile).absoluteFilePath())); // load the rich text (Qt HTML)
+                         serial->deleteLater();
+                     });
+    formatSelector->addItems(
+            QStringList{QStringLiteral("Binary"), QStringLiteral("XML"), QStringLiteral("HTML"), QStringLiteral("CSV"), QStringLiteral("JSON")});
     mainWidget.show();
     return a.exec();
 }

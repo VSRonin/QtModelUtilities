@@ -24,31 +24,32 @@ class MODELUTILITIES_EXPORT AbstractModelSerialiser : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QList<int> rolesToSave READ rolesToSave WRITE setRoleToSave RESET resetRoleToSave)
-    Q_PROPERTY(QAbstractItemModel* model READ model WRITE setModel)
-    Q_PROPERTY(const QAbstractItemModel* constModel READ constModel WRITE setModel)
+    Q_PROPERTY(QAbstractItemModel *model READ model WRITE setModel)
+    Q_PROPERTY(const QAbstractItemModel *constModel READ constModel WRITE setModel)
     Q_DECLARE_PRIVATE(AbstractModelSerialiser)
     Q_DISABLE_COPY(AbstractModelSerialiser)
 public:
-    AbstractModelSerialiser(QAbstractItemModel* model = Q_NULLPTR, QObject* parent = Q_NULLPTR);
-    AbstractModelSerialiser(const QAbstractItemModel* model, QObject* parent = Q_NULLPTR);
+    AbstractModelSerialiser(QAbstractItemModel *model = Q_NULLPTR, QObject *parent = Q_NULLPTR);
+    AbstractModelSerialiser(const QAbstractItemModel *model, QObject *parent = Q_NULLPTR);
     virtual ~AbstractModelSerialiser() = 0;
-    virtual const QList<int>& rolesToSave() const;
-    virtual void setRoleToSave(const QList<int>& val);
+    virtual const QList<int> &rolesToSave() const;
+    virtual void setRoleToSave(const QList<int> &val);
     Q_INVOKABLE virtual void addRoleToSave(int role);
     Q_INVOKABLE virtual void removeRoleToSave(int role);
     Q_INVOKABLE virtual void clearRoleToSave();
     virtual void resetRoleToSave();
     static QList<int> modelDefaultRoles();
-    virtual QAbstractItemModel* model() const;
-    virtual const QAbstractItemModel* constModel() const;
-    void setModel(QAbstractItemModel* val);
-    void setModel(const QAbstractItemModel* val);
-    Q_INVOKABLE virtual bool saveModel(QIODevice* destination) const = 0;
-    Q_INVOKABLE virtual bool saveModel(QByteArray* destination) const = 0;
-    Q_INVOKABLE virtual bool loadModel(QIODevice* source) = 0;
-    Q_INVOKABLE virtual bool loadModel(const QByteArray& source) = 0;
+    virtual QAbstractItemModel *model() const;
+    virtual const QAbstractItemModel *constModel() const;
+    void setModel(QAbstractItemModel *val);
+    void setModel(const QAbstractItemModel *val);
+    Q_INVOKABLE virtual bool saveModel(QIODevice *destination) const = 0;
+    Q_INVOKABLE virtual bool saveModel(QByteArray *destination) const = 0;
+    Q_INVOKABLE virtual bool loadModel(QIODevice *source) = 0;
+    Q_INVOKABLE virtual bool loadModel(const QByteArray &source) = 0;
+
 protected:
-    AbstractModelSerialiser(AbstractModelSerialiserPrivate& d, QObject* parent);
+    AbstractModelSerialiser(AbstractModelSerialiserPrivate &d, QObject *parent);
     QScopedPointer<AbstractModelSerialiserPrivate> d_ptr;
 };
 #endif // abstractmultiroleserialiser_h__

@@ -16,7 +16,7 @@
 #include "modelutilities_global.h"
 #include "abstractmodelserialiser.h"
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-    #include <QTextCodec>
+#    include <QTextCodec>
 #endif
 class AbstractStringSerialiserPrivate;
 class MODELUTILITIES_EXPORT AbstractStringSerialiser : public AbstractModelSerialiser
@@ -25,18 +25,19 @@ class MODELUTILITIES_EXPORT AbstractStringSerialiser : public AbstractModelSeria
     Q_DECLARE_PRIVATE(AbstractStringSerialiser)
     Q_DISABLE_COPY(AbstractStringSerialiser)
 public:
-    AbstractStringSerialiser(QAbstractItemModel* model = Q_NULLPTR, QObject* parent = Q_NULLPTR);
-    AbstractStringSerialiser(const QAbstractItemModel* model, QObject* parent = Q_NULLPTR);
+    AbstractStringSerialiser(QAbstractItemModel *model = Q_NULLPTR, QObject *parent = Q_NULLPTR);
+    AbstractStringSerialiser(const QAbstractItemModel *model, QObject *parent = Q_NULLPTR);
     virtual ~AbstractStringSerialiser() = 0;
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-    QTextCodec* textCodec() const;
-    bool setTextCodec(QTextCodec* val);
+    QTextCodec *textCodec() const;
+    bool setTextCodec(QTextCodec *val);
 #endif
-    Q_INVOKABLE virtual bool saveModel(QString* destination) const =0;
-    Q_INVOKABLE virtual bool loadModel(QString* source) = 0;
-    Q_INVOKABLE bool loadModel(const QString& source);
+    Q_INVOKABLE virtual bool saveModel(QString *destination) const = 0;
+    Q_INVOKABLE virtual bool loadModel(QString *source) = 0;
+    Q_INVOKABLE bool loadModel(const QString &source);
+
 protected:
-    AbstractStringSerialiser(AbstractStringSerialiserPrivate& d, QObject* parent);
+    AbstractStringSerialiser(AbstractStringSerialiserPrivate &d, QObject *parent);
 };
 
 #endif // abstractmodelserialiser_h__

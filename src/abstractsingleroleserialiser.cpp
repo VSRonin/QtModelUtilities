@@ -18,7 +18,7 @@
 
 \brief The interface for model serialisers saving only one role.
 */
-AbstractSingleRoleSerialiserPrivate::AbstractSingleRoleSerialiserPrivate(AbstractSingleRoleSerialiser* q)
+AbstractSingleRoleSerialiserPrivate::AbstractSingleRoleSerialiserPrivate(AbstractSingleRoleSerialiser *q)
     : AbstractStringSerialiserPrivate(q)
 {
     Q_ASSERT(q_ptr);
@@ -27,7 +27,7 @@ AbstractSingleRoleSerialiserPrivate::AbstractSingleRoleSerialiserPrivate(Abstrac
 /*!
 Construct a read/write serialiser
 */
-AbstractSingleRoleSerialiser::AbstractSingleRoleSerialiser(QAbstractItemModel* model, QObject* parent)
+AbstractSingleRoleSerialiser::AbstractSingleRoleSerialiser(QAbstractItemModel *model, QObject *parent)
     : AbstractStringSerialiser(*new AbstractSingleRoleSerialiserPrivate(this), parent)
 {
     setRoleToSave(Qt::DisplayRole);
@@ -37,7 +37,7 @@ AbstractSingleRoleSerialiser::AbstractSingleRoleSerialiser(QAbstractItemModel* m
 /*!
 Construct a write-only serialiser
 */
-AbstractSingleRoleSerialiser::AbstractSingleRoleSerialiser(const QAbstractItemModel* model, QObject* parent)
+AbstractSingleRoleSerialiser::AbstractSingleRoleSerialiser(const QAbstractItemModel *model, QObject *parent)
     : AbstractStringSerialiser(*new AbstractSingleRoleSerialiserPrivate(this), parent)
 {
     setRoleToSave(Qt::DisplayRole);
@@ -48,15 +48,14 @@ AbstractSingleRoleSerialiser::AbstractSingleRoleSerialiser(const QAbstractItemMo
 Constructor used only while subclassing the private class.
 Not part of the public API
 */
-AbstractSingleRoleSerialiser::AbstractSingleRoleSerialiser(AbstractSingleRoleSerialiserPrivate& d, QObject* parent)
-    :AbstractStringSerialiser(d, parent)
-{}
+AbstractSingleRoleSerialiser::AbstractSingleRoleSerialiser(AbstractSingleRoleSerialiserPrivate &d, QObject *parent)
+    : AbstractStringSerialiser(d, parent)
+{ }
 
 /*!
 Destructor
 */
 AbstractSingleRoleSerialiser::~AbstractSingleRoleSerialiser() = default;
-
 
 /*!
 \property AbstractSingleRoleSerialiser::roleToSave
@@ -80,7 +79,7 @@ void AbstractSingleRoleSerialiser::setRoleToSave(int val)
 \reimp
 If \a val contains more than one value only the first one is considered
 */
-void AbstractSingleRoleSerialiser::setRoleToSave(const QList<int>& val)
+void AbstractSingleRoleSerialiser::setRoleToSave(const QList<int> &val)
 {
     if (val.size() > 1)
         return AbstractModelSerialiser::setRoleToSave(QList<int>{val.first()});

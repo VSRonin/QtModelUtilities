@@ -20,7 +20,7 @@
 \brief The interface for model serialisers saving multiple roles.
 */
 
-AbstractModelSerialiserPrivate::AbstractModelSerialiserPrivate(AbstractModelSerialiser* q)
+AbstractModelSerialiserPrivate::AbstractModelSerialiserPrivate(AbstractModelSerialiser *q)
     : q_ptr(q)
     , m_model(Q_NULLPTR)
     , m_constModel(Q_NULLPTR)
@@ -34,7 +34,7 @@ Constructs a serialiser operating over \a model
 
 \sa isEmpty()
 */
-AbstractModelSerialiser::AbstractModelSerialiser(QAbstractItemModel* model, QObject* parent)
+AbstractModelSerialiser::AbstractModelSerialiser(QAbstractItemModel *model, QObject *parent)
     : QObject(parent)
     , d_ptr(new AbstractModelSerialiserPrivate(this))
 {
@@ -46,7 +46,7 @@ AbstractModelSerialiser::AbstractModelSerialiser(QAbstractItemModel* model, QObj
 
 the model will only be allowed to be saved, not loaded
 */
-AbstractModelSerialiser::AbstractModelSerialiser(const QAbstractItemModel* model, QObject* parent)
+AbstractModelSerialiser::AbstractModelSerialiser(const QAbstractItemModel *model, QObject *parent)
     : QObject(parent)
     , d_ptr(new AbstractModelSerialiserPrivate(this))
 {
@@ -56,9 +56,9 @@ AbstractModelSerialiser::AbstractModelSerialiser(const QAbstractItemModel* model
 /*!
 \internal
 */
-AbstractModelSerialiser::AbstractModelSerialiser(AbstractModelSerialiserPrivate& d, QObject* parent)
-    :d_ptr(&d)
-{}
+AbstractModelSerialiser::AbstractModelSerialiser(AbstractModelSerialiserPrivate &d, QObject *parent)
+    : d_ptr(&d)
+{ }
 
 /*!
 Destructor
@@ -75,19 +75,19 @@ by default this property is set to all non obsolete Qt::ItemDataRole values
 /*!
 \brief getter of rolesToSave property
 */
-const QList<int>& AbstractModelSerialiser::rolesToSave() const
+const QList<int> &AbstractModelSerialiser::rolesToSave() const
 {
     Q_D(const AbstractModelSerialiser);
-    
+
     return d->m_rolesToSave;
 }
 /*!
 \brief setter of rolesToSave property
 */
-void AbstractModelSerialiser::setRoleToSave(const QList<int>& val)
+void AbstractModelSerialiser::setRoleToSave(const QList<int> &val)
 {
     Q_D(AbstractModelSerialiser);
-    
+
     d->m_rolesToSave = val;
 }
 /*!
@@ -96,7 +96,7 @@ void AbstractModelSerialiser::setRoleToSave(const QList<int>& val)
 void AbstractModelSerialiser::addRoleToSave(int role)
 {
     Q_D(AbstractModelSerialiser);
-    
+
     if (!d->m_rolesToSave.contains(role))
         d->m_rolesToSave.append(role);
 }
@@ -106,7 +106,7 @@ void AbstractModelSerialiser::addRoleToSave(int role)
 void AbstractModelSerialiser::removeRoleToSave(int role)
 {
     Q_D(AbstractModelSerialiser);
-    
+
     d->m_rolesToSave.removeAll(role);
 }
 /*!
@@ -115,7 +115,7 @@ void AbstractModelSerialiser::removeRoleToSave(int role)
 void AbstractModelSerialiser::clearRoleToSave()
 {
     Q_D(AbstractModelSerialiser);
-    
+
     d->m_rolesToSave.clear();
 }
 /*!
@@ -126,7 +126,7 @@ fills the list fo roles to save with all non obsolete Qt::ItemDataRole values
 void AbstractModelSerialiser::resetRoleToSave()
 {
     Q_D(AbstractModelSerialiser);
-    
+
     d->m_rolesToSave = AbstractModelSerialiser::modelDefaultRoles();
 }
 /*!
@@ -134,23 +134,21 @@ Returns a list of all non-obsolete Qt::ItemDataRole values
 */
 QList<int> AbstractModelSerialiser::modelDefaultRoles()
 {
-    return QList<int>{{
-            Qt::EditRole
-            , Qt::DecorationRole
-            , Qt::ToolTipRole
-            , Qt::StatusTipRole
-            , Qt::WhatsThisRole
-            , Qt::SizeHintRole
-            , Qt::FontRole
-            , Qt::TextAlignmentRole
-            , Qt::BackgroundRole
-            , Qt::ForegroundRole
-            , Qt::CheckStateRole
-            , Qt::InitialSortOrderRole
-            , Qt::AccessibleTextRole
-            , Qt::AccessibleDescriptionRole
-            , Qt::UserRole
-        }};
+    return QList<int>{Qt::EditRole,
+                      Qt::DecorationRole,
+                      Qt::ToolTipRole,
+                      Qt::StatusTipRole,
+                      Qt::WhatsThisRole,
+                      Qt::SizeHintRole,
+                      Qt::FontRole,
+                      Qt::TextAlignmentRole,
+                      Qt::BackgroundRole,
+                      Qt::ForegroundRole,
+                      Qt::CheckStateRole,
+                      Qt::InitialSortOrderRole,
+                      Qt::AccessibleTextRole,
+                      Qt::AccessibleDescriptionRole,
+                      Qt::UserRole};
 }
 
 /*!
@@ -158,7 +156,7 @@ Returns the model over which the serialiser will operate.
 
 If setModel(const QAbstractItemModel*) was used to se the model, this method will return \c nullptr
 */
-QAbstractItemModel* AbstractModelSerialiser::model() const
+QAbstractItemModel *AbstractModelSerialiser::model() const
 {
     Q_D(const AbstractModelSerialiser);
 
@@ -168,7 +166,7 @@ QAbstractItemModel* AbstractModelSerialiser::model() const
 /*!
 Returns the model over which the serialiser will operate.
 */
-const QAbstractItemModel* AbstractModelSerialiser::constModel() const
+const QAbstractItemModel *AbstractModelSerialiser::constModel() const
 {
     Q_D(const AbstractModelSerialiser);
 
@@ -178,7 +176,7 @@ const QAbstractItemModel* AbstractModelSerialiser::constModel() const
 /*!
 Sets the model over which the serialiser will operate.
 */
-void AbstractModelSerialiser::setModel(QAbstractItemModel* val)
+void AbstractModelSerialiser::setModel(QAbstractItemModel *val)
 {
     Q_D(AbstractModelSerialiser);
 
@@ -191,7 +189,7 @@ Sets the model over which the serialiser will operate.
 
 Using this method will only allow the model to be saved, not loaded
 */
-void AbstractModelSerialiser::setModel(const QAbstractItemModel* val)
+void AbstractModelSerialiser::setModel(const QAbstractItemModel *val)
 {
     Q_D(AbstractModelSerialiser);
 

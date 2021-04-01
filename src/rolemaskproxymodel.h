@@ -26,10 +26,10 @@ class MODELUTILITIES_EXPORT RoleMaskProxyModel : public QIdentityProxyModel
     Q_DISABLE_COPY(RoleMaskProxyModel)
     Q_DECLARE_PRIVATE(RoleMaskProxyModel)
 public:
-    explicit RoleMaskProxyModel(QObject* parent = Q_NULLPTR);
+    explicit RoleMaskProxyModel(QObject *parent = Q_NULLPTR);
     ~RoleMaskProxyModel();
     QList<int> maskedRoles() const;
-    void setMaskedRoles(const QList<int>& roles);
+    void setMaskedRoles(const QList<int> &roles);
     void clearMaskedRoles();
     void addMaskedRole(int role);
     void removeMaskedRole(int role);
@@ -48,11 +48,13 @@ Q_SIGNALS:
     void mergeDisplayEditChanged(bool val);
     void transparentIfEmptyChanged(bool val);
     void maskedRolesChanged();
-    void maskedDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int>& roles);
+    void maskedDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
+
 protected:
-    const QSet<int>& maskedRolesSets() const;
-    RoleMaskProxyModel(RoleMaskProxyModelPrivate& dptr, QObject* parent);
+    const QSet<int> &maskedRolesSets() const;
+    RoleMaskProxyModel(RoleMaskProxyModelPrivate &dptr, QObject *parent);
+
 private:
-    RoleMaskProxyModelPrivate* d_ptr;
+    RoleMaskProxyModelPrivate *d_ptr;
 };
 #endif // rolemaskproxymodel_h__

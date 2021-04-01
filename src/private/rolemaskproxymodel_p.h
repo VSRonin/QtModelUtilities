@@ -22,18 +22,18 @@
 class RoleMaskProxyModelPrivate
 {
     Q_DECLARE_PUBLIC(RoleMaskProxyModel)
-    RoleMaskProxyModel* q_ptr;
-    RoleMaskProxyModelPrivate(RoleMaskProxyModel* q);
+    RoleMaskProxyModel *q_ptr;
+    RoleMaskProxyModelPrivate(RoleMaskProxyModel *q);
     QSet<int> m_maskedRoles;
-    QHash<QPersistentModelIndex, RolesContainer > m_maskedData;
+    QHash<QPersistentModelIndex, RolesContainer> m_maskedData;
     bool m_transparentIfEmpty;
     bool m_mergeDisplayEdit;
     QVector<QMetaObject::Connection> m_sourceConnections;
-    void clearUnusedMaskedRoles(const QSet<int>& roles);
-    bool removeRole(const QPersistentModelIndex& idx, int role);
-    bool removeRole(const QHash<QPersistentModelIndex, RolesContainer >::iterator& idxIter, int role);
-    void signalAllChanged(const QVector<int>& roles = QVector<int>(), const QModelIndex& parent = QModelIndex());
-    void interceptDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
+    void clearUnusedMaskedRoles(const QSet<int> &roles);
+    bool removeRole(const QPersistentModelIndex &idx, int role);
+    bool removeRole(const QHash<QPersistentModelIndex, RolesContainer>::iterator &idxIter, int role);
+    void signalAllChanged(const QVector<int> &roles = QVector<int>(), const QModelIndex &parent = QModelIndex());
+    void interceptDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 };
 
 #endif // rolemaskproxymodel_p_h__

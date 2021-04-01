@@ -11,7 +11,6 @@
    limitations under the License.
 \****************************************************************************/
 
-
 #ifndef xmlmodelserialiser_h__
 #define xmlmodelserialiser_h__
 
@@ -27,29 +26,30 @@ class MODELUTILITIES_EXPORT XmlModelSerialiser : public AbstractStringSerialiser
     Q_DECLARE_PRIVATE(XmlModelSerialiser)
     Q_DISABLE_COPY(XmlModelSerialiser)
 public:
-    XmlModelSerialiser(QAbstractItemModel* model = Q_NULLPTR, QObject* parent = Q_NULLPTR);
-    XmlModelSerialiser(const QAbstractItemModel* model, QObject* parent = Q_NULLPTR);
+    XmlModelSerialiser(QAbstractItemModel *model = Q_NULLPTR, QObject *parent = Q_NULLPTR);
+    XmlModelSerialiser(const QAbstractItemModel *model, QObject *parent = Q_NULLPTR);
     ~XmlModelSerialiser();
     bool printStartDocument() const;
     void setPrintStartDocument(bool val);
-    virtual bool saveModel(QXmlStreamWriter& stream) const;
-    bool saveModel(QIODevice* destination) const Q_DECL_OVERRIDE;
-    bool saveModel(QByteArray* destination) const Q_DECL_OVERRIDE;
-    bool saveModel(QString* destination) const Q_DECL_OVERRIDE;
-    bool loadModel(QString* source) Q_DECL_OVERRIDE;
-    bool loadModel(QIODevice* source) Q_DECL_OVERRIDE;
-    bool loadModel(const QByteArray& source) Q_DECL_OVERRIDE;
-    virtual bool loadModel(QXmlStreamReader& stream);
+    virtual bool saveModel(QXmlStreamWriter &stream) const;
+    bool saveModel(QIODevice *destination) const Q_DECL_OVERRIDE;
+    bool saveModel(QByteArray *destination) const Q_DECL_OVERRIDE;
+    bool saveModel(QString *destination) const Q_DECL_OVERRIDE;
+    bool loadModel(QString *source) Q_DECL_OVERRIDE;
+    bool loadModel(QIODevice *source) Q_DECL_OVERRIDE;
+    bool loadModel(const QByteArray &source) Q_DECL_OVERRIDE;
+    virtual bool loadModel(QXmlStreamReader &stream);
+
 protected:
-    XmlModelSerialiser(XmlModelSerialiserPrivate& d, QObject* parent);
+    XmlModelSerialiser(XmlModelSerialiserPrivate &d, QObject *parent);
 
 #ifdef MS_DECLARE_STREAM_OPERATORS
-    friend QXmlStreamWriter&  operator<<(QXmlStreamWriter & stream, const QAbstractItemModel& model);
-    friend QXmlStreamReader& operator>>(QXmlStreamReader & stream, QAbstractItemModel& model);
+    friend QXmlStreamWriter &operator<<(QXmlStreamWriter &stream, const QAbstractItemModel &model);
+    friend QXmlStreamReader &operator>>(QXmlStreamReader &stream, QAbstractItemModel &model);
 #endif
 };
 #ifdef MS_DECLARE_STREAM_OPERATORS
-QXmlStreamWriter&  operator<<(QXmlStreamWriter & stream, const QAbstractItemModel& model);
-QXmlStreamReader& operator>>(QXmlStreamReader & stream, QAbstractItemModel& model);
+QXmlStreamWriter &operator<<(QXmlStreamWriter &stream, const QAbstractItemModel &model);
+QXmlStreamReader &operator>>(QXmlStreamReader &stream, QAbstractItemModel &model);
 #endif
 #endif // xmlmodelserialiser_h__

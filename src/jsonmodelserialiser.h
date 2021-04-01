@@ -25,21 +25,21 @@ class MODELUTILITIES_EXPORT JsonModelSerialiser : public AbstractStringSerialise
     Q_DECLARE_PRIVATE(JsonModelSerialiser)
     Q_DISABLE_COPY(JsonModelSerialiser)
 public:
-    JsonModelSerialiser(QAbstractItemModel* model = Q_NULLPTR, QObject* parent = Q_NULLPTR);
-    JsonModelSerialiser(const QAbstractItemModel* model, QObject* parent = Q_NULLPTR);
-    bool saveModel(QIODevice* destination) const Q_DECL_OVERRIDE;
-    bool saveModel(QByteArray* destination) const Q_DECL_OVERRIDE;
-    bool saveModel(QString* destination) const Q_DECL_OVERRIDE;
+    JsonModelSerialiser(QAbstractItemModel *model = Q_NULLPTR, QObject *parent = Q_NULLPTR);
+    JsonModelSerialiser(const QAbstractItemModel *model, QObject *parent = Q_NULLPTR);
+    bool saveModel(QIODevice *destination) const Q_DECL_OVERRIDE;
+    bool saveModel(QByteArray *destination) const Q_DECL_OVERRIDE;
+    bool saveModel(QString *destination) const Q_DECL_OVERRIDE;
     Q_INVOKABLE virtual QJsonObject toJsonObject() const;
-    bool loadModel(QIODevice* source) Q_DECL_OVERRIDE;
-    bool loadModel(const QByteArray& source) Q_DECL_OVERRIDE;
-    bool loadModel(QString* source) Q_DECL_OVERRIDE;
-    Q_INVOKABLE virtual bool fromJsonObject(const QJsonObject& source);
+    bool loadModel(QIODevice *source) Q_DECL_OVERRIDE;
+    bool loadModel(const QByteArray &source) Q_DECL_OVERRIDE;
+    bool loadModel(QString *source) Q_DECL_OVERRIDE;
+    Q_INVOKABLE virtual bool fromJsonObject(const QJsonObject &source);
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 1, 0))
     QJsonDocument::JsonFormat format() const;
     void setFormat(QJsonDocument::JsonFormat val);
 #endif
 protected:
-    JsonModelSerialiser(JsonModelSerialiserPrivate& d, QObject* parent);
+    JsonModelSerialiser(JsonModelSerialiserPrivate &d, QObject *parent);
 };
 #endif // jsonmodelserialiser_h__*/

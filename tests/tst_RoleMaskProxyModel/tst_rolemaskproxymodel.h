@@ -6,7 +6,8 @@
 #include <QModelIndexList>
 class QAbstractItemModel;
 class RoleMaskProxyModel;
-class tst_RoleMaskProxyModel :public QObject{
+class tst_RoleMaskProxyModel : public QObject
+{
     Q_OBJECT
 private Q_SLOTS:
     void initTestCase();
@@ -33,9 +34,14 @@ private Q_SLOTS:
     void testSort_data();
     void testSort();
     void testEmptyProxy();
+
 private:
-    void testTransparentIfEmptyRecurse(const QAbstractItemModel* const baseModel, const RoleMaskProxyModel* const proxyModel, const QModelIndex& maskedIdx, const QVariant& maskedVal, bool nonMaskedIsNull, const QModelIndex& sourceParent = QModelIndex());
-    int countChildren(const QAbstractItemModel* const baseModel, const QModelIndex& parIdx = QModelIndex());
-    void testUseRoleMaskRecurse(const int magicNumber, const QAbstractItemModel* const baseModel, const RoleMaskProxyModel* const proxyModel, const QModelIndexList& magicNumerIndexes, const bool userRoleEditable, const QModelIndex& sourceParent = QModelIndex(), const QModelIndex& proxyParent = QModelIndex());
+    void testTransparentIfEmptyRecurse(const QAbstractItemModel *const baseModel, const RoleMaskProxyModel *const proxyModel,
+                                       const QModelIndex &maskedIdx, const QVariant &maskedVal, bool nonMaskedIsNull,
+                                       const QModelIndex &sourceParent = QModelIndex());
+    int countChildren(const QAbstractItemModel *const baseModel, const QModelIndex &parIdx = QModelIndex());
+    void testUseRoleMaskRecurse(const int magicNumber, const QAbstractItemModel *const baseModel, const RoleMaskProxyModel *const proxyModel,
+                                const QModelIndexList &magicNumerIndexes, const bool userRoleEditable,
+                                const QModelIndex &sourceParent = QModelIndex(), const QModelIndex &proxyParent = QModelIndex());
 };
 #endif // tst_rolemaskproxymodel_h__
