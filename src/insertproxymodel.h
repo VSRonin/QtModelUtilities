@@ -75,7 +75,7 @@ Q_SIGNALS:
     void dataForCornerChanged(const QVector<int>& roles);
     void extraDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
     void mergeDisplayEditChanged(bool separate);
-    void insertDirectionChanged(const InsertDirections& direction);
+    void insertDirectionChanged(InsertDirections direction);
 protected:
     virtual bool validRow() const;
     virtual bool validColumn() const;

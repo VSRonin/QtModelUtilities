@@ -66,7 +66,6 @@ QString AbstractStringSerialiserPrivate::guessDecimalsString(double val, QLocale
 */
 QString AbstractStringSerialiserPrivate::variantToString(const QVariant& val)
 {
-    QString result;
     QByteArray data;
     QDataStream outStream(&data, QIODevice::WriteOnly);
 #ifdef MS_DATASTREAM_VERSION

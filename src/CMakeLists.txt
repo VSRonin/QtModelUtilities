@@ -31,19 +31,19 @@ if(BUILD_DOCS)
 endif()
 
 if(BUILD_ROLEMASKPROXY)
-    set(modelutilities_SRCS rolemaskproxymodel.cpp ${modelutilities_SRCS})
+    set(rolemaskproxy_SRCS rolemaskproxymodel.cpp rolemaskproxymodel.h private/rolemaskproxymodel_p.h)
+    set(modelutilities_SRCS ${rolemaskproxy_SRCS} ${modelutilities_SRCS})
     set(modelutilities_INSTALL_INCLUDE rolemaskproxymodel.h includes/RoleMaskProxyModel ${modelutilities_INSTALL_INCLUDE})
+    source_group(RoleMaskProxyModel FILES ${rolemaskproxy_SRCS})
 endif()
 if(BUILD_INSERTPROXY)
-    set(modelutilities_SRCS insertproxymodel.cpp ${modelutilities_SRCS})
+    set(insertproxy_SRCS insertproxymodel.cpp insertproxymodel.h private/insertproxymodel_p.h)
+    set(modelutilities_SRCS ${insertproxy_SRCS} ${modelutilities_SRCS})
     set(modelutilities_INSTALL_INCLUDE insertproxymodel.h includes/InsertProxyModel ${modelutilities_INSTALL_INCLUDE})
-endif()
-if(BUILD_TRANSPOSEPROXY)
-    set(modelutilities_SRCS transposeproxymodel.cpp treemapproxymodel.cpp ${modelutilities_SRCS})
-    set(modelutilities_INSTALL_INCLUDE transposeproxymodel.h treemapproxymodel.h includes/TransposeProxyModel ${modelutilities_INSTALL_INCLUDE})
+    source_group(InsertProxyModel FILES ${insertproxy_SRCS})
 endif()
 if(BUILD_MODELSERIALISATION)
-    set(modelutilities_SRCS
+    set(modelserialisation_SRCS
         abstractmodelserialiser.cpp
         abstractstringserialiser.cpp
         abstractsingleroleserialiser.cpp
@@ -52,8 +52,25 @@ if(BUILD_MODELSERIALISATION)
         htmlmodelserialiser.cpp
         jsonmodelserialiser.cpp
         xmlmodelserialiser.cpp
-        ${modelutilities_SRCS}
+        abstractmodelserialiser.h
+        abstractstringserialiser.h
+        abstractsingleroleserialiser.h
+        binarymodelserialiser.h
+        csvmodelserialiser.h
+        htmlmodelserialiser.h
+        jsonmodelserialiser.h
+        xmlmodelserialiser.h
+        modelutilities_global.h
+        private/abstractmodelserialiser_p.h
+        private/abstractstringserialiser_p.h
+        private/abstractsingleroleserialiser_p.h
+        private/binarymodelserialiser_p.h
+        private/csvmodelserialiser_p.h
+        private/htmlmodelserialiser_p.h
+        private/jsonmodelserialiser_p.h
+        private/xmlmodelserialiser_p.h
     )
+    set(modelutilities_SRCS ${modelserialisation_SRCS} ${modelutilities_SRCS})
     set(modelutilities_INSTALL_INCLUDE 
         abstractmodelserialiser.h
         abstractstringserialiser.h
@@ -72,6 +89,7 @@ if(BUILD_MODELSERIALISATION)
         includes/XmlModelSerialiser
         ${modelutilities_INSTALL_INCLUDE}
     )
+    source_group(ModelSerialisation FILES ${modelserialisation_SRCS})
 endif()
 
 if(BUILD_STATIC_LIBS)

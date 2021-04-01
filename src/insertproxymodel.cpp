@@ -107,7 +107,6 @@ bool InsertProxyModelPrivate::commitToSource(const bool isRow)
         RolesContainer& allRoles = m_extraData[isRow][i];
         if (allRoles.isEmpty())
             continue;
-        const auto endRoles = allRoles.constEnd();
         const QModelIndex currentIdx = 
             isRow ? 
             q->sourceModel()->index(sourceRows, i)
