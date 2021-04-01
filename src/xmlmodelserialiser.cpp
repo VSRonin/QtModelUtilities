@@ -232,6 +232,14 @@ bool XmlModelSerialiserPrivate::readXml(QXmlStreamReader &reader)
     return true;
 }
 
+/*!
+\property XmlModelSerialiser::printStartDocument
+\accessors %printStartDocument(), setPrintStartDocument()
+\brief This property determines if the start of the xml document should be written
+\details If this property is set to \c true (the default) the serialiser will write the \c <?xml> starting block.
+Set this to false to save the model as part of a larger xml document
+*/
+
 bool XmlModelSerialiser::printStartDocument() const
 {
     Q_D(const XmlModelSerialiser);
@@ -246,6 +254,9 @@ void XmlModelSerialiser::setPrintStartDocument(bool val)
     d->m_printStartDocument = val;
 }
 
+/*!
+\reimp
+*/
 bool XmlModelSerialiser::saveModel(QString *destination) const
 {
     if (!destination)
@@ -261,6 +272,9 @@ bool XmlModelSerialiser::saveModel(QString *destination) const
     return d->writeXml(writer);
 }
 
+/*!
+\reimp
+*/
 bool XmlModelSerialiser::saveModel(QIODevice *destination) const
 {
     if (!destination)
@@ -282,6 +296,9 @@ bool XmlModelSerialiser::saveModel(QIODevice *destination) const
     return d->writeXml(writer);
 }
 
+/*!
+\reimp
+*/
 bool XmlModelSerialiser::saveModel(QByteArray *destination) const
 {
     if (!destination)
@@ -297,12 +314,18 @@ bool XmlModelSerialiser::saveModel(QByteArray *destination) const
     return d->writeXml(writer);
 }
 
+/*!
+Saves the model to the given \a stream
+*/
 bool XmlModelSerialiser::saveModel(QXmlStreamWriter &stream) const
 {
     Q_D(const XmlModelSerialiser);
     return d->writeXml(stream);
 }
 
+/*!
+\reimp
+*/
 bool XmlModelSerialiser::loadModel(QIODevice *source)
 {
     if (!source)
@@ -320,6 +343,10 @@ bool XmlModelSerialiser::loadModel(QIODevice *source)
     QXmlStreamReader reader(source);
     return d->readXml(reader);
 }
+
+/*!
+\reimp
+*/
 bool XmlModelSerialiser::loadModel(const QByteArray &source)
 {
     Q_D(XmlModelSerialiser);
@@ -329,6 +356,10 @@ bool XmlModelSerialiser::loadModel(const QByteArray &source)
     QXmlStreamReader reader(source);
     return d->readXml(reader);
 }
+
+/*!
+\reimp
+*/
 bool XmlModelSerialiser::loadModel(QString *source)
 {
     if (!source)
@@ -339,27 +370,47 @@ bool XmlModelSerialiser::loadModel(QString *source)
     return d->readXml(reader);
 }
 
+/*!
+Loads the model from the given \a stream
+
+Data previously stored in the model will be removed
+                */
 bool XmlModelSerialiser::loadModel(QXmlStreamReader &stream)
 {
     Q_D(XmlModelSerialiser);
     return d->readXml(stream);
 }
 
+/*!
+Constructs a serialiser operating over \a model
+*/
 XmlModelSerialiser::XmlModelSerialiser(QAbstractItemModel *model, QObject *parent)
     : AbstractStringSerialiser(*new XmlModelSerialiserPrivate(this), parent)
 {
     setModel(model);
 }
+
+/*!
+\overload
+
+the model will only be allowed to be saved, not loaded
+*/
 XmlModelSerialiser::XmlModelSerialiser(const QAbstractItemModel *model, QObject *parent)
     : AbstractStringSerialiser(*new XmlModelSerialiserPrivate(this), parent)
 {
     setModel(model);
 }
 
+/*!
+\internal
+*/
 XmlModelSerialiser::XmlModelSerialiser(XmlModelSerialiserPrivate &d, QObject *parent)
     : AbstractStringSerialiser(d, parent)
 { }
 
+/*!
+Destructor
+*/
 XmlModelSerialiser::~XmlModelSerialiser() = default;
 
 #ifdef MS_DECLARE_STREAM_OPERATORS
@@ -379,3 +430,9 @@ QXmlStreamReader &operator>>(QXmlStreamReader &stream, QAbstractItemModel &model
 }
 
 #endif // MS_DECLARE_STREAM_OPERATORS
+
+/*!
+\class XmlModelSerialiser
+
+\brief Serialiser to save and load models in XML format
+*/

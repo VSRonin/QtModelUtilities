@@ -624,8 +624,9 @@ QModelIndex InsertProxyModel::mapToSource(const QModelIndex &proxyIndex) const
 }
 
 /*!
-\property InsertProxy::insertDirection
+\property InsertProxyModel::insertDirection
 \accessors %insertDirection(), setInsertDirection()
+\notifier insertDirectionChanged()
 \brief This property determines if the extra row, column or both are displayed
 */
 InsertProxyModel::InsertDirections InsertProxyModel::insertDirection() const
@@ -1004,8 +1005,9 @@ bool InsertProxyModel::commitColumn()
 }
 
 /*!
-\property InsertProxy::mergeDisplayEdit
+\property InsertProxyModel::mergeDisplayEdit
 \accessors %mergeDisplayEdit(), setMergeDisplayEdit()
+\notifier mergeDisplayEditChanged()
 \brief This property determines if the Qt::DisplayRole and Qt::EditRole should be merged in the extra row/column
 \details By default the two roles are one and the same you can use this property to separate them.
 If there's any data in the role when you set this property to true it will be duplicated for both roles.
@@ -1125,4 +1127,20 @@ This signal is emitted whenever the data for the corner at the intersection of t
 \fn void InsertProxyModel::extraDataChanged(int role)
 
 Same as dataChanged but is emitted only for the extra row/column
+*/
+
+/*! \enum InsertProxyModel::InsertDirection
+Direction of the Insertion
+*/
+
+/*! \var InsertProxyModel::InsertDirection InsertProxyModel::NoInsert
+No Insertion
+*/
+
+/*! \var InsertProxyModel::InsertDirection InsertProxyModel::InsertRow
+Insert new rows
+*/
+
+/*! \var InsertProxyModel::InsertDirection InsertProxyModel::InsertColumn
+Insert new columns
 */

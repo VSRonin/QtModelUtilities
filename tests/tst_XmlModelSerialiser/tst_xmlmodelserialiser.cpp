@@ -21,7 +21,7 @@ void tst_XmlModelSerialiser::basicSaveLoad()
 
     QVERIFY(destinationModel->removeRows(0, destinationModel->rowCount()));
     serialiser.setModel(static_cast<const QAbstractItemModel *>(sourceModel));
-    QFile serialisedXmlStream(QStringLiteral("SerialisedXmlStream.xml"));
+    QFile serialisedXmlStream(QStringLiteral("Serialised Xml Stream ") + QTest::currentDataTag() + QStringLiteral(".xml"));
     QVERIFY(serialisedXmlStream.open(QIODevice::WriteOnly));
     QXmlStreamWriter writeStream(&serialisedXmlStream);
     QVERIFY(serialiser.saveModel(writeStream));
@@ -35,7 +35,7 @@ void tst_XmlModelSerialiser::basicSaveLoad()
 
     QVERIFY(destinationModel->removeRows(0, destinationModel->rowCount()));
     serialiser.setModel(static_cast<const QAbstractItemModel *>(sourceModel));
-    QFile serialisedXmlDevice(QStringLiteral("SerialisedXmlDevice.xml"));
+    QFile serialisedXmlDevice(QStringLiteral("Serialised Xml Device ") + QTest::currentDataTag() + QStringLiteral(".xml"));
     QVERIFY(serialisedXmlDevice.open(QIODevice::WriteOnly));
     QVERIFY(serialiser.saveModel(&serialisedXmlDevice));
     serialisedXmlDevice.close();
@@ -47,7 +47,7 @@ void tst_XmlModelSerialiser::basicSaveLoad()
 
     QVERIFY(destinationModel->removeRows(0, destinationModel->rowCount()));
     serialiser.setModel(static_cast<const QAbstractItemModel *>(sourceModel));
-    QFile serialisedXmlNested(QStringLiteral("SerialisedXmlNested.xml"));
+    QFile serialisedXmlNested(QStringLiteral("Serialised Xml Nested ") + QTest::currentDataTag() + QStringLiteral(".xml"));
     QVERIFY(serialisedXmlNested.open(QIODevice::WriteOnly));
     QXmlStreamWriter writeNestedStream(&serialisedXmlNested);
     writeNestedStream.writeStartDocument();

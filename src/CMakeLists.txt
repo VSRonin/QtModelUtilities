@@ -29,7 +29,8 @@ if(BUILD_DOCS)
         set(BUILD_DOCS OFF)
     endif()
 endif()
-
+set(modelutilities_SRCS modelutilities_global.h)
+set(modelutilities_INSTALL_INCLUDE modelutilities_global.h)
 if(BUILD_ROLEMASKPROXY)
     set(rolemaskproxy_SRCS rolemaskproxymodel.cpp rolemaskproxymodel.h private/rolemaskproxymodel_p.h)
     set(modelutilities_SRCS ${rolemaskproxy_SRCS} ${modelutilities_SRCS})
@@ -60,7 +61,6 @@ if(BUILD_MODELSERIALISATION)
         htmlmodelserialiser.h
         jsonmodelserialiser.h
         xmlmodelserialiser.h
-        modelutilities_global.h
         private/abstractmodelserialiser_p.h
         private/abstractstringserialiser_p.h
         private/abstractsingleroleserialiser_p.h
@@ -80,7 +80,6 @@ if(BUILD_MODELSERIALISATION)
         htmlmodelserialiser.h
         jsonmodelserialiser.h
         xmlmodelserialiser.h
-        modelutilities_global.h
         includes/BinaryModelSerialiser
         includes/CsvModelSerialiser
         includes/HtmlModelSerialiser

@@ -13,12 +13,24 @@ void modelEqual(const QAbstractItemModel *a, const QAbstractItemModel *b, const 
 {
     Q_ASSERT(a);
     Q_ASSERT(b);
-    Q_ASSERT(!aParent.isValid() || aParent.model() == a);
+    const bool aParentValid = aParent.isValid();
+    Q_ASSERT(!aParentValid || aParent.model() == a);
     Q_ASSERT(!bParent.isValid() || bParent.model() == b);
+    Q_ASSERT(aParentValid == bParent.isValid());
     const int rowC = a->rowCount(aParent);
     QCOMPARE(b->rowCount(bParent), rowC);
     const int colC = a->columnCount(aParent);
     QCOMPARE(b->columnCount(bParent), colC);
+    if (!aParentValid) {
+        for (int i = 0; i < rowC; ++i) {
+            QCOMPARE(a->headerData(i, Qt::Vertical), b->headerData(i, Qt::Vertical));
+            QCOMPARE(a->headerData(i, Qt::Vertical, Qt::UserRole), b->headerData(i, Qt::Vertical, Qt::UserRole));
+        }
+        for (int i = 0; i < colC; ++i) {
+            QCOMPARE(a->headerData(i, Qt::Horizontal), b->headerData(i, Qt::Horizontal));
+            QCOMPARE(a->headerData(i, Qt::Horizontal, Qt::UserRole), b->headerData(i, Qt::Horizontal, Qt::UserRole));
+        }
+    }
     for (int i = 0; i < rowC; ++i) {
         for (int j = 0; j < colC; ++j) {
             const QModelIndex aIdx = a->index(i, j, aParent);
@@ -93,6 +105,16 @@ QAbstractItemModel *createComplexModel(bool tree, bool multiRoles, QObject *pare
 {
     QStandardItemModel *result = new QStandardItemModel(parent);
     insertBranch(result, QModelIndex(), multiRoles, tree ? 2 : 0);
+    for (int i = 0; i < result->rowCount(); ++i) {
+        result->setHeaderData(i, Qt::Vertical, QStringLiteral("Row %1").arg(i));
+        if (multiRoles)
+            result->setHeaderData(i, Qt::Vertical, i, Qt::UserRole);
+    }
+    for (int i = 0; i < result->columnCount(); ++i) {
+        result->setHeaderData(i, Qt::Horizontal, QStringLiteral("Column %1").arg(i));
+        if (multiRoles)
+            result->setHeaderData(i, Qt::Horizontal, i, Qt::UserRole);
+    }
     return result;
 }
 #endif

@@ -16,17 +16,11 @@
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 
-/*!
-\internal
-*/
 HtmlModelSerialiserPrivate::HtmlModelSerialiserPrivate(HtmlModelSerialiser *q)
     : AbstractStringSerialiserPrivate(q)
     , m_printStartDocument(true)
 { }
 
-/*!
-\internal
-*/
 void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter &destination, const QModelIndex &parent) const
 {
     Q_ASSERT(m_constModel);
@@ -122,9 +116,6 @@ void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter &destination,
     destination.writeEndElement(); // table
 }
 
-/*!
-\internal
-*/
 bool HtmlModelSerialiserPrivate::readHtmlElement(QXmlStreamReader &source, const QModelIndex &parent)
 {
     enum SableHeadCode { None = -1, Col = Qt::Horizontal, Row = Qt::Vertical };
@@ -202,9 +193,6 @@ bool HtmlModelSerialiserPrivate::readHtmlElement(QXmlStreamReader &source, const
     return false;
 }
 
-/*!
-\internal
-*/
 bool HtmlModelSerialiserPrivate::writeHtml(QXmlStreamWriter &writer) const
 {
     if (!m_constModel)
@@ -240,9 +228,6 @@ bool HtmlModelSerialiserPrivate::writeHtml(QXmlStreamWriter &writer) const
     return !writer.hasError();
 }
 
-/*!
-\internal
-*/
 bool HtmlModelSerialiserPrivate::readHtml(QXmlStreamReader &reader)
 {
     if (!m_model)
@@ -281,9 +266,6 @@ bool HtmlModelSerialiserPrivate::readHtml(QXmlStreamReader &reader)
     return true;
 }
 
-/*!
-\internal
-*/
 void HtmlModelSerialiserPrivate::writeHtmlVariant(QXmlStreamWriter &writer, const QVariant &val)
 {
     if (isImageType(val.userType())) {
@@ -295,9 +277,6 @@ void HtmlModelSerialiserPrivate::writeHtmlVariant(QXmlStreamWriter &writer, cons
     writer.writeCharacters(saveVariant(val));
 }
 
-/*!
-\internal
-*/
 QVariant HtmlModelSerialiserPrivate::readHtmlVariant(QXmlStreamReader &reader, int valType)
 {
     if (isImageType(valType)) {
@@ -314,7 +293,7 @@ QVariant HtmlModelSerialiserPrivate::readHtmlVariant(QXmlStreamReader &reader, i
 }
 
 /*!
-Construct a read/write serialiser
+Constructs a serialiser operating over \a model
 */
 HtmlModelSerialiser::HtmlModelSerialiser(QAbstractItemModel *model, QObject *parent)
     : AbstractStringSerialiser(*new HtmlModelSerialiserPrivate(this), parent)
@@ -323,7 +302,9 @@ HtmlModelSerialiser::HtmlModelSerialiser(QAbstractItemModel *model, QObject *par
 }
 
 /*!
-Construct a write-only serialiser
+\overload
+
+the model will only be allowed to be saved, not loaded
 */
 HtmlModelSerialiser::HtmlModelSerialiser(const QAbstractItemModel *model, QObject *parent)
     : AbstractStringSerialiser(*new HtmlModelSerialiserPrivate(this), parent)
@@ -332,8 +313,7 @@ HtmlModelSerialiser::HtmlModelSerialiser(const QAbstractItemModel *model, QObjec
 }
 
 /*!
-Constructor used only while subclassing the private class.
-Not part of the public API
+\internal
 */
 HtmlModelSerialiser::HtmlModelSerialiser(HtmlModelSerialiserPrivate &d, QObject *parent)
     : AbstractStringSerialiser(d, parent)
@@ -342,10 +322,9 @@ HtmlModelSerialiser::HtmlModelSerialiser(HtmlModelSerialiserPrivate &d, QObject 
 /*!
 \property HtmlModelSerialiser::printStartDocument
 \accessors %printStartDocument(), setPrintStartDocument()
-\brief Should the first column contain headers
-\details If this property is set to true (the default), the serialisation will the write
-the vertical headerData of the model as the first column of the csv file
-and will load the first column of the csv file as the model's vertical headerData
+\brief This property determines if the start of the html document should be written
+\details If this property is set to \c true (the default) the serialiser will write the \c <html> starting block.
+Set this to false to save the model as part of a larger html document or if you want to specify your custom css in the \c <head>
 */
 bool HtmlModelSerialiser::printStartDocument() const
 {
@@ -362,7 +341,7 @@ void HtmlModelSerialiser::setPrintStartDocument(bool val)
 }
 
 /*!
-Saves the model in html format to the \a destination string
+\reimp
 */
 bool HtmlModelSerialiser::saveModel(QString *destination) const
 {
@@ -370,7 +349,7 @@ bool HtmlModelSerialiser::saveModel(QString *destination) const
         return false;
     Q_D(const HtmlModelSerialiser);
 
-    if (!d->m_model)
+    if (!d->m_constModel)
         return false;
     QXmlStreamWriter writer(destination);
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
@@ -380,7 +359,7 @@ bool HtmlModelSerialiser::saveModel(QString *destination) const
 }
 
 /*!
-Saves the model in html format to the \a destination device
+\reimp
 */
 bool HtmlModelSerialiser::saveModel(QIODevice *destination) const
 {
@@ -394,7 +373,7 @@ bool HtmlModelSerialiser::saveModel(QIODevice *destination) const
         return false;
     Q_D(const HtmlModelSerialiser);
 
-    if (!d->m_model)
+    if (!d->m_constModel)
         return false;
     QXmlStreamWriter writer(destination);
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
@@ -404,7 +383,7 @@ bool HtmlModelSerialiser::saveModel(QIODevice *destination) const
 }
 
 /*!
-Saves the model in html format to the \a destination byte array
+\reimp
 */
 bool HtmlModelSerialiser::saveModel(QByteArray *destination) const
 {
@@ -412,7 +391,7 @@ bool HtmlModelSerialiser::saveModel(QByteArray *destination) const
         return false;
     Q_D(const HtmlModelSerialiser);
 
-    if (!d->m_model)
+    if (!d->m_constModel)
         return false;
     QXmlStreamWriter writer(destination);
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
@@ -422,7 +401,7 @@ bool HtmlModelSerialiser::saveModel(QByteArray *destination) const
 }
 
 /*!
-Loads the model from a \a source device containing html data
+\reimp
 */
 bool HtmlModelSerialiser::loadModel(QIODevice *source)
 {
@@ -443,7 +422,7 @@ bool HtmlModelSerialiser::loadModel(QIODevice *source)
 }
 
 /*!
-Loads the model from a \a source byte array containing html data
+\reimp
 */
 bool HtmlModelSerialiser::loadModel(const QByteArray &source)
 {
@@ -456,7 +435,7 @@ bool HtmlModelSerialiser::loadModel(const QByteArray &source)
 }
 
 /*!
-Loads the model from a \a string array containing html data
+\reimp
 */
 bool HtmlModelSerialiser::loadModel(QString *source)
 {
@@ -469,3 +448,9 @@ bool HtmlModelSerialiser::loadModel(QString *source)
     QXmlStreamReader reader(*source);
     return d->readHtml(reader);
 }
+
+/*!
+\class HtmlModelSerialiser
+
+\brief Serialiser to save and load models in HTML format
+*/

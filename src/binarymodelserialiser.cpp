@@ -92,7 +92,7 @@ bool BinaryModelSerialiserPrivate::readBinary(QDataStream &reader)
 #if QT_VERSION >= 0x050700
     reader.startTransaction();
 #endif
-    reader.setVersion(QDataStream::Qt_5_0);
+    reader.setVersion(QDataStream::Qt_5_1);
     qint32 steramVersion;
     reader >> steramVersion;
     if (steramVersion > QDataStream().version()) {
@@ -163,7 +163,7 @@ bool BinaryModelSerialiserPrivate::writeBinary(QDataStream &writer) const
     if (!m_constModel)
         return false;
     const qint32 writerVersion = writer.version();
-    writer.setVersion(QDataStream::Qt_5_0);
+    writer.setVersion(QDataStream::Qt_5_1);
     writer << writerVersion;
     writer.setVersion(writerVersion);
     writer << Magic_Model_Header;

@@ -21,12 +21,6 @@
 #    include <QTextCodec>
 #endif
 
-/*!
-\class CsvModelSerialiser
-
-\brief Serialiser to save and load models in csv (comma separated values) format
-*/
-
 CsvModelSerialiserPrivate::CsvModelSerialiserPrivate(CsvModelSerialiser *q)
     : AbstractSingleRoleSerialiserPrivate(q)
     , m_firstRowIsHeader(true)
@@ -284,7 +278,7 @@ bool CsvModelSerialiser::saveModel(QString *destination) const
         return false;
     Q_D(const CsvModelSerialiser);
 
-    if (!d->m_model)
+    if (!d->m_constModel)
         return false;
     QTextStream writer(destination, QIODevice::WriteOnly | QIODevice::Text);
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
@@ -308,7 +302,7 @@ bool CsvModelSerialiser::saveModel(QIODevice *destination) const
         return false;
     Q_D(const CsvModelSerialiser);
 
-    if (!d->m_model)
+    if (!d->m_constModel)
         return false;
     destination->setTextModeEnabled(true);
     QTextStream writer(destination);
@@ -327,7 +321,7 @@ bool CsvModelSerialiser::saveModel(QByteArray *destination) const
         return false;
     Q_D(const CsvModelSerialiser);
 
-    if (!d->m_model)
+    if (!d->m_constModel)
         return false;
     QTextStream writer(destination, QIODevice::WriteOnly | QIODevice::Text);
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
@@ -414,6 +408,12 @@ bool CsvModelSerialiser::loadModel(QTextStream &stream)
     Q_D(CsvModelSerialiser);
     return d->readCsv(stream);
 }
+
+/*!
+\class CsvModelSerialiser
+
+\brief Serialiser to save and load models in csv (comma separated values) format
+*/
 
 #ifdef MS_DECLARE_STREAM_OPERATORS
 /*!

@@ -17,17 +17,12 @@
 #include <QJsonParseError>
 #include <QJsonArray>
 #include <QIODevice>
-/*!
-\internal
-*/
+
 JsonModelSerialiserPrivate::JsonModelSerialiserPrivate(JsonModelSerialiser *q)
     : AbstractStringSerialiserPrivate(q)
     , m_format(QJsonDocument::Compact)
 { }
 
-/*!
-\internal
-*/
 bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject &source, const QModelIndex &parent)
 {
     if (source.isEmpty())
@@ -174,9 +169,6 @@ bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject &source, const
     return true;
 }
 
-/*!
-\internal
-*/
 bool JsonModelSerialiserPrivate::roleForObject(const QJsonObject &source, const QModelIndex &destination)
 {
     QJsonValue tempValue = source.value(QLatin1String("role"));
@@ -205,9 +197,6 @@ bool JsonModelSerialiserPrivate::roleForObject(const QJsonObject &source, const 
     return true;
 }
 
-/*!
-\internal
-*/
 QJsonObject JsonModelSerialiserPrivate::objectForRole(int role, const QVariant &value) const
 {
     QJsonObject roleObject;
@@ -217,9 +206,6 @@ QJsonObject JsonModelSerialiserPrivate::objectForRole(int role, const QVariant &
     return roleObject;
 }
 
-/*!
-\internal
-*/
 QJsonObject JsonModelSerialiserPrivate::toJsonObject(const QModelIndex &parent) const
 {
     QJsonObject result;
@@ -291,7 +277,7 @@ QJsonObject JsonModelSerialiserPrivate::toJsonObject(const QModelIndex &parent) 
 }
 
 /*!
-Construct a read/write serialiser
+Constructs a serialiser operating over \a model
 */
 JsonModelSerialiser::JsonModelSerialiser(QAbstractItemModel *model, QObject *parent)
     : AbstractStringSerialiser(*new JsonModelSerialiserPrivate(this), parent)
@@ -300,7 +286,9 @@ JsonModelSerialiser::JsonModelSerialiser(QAbstractItemModel *model, QObject *par
 }
 
 /*!
-Construct a write-only serialiser
+\overload
+
+the model will only be allowed to be saved, not loaded
 */
 JsonModelSerialiser::JsonModelSerialiser(const QAbstractItemModel *model, QObject *parent)
     : AbstractStringSerialiser(*new JsonModelSerialiserPrivate(this), parent)
@@ -309,15 +297,14 @@ JsonModelSerialiser::JsonModelSerialiser(const QAbstractItemModel *model, QObjec
 }
 
 /*!
-Constructor used only while subclassing the private class.
-Not part of the public API
+\internal
 */
 JsonModelSerialiser::JsonModelSerialiser(JsonModelSerialiserPrivate &d, QObject *parent)
     : AbstractStringSerialiser(d, parent)
 { }
 
 /*!
-Saves the model in JSON format to the \a destination string
+\reimp
 */
 bool JsonModelSerialiser::saveModel(QString *destination) const
 {
@@ -332,7 +319,7 @@ bool JsonModelSerialiser::saveModel(QString *destination) const
 }
 
 /*!
-Saves the model in JSON format to the \a destination byte array
+\reimp
 */
 bool JsonModelSerialiser::saveModel(QByteArray *destination) const
 {
@@ -348,7 +335,7 @@ bool JsonModelSerialiser::saveModel(QByteArray *destination) const
 }
 
 /*!
-Saves the model in JSON format to the \a destination device
+\reimp
 */
 bool JsonModelSerialiser::saveModel(QIODevice *destination) const
 {
@@ -364,7 +351,7 @@ bool JsonModelSerialiser::saveModel(QIODevice *destination) const
 }
 
 /*!
-Saves the model to the \a destination JSON object
+Saves the model to a JSON object and returns it
 */
 QJsonObject JsonModelSerialiser::toJsonObject() const
 {
@@ -373,7 +360,7 @@ QJsonObject JsonModelSerialiser::toJsonObject() const
 }
 
 /*!
-Loads the model from a \a source string containing JSON data
+\reimp
 */
 bool JsonModelSerialiser::loadModel(QString *source)
 {
@@ -388,7 +375,7 @@ bool JsonModelSerialiser::loadModel(QString *source)
 }
 
 /*!
-Loads the model from a \a source device containing JSON data
+\reimp
 */
 bool JsonModelSerialiser::loadModel(QIODevice *source)
 {
@@ -410,7 +397,7 @@ bool JsonModelSerialiser::loadModel(QIODevice *source)
 }
 
 /*!
-Loads the model from a \a source byte array containing JSON data
+\reimp
 */
 bool JsonModelSerialiser::loadModel(const QByteArray &source)
 {
@@ -435,6 +422,13 @@ bool JsonModelSerialiser::fromJsonObject(const QJsonObject &source)
     return d->fromJsonObject(source);
 }
 
+/*!
+\property JsonModelSerialiser::format
+\accessors %format(), setFormat()
+\brief The JSON format to use
+\details Defaults to \c Compact
+*/
+
 QJsonDocument::JsonFormat JsonModelSerialiser::format() const
 {
     Q_D(const JsonModelSerialiser);
@@ -446,3 +440,9 @@ void JsonModelSerialiser::setFormat(QJsonDocument::JsonFormat val)
     Q_D(JsonModelSerialiser);
     d->m_format = val;
 }
+
+/*!
+\class JsonModelSerialiser
+
+\brief Serialiser to save and load models in JSON format
+*/

@@ -59,10 +59,10 @@ Destructor
 AbstractModelSerialiser::~AbstractModelSerialiser() = default;
 
 /*!
-\property AbstractSingleRoleSerialiser::rolesToSave
-\brief the roles that will be serialised
-
-by default this property is set to all non obsolete Qt::ItemDataRole values
+\property AbstractModelSerialiser::rolesToSave
+\accessors %rolesToSave(), setRoleToSave()
+\brief The roles that will be serialised
+\details By default this property is set to all non obsolete Qt::ItemDataRole values
 */
 
 const QList<int> &AbstractModelSerialiser::rolesToSave() const
@@ -80,7 +80,7 @@ void AbstractModelSerialiser::setRoleToSave(const QList<int> &val)
 }
 
 /*!
-\brief appends \a role to the list of roles to save
+\brief Appends \a role to the list of roles to save
 */
 void AbstractModelSerialiser::addRoleToSave(int role)
 {
@@ -90,7 +90,7 @@ void AbstractModelSerialiser::addRoleToSave(int role)
         d->m_rolesToSave.append(role);
 }
 /*!
-\brief removes \a role from the list of roles to save
+\brief Removes \a role from the list of roles to save
 */
 void AbstractModelSerialiser::removeRoleToSave(int role)
 {
@@ -141,10 +141,12 @@ QList<int> AbstractModelSerialiser::modelDefaultRoles()
 }
 
 /*!
-Returns the model over which the serialiser will operate.
-
-If setModel(const QAbstractItemModel*) was used to se the model, this method will return \c nullptr
+\property AbstractModelSerialiser::model
+\accessors %model(), setModel()
+\brief The model over which the serialiser will operate for reading/writing
+\details If setModel(const QAbstractItemModel*) was used to se the model, this method will return \c nullptr
 */
+
 QAbstractItemModel *AbstractModelSerialiser::model() const
 {
     Q_D(const AbstractModelSerialiser);
@@ -153,8 +155,11 @@ QAbstractItemModel *AbstractModelSerialiser::model() const
 }
 
 /*!
-Returns the model over which the serialiser will operate.
+\property AbstractModelSerialiser::constModel
+\accessors %constModel(), setModel()
+\brief The model over which the serialiser will operate in read mode
 */
+
 const QAbstractItemModel *AbstractModelSerialiser::constModel() const
 {
     Q_D(const AbstractModelSerialiser);
@@ -162,9 +167,6 @@ const QAbstractItemModel *AbstractModelSerialiser::constModel() const
     return d->m_constModel;
 }
 
-/*!
-Sets the model over which the serialiser will operate.
-*/
 void AbstractModelSerialiser::setModel(QAbstractItemModel *val)
 {
     Q_D(AbstractModelSerialiser);
@@ -174,7 +176,7 @@ void AbstractModelSerialiser::setModel(QAbstractItemModel *val)
 }
 
 /*!
-Sets the model over which the serialiser will operate.
+Sets the model over which the serialiser will operate in read mode
 
 Using this method will only allow the model to be saved, not loaded
 */

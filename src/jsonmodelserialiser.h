@@ -22,6 +22,7 @@ class JsonModelSerialiserPrivate;
 class MODELUTILITIES_EXPORT JsonModelSerialiser : public AbstractStringSerialiser
 {
     Q_OBJECT
+    Q_PROPERTY(QJsonDocument::JsonFormat format READ format WRITE setFormat)
     Q_DECLARE_PRIVATE(JsonModelSerialiser)
     Q_DISABLE_COPY(JsonModelSerialiser)
 public:
