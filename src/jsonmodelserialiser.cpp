@@ -37,7 +37,7 @@ bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject &source, const
             static_cast<int>(tempValue.toDouble());
 #endif
     m_model->insertRows(0, maxRow, parent);
-    if(m_model->rowCount(parent)!=maxRow)
+    if (m_model->rowCount(parent) != maxRow)
         return false;
     tempValue = source.value(QLatin1String("columns"));
     if (tempValue.isUndefined() || !tempValue.isDouble())
@@ -49,7 +49,7 @@ bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject &source, const
             static_cast<int>(tempValue.toDouble());
 #endif
     m_model->insertColumns(0, maxCol, parent);
-    if(m_model->columnCount(parent)!=maxCol)
+    if (m_model->columnCount(parent) != maxCol)
         return false;
     if (!parent.isValid()) {
         for (auto orientat :

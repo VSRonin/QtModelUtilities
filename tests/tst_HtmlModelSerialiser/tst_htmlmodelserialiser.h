@@ -11,10 +11,11 @@ private Q_SLOTS:
     void basicSaveLoadFile();
     void basicSaveLoadString();
     void basicSaveLoadNested();
-    void basicSaveLoadByteArray_data(){basicSaveLoadData();}
-    void basicSaveLoadFile_data(){basicSaveLoadData();}
-    void basicSaveLoadString_data(){basicSaveLoadData();}
-    void basicSaveLoadNested_data(){basicSaveLoadData();}
+    void basicSaveLoadByteArray_data() { basicSaveLoadData(); }
+    void basicSaveLoadFile_data() { basicSaveLoadData(); }
+    void basicSaveLoadString_data() { basicSaveLoadData(); }
+    void basicSaveLoadNested_data() { basicSaveLoadData(); }
+
 protected:
     void basicSaveLoadData();
 };

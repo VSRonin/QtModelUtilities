@@ -144,7 +144,7 @@ bool CsvModelSerialiserPrivate::readCsv(QTextStream &reader)
         const int startI = (m_firstColumnIsHeader ? 1 : 0);
         if (m_model->columnCount() == 0) {
             m_model->insertColumns(0, fields.size() - startI);
-            if(m_model->columnCount()!=fields.size() - startI)
+            if (m_model->columnCount() != fields.size() - startI)
                 return false;
         } else if (m_model->columnCount() != fields.size() - startI) {
             m_model->removeColumns(0, m_model->columnCount());
@@ -161,7 +161,7 @@ bool CsvModelSerialiserPrivate::readCsv(QTextStream &reader)
                                        q->roleToSave());
         } else {
             const int newRow = m_model->rowCount();
-            if(!m_model->insertRow(newRow))
+            if (!m_model->insertRow(newRow))
                 return false;
             for (int i = 0; i < fields.size(); ++i) {
                 if (i == 0 && m_firstColumnIsHeader)

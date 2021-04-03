@@ -50,9 +50,9 @@ bool BinaryModelSerialiserPrivate::readBinaryElement(QDataStream &source, const 
     source >> rowCount >> colCount;
     m_model->insertRows(0, rowCount, parent);
     m_model->insertColumns(0, colCount, parent);
-    if(m_model->rowCount(parent) != rowCount)
+    if (m_model->rowCount(parent) != rowCount)
         return false;
-    if(m_model->columnCount(parent) != colCount)
+    if (m_model->columnCount(parent) != colCount)
         return false;
     qint32 tempRole = -1;
     QVariant tempData;
@@ -285,8 +285,6 @@ bool BinaryModelSerialiser::loadModel(QDataStream &stream)
     Q_D(BinaryModelSerialiser);
     return d->readBinary(stream);
 }
-
-
 
 /*!
 Constructs a serialiser operating over \a model

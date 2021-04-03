@@ -5,10 +5,11 @@
 #include <algorithm>
 #include <random>
 #include <QtTest/QTest>
-void tst_SerialiserCommon::saveLoadByteArray(AbstractModelSerialiser *serialiser, const QAbstractItemModel *sourceModel, QAbstractItemModel *destinationModel, bool multiRole) const
+void tst_SerialiserCommon::saveLoadByteArray(AbstractModelSerialiser *serialiser, const QAbstractItemModel *sourceModel,
+                                             QAbstractItemModel *destinationModel, bool multiRole) const
 {
     serialiser->setModel(sourceModel);
-    if(multiRole)
+    if (multiRole)
         serialiser->addRoleToSave(Qt::UserRole + 1);
     QByteArray dataArray;
     QVERIFY(serialiser->saveModel(&dataArray));
@@ -17,10 +18,11 @@ void tst_SerialiserCommon::saveLoadByteArray(AbstractModelSerialiser *serialiser
     checkModelEqual(sourceModel, destinationModel);
 }
 
-void tst_SerialiserCommon::saveLoadFile(AbstractModelSerialiser *serialiser, const QAbstractItemModel *sourceModel, QAbstractItemModel *destinationModel, bool multiRole) const
+void tst_SerialiserCommon::saveLoadFile(AbstractModelSerialiser *serialiser, const QAbstractItemModel *sourceModel,
+                                        QAbstractItemModel *destinationModel, bool multiRole) const
 {
     serialiser->setModel(sourceModel);
-    if(multiRole)
+    if (multiRole)
         serialiser->addRoleToSave(Qt::UserRole + 1);
     QTemporaryFile tempFile;
     QVERIFY(tempFile.open());
@@ -31,10 +33,11 @@ void tst_SerialiserCommon::saveLoadFile(AbstractModelSerialiser *serialiser, con
     checkModelEqual(sourceModel, destinationModel);
 }
 
-void tst_SerialiserCommon::saveLoadString(AbstractStringSerialiser *serialiser, const QAbstractItemModel *sourceModel, QAbstractItemModel *destinationModel, bool multiRole) const
+void tst_SerialiserCommon::saveLoadString(AbstractStringSerialiser *serialiser, const QAbstractItemModel *sourceModel,
+                                          QAbstractItemModel *destinationModel, bool multiRole) const
 {
     serialiser->setModel(sourceModel);
-    if(multiRole)
+    if (multiRole)
         serialiser->addRoleToSave(Qt::UserRole + 1);
     QString dataString;
     QVERIFY(serialiser->saveModel(&dataString));
@@ -43,7 +46,8 @@ void tst_SerialiserCommon::saveLoadString(AbstractStringSerialiser *serialiser, 
     checkModelEqual(sourceModel, destinationModel);
 }
 
-void tst_SerialiserCommon::checkModelEqual(const QAbstractItemModel *a, const QAbstractItemModel *b, const QModelIndex &aParent, const QModelIndex &bParent) const
+void tst_SerialiserCommon::checkModelEqual(const QAbstractItemModel *a, const QAbstractItemModel *b, const QModelIndex &aParent,
+                                           const QModelIndex &bParent) const
 {
     Q_ASSERT(a);
     Q_ASSERT(b);
@@ -85,32 +89,32 @@ void tst_SerialiserCommon::checkModelEqual(const QAbstractItemModel *a, const QA
 const QAbstractItemModel *tst_SerialiserCommon::createStringModel(QObject *parent) const
 {
     QStringList euStates{QStringLiteral("Austria"),
-                QStringLiteral("Belgium"),
-                QStringLiteral("Bulgaria"),
-                QStringLiteral("Croatia"),
-                QStringLiteral("Republic of Cyprus"),
-                QStringLiteral("Czech Republic"),
-                QStringLiteral("Denmark"),
-                QStringLiteral("Estonia"),
-                QStringLiteral("Finland"),
-                QStringLiteral("France"),
-                QStringLiteral("Germany"),
-                QStringLiteral("Greece"),
-                QStringLiteral("Hungary"),
-                QStringLiteral("Ireland"),
-                QStringLiteral("Italy"),
-                QStringLiteral("Latvia"),
-                QStringLiteral("Lithuania"),
-                QStringLiteral("Luxembourg"),
-                QStringLiteral("Malta"),
-                QStringLiteral("Netherlands"),
-                QStringLiteral("Poland"),
-                QStringLiteral("Portugal"),
-                QStringLiteral("Romania"),
-                QStringLiteral("Slovakia"),
-                QStringLiteral("Slovenia"),
-                QStringLiteral("Spain"),
-                QStringLiteral("Sweden")};
+                         QStringLiteral("Belgium"),
+                         QStringLiteral("Bulgaria"),
+                         QStringLiteral("Croatia"),
+                         QStringLiteral("Republic of Cyprus"),
+                         QStringLiteral("Czech Republic"),
+                         QStringLiteral("Denmark"),
+                         QStringLiteral("Estonia"),
+                         QStringLiteral("Finland"),
+                         QStringLiteral("France"),
+                         QStringLiteral("Germany"),
+                         QStringLiteral("Greece"),
+                         QStringLiteral("Hungary"),
+                         QStringLiteral("Ireland"),
+                         QStringLiteral("Italy"),
+                         QStringLiteral("Latvia"),
+                         QStringLiteral("Lithuania"),
+                         QStringLiteral("Luxembourg"),
+                         QStringLiteral("Malta"),
+                         QStringLiteral("Netherlands"),
+                         QStringLiteral("Poland"),
+                         QStringLiteral("Portugal"),
+                         QStringLiteral("Romania"),
+                         QStringLiteral("Slovakia"),
+                         QStringLiteral("Slovenia"),
+                         QStringLiteral("Spain"),
+                         QStringLiteral("Sweden")};
     std::default_random_engine generator;
     std::shuffle(euStates.begin(), euStates.end(), generator);
     return new QStringListModel(euStates, parent);

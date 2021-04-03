@@ -10,7 +10,7 @@ void tst_HtmlModelSerialiser::basicSaveLoadByteArray()
     QFETCH(const QAbstractItemModel *, sourceModel);
     QFETCH(QAbstractItemModel *, destinationModel);
     HtmlModelSerialiser serialiser;
-    saveLoadByteArray(&serialiser,sourceModel,destinationModel,true);
+    saveLoadByteArray(&serialiser, sourceModel, destinationModel, true);
     destinationModel->deleteLater();
 }
 
@@ -19,7 +19,7 @@ void tst_HtmlModelSerialiser::basicSaveLoadFile()
     QFETCH(const QAbstractItemModel *, sourceModel);
     QFETCH(QAbstractItemModel *, destinationModel);
     HtmlModelSerialiser serialiser;
-    saveLoadFile(&serialiser,sourceModel,destinationModel,true);
+    saveLoadFile(&serialiser, sourceModel, destinationModel, true);
     destinationModel->deleteLater();
 }
 
@@ -28,7 +28,7 @@ void tst_HtmlModelSerialiser::basicSaveLoadString()
     QFETCH(const QAbstractItemModel *, sourceModel);
     QFETCH(QAbstractItemModel *, destinationModel);
     HtmlModelSerialiser serialiser;
-    saveLoadString(&serialiser,sourceModel,destinationModel,true);
+    saveLoadString(&serialiser, sourceModel, destinationModel, true);
     destinationModel->deleteLater();
 }
 
@@ -37,7 +37,7 @@ void tst_HtmlModelSerialiser::basicSaveLoadNested()
     QFETCH(const QAbstractItemModel *, sourceModel);
     QFETCH(QAbstractItemModel *, destinationModel);
     HtmlModelSerialiser serialiser(sourceModel);
-    serialiser.addRoleToSave(Qt::UserRole+1);
+    serialiser.addRoleToSave(Qt::UserRole + 1);
     QByteArray dataArray;
     QBuffer serialisedHtmlNested(&dataArray);
     QVERIFY(serialisedHtmlNested.open(QIODevice::WriteOnly));
@@ -64,13 +64,9 @@ void tst_HtmlModelSerialiser::basicSaveLoadData()
     QTest::addColumn<QAbstractItemModel *>("destinationModel");
     QTest::newRow("List Single Role") << createStringModel(this) << static_cast<QAbstractItemModel *>(new QStringListModel(this));
 #ifdef QT_GUI_LIB
-    QTest::newRow("Table Single Role") << createComplexModel(false, false,this)
-                                       << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
-    QTest::newRow("Table Multi Roles") << createComplexModel(false, true,this)
-                                       << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
-    QTest::newRow("Tree Single Role") << createComplexModel(true, false,this)
-                                      << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
-    QTest::newRow("Tree Multi Roles") << createComplexModel(true, true,this)
-                                      << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
+    QTest::newRow("Table Single Role") << createComplexModel(false, false, this) << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
+    QTest::newRow("Table Multi Roles") << createComplexModel(false, true, this) << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
+    QTest::newRow("Tree Single Role") << createComplexModel(true, false, this) << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
+    QTest::newRow("Tree Multi Roles") << createComplexModel(true, true, this) << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
 #endif
 }

@@ -32,6 +32,7 @@ public:
     Q_INVOKABLE bool loadModel(QIODevice *source) Q_DECL_OVERRIDE;
     Q_INVOKABLE bool loadModel(const QByteArray &source) Q_DECL_OVERRIDE;
     virtual bool loadModel(QDataStream &stream);
+
 protected:
     BinaryModelSerialiser(BinaryModelSerialiserPrivate &d, QObject *parent = Q_NULLPTR);
 
