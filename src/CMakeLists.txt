@@ -111,7 +111,7 @@ if(NOT NO_WIDGETS)
 endif()
 
 if(BUILD_DOCS)
-    set(htmlDocRedirect "<!DOCTYPE html><html><head><meta http-equiv=\"refresh\" content=\"0; url=html/index.html\" /></head><body><p><a href=\"html/index.html\">Redirect</a></p></body></html>")
+    set(htmlDocRedirect "<!DOCTYPE html><html><head><title>Redirect</title><meta http-equiv=\"refresh\" content=\"0; url=html/index.html\" /></head><body><p><a href=\"html/index.html\">Click here if you are not redirected automatically</a></p></body></html>")
     file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/docs/htmldocs.html" ${htmlDocRedirect})
     set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/docs/DoxygenConfig.doxyfile)
     add_custom_target( doc_doxygen ALL
@@ -159,11 +159,4 @@ install(EXPORT modelutilitiesTargets
 install(FILES "modelutilitiesConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/modelutilitiesConfigVersion.cmake"
     DESTINATION lib/cmake/modelutilities
 )
-SET(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
-SET(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
-SET(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
-SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/README.markdown")
-SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
-SET(CPACK_PACKAGE_FILE_NAME "QtModelUtilities-${VERSION_SHORT}-${CMAKE_SYSTEM_NAME}-${modelutilities_PlatformDir}")
-include(CPack)
 

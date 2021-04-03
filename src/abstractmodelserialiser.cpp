@@ -16,12 +16,33 @@
 #include <QAbstractItemModel>
 
 AbstractModelSerialiserPrivate::AbstractModelSerialiserPrivate(AbstractModelSerialiser *q)
-    : q_ptr(q)
+    : m_streamVersion(static_cast<QDataStream::Version>(QDataStream().version()))
+    , m_rolesToSave(AbstractModelSerialiser::modelDefaultRoles())
     , m_model(Q_NULLPTR)
     , m_constModel(Q_NULLPTR)
-    , m_rolesToSave(AbstractModelSerialiser::modelDefaultRoles())
+    , q_ptr(q)
 {
     Q_ASSERT(q_ptr);
+}
+
+/*!
+\property AbstractModelSerialiser::streamVersion
+\accessors %streamVersion(), setStreamVersion()
+\brief The datastream version used to serialise binary data
+\details This will be used to serialise variants that have a binary-only representation.
+By default this property is set to the latest version avaliable in Qt.
+*/
+
+QDataStream::Version AbstractModelSerialiser::streamVersion() const
+{
+    Q_D(const AbstractModelSerialiser);
+    return d->m_streamVersion;
+}
+
+void AbstractModelSerialiser::setStreamVersion(QDataStream::Version ver)
+{
+    Q_D(AbstractModelSerialiser);
+    d->m_streamVersion = ver;
 }
 
 /*!

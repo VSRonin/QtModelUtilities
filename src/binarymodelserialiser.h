@@ -13,14 +13,13 @@
 
 #ifndef binarymodelserialiser_h__
 #define binarymodelserialiser_h__
-
 #include "modelutilities_global.h"
 #include "abstractmodelserialiser.h"
 class BinaryModelSerialiserPrivate;
-class QDataStream;
 class MODELUTILITIES_EXPORT BinaryModelSerialiser : public AbstractModelSerialiser
 {
     Q_OBJECT
+
     Q_DECLARE_PRIVATE(BinaryModelSerialiser)
     Q_DISABLE_COPY(BinaryModelSerialiser)
 public:
@@ -33,7 +32,6 @@ public:
     Q_INVOKABLE bool loadModel(QIODevice *source) Q_DECL_OVERRIDE;
     Q_INVOKABLE bool loadModel(const QByteArray &source) Q_DECL_OVERRIDE;
     virtual bool loadModel(QDataStream &stream);
-
 protected:
     BinaryModelSerialiser(BinaryModelSerialiserPrivate &d, QObject *parent = Q_NULLPTR);
 

@@ -27,7 +27,6 @@ protected:
     bool readBinary(QDataStream &reader);
     void writeBinaryElement(QDataStream &destination, const QModelIndex &parent = QModelIndex()) const;
     bool readBinaryElement(QDataStream &source, const QModelIndex &parent = QModelIndex());
-
 #ifdef MS_DECLARE_STREAM_OPERATORS
     friend QDataStream &operator<<(QDataStream &stream, const QAbstractItemModel &model);
     friend QDataStream &operator>>(QDataStream &stream, QAbstractItemModel &model);

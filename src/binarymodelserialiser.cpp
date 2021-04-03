@@ -50,6 +50,10 @@ bool BinaryModelSerialiserPrivate::readBinaryElement(QDataStream &source, const 
     source >> rowCount >> colCount;
     m_model->insertRows(0, rowCount, parent);
     m_model->insertColumns(0, colCount, parent);
+    if(m_model->rowCount(parent) != rowCount)
+        return false;
+    if(m_model->columnCount(parent) != colCount)
+        return false;
     qint32 tempRole = -1;
     QVariant tempData;
     bool hasChild = false;
@@ -92,7 +96,7 @@ bool BinaryModelSerialiserPrivate::readBinary(QDataStream &reader)
 #if QT_VERSION >= 0x050700
     reader.startTransaction();
 #endif
-    reader.setVersion(QDataStream::Qt_5_1);
+    reader.setVersion(QDataStream::Qt_5_0);
     qint32 steramVersion;
     reader >> steramVersion;
     if (steramVersion > QDataStream().version()) {
@@ -163,7 +167,7 @@ bool BinaryModelSerialiserPrivate::writeBinary(QDataStream &writer) const
     if (!m_constModel)
         return false;
     const qint32 writerVersion = writer.version();
-    writer.setVersion(QDataStream::Qt_5_1);
+    writer.setVersion(QDataStream::Qt_5_0);
     writer << writerVersion;
     writer.setVersion(writerVersion);
     writer << Magic_Model_Header;
@@ -207,9 +211,7 @@ bool BinaryModelSerialiser::saveModel(QIODevice *destination) const
     if (!d->m_constModel)
         return false;
     QDataStream witer(destination);
-#ifdef MS_DATASTREAM_VERSION
-    witer.setVersion(MS_DATASTREAM_VERSION);
-#endif // MS_DATASTREAM_VERSION
+    witer.setVersion(d->m_streamVersion);
     return d->writeBinary(witer);
 }
 
@@ -225,9 +227,7 @@ bool BinaryModelSerialiser::saveModel(QByteArray *destination) const
     if (!d->m_constModel)
         return false;
     QDataStream witer(destination, QIODevice::WriteOnly);
-#ifdef MS_DATASTREAM_VERSION
-    witer.setVersion(MS_DATASTREAM_VERSION);
-#endif // MS_DATASTREAM_VERSION
+    witer.setVersion(d->m_streamVersion);
     return d->writeBinary(witer);
 }
 
@@ -254,13 +254,10 @@ bool BinaryModelSerialiser::loadModel(QIODevice *source)
     if (!source->isReadable())
         return false;
     Q_D(BinaryModelSerialiser);
-
     if (!d->m_model)
         return false;
     QDataStream reader(source);
-#ifdef MS_DATASTREAM_VERSION
-    reader.setVersion(MS_DATASTREAM_VERSION);
-#endif // MS_DATASTREAM_VERSION
+    reader.setVersion(d->m_streamVersion);
     return d->readBinary(reader);
 }
 
@@ -274,9 +271,7 @@ bool BinaryModelSerialiser::loadModel(const QByteArray &source)
     if (!d->m_model)
         return false;
     QDataStream reader(source);
-#ifdef MS_DATASTREAM_VERSION
-    reader.setVersion(MS_DATASTREAM_VERSION);
-#endif // MS_DATASTREAM_VERSION
+    reader.setVersion(streamVersion());
     return d->readBinary(reader);
 }
 
@@ -290,6 +285,8 @@ bool BinaryModelSerialiser::loadModel(QDataStream &stream)
     Q_D(BinaryModelSerialiser);
     return d->readBinary(stream);
 }
+
+
 
 /*!
 Constructs a serialiser operating over \a model

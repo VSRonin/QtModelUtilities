@@ -1,45 +1,52 @@
 #include <QtTest/QTest>
-#include "tst_binarymodelserialiser.h"
-#include <binarymodelserialiser.h>
+#include "tst_jsonmodelserialiser.h"
+#include <jsonmodelserialiser.h>
 #include <QByteArray>
-#include <QBuffer>
-#include <QDataStream>
+#include <QFile>
+#include <QJsonObject>
 
-void tst_BinaryModelSerialiser::basicSaveLoadByteArray()
+void tst_JsonModelSerialiser::basicSaveLoadByteArray()
 {
     QFETCH(const QAbstractItemModel *, sourceModel);
     QFETCH(QAbstractItemModel *, destinationModel);
-    BinaryModelSerialiser serialiser;
-    saveLoadFile(&serialiser,sourceModel,destinationModel,true);
-    destinationModel->deleteLater();
-}
-
-void tst_BinaryModelSerialiser::basicSaveLoadFile()
-{
-    QFETCH(const QAbstractItemModel *, sourceModel);
-    QFETCH(QAbstractItemModel *, destinationModel);
-    BinaryModelSerialiser serialiser;
+    JsonModelSerialiser serialiser;
     saveLoadByteArray(&serialiser,sourceModel,destinationModel,true);
     destinationModel->deleteLater();
 }
 
-void tst_BinaryModelSerialiser::basicSaveLoadStream()
+void tst_JsonModelSerialiser::basicSaveLoadFile()
 {
     QFETCH(const QAbstractItemModel *, sourceModel);
     QFETCH(QAbstractItemModel *, destinationModel);
-    BinaryModelSerialiser serialiser(sourceModel);
+    JsonModelSerialiser serialiser;
+    saveLoadFile(&serialiser,sourceModel,destinationModel,true);
+    destinationModel->deleteLater();
+}
+
+void tst_JsonModelSerialiser::basicSaveLoadString()
+{
+    QFETCH(const QAbstractItemModel *, sourceModel);
+    QFETCH(QAbstractItemModel *, destinationModel);
+    JsonModelSerialiser serialiser;
+    saveLoadString(&serialiser,sourceModel,destinationModel,true);
+    destinationModel->deleteLater();
+}
+
+void tst_JsonModelSerialiser::basicSaveLoadObject()
+{
+    QFETCH(const QAbstractItemModel *, sourceModel);
+    QFETCH(QAbstractItemModel *, destinationModel);
+    JsonModelSerialiser serialiser(sourceModel);
     serialiser.addRoleToSave(Qt::UserRole+1);
-    QByteArray dataArray;
-    QDataStream writeStream(&dataArray, QIODevice::WriteOnly);
-    QVERIFY(serialiser.saveModel(writeStream));
-    QDataStream readStream(dataArray);
+    QJsonObject writeObject = serialiser.toJsonObject();
+    QVERIFY(!writeObject.isEmpty());
     serialiser.setModel(destinationModel);
-    QVERIFY(serialiser.loadModel(readStream));
+    QVERIFY(serialiser.fromJsonObject(writeObject));
     checkModelEqual(sourceModel, destinationModel);
     destinationModel->deleteLater();
 }
 
-void tst_BinaryModelSerialiser::basicSaveLoadData()
+void tst_JsonModelSerialiser::basicSaveLoadData()
 {
     QTest::addColumn<const QAbstractItemModel *>("sourceModel");
     QTest::addColumn<QAbstractItemModel *>("destinationModel");
@@ -52,6 +59,6 @@ void tst_BinaryModelSerialiser::basicSaveLoadData()
     QTest::newRow("Tree Single Role") << createComplexModel(true, false,this)
                                       << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
     QTest::newRow("Tree Multi Roles") << createComplexModel(true, true,this)
-                                      << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
+                                      << static_cast<QAbstractItemModel *>(new QStandardItemModel());
 #endif
 }

@@ -1,26 +1,44 @@
 #include <QtTest/QTest>
 #include "tst_csvmodelserialiser.h"
-#include <../serialisers_common.hpp>
 #include <csvmodelserialiser.h>
 #include <QByteArray>
-#include <QFile>
+#include <QBuffer>
 #include <QTextStream>
 
-void tst_CsvModelSerialiser::basicSaveLoad()
+void tst_CsvModelSerialiser::basicSaveLoadByteArray()
 {
-    QFETCH(QAbstractItemModel *, sourceModel);
+    QFETCH(const QAbstractItemModel *, sourceModel);
     QFETCH(QAbstractItemModel *, destinationModel);
-    QByteArray dataArray;
-    CsvModelSerialiser serialiser(static_cast<const QAbstractItemModel *>(sourceModel));
-    serialiser.addRoleToSave(Qt::UserRole + 1);
-    QVERIFY(serialiser.saveModel(&dataArray));
-    serialiser.setModel(destinationModel);
-    QVERIFY(serialiser.loadModel(dataArray));
-    SerialiserCommon::modelEqual(sourceModel, destinationModel);
+    CsvModelSerialiser serialiser;
+    saveLoadByteArray(&serialiser,sourceModel,destinationModel,false);
+    destinationModel->deleteLater();
+}
 
-    QVERIFY(destinationModel->removeRows(0, destinationModel->rowCount()));
-    serialiser.setModel(static_cast<const QAbstractItemModel *>(sourceModel));
-    QFile serialisedCsvStream(QStringLiteral("Serialised Csv Stream ") + QTest::currentDataTag() + QStringLiteral(".csv"));
+void tst_CsvModelSerialiser::basicSaveLoadFile()
+{
+    QFETCH(const QAbstractItemModel *, sourceModel);
+    QFETCH(QAbstractItemModel *, destinationModel);
+    CsvModelSerialiser serialiser;
+    saveLoadFile(&serialiser,sourceModel,destinationModel,false);
+    destinationModel->deleteLater();
+}
+
+void tst_CsvModelSerialiser::basicSaveLoadString()
+{
+    QFETCH(const QAbstractItemModel *, sourceModel);
+    QFETCH(QAbstractItemModel *, destinationModel);
+    CsvModelSerialiser serialiser;
+    saveLoadString(&serialiser,sourceModel,destinationModel,false);
+    destinationModel->deleteLater();
+}
+
+void tst_CsvModelSerialiser::basicSaveLoadStream()
+{
+    QFETCH(const QAbstractItemModel *, sourceModel);
+    QFETCH(QAbstractItemModel *, destinationModel);
+    CsvModelSerialiser serialiser(sourceModel);
+    QByteArray dataArray;
+    QBuffer serialisedCsvStream(&dataArray);
     QVERIFY(serialisedCsvStream.open(QIODevice::WriteOnly));
     QTextStream writeStream(&serialisedCsvStream);
     QVERIFY(serialiser.saveModel(writeStream));
@@ -29,32 +47,17 @@ void tst_CsvModelSerialiser::basicSaveLoad()
     QTextStream readStream(&serialisedCsvStream);
     serialiser.setModel(destinationModel);
     QVERIFY(serialiser.loadModel(readStream));
-    serialisedCsvStream.close();
-    SerialiserCommon::modelEqual(sourceModel, destinationModel);
-
-    QVERIFY(destinationModel->removeRows(0, destinationModel->rowCount()));
-    serialiser.setModel(static_cast<const QAbstractItemModel *>(sourceModel));
-    QFile serialisedCsvDevice(QStringLiteral("Serialised Csv Device ") + QTest::currentDataTag() + QStringLiteral(".csv"));
-    QVERIFY(serialisedCsvDevice.open(QIODevice::WriteOnly));
-    QVERIFY(serialiser.saveModel(&serialisedCsvDevice));
-    serialisedCsvDevice.close();
-    QVERIFY(serialisedCsvDevice.open(QIODevice::ReadOnly));
-    serialiser.setModel(destinationModel);
-    QVERIFY(serialiser.loadModel(&serialisedCsvDevice));
-    serialisedCsvDevice.close();
-    SerialiserCommon::modelEqual(sourceModel, destinationModel);
-
-    sourceModel->deleteLater();
+    checkModelEqual(sourceModel, destinationModel);
     destinationModel->deleteLater();
 }
 
-void tst_CsvModelSerialiser::basicSaveLoad_data()
+void tst_CsvModelSerialiser::basicSaveLoadData()
 {
-    QTest::addColumn<QAbstractItemModel *>("sourceModel");
+    QTest::addColumn<const QAbstractItemModel *>("sourceModel");
     QTest::addColumn<QAbstractItemModel *>("destinationModel");
-    QTest::newRow("List Single Role") << SerialiserCommon::createStringModel() << static_cast<QAbstractItemModel *>(new QStringListModel());
+    QTest::newRow("List Single Role") << createStringModel(this) << static_cast<QAbstractItemModel *>(new QStringListModel(this));
 #ifdef QT_GUI_LIB
-    QTest::newRow("Table Single Role") << SerialiserCommon::createComplexModel(false, false)
-                                       << static_cast<QAbstractItemModel *>(new QStandardItemModel());
+    QTest::newRow("Table Single Role") << createComplexModel(false, false, this)
+                                       << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
 #endif
 }

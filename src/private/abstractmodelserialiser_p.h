@@ -22,6 +22,7 @@ class AbstractModelSerialiserPrivate
     Q_DECLARE_PUBLIC(AbstractModelSerialiser)
 protected:
     AbstractModelSerialiserPrivate(AbstractModelSerialiser *q);
+    QDataStream::Version m_streamVersion;
     QList<int> m_rolesToSave;
     QAbstractItemModel *m_model;
     const QAbstractItemModel *m_constModel;

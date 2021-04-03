@@ -25,7 +25,7 @@ JsonModelSerialiserPrivate::JsonModelSerialiserPrivate(JsonModelSerialiser *q)
 
 bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject &source, const QModelIndex &parent)
 {
-    if (source.isEmpty())
+    if (source.isEmpty() || !m_model)
         return false;
     QJsonValue tempValue = source.value(QLatin1String("rows"));
     if (tempValue.isUndefined() || !tempValue.isDouble())
@@ -36,7 +36,8 @@ bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject &source, const
 #else
             static_cast<int>(tempValue.toDouble());
 #endif
-    if (!m_model->insertRows(0, maxRow, parent))
+    m_model->insertRows(0, maxRow, parent);
+    if(m_model->rowCount(parent)!=maxRow)
         return false;
     tempValue = source.value(QLatin1String("columns"));
     if (tempValue.isUndefined() || !tempValue.isDouble())
@@ -47,7 +48,8 @@ bool JsonModelSerialiserPrivate::fromJsonObject(const QJsonObject &source, const
 #else
             static_cast<int>(tempValue.toDouble());
 #endif
-    if (!m_model->insertColumns(0, maxCol, parent))
+    m_model->insertColumns(0, maxCol, parent);
+    if(m_model->columnCount(parent)!=maxCol)
         return false;
     if (!parent.isValid()) {
         for (auto orientat :
@@ -209,10 +211,10 @@ QJsonObject JsonModelSerialiserPrivate::objectForRole(int role, const QVariant &
 QJsonObject JsonModelSerialiserPrivate::toJsonObject(const QModelIndex &parent) const
 {
     QJsonObject result;
-    if (!m_model)
+    if (!m_constModel)
         return result;
-    const int maxRow = m_model->rowCount(parent);
-    const int maxCol = m_model->columnCount(parent);
+    const int maxRow = m_constModel->rowCount(parent);
+    const int maxCol = m_constModel->columnCount(parent);
     result[QLatin1String("rows")] = maxRow;
     result[QLatin1String("columns")] = maxCol;
     if (!parent.isValid()) {
@@ -221,7 +223,7 @@ QJsonObject JsonModelSerialiserPrivate::toJsonObject(const QModelIndex &parent) 
             QJsonObject headerObject;
             QJsonArray rolesArray;
             for (auto roleIter = m_rolesToSave.constBegin(); roleIter != m_rolesToSave.constEnd(); ++roleIter) {
-                const QVariant roleVariant = m_model->headerData(i, Qt::Vertical, *roleIter);
+                const QVariant roleVariant = m_constModel->headerData(i, Qt::Vertical, *roleIter);
                 if (roleVariant.isValid())
                     rolesArray.append(objectForRole(*roleIter, roleVariant));
             }
@@ -238,7 +240,7 @@ QJsonObject JsonModelSerialiserPrivate::toJsonObject(const QModelIndex &parent) 
             QJsonObject headerObject;
             QJsonArray rolesArray;
             for (auto roleIter = m_rolesToSave.constBegin(); roleIter != m_rolesToSave.constEnd(); ++roleIter) {
-                const QVariant roleVariant = m_model->headerData(i, Qt::Horizontal, *roleIter);
+                const QVariant roleVariant = m_constModel->headerData(i, Qt::Horizontal, *roleIter);
                 if (roleVariant.isValid())
                     rolesArray.append(objectForRole(*roleIter, roleVariant));
             }
@@ -257,7 +259,7 @@ QJsonObject JsonModelSerialiserPrivate::toJsonObject(const QModelIndex &parent) 
             QJsonObject dataObject;
             dataObject[QLatin1String("row")] = i;
             dataObject[QLatin1String("col")] = j;
-            const QModelIndex currIdx = m_model->index(i, j, parent);
+            const QModelIndex currIdx = m_constModel->index(i, j, parent);
             QJsonArray valuesArray;
             for (auto roleIter = m_rolesToSave.constBegin(); roleIter != m_rolesToSave.constEnd(); ++roleIter) {
                 const QVariant roleVariant = currIdx.data(*roleIter);
@@ -266,7 +268,7 @@ QJsonObject JsonModelSerialiserPrivate::toJsonObject(const QModelIndex &parent) 
             }
             if (!valuesArray.isEmpty())
                 dataObject[QLatin1String("values")] = valuesArray;
-            if (m_model->hasChildren(currIdx))
+            if (m_constModel->hasChildren(currIdx))
                 dataObject[QLatin1String("children")] = toJsonObject(currIdx);
             dataArray.append(dataObject);
         }
@@ -308,8 +310,10 @@ JsonModelSerialiser::JsonModelSerialiser(JsonModelSerialiserPrivate &d, QObject 
 */
 bool JsonModelSerialiser::saveModel(QString *destination) const
 {
+    if (!destination)
+        return false;
     Q_D(const JsonModelSerialiser);
-    if (!d->m_model || !destination)
+    if (!d->m_constModel)
         return false;
     const QJsonDocument jDoc(toJsonObject());
     if (jDoc.isNull())
@@ -323,6 +327,8 @@ bool JsonModelSerialiser::saveModel(QString *destination) const
 */
 bool JsonModelSerialiser::saveModel(QByteArray *destination) const
 {
+    if (!destination)
+        return false;
     QString tempString;
     if (!saveModel(&tempString))
         return false;
@@ -339,6 +345,8 @@ bool JsonModelSerialiser::saveModel(QByteArray *destination) const
 */
 bool JsonModelSerialiser::saveModel(QIODevice *destination) const
 {
+    if (!destination)
+        return false;
     QString tempString;
     if (!saveModel(&tempString))
         return false;

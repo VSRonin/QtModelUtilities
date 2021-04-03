@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.2)
 include(TestMacro)
-BasicTest(HtmlModelSerialiser)
-target_sources(tst_HtmlModelSerialiser PRIVATE
+BasicTest(JsonModelSerialiser)
+target_sources(tst_JsonModelSerialiser PRIVATE
     ../tst_SerialisersCommon/tst_serialiserscommon.h
     ../tst_SerialisersCommon/tst_serialiserscommon.cpp
 )
-target_include_directories(tst_HtmlModelSerialiser PRIVATE ../tst_SerialisersCommon/)
+target_include_directories(tst_JsonModelSerialiser PRIVATE ../tst_SerialisersCommon/)

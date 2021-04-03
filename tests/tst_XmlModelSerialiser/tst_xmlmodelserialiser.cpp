@@ -1,85 +1,93 @@
 #include <QtTest/QTest>
 #include "tst_xmlmodelserialiser.h"
-#include <../serialisers_common.hpp>
 #include <xmlmodelserialiser.h>
 #include <QByteArray>
-#include <QFile>
+#include <QTemporaryFile>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
-void tst_XmlModelSerialiser::basicSaveLoad()
+void tst_XmlModelSerialiser::basicSaveLoadByteArray()
 {
-    QFETCH(QAbstractItemModel *, sourceModel);
+    QFETCH(const QAbstractItemModel *, sourceModel);
     QFETCH(QAbstractItemModel *, destinationModel);
-    QByteArray dataArray;
-    XmlModelSerialiser serialiser(static_cast<const QAbstractItemModel *>(sourceModel));
-    serialiser.addRoleToSave(Qt::UserRole + 1);
-    QVERIFY(serialiser.saveModel(&dataArray));
-    serialiser.setModel(destinationModel);
-    QVERIFY(serialiser.loadModel(dataArray));
-    SerialiserCommon::modelEqual(sourceModel, destinationModel);
+    XmlModelSerialiser serialiser;
+    saveLoadByteArray(&serialiser,sourceModel,destinationModel,true);
+    destinationModel->deleteLater();
+}
 
-    QVERIFY(destinationModel->removeRows(0, destinationModel->rowCount()));
-    serialiser.setModel(static_cast<const QAbstractItemModel *>(sourceModel));
-    QFile serialisedXmlStream(QStringLiteral("Serialised Xml Stream ") + QTest::currentDataTag() + QStringLiteral(".xml"));
-    QVERIFY(serialisedXmlStream.open(QIODevice::WriteOnly));
+void tst_XmlModelSerialiser::basicSaveLoadFile()
+{
+    QFETCH(const QAbstractItemModel *, sourceModel);
+    QFETCH(QAbstractItemModel *, destinationModel);
+    XmlModelSerialiser serialiser;
+    saveLoadFile(&serialiser,sourceModel,destinationModel,true);
+    destinationModel->deleteLater();
+}
+
+void tst_XmlModelSerialiser::basicSaveLoadString()
+{
+    QFETCH(const QAbstractItemModel *, sourceModel);
+    QFETCH(QAbstractItemModel *, destinationModel);
+    XmlModelSerialiser serialiser;
+    saveLoadString(&serialiser,sourceModel,destinationModel,true);
+    destinationModel->deleteLater();
+}
+
+void tst_XmlModelSerialiser::basicSaveLoadStream()
+{
+    QFETCH(const QAbstractItemModel *, sourceModel);
+    QFETCH(QAbstractItemModel *, destinationModel);
+    XmlModelSerialiser serialiser(sourceModel);
+    serialiser.addRoleToSave(Qt::UserRole+1);
+    QTemporaryFile serialisedXmlStream;
+    QVERIFY(serialisedXmlStream.open());
     QXmlStreamWriter writeStream(&serialisedXmlStream);
     QVERIFY(serialiser.saveModel(writeStream));
-    serialisedXmlStream.close();
-    QVERIFY(serialisedXmlStream.open(QIODevice::ReadOnly));
+    QVERIFY(serialisedXmlStream.seek(0));
     QXmlStreamReader readStream(&serialisedXmlStream);
     serialiser.setModel(destinationModel);
     QVERIFY(serialiser.loadModel(readStream));
     serialisedXmlStream.close();
-    SerialiserCommon::modelEqual(sourceModel, destinationModel);
+    checkModelEqual(sourceModel, destinationModel);
+    destinationModel->deleteLater();
+}
 
-    QVERIFY(destinationModel->removeRows(0, destinationModel->rowCount()));
-    serialiser.setModel(static_cast<const QAbstractItemModel *>(sourceModel));
-    QFile serialisedXmlDevice(QStringLiteral("Serialised Xml Device ") + QTest::currentDataTag() + QStringLiteral(".xml"));
-    QVERIFY(serialisedXmlDevice.open(QIODevice::WriteOnly));
-    QVERIFY(serialiser.saveModel(&serialisedXmlDevice));
-    serialisedXmlDevice.close();
-    QVERIFY(serialisedXmlDevice.open(QIODevice::ReadOnly));
-    serialiser.setModel(destinationModel);
-    QVERIFY(serialiser.loadModel(&serialisedXmlDevice));
-    serialisedXmlDevice.close();
-    SerialiserCommon::modelEqual(sourceModel, destinationModel);
-
-    QVERIFY(destinationModel->removeRows(0, destinationModel->rowCount()));
-    serialiser.setModel(static_cast<const QAbstractItemModel *>(sourceModel));
-    QFile serialisedXmlNested(QStringLiteral("Serialised Xml Nested ") + QTest::currentDataTag() + QStringLiteral(".xml"));
-    QVERIFY(serialisedXmlNested.open(QIODevice::WriteOnly));
+void tst_XmlModelSerialiser::basicSaveLoadNested()
+{
+    QFETCH(const QAbstractItemModel *, sourceModel);
+    QFETCH(QAbstractItemModel *, destinationModel);
+    XmlModelSerialiser serialiser(sourceModel);
+    serialiser.addRoleToSave(Qt::UserRole+1);
+    QTemporaryFile serialisedXmlNested;
+    QVERIFY(serialisedXmlNested.open());
     QXmlStreamWriter writeNestedStream(&serialisedXmlNested);
     writeNestedStream.writeStartDocument();
     writeNestedStream.writeStartElement(QStringLiteral("NestForModel"));
     serialiser.setPrintStartDocument(false);
     QVERIFY(serialiser.saveModel(writeNestedStream));
     writeNestedStream.writeEndElement(); // NestForModel
-    serialisedXmlNested.close();
-    QVERIFY(serialisedXmlNested.open(QIODevice::ReadOnly));
+    QVERIFY(serialisedXmlNested.seek(0));
     QXmlStreamReader readNestedStream(&serialisedXmlNested);
     serialiser.setModel(destinationModel);
     QVERIFY(serialiser.loadModel(readNestedStream));
     serialisedXmlNested.close();
-    SerialiserCommon::modelEqual(sourceModel, destinationModel);
-
-    sourceModel->deleteLater();
+    checkModelEqual(sourceModel, destinationModel);
     destinationModel->deleteLater();
 }
 
-void tst_XmlModelSerialiser::basicSaveLoad_data()
+void tst_XmlModelSerialiser::basicSaveLoadData()
 {
-    QTest::addColumn<QAbstractItemModel *>("sourceModel");
+    QTest::addColumn<const QAbstractItemModel *>("sourceModel");
     QTest::addColumn<QAbstractItemModel *>("destinationModel");
-    QTest::newRow("List Single Role") << SerialiserCommon::createStringModel() << static_cast<QAbstractItemModel *>(new QStringListModel());
+    QTest::newRow("List Single Role") << createStringModel(this) << static_cast<QAbstractItemModel *>(new QStringListModel(this));
 #ifdef QT_GUI_LIB
-    QTest::newRow("Table Single Role") << SerialiserCommon::createComplexModel(false, false)
-                                       << static_cast<QAbstractItemModel *>(new QStandardItemModel());
-    QTest::newRow("Table Multi Roles") << SerialiserCommon::createComplexModel(false, true)
-                                       << static_cast<QAbstractItemModel *>(new QStandardItemModel());
-    QTest::newRow("Tree Single Role") << SerialiserCommon::createComplexModel(true, false)
-                                      << static_cast<QAbstractItemModel *>(new QStandardItemModel());
-    QTest::newRow("Tree Multi Roles") << SerialiserCommon::createComplexModel(true, true)
-                                      << static_cast<QAbstractItemModel *>(new QStandardItemModel());
+    QTest::newRow("Table Single Role") << createComplexModel(false, false,this)
+                                       << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
+    QTest::newRow("Table Multi Roles") << createComplexModel(false, true,this)
+                                       << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
+    QTest::newRow("Tree Single Role") << createComplexModel(true, false,this)
+                                      << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
+    QTest::newRow("Tree Multi Roles") << createComplexModel(true, true,this)
+                                      << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
 #endif
 }
