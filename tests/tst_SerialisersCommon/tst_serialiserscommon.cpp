@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <QtTest/QTest>
 void tst_SerialiserCommon::saveLoadByteArray(AbstractModelSerialiser *serialiser, const QAbstractItemModel *sourceModel,
-                                             QAbstractItemModel *destinationModel, bool multiRole) const
+                                             QAbstractItemModel *destinationModel, bool multiRole, bool checkHeaders) const
 {
     serialiser->setModel(sourceModel);
     if (multiRole)
@@ -14,11 +14,11 @@ void tst_SerialiserCommon::saveLoadByteArray(AbstractModelSerialiser *serialiser
     QVERIFY(serialiser->saveModel(&dataArray));
     serialiser->setModel(destinationModel);
     QVERIFY(serialiser->loadModel(dataArray));
-    checkModelEqual(sourceModel, destinationModel);
+    checkModelEqual(sourceModel, destinationModel,QModelIndex(),QModelIndex(),checkHeaders);
 }
 
 void tst_SerialiserCommon::saveLoadFile(AbstractModelSerialiser *serialiser, const QAbstractItemModel *sourceModel,
-                                        QAbstractItemModel *destinationModel, bool multiRole) const
+                                        QAbstractItemModel *destinationModel, bool multiRole, bool checkHeaders) const
 {
     serialiser->setModel(sourceModel);
     if (multiRole)
@@ -29,11 +29,11 @@ void tst_SerialiserCommon::saveLoadFile(AbstractModelSerialiser *serialiser, con
     QVERIFY(tempFile.seek(0));
     serialiser->setModel(destinationModel);
     QVERIFY(serialiser->loadModel(&tempFile));
-    checkModelEqual(sourceModel, destinationModel);
+    checkModelEqual(sourceModel, destinationModel,QModelIndex(),QModelIndex(),checkHeaders);
 }
 
 void tst_SerialiserCommon::saveLoadString(AbstractStringSerialiser *serialiser, const QAbstractItemModel *sourceModel,
-                                          QAbstractItemModel *destinationModel, bool multiRole) const
+                                          QAbstractItemModel *destinationModel, bool multiRole, bool checkHeaders) const
 {
     serialiser->setModel(sourceModel);
     if (multiRole)
@@ -42,11 +42,11 @@ void tst_SerialiserCommon::saveLoadString(AbstractStringSerialiser *serialiser, 
     QVERIFY(serialiser->saveModel(&dataString));
     serialiser->setModel(destinationModel);
     QVERIFY(serialiser->loadModel(dataString));
-    checkModelEqual(sourceModel, destinationModel);
+    checkModelEqual(sourceModel, destinationModel,QModelIndex(),QModelIndex(),checkHeaders);
 }
 
 void tst_SerialiserCommon::checkModelEqual(const QAbstractItemModel *a, const QAbstractItemModel *b, const QModelIndex &aParent,
-                                           const QModelIndex &bParent) const
+                                           const QModelIndex &bParent, bool checkHeaders) const
 {
     Q_ASSERT(a);
     Q_ASSERT(b);
@@ -58,7 +58,7 @@ void tst_SerialiserCommon::checkModelEqual(const QAbstractItemModel *a, const QA
     QCOMPARE(b->rowCount(bParent), rowC);
     const int colC = a->columnCount(aParent);
     QCOMPARE(b->columnCount(bParent), colC);
-    if (!aParentValid) {
+    if (!aParentValid && checkHeaders) {
         for (int i = 0; i < rowC; ++i) {
             QCOMPARE(a->headerData(i, Qt::Vertical), b->headerData(i, Qt::Vertical));
             QCOMPARE(a->headerData(i, Qt::Vertical, Qt::UserRole), b->headerData(i, Qt::Vertical, Qt::UserRole));
@@ -79,7 +79,7 @@ void tst_SerialiserCommon::checkModelEqual(const QAbstractItemModel *a, const QA
             const bool hasChildren = a->hasChildren(aIdx);
             QCOMPARE(b->hasChildren(bIdx), hasChildren);
             if (hasChildren) {
-                checkModelEqual(a, b, aIdx, bIdx);
+                checkModelEqual(a, b, aIdx, bIdx, checkHeaders);
             }
         }
     }
@@ -104,8 +104,8 @@ void tst_SerialiserCommon::insertBranch(QAbstractItemModel *model, const QModelI
     const std::uniform_int_distribution<int> colorDistribution(0, (sizeof(randomBrushes) / sizeof(randomBrushes[0])) - 1);
     const std::uniform_int_distribution<int> coulmnsDist(2,5);
     const std::uniform_int_distribution<int> rowsDist(3,6);
-    Q_ASSUME(model->insertColumns(0, 3, parent));
-    Q_ASSUME(model->insertRows(0, 5, parent));
+    Q_ASSUME(model->insertColumns(0, coulmnsDist(generator), parent));
+    Q_ASSUME(model->insertRows(0, rowsDist(generator), parent));
     const QString baseString = parent.isValid() ? (parent.data(Qt::EditRole).toString() + QStringLiteral("->")) : QString();
     for (int i = 0; i < model->rowCount(parent); ++i) {
         for (int j = 0; j < model->columnCount(parent); ++j) {
