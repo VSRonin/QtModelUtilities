@@ -32,6 +32,29 @@ void tst_JsonModelSerialiser::basicSaveLoadString()
     destinationModel->deleteLater();
 }
 
+void tst_JsonModelSerialiser::validateJsonOutput()
+{
+    QFETCH(const QAbstractItemModel *, sourceModel);
+    QByteArray modelData;
+    JsonModelSerialiser serialiser(sourceModel);
+    serialiser.saveModel(&modelData);
+    QJsonParseError parseErr;
+    QJsonDocument::fromJson(modelData,&parseErr);
+    QCOMPARE(parseErr.error, QJsonParseError::NoError);
+}
+
+void tst_JsonModelSerialiser::validateJsonOutput_data()
+{
+    QTest::addColumn<const QAbstractItemModel *>("sourceModel");
+    QTest::newRow("List Single Role") << static_cast<const QAbstractItemModel *>(createStringModel(this));
+#ifdef QT_GUI_LIB
+    QTest::newRow("Table Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, this));
+    QTest::newRow("Table Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(false, true, this));
+    QTest::newRow("Tree Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(true, false, this));
+    QTest::newRow("Tree Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(true, true, this));
+#endif
+}
+
 void tst_JsonModelSerialiser::basicSaveLoadObject()
 {
     QFETCH(const QAbstractItemModel *, sourceModel);

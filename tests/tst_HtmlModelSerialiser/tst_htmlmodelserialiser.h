@@ -3,10 +3,12 @@
 #include <QObject>
 #include <tst_serialiserscommon.h>
 class QAbstractItemModel;
+class QNetworkAccessManager;
 class tst_HtmlModelSerialiser : public QObject, public tst_SerialiserCommon
 {
     Q_OBJECT
 private Q_SLOTS:
+    void initTestCase();
     void basicSaveLoadByteArray();
     void basicSaveLoadFile();
     void basicSaveLoadString();
@@ -15,5 +17,9 @@ private Q_SLOTS:
     void basicSaveLoadFile_data() { basicSaveLoadData(this); }
     void basicSaveLoadString_data() { basicSaveLoadData(this); }
     void basicSaveLoadNested_data() { basicSaveLoadData(this); }
+    void validateHtmlOutput();
+    void validateHtmlOutput_data();
+protected:
+    QNetworkAccessManager* qnam;
 };
 #endif

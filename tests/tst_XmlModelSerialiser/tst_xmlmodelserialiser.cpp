@@ -75,4 +75,26 @@ void tst_XmlModelSerialiser::basicSaveLoadNested()
     destinationModel->deleteLater();
 }
 
+void tst_XmlModelSerialiser::validateXmlOutput()
+{
+    QFETCH(const QAbstractItemModel *, sourceModel);
+    QByteArray modelData;
+    XmlModelSerialiser serialiser(sourceModel);
+    serialiser.saveModel(&modelData);
+    QXmlStreamReader xmlReader(modelData);
+    while (!xmlReader.atEnd())
+        xmlReader.readNext();
+    QVERIFY(!xmlReader.hasError());
+}
 
+void tst_XmlModelSerialiser::validateXmlOutput_data()
+{
+    QTest::addColumn<const QAbstractItemModel *>("sourceModel");
+    QTest::newRow("List Single Role") << static_cast<const QAbstractItemModel *>(createStringModel(this));
+#ifdef QT_GUI_LIB
+    QTest::newRow("Table Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, this));
+    QTest::newRow("Table Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(false, true, this));
+    QTest::newRow("Tree Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(true, false, this));
+    QTest::newRow("Tree Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(true, true, this));
+#endif
+}

@@ -15,5 +15,7 @@ private Q_SLOTS:
     void basicSaveLoadFile_data() { basicSaveLoadData(this); }
     void basicSaveLoadObject_data() { basicSaveLoadData(this); }
     void basicSaveLoadString_data() { basicSaveLoadData(this); }
+    void validateJsonOutput();
+    void validateJsonOutput_data();
 };
 #endif

@@ -36,6 +36,6 @@ private Q_SLOTS:
     void basicSaveLoadStreamCustomSeparator_data() { basicSaveLoadData(); }
 
 protected:
-    void basicSaveLoadData(QObject* parent = nullptr) override;
+    void basicSaveLoadData(QObject *parent = nullptr) override;
 };
 #endif

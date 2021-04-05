@@ -17,5 +17,7 @@ private Q_SLOTS:
     void basicSaveLoadString_data() { basicSaveLoadData(this); }
     void basicSaveLoadNested_data() { basicSaveLoadData(this); }
     void basicSaveLoadStream_data() { basicSaveLoadData(this); }
+    void validateXmlOutput();
+    void validateXmlOutput_data();
 };
 #endif

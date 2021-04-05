@@ -14,7 +14,7 @@ void tst_SerialiserCommon::saveLoadByteArray(AbstractModelSerialiser *serialiser
     QVERIFY(serialiser->saveModel(&dataArray));
     serialiser->setModel(destinationModel);
     QVERIFY(serialiser->loadModel(dataArray));
-    checkModelEqual(sourceModel, destinationModel,QModelIndex(),QModelIndex(),checkHeaders);
+    checkModelEqual(sourceModel, destinationModel, QModelIndex(), QModelIndex(), checkHeaders);
 }
 
 void tst_SerialiserCommon::saveLoadFile(AbstractModelSerialiser *serialiser, const QAbstractItemModel *sourceModel,
@@ -29,7 +29,7 @@ void tst_SerialiserCommon::saveLoadFile(AbstractModelSerialiser *serialiser, con
     QVERIFY(tempFile.seek(0));
     serialiser->setModel(destinationModel);
     QVERIFY(serialiser->loadModel(&tempFile));
-    checkModelEqual(sourceModel, destinationModel,QModelIndex(),QModelIndex(),checkHeaders);
+    checkModelEqual(sourceModel, destinationModel, QModelIndex(), QModelIndex(), checkHeaders);
 }
 
 void tst_SerialiserCommon::saveLoadString(AbstractStringSerialiser *serialiser, const QAbstractItemModel *sourceModel,
@@ -42,7 +42,7 @@ void tst_SerialiserCommon::saveLoadString(AbstractStringSerialiser *serialiser, 
     QVERIFY(serialiser->saveModel(&dataString));
     serialiser->setModel(destinationModel);
     QVERIFY(serialiser->loadModel(dataString));
-    checkModelEqual(sourceModel, destinationModel,QModelIndex(),QModelIndex(),checkHeaders);
+    checkModelEqual(sourceModel, destinationModel, QModelIndex(), QModelIndex(), checkHeaders);
 }
 
 void tst_SerialiserCommon::checkModelEqual(const QAbstractItemModel *a, const QAbstractItemModel *b, const QModelIndex &aParent,
@@ -87,23 +87,23 @@ void tst_SerialiserCommon::checkModelEqual(const QAbstractItemModel *a, const QA
 
 QAbstractItemModel *tst_SerialiserCommon::createStringModel(QObject *parent)
 {
-    const std::uniform_int_distribution<int> rowsDist(20,50);
-    const std::uniform_int_distribution<int> itemsDist(0,1000);
+    std::uniform_int_distribution<int> rowsDist(20, 50);
+    std::uniform_int_distribution<int> itemsDist(0, 1000);
 
     QStringList itmesList;
-    for(int i=rowsDist(generator);i>0;--i)
-        itmesList.append(QStringLiteral("Item ")+QString::number(itemsDist(generator)));
+    for (int i = rowsDist(generator); i > 0; --i)
+        itmesList.append(QStringLiteral("Item ") + QString::number(itemsDist(generator)));
     return new QStringListModel(itmesList, parent);
 }
-
+#ifdef QT_GUI_LIB
 void tst_SerialiserCommon::insertBranch(QAbstractItemModel *model, const QModelIndex &parent, bool multiRoles, int subBranches)
 {
     Q_ASSERT(model);
     Q_ASSERT(!parent.isValid() || parent.model() == model);
     const QBrush randomBrushes[] = {QBrush(Qt::red), QBrush(Qt::blue), QBrush(Qt::green), QBrush(Qt::yellow), QBrush(Qt::magenta), QBrush(Qt::cyan)};
-    const std::uniform_int_distribution<int> colorDistribution(0, (sizeof(randomBrushes) / sizeof(randomBrushes[0])) - 1);
-    const std::uniform_int_distribution<int> coulmnsDist(2,5);
-    const std::uniform_int_distribution<int> rowsDist(3,6);
+    std::uniform_int_distribution<int> colorDistribution(0, (sizeof(randomBrushes) / sizeof(randomBrushes[0])) - 1);
+    std::uniform_int_distribution<int> coulmnsDist(2, 5);
+    std::uniform_int_distribution<int> rowsDist(3, 6);
     Q_ASSUME(model->insertColumns(0, coulmnsDist(generator), parent));
     Q_ASSUME(model->insertRows(0, rowsDist(generator), parent));
     const QString baseString = parent.isValid() ? (parent.data(Qt::EditRole).toString() + QStringLiteral("->")) : QString();
@@ -139,21 +139,30 @@ QAbstractItemModel *tst_SerialiserCommon::createComplexModel(bool tree, bool mul
     }
     return result;
 }
-
-void tst_SerialiserCommon::basicSaveLoadData(QObject* parent)
+#endif
+void tst_SerialiserCommon::basicSaveLoadData(QObject *parent)
 {
     QTest::addColumn<const QAbstractItemModel *>("sourceModel");
     QTest::addColumn<QAbstractItemModel *>("destinationModel");
-    QTest::newRow("List Single Role") << static_cast<const QAbstractItemModel *>(createStringModel(parent)) << static_cast<QAbstractItemModel *>(new QStringListModel(parent));
+    QTest::newRow("List Single Role") << static_cast<const QAbstractItemModel *>(createStringModel(parent))
+                                      << static_cast<QAbstractItemModel *>(new QStringListModel(parent));
     QTest::newRow("List Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createStringModel(parent)) << createStringModel(parent);
 #ifdef QT_GUI_LIB
-    QTest::newRow("Table Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, parent)) << static_cast<QAbstractItemModel *>(new QStandardItemModel(parent));
-    QTest::newRow("Table Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(false, true, parent)) << static_cast<QAbstractItemModel *>(new QStandardItemModel(parent));
-    QTest::newRow("Table Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, parent)) << createComplexModel(false, false, parent);
-    QTest::newRow("Table Multi Roles Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(false, true, parent)) << createComplexModel(false, true, parent);
-    QTest::newRow("Tree Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(true, false, parent)) << static_cast<QAbstractItemModel *>(new QStandardItemModel(parent));
-    QTest::newRow("Tree Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(true, true, parent)) << static_cast<QAbstractItemModel *>(new QStandardItemModel(parent));
-    QTest::newRow("Tree Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(true, false, parent)) << createComplexModel(true, false, parent);
-    QTest::newRow("Tree Multi Roles Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(true, true, parent)) << createComplexModel(true, true, parent);
+    QTest::newRow("Table Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, parent))
+                                       << static_cast<QAbstractItemModel *>(new QStandardItemModel(parent));
+    QTest::newRow("Table Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(false, true, parent))
+                                       << static_cast<QAbstractItemModel *>(new QStandardItemModel(parent));
+    QTest::newRow("Table Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, parent))
+                                                 << createComplexModel(false, false, parent);
+    QTest::newRow("Table Multi Roles Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(false, true, parent))
+                                                 << createComplexModel(false, true, parent);
+    QTest::newRow("Tree Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(true, false, parent))
+                                      << static_cast<QAbstractItemModel *>(new QStandardItemModel(parent));
+    QTest::newRow("Tree Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(true, true, parent))
+                                      << static_cast<QAbstractItemModel *>(new QStandardItemModel(parent));
+    QTest::newRow("Tree Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(true, false, parent))
+                                                << createComplexModel(true, false, parent);
+    QTest::newRow("Tree Multi Roles Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(true, true, parent))
+                                                << createComplexModel(true, true, parent);
 #endif
 }

@@ -51,7 +51,6 @@ void tst_CsvModelSerialiser::basicSaveLoadStream()
     destinationModel->deleteLater();
 }
 
-
 void tst_CsvModelSerialiser::basicSaveLoadByteArrayNoHeader()
 {
     QFETCH(const QAbstractItemModel *, sourceModel);
@@ -59,7 +58,7 @@ void tst_CsvModelSerialiser::basicSaveLoadByteArrayNoHeader()
     CsvModelSerialiser serialiser;
     serialiser.setFirstColumnIsHeader(false);
     serialiser.setFirstRowIsHeader(false);
-    saveLoadByteArray(&serialiser, sourceModel, destinationModel, false,false);
+    saveLoadByteArray(&serialiser, sourceModel, destinationModel, false, false);
     destinationModel->deleteLater();
 }
 
@@ -70,7 +69,7 @@ void tst_CsvModelSerialiser::basicSaveLoadFileNoHeader()
     CsvModelSerialiser serialiser;
     serialiser.setFirstColumnIsHeader(false);
     serialiser.setFirstRowIsHeader(false);
-    saveLoadFile(&serialiser, sourceModel, destinationModel, false,false);
+    saveLoadFile(&serialiser, sourceModel, destinationModel, false, false);
     destinationModel->deleteLater();
 }
 
@@ -81,7 +80,7 @@ void tst_CsvModelSerialiser::basicSaveLoadStringNoHeader()
     CsvModelSerialiser serialiser;
     serialiser.setFirstColumnIsHeader(false);
     serialiser.setFirstRowIsHeader(false);
-    saveLoadString(&serialiser, sourceModel, destinationModel, false,false);
+    saveLoadString(&serialiser, sourceModel, destinationModel, false, false);
     destinationModel->deleteLater();
 }
 
@@ -102,7 +101,7 @@ void tst_CsvModelSerialiser::basicSaveLoadStreamNoHeader()
     QTextStream readStream(&serialisedCsvStream);
     serialiser.setModel(destinationModel);
     QVERIFY(serialiser.loadModel(readStream));
-    checkModelEqual(sourceModel, destinationModel,QModelIndex(),QModelIndex(),false);
+    checkModelEqual(sourceModel, destinationModel, QModelIndex(), QModelIndex(), false);
     destinationModel->deleteLater();
 }
 
@@ -156,15 +155,18 @@ void tst_CsvModelSerialiser::basicSaveLoadStreamCustomSeparator()
     destinationModel->deleteLater();
 }
 
-void tst_CsvModelSerialiser::basicSaveLoadData(QObject* parent)
+void tst_CsvModelSerialiser::basicSaveLoadData(QObject *parent)
 {
     Q_UNUSED(parent)
     QTest::addColumn<const QAbstractItemModel *>("sourceModel");
     QTest::addColumn<QAbstractItemModel *>("destinationModel");
-    QTest::newRow("List Single Role") << static_cast<const QAbstractItemModel *>(createStringModel(this)) << static_cast<QAbstractItemModel *>(new QStringListModel(this));
+    QTest::newRow("List Single Role") << static_cast<const QAbstractItemModel *>(createStringModel(this))
+                                      << static_cast<QAbstractItemModel *>(new QStringListModel(this));
     QTest::newRow("List Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createStringModel(this)) << createStringModel(this);
 #ifdef QT_GUI_LIB
-    QTest::newRow("Table Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, this)) << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
-    QTest::newRow("Table Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, this)) << createComplexModel(false, false, this);
+    QTest::newRow("Table Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, this))
+                                       << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
+    QTest::newRow("Table Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, this))
+                                                 << createComplexModel(false, false, this);
 #endif
 }
