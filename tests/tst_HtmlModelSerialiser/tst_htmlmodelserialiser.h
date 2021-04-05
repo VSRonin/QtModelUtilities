@@ -19,7 +19,8 @@ private Q_SLOTS:
     void basicSaveLoadNested_data() { basicSaveLoadData(this); }
     void validateHtmlOutput();
     void validateHtmlOutput_data();
+
 protected:
-    QNetworkAccessManager* qnam;
+    QNetworkAccessManager *qnam;
 };
 #endif

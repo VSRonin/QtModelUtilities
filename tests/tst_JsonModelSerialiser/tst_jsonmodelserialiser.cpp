@@ -39,7 +39,7 @@ void tst_JsonModelSerialiser::validateJsonOutput()
     JsonModelSerialiser serialiser(sourceModel);
     serialiser.saveModel(&modelData);
     QJsonParseError parseErr;
-    QJsonDocument::fromJson(modelData,&parseErr);
+    QJsonDocument::fromJson(modelData, &parseErr);
     QCOMPARE(parseErr.error, QJsonParseError::NoError);
 }
 
