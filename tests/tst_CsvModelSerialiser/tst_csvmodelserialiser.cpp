@@ -51,12 +51,15 @@ void tst_CsvModelSerialiser::basicSaveLoadStream()
     destinationModel->deleteLater();
 }
 
-void tst_CsvModelSerialiser::basicSaveLoadData()
+void tst_CsvModelSerialiser::basicSaveLoadData(QObject* parent)
 {
+    Q_UNUSED(parent)
     QTest::addColumn<const QAbstractItemModel *>("sourceModel");
     QTest::addColumn<QAbstractItemModel *>("destinationModel");
-    QTest::newRow("List Single Role") << createStringModel(this) << static_cast<QAbstractItemModel *>(new QStringListModel(this));
+    QTest::newRow("List Single Role") << static_cast<const QAbstractItemModel *>(createStringModel(this)) << static_cast<QAbstractItemModel *>(new QStringListModel(this));
+    QTest::newRow("List Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createStringModel(parent)) << createStringModel(parent);
 #ifdef QT_GUI_LIB
-    QTest::newRow("Table Single Role") << createComplexModel(false, false, this) << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
+    QTest::newRow("Table Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, this)) << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
+    QTest::newRow("Table Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, parent)) << createComplexModel(false, false, parent);
 #endif
 }

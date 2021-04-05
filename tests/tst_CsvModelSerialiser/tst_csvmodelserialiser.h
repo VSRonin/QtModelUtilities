@@ -17,6 +17,6 @@ private Q_SLOTS:
     void basicSaveLoadStream_data() { basicSaveLoadData(); }
 
 protected:
-    void basicSaveLoadData();
+    void basicSaveLoadData(QObject* parent = nullptr) override;
 };
 #endif

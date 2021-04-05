@@ -10,11 +10,8 @@ private Q_SLOTS:
     void basicSaveLoadByteArray();
     void basicSaveLoadFile();
     void basicSaveLoadStream();
-    void basicSaveLoadByteArray_data() { basicSaveLoadData(); }
-    void basicSaveLoadFile_data() { basicSaveLoadData(); }
-    void basicSaveLoadStream_data() { basicSaveLoadData(); }
-
-protected:
-    void basicSaveLoadData();
+    void basicSaveLoadByteArray_data() { basicSaveLoadData(this); }
+    void basicSaveLoadFile_data() { basicSaveLoadData(this); }
+    void basicSaveLoadStream_data() { basicSaveLoadData(this); }
 };
 #endif

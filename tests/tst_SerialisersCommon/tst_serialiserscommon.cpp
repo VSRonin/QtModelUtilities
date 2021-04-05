@@ -3,7 +3,6 @@
 #include <abstractstringserialiser.h>
 #include <QTemporaryFile>
 #include <algorithm>
-#include <random>
 #include <QtTest/QTest>
 void tst_SerialiserCommon::saveLoadByteArray(AbstractModelSerialiser *serialiser, const QAbstractItemModel *sourceModel,
                                              QAbstractItemModel *destinationModel, bool multiRole) const
@@ -86,57 +85,35 @@ void tst_SerialiserCommon::checkModelEqual(const QAbstractItemModel *a, const QA
     }
 }
 
-const QAbstractItemModel *tst_SerialiserCommon::createStringModel(QObject *parent) const
+QAbstractItemModel *tst_SerialiserCommon::createStringModel(QObject *parent)
 {
-    QStringList euStates{QStringLiteral("Austria"),
-                         QStringLiteral("Belgium"),
-                         QStringLiteral("Bulgaria"),
-                         QStringLiteral("Croatia"),
-                         QStringLiteral("Republic of Cyprus"),
-                         QStringLiteral("Czech Republic"),
-                         QStringLiteral("Denmark"),
-                         QStringLiteral("Estonia"),
-                         QStringLiteral("Finland"),
-                         QStringLiteral("France"),
-                         QStringLiteral("Germany"),
-                         QStringLiteral("Greece"),
-                         QStringLiteral("Hungary"),
-                         QStringLiteral("Ireland"),
-                         QStringLiteral("Italy"),
-                         QStringLiteral("Latvia"),
-                         QStringLiteral("Lithuania"),
-                         QStringLiteral("Luxembourg"),
-                         QStringLiteral("Malta"),
-                         QStringLiteral("Netherlands"),
-                         QStringLiteral("Poland"),
-                         QStringLiteral("Portugal"),
-                         QStringLiteral("Romania"),
-                         QStringLiteral("Slovakia"),
-                         QStringLiteral("Slovenia"),
-                         QStringLiteral("Spain"),
-                         QStringLiteral("Sweden")};
-    std::default_random_engine generator;
-    std::shuffle(euStates.begin(), euStates.end(), generator);
-    return new QStringListModel(euStates, parent);
+    const std::uniform_int_distribution<int> rowsDist(20,50);
+    const std::uniform_int_distribution<int> itemsDist(0,1000);
+
+    QStringList itmesList;
+    for(int i=rowsDist(generator);i>0;--i)
+        itmesList.append(QStringLiteral("Item ")+QString::number(itemsDist(generator)));
+    return new QStringListModel(itmesList, parent);
 }
 
-void tst_SerialiserCommon::insertBranch(QAbstractItemModel *model, const QModelIndex &parent, bool multiRoles, int subBranches) const
+void tst_SerialiserCommon::insertBranch(QAbstractItemModel *model, const QModelIndex &parent, bool multiRoles, int subBranches)
 {
     Q_ASSERT(model);
     Q_ASSERT(!parent.isValid() || parent.model() == model);
     const QBrush randomBrushes[] = {QBrush(Qt::red), QBrush(Qt::blue), QBrush(Qt::green), QBrush(Qt::yellow), QBrush(Qt::magenta), QBrush(Qt::cyan)};
-    std::default_random_engine generator;
-    std::uniform_int_distribution<int> distribution(0, (sizeof(randomBrushes) / sizeof(randomBrushes[0])) - 1);
-    model->insertColumns(0, 3, parent);
-    model->insertRows(0, 4, parent);
+    const std::uniform_int_distribution<int> colorDistribution(0, (sizeof(randomBrushes) / sizeof(randomBrushes[0])) - 1);
+    const std::uniform_int_distribution<int> coulmnsDist(2,5);
+    const std::uniform_int_distribution<int> rowsDist(3,6);
+    Q_ASSUME(model->insertColumns(0, 3, parent));
+    Q_ASSUME(model->insertRows(0, 5, parent));
     const QString baseString = parent.isValid() ? (parent.data(Qt::EditRole).toString() + QStringLiteral("->")) : QString();
     for (int i = 0; i < model->rowCount(parent); ++i) {
         for (int j = 0; j < model->columnCount(parent); ++j) {
             const QModelIndex idx = model->index(i, j, parent);
-            model->setData(idx, baseString + QStringLiteral("%1,%2[%3]").arg(i).arg(j).arg(distribution(generator)), Qt::EditRole);
+            model->setData(idx, baseString + QStringLiteral("%1,%2[%3]").arg(i).arg(j).arg(colorDistribution(generator)), Qt::EditRole);
             if (multiRoles) {
-                model->setData(idx, randomBrushes[distribution(generator)], Qt::BackgroundRole);
-                model->setData(idx, randomBrushes[distribution(generator)], Qt::ForegroundRole);
+                model->setData(idx, randomBrushes[colorDistribution(generator)], Qt::BackgroundRole);
+                model->setData(idx, randomBrushes[colorDistribution(generator)], Qt::ForegroundRole);
                 model->setData(idx, i, Qt::UserRole);
                 model->setData(idx, j, Qt::UserRole + 1);
             }
@@ -146,7 +123,7 @@ void tst_SerialiserCommon::insertBranch(QAbstractItemModel *model, const QModelI
     }
 }
 
-const QAbstractItemModel *tst_SerialiserCommon::createComplexModel(bool tree, bool multiRoles, QObject *parent) const
+QAbstractItemModel *tst_SerialiserCommon::createComplexModel(bool tree, bool multiRoles, QObject *parent)
 {
     QStandardItemModel *result = new QStandardItemModel(parent);
     insertBranch(result, QModelIndex(), multiRoles, tree ? 2 : 0);
@@ -161,4 +138,22 @@ const QAbstractItemModel *tst_SerialiserCommon::createComplexModel(bool tree, bo
             result->setHeaderData(i, Qt::Horizontal, i, Qt::UserRole);
     }
     return result;
+}
+
+void tst_SerialiserCommon::basicSaveLoadData(QObject* parent)
+{
+    QTest::addColumn<const QAbstractItemModel *>("sourceModel");
+    QTest::addColumn<QAbstractItemModel *>("destinationModel");
+    QTest::newRow("List Single Role") << static_cast<const QAbstractItemModel *>(createStringModel(parent)) << static_cast<QAbstractItemModel *>(new QStringListModel(parent));
+    QTest::newRow("List Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createStringModel(parent)) << createStringModel(parent);
+#ifdef QT_GUI_LIB
+    QTest::newRow("Table Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, parent)) << static_cast<QAbstractItemModel *>(new QStandardItemModel(parent));
+    QTest::newRow("Table Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(false, true, parent)) << static_cast<QAbstractItemModel *>(new QStandardItemModel(parent));
+    QTest::newRow("Table Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, parent)) << createComplexModel(false, false, parent);
+    QTest::newRow("Table Multi Roles Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(false, true, parent)) << createComplexModel(false, true, parent);
+    QTest::newRow("Tree Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(true, false, parent)) << static_cast<QAbstractItemModel *>(new QStandardItemModel(parent));
+    QTest::newRow("Tree Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(true, true, parent)) << static_cast<QAbstractItemModel *>(new QStandardItemModel(parent));
+    QTest::newRow("Tree Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(true, false, parent)) << createComplexModel(true, false, parent);
+    QTest::newRow("Tree Multi Roles Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(true, true, parent)) << createComplexModel(true, true, parent);
+#endif
 }
