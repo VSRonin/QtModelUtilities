@@ -26,15 +26,11 @@ on:
       - 'LICENSE'
 jobs:
     build:
-        name: Latest Ubuntu Build
+        name: Ubuntu LTS Build
         runs-on: ubuntu-latest
         strategy:
           matrix:
               qt_ver: [5.9.9,5.12.10]
-              static_lib: [OFF,ON]
-              no_widgets: [OFF,ON]
-              no_gui: [OFF,ON]
-              many_roles: [OFF,ON]
         steps:
           - name: Install Dependencies
             run: |
@@ -52,10 +48,10 @@ jobs:
           - name: Create Build Directory
             run: |
               mkdir build
-          - name: Debug Build Qt ${{ matrix.qt_ver }} Static:${{ matrix.static_lib }} No Gui:${{ matrix.no_gui }} No Widgets:${{ matrix.no_widgets }} Many Roles:${{ matrix.many_roles }}
+          - name: Debug Build Qt ${{ matrix.qt_ver }}
             run: |
               cd build
-              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=OFF -DBUILD_STATIC_LIBS=${{ matrix.static_lib }} -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=${{ matrix.no_widgets }} -DNO_GUI=${{ matrix.no_gui }} -DOPTIMISE_FOR_MANY_ROLES=${{ matrix.many_roles }} ../
+              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" ../
               cmake --build .
               cmake --build . --target install
           - name: Test Debug
@@ -63,10 +59,10 @@ jobs:
             with:
               working-directory: ./build
               run: ctest --verbose
-          - name: Release Build Qt ${{ matrix.qt_ver }} Static:${{ matrix.static_lib }} No Gui:${{ matrix.no_gui }} No Widgets:${{ matrix.no_widgets }} Many Roles:${{ matrix.many_roles }}
+          - name: Release Build Qt ${{ matrix.qt_ver }}
             run: |
               cd build
-              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=${{ matrix.static_lib }} -DCMAKE_INSTALL_PREFIX="./installed" -DNO_WIDGETS=${{ matrix.no_widgets }} -DNO_GUI=${{ matrix.no_gui }} -DOPTIMISE_FOR_MANY_ROLES=${{ matrix.many_roles }} ../
+              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" ../
               cmake --build .
               cmake --build . --target install
           - name: Test Release

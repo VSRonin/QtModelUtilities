@@ -5,10 +5,10 @@ This library is a collection of utilities for Qt's Model/View framework.
 ### Status
 | **CI** | **master** | **dev** |
 |--------|------------|---------|
-| [Windows](https://ci.appveyor.com/project/VSRonin/qtmodelutilities) | ![Appveyor Build status](https://ci.appveyor.com/api/projects/status/3x8h2laxlbh9wc7c/branch/master?svg=true) | ![Appveyor Build status](https://ci.appveyor.com/api/projects/status/3x8h2laxlbh9wc7c/branch/dev?svg=true)|
-| [Ubuntu](https://github.com/VSRonin/QtModelUtilities/actions/workflows/ubuntu.yml) | ![Ubuntu Build Status](https://github.com/VSRonin/QtModelUtilities/actions/workflows/ubuntu.yml/badge.svg?branch=master) | ![Ubuntu Build Status](https://github.com/VSRonin/QtModelUtilities/actions/workflows/ubuntu.yml/badge.svg?branch=dev) |
-| [MacOS](https://github.com/VSRonin/QtModelUtilities/actions/workflows/macos.yml) | ![MacOS Build Status](https://github.com/VSRonin/QtModelUtilities/actions/workflows/macos.yml/badge.svg?branch=master) | ![MacOS Build Status](https://github.com/VSRonin/QtModelUtilities/actions/workflows/macos.yml/badge.svg?branch=dev) |
-| [Ubuntu Qt 5.1](https://travis-ci.org/VSRonin/QtModelUtilities) | ![Ubuntu Qt 5.1 Build Status](https://travis-ci.org/VSRonin/QtModelUtilities.svg?branch=master) | ![Ubuntu Qt 5.1 Build Status](https://travis-ci.org/VSRonin/QtModelUtilities.svg?branch=dev) |
+| [Windows](https://ci.appveyor.com/project/VSRonin/qtmodelutilities) | ![Appveyor Build status](https://ci.appveyor.com/api/projects/status/3x8h2laxlbh9wc7c/branch/master?svg=true)|
+| [Ubuntu](https://github.com/VSRonin/QtModelUtilities/actions/workflows/ubuntu.yml) | ![Ubuntu Build Status](https://github.com/VSRonin/QtModelUtilities/actions/workflows/ubuntu.yml/badge.svg?branch=master) |
+| [MacOS](https://github.com/VSRonin/QtModelUtilities/actions/workflows/macos.yml) | ![MacOS Build Status](https://github.com/VSRonin/QtModelUtilities/actions/workflows/macos.yml/badge.svg?branch=master) |
+| [Ubuntu Qt 5.1](https://travis-ci.org/VSRonin/QtModelUtilities) | ![Ubuntu Qt 5.1 Build Status](https://travis-ci.org/VSRonin/QtModelUtilities.svg?branch=master) |
 
 ### Contents
 
@@ -20,14 +20,11 @@ This library is a collection of utilities for Qt's Model/View framework.
 ### Installation
 
 #### Official Binary Release
-If your system is compatible with one of the 5 main platforms you can download the pre-compiled dinamically linked library from [the releases page](https://github.com/VSRonin/QtModelUtilities/releases).
+If your system is compatible with one of the main platforms you can download the pre-compiled dinamically linked library from [the releases page](https://github.com/VSRonin/QtModelUtilities/releases).
 
 #### Build from Source
 This library uses [CMake](https://cmake.org/) as build system and allows usage both using static and dynamic linking. 
 See [INSTALL](https://vsronin.github.io/QtModelUtilities/md__i_n_s_t_a_l_l.html) for detailed build instructions.
-
-#### Use the source directly
-If you use `qmake` (Qt Creator), you can include the entire source of the library directly in your code by adding `include(path/to/source/modelutilities.pri)` in your `.pro` file.
 
 ### Platforms
 
@@ -35,14 +32,18 @@ The library should be compatible with all platform supported by Qt, the CI will 
 
 + Windows MSVC 2019 64bit Qt 5.15
 + Windows MSVC 2019 64bit Qt 6.0
-+ Ubuntu 64bit Qt 5.15
-+ Ubuntu 64bit Qt 6.0
-+ Mac OS X 64bit Qt 5.15
-+ Mac OS X 64bit Qt 6.0
++ Windows MinGW 8.1 64bit Qt 5.15
++ Windows MinGW 8.1 64bit Qt 6.0
++ Ubuntu g++ 64bit Qt 5.15
++ Ubuntu g++ 64bit Qt 6.0
++ Mac OS X Clang 64bit Qt 5.15
++ Mac OS X Clang64bit Qt 6.0
 
 A reduced suite of tests, to ensure compatibility, is also run on:
 
 + Ubuntu Trusty gcc 6 64bit Qt 5.1
++ Ubuntu g++ 64bit Qt 5.12
++ Ubuntu g++ 64bit Qt 5.9
 
 ### Examples
 

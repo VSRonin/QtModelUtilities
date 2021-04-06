@@ -1,0 +1,166 @@
+name: Releases
+on: 
+  push:
+    tags:
+      - "*"
+jobs:
+    releasemac:
+        name: MacOS Releases
+        runs-on: macos-latest
+        strategy:
+          max-parallel: 1
+          matrix:
+              qt_ver: [5.15.2,6.0.2]
+        steps:
+          - name: Install Qt
+            uses: jurplel/install-qt-action@v2
+            with:
+              version: ${{ matrix.qt_ver }}
+          - uses: actions/checkout@v2
+          - name: Create Build Directory
+            run: |
+              mkdir build
+          - name: Debug MacOS Qt ${{ matrix.qt_ver }}
+            run: |
+              cd build
+              mkdir shared-Debug
+              cd shared-Debug
+              cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=_debug -DCMAKE_INSTALL_PREFIX="./installed" ../../
+              cmake --build .
+          - name: Release MacOS Qt ${{ matrix.qt_ver }}
+            run: |
+              cd build
+              mkdir shared-Release
+              cd shared-Release
+              cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX="./installed" ../../
+              cmake --build .
+          - name: Create Package
+            run: |
+              cd build
+              cpack -G ZIP --config ../cmake/modules/package.cmake
+          - uses: ncipollo/release-action@v1
+            with:
+              artifacts: "build/QtModelUtilities*.zip"
+              token: ${{ secrets.GITHUB_TOKEN }}
+              allowUpdates: true
+              artifactErrorsFailBuild: true
+    releaseubuntu:
+        name: Ubuntu Releases
+        runs-on: ubuntu-latest
+        strategy:
+          max-parallel: 1
+          matrix:
+              qt_ver: [5.15.2,6.0.2]
+        steps:
+          - name: Install Dependencies
+            run: |
+               sudo apt-get update -y
+               sudo apt-get install libxcb-icccm4 libxcb-xkb1 libxcb-icccm4 libxcb-image0 libxcb-render-util0 libxcb-randr0 libxcb-keysyms1 libxcb-xinerama0 libxcb-xinput-dev
+          - name: Install Qt
+            uses: jurplel/install-qt-action@v2
+            with:
+              version: ${{ matrix.qt_ver }}
+          - uses: actions/checkout@v2
+          - name: Create Build Directory
+            run: |
+              mkdir build
+          - name: Release Ubuntu Qt ${{ matrix.qt_ver }}
+            run: |
+              cd build
+              cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX="./installed" ../
+              cmake --build .
+          - name: Create Package
+            run: |
+              cd build
+              cpack -G TGZ
+          - uses: ncipollo/release-action@v1
+            with:
+              artifacts: "build/QtModelUtilities*.tar.gz"
+              token: ${{ secrets.GITHUB_TOKEN }}
+              allowUpdates: true
+              artifactErrorsFailBuild: true
+    releasemsvc:
+        name: MSVC Releases
+        runs-on: windows-latest
+        strategy:
+          max-parallel: 1
+          matrix:
+              qt_ver: [5.15.2,6.0.2]
+        steps:
+          - name: Install Qt
+            uses: jurplel/install-qt-action@v2
+            with:
+              version: ${{ matrix.qt_ver }}
+          - uses: actions/checkout@v2
+          - name: Create Build Directory
+            run: |
+              mkdir build
+          - name: Set up environment
+            uses: ilammy/msvc-dev-cmd@v1
+          - name: Debug MSVC Qt ${{ matrix.qt_ver }}
+            run: |
+              cd build
+              mkdir shared-Debug
+              cd shared-Debug
+              cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DCMAKE_INSTALL_PREFIX="./installed" ../../
+              cmake --build .
+          - name: Release MSVC Qt ${{ matrix.qt_ver }}
+            run: |
+              cd build
+              mkdir shared-Release
+              cd shared-Release
+              cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX="./installed" ../../
+              cmake --build .
+          - name: Create Package
+            shell: cmd
+            run: |
+              cd build
+              cpack -G ZIP --config ../cmake/modules/package.cmake
+          - uses: ncipollo/release-action@v1
+            with:
+              artifacts: "build/QtModelUtilities*.zip"
+              token: ${{ secrets.GITHUB_TOKEN }}
+              allowUpdates: true
+              artifactErrorsFailBuild: true
+    releasemingw:
+        name: MinGW Releases
+        runs-on: windows-latest
+        strategy:
+          max-parallel: 1
+          matrix:
+              qt_ver: [5.15.2,6.0.2]
+        steps:
+          - name: Install Qt
+            uses: jurplel/install-qt-action@v2
+            with:
+              version: ${{ matrix.qt_ver }}
+              arch: 'win64_mingw81'
+          - uses: actions/checkout@v2
+          - name: Create Build Directory
+            run: |
+              mkdir build
+          - name: Debug MinGW Qt ${{ matrix.qt_ver }}
+            run: |
+              cd build
+              mkdir shared-Debug
+              cd shared-Debug
+              cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=d -DCMAKE_INSTALL_PREFIX="./installed" ../../
+              cmake --build .
+          - name: Release MinGW Qt ${{ matrix.qt_ver }}
+            run: |
+              cd build
+              mkdir shared-Release
+              cd shared-Release
+              cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX="./installed" ../../
+              cmake --build .
+          - name: Create Package
+            shell: cmd
+            run: |
+              cd build
+              cpack -G ZIP --config ../cmake/modules/package.cmake
+          - uses: ncipollo/release-action@v1
+            with:
+              artifacts: "build/QtModelUtilities*.zip"
+              token: ${{ secrets.GITHUB_TOKEN }}
+              allowUpdates: true
+              artifactErrorsFailBuild: true

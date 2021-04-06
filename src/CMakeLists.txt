@@ -5,7 +5,7 @@ find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Gui)
 message(STATUS "Found Qt Core ${Qt5Core_VERSION}")
-
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 if(NOT "${Qt${QT_VERSION_MAJOR}Gui_FOUND}")
     set(NO_GUI ON)
@@ -104,10 +104,10 @@ if(OPTIMISE_FOR_MANY_ROLES)
 endif()
 target_link_libraries(modelutilities PUBLIC Qt${QT_VERSION_MAJOR}::Core)
 if(NOT NO_GUI)
-        target_link_libraries(modelutilities PUBLIC Qt${QT_VERSION_MAJOR}::Gui)
+    target_link_libraries(modelutilities PUBLIC Qt${QT_VERSION_MAJOR}::Gui)
 endif()
 if(NOT NO_WIDGETS)
-        target_link_libraries(modelutilities PUBLIC Qt${QT_VERSION_MAJOR}::Widgets)
+    target_link_libraries(modelutilities PUBLIC Qt${QT_VERSION_MAJOR}::Widgets)
 endif()
 
 if(BUILD_DOCS)
@@ -128,13 +128,13 @@ set_target_properties(modelutilities PROPERTIES
     CXX_STANDARD 11
     CXX_STANDARD_REQUIRED ON
     VERSION ${VERSION_SHORT}
-    EXPORT_NAME "modelutilities"
+    EXPORT_NAME "QtModelUtilities"
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin"
 )
 include(CMakePackageConfigHelpers)
-write_basic_package_version_file("modelutilitiesConfigVersion.cmake"
+write_basic_package_version_file("QtModelUtilitiesConfigVersion.cmake"
     VERSION ${VERSION_SHORT}
     COMPATIBILITY SameMajorVersion
 )
@@ -148,15 +148,12 @@ install(TARGETS modelutilities
     ARCHIVE DESTINATION lib
     INCLUDES DESTINATION include
 )
-if((NOT BUILD_STATIC_LIBS) AND WIN32 AND MSVC AND (NOT MSVC_VERSION LESS 1600))
-    install(FILES $<TARGET_PDB_FILE:modelutilities> DESTINATION bin OPTIONAL)
-endif()
 install(EXPORT modelutilitiesTargets
 	FILE QtModelUtilitiesTargets.cmake
-	NAMESPACE qmu::
-	DESTINATION lib/cmake/modelutilities
+        NAMESPACE QtModelUtilities::
+        DESTINATION lib/cmake/QtModelUtilities
 )
-install(FILES "modelutilitiesConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/modelutilitiesConfigVersion.cmake"
-    DESTINATION lib/cmake/modelutilities
+install(FILES "QtModelUtilitiesConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/QtModelUtilitiesConfigVersion.cmake"
+    DESTINATION lib/cmake/QtModelUtilities
 )
 
