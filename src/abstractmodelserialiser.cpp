@@ -26,19 +26,21 @@ AbstractModelSerialiserPrivate::AbstractModelSerialiserPrivate(AbstractModelSeri
 }
 
 /*!
-\property AbstractModelSerialiser::streamVersion
-\accessors %streamVersion(), setStreamVersion()
 \brief The datastream version used to serialise binary data
 \details This will be used to serialise variants that have a binary-only representation.
 By default this property is set to the latest version avaliable in Qt.
 */
-
 QDataStream::Version AbstractModelSerialiser::streamVersion() const
 {
     Q_D(const AbstractModelSerialiser);
     return d->m_streamVersion;
 }
 
+/*!
+\brief Set the datastream version used to serialise binary data
+\details This will be used to serialise variants that have a binary-only representation.
+By default this property is set to the latest version avaliable in Qt.
+*/
 void AbstractModelSerialiser::setStreamVersion(QDataStream::Version ver)
 {
     Q_D(AbstractModelSerialiser);

@@ -27,7 +27,6 @@ class MODELUTILITIES_EXPORT AbstractModelSerialiser : public QObject
     Q_PROPERTY(QList<int> rolesToSave READ rolesToSave WRITE setRoleToSave RESET resetRoleToSave)
     Q_PROPERTY(QAbstractItemModel *model READ model WRITE setModel)
     Q_PROPERTY(const QAbstractItemModel *constModel READ constModel WRITE setModel)
-    Q_PROPERTY(QDataStream::Version streamVersion READ streamVersion WRITE setStreamVersion)
     Q_DECLARE_PRIVATE(AbstractModelSerialiser)
     Q_DISABLE_COPY(AbstractModelSerialiser)
 public:
@@ -45,12 +44,13 @@ public:
     virtual const QAbstractItemModel *constModel() const;
     void setModel(QAbstractItemModel *val);
     void setModel(const QAbstractItemModel *val);
-    QDataStream::Version streamVersion() const;
-    void setStreamVersion(QDataStream::Version ver);
+    Q_INVOKABLE QDataStream::Version streamVersion() const;
     Q_INVOKABLE virtual bool saveModel(QIODevice *destination) const = 0;
     Q_INVOKABLE virtual bool saveModel(QByteArray *destination) const = 0;
     Q_INVOKABLE virtual bool loadModel(QIODevice *source) = 0;
     Q_INVOKABLE virtual bool loadModel(const QByteArray &source) = 0;
+public Q_SLOTS:
+    void setStreamVersion(QDataStream::Version ver);
 
 protected:
     AbstractModelSerialiser(AbstractModelSerialiserPrivate &d, QObject *parent);

@@ -97,9 +97,9 @@ void tst_HtmlModelSerialiser::validateHtmlOutput()
     QVERIFY(replyObj.contains(QStringLiteral("messages")));
     QVERIFY(replyObj.value(QStringLiteral("messages")).isArray());
     const QJsonArray msgArr = replyObj.value(QStringLiteral("messages")).toArray();
-    for (auto i = msgArr.begin(), endI = msgArr.end(); i != endI; ++i) {
-        QVERIFY(i->isObject());
-        const QJsonObject msgObject = i->toObject();
+    for (auto&& i : msgArr) {
+        QVERIFY(i.isObject());
+        const QJsonObject msgObject = i.toObject();
         QVERIFY(msgObject.contains(QStringLiteral("type")));
         QVERIFY(msgObject.value(QStringLiteral("type")).isString());
         const QString typeString = msgObject.value(QStringLiteral("type")).toString();
@@ -114,12 +114,14 @@ void tst_HtmlModelSerialiser::validateHtmlOutput()
 void tst_HtmlModelSerialiser::validateHtmlOutput_data()
 {
     QTest::addColumn<const QAbstractItemModel *>("sourceModel");
-#ifdef QT_GUI_LIB
-    // QTest::newRow("Table Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, this));
-    // QTest::newRow("Table Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(false, true, this));
-    // QTest::newRow("Tree Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(true, false, this));
-    QTest::newRow("Tree Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(true, true, this));
-#else
     QTest::newRow("List Single Role") << static_cast<const QAbstractItemModel *>(createStringModel(this));
+#ifdef QT_GUI_LIB
+    QTest::newRow("Tree Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(true, true, this));
+
+    QTest::newRow("Table Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, this));
+    QTest::newRow("Table Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(false, true, this));
+    QTest::newRow("Tree Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(true, false, this));
+
+    QTest::newRow("abvbavole") << static_cast<const QAbstractItemModel *>(createStringModel(this));
 #endif
 }

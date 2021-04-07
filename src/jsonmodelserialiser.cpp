@@ -431,18 +431,19 @@ bool JsonModelSerialiser::fromJsonObject(const QJsonObject &source)
 }
 
 /*!
-\property JsonModelSerialiser::format
-\accessors %format(), setFormat()
 \brief The JSON format to use
 \details Defaults to \c Compact
 */
-
 QJsonDocument::JsonFormat JsonModelSerialiser::format() const
 {
     Q_D(const JsonModelSerialiser);
     return d->m_format;
 }
 
+/*!
+\brief Sets the JSON format to use
+\details Defaults to \c Compact
+*/
 void JsonModelSerialiser::setFormat(QJsonDocument::JsonFormat val)
 {
     Q_D(JsonModelSerialiser);

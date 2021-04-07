@@ -6,6 +6,7 @@ on:
 jobs:
     releasemac:
         name: MacOS Releases
+        needs: releasemingw
         runs-on: macos-latest
         strategy:
           max-parallel: 1
@@ -81,6 +82,7 @@ jobs:
               artifactErrorsFailBuild: true
     releasemsvc:
         name: MSVC Releases
+        needs: releaseubuntu
         runs-on: windows-latest
         strategy:
           max-parallel: 1
@@ -124,6 +126,7 @@ jobs:
               artifactErrorsFailBuild: true
     releasemingw:
         name: MinGW Releases
+        needs: releasemsvc
         runs-on: windows-latest
         strategy:
           max-parallel: 1
