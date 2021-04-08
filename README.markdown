@@ -4,7 +4,7 @@ This library is a collection of utilities for Qt's Model/View framework.
 
 ### Status
 [![Build Status](https://github.com/VSRonin/QtModelUtilities/actions/workflows/buildtest.yml/badge.svg?branch=master)](https://github.com/VSRonin/QtModelUtilities/actions)
-[![Qt 5.1 Build Status](https://travis-ci.org/VSRonin/QtModelUtilities.svg?branch=master)](https://travis-ci.org/VSRonin/QtModelUtilities)
+[![Qt 5.1 Build Status](https://travis-ci.com/VSRonin/QtModelUtilities.svg?branch=master)](https://travis-ci.com/VSRonin/QtModelUtilities)
 
 ### Contents
 

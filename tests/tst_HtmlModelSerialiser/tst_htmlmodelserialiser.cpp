@@ -89,7 +89,12 @@ void tst_HtmlModelSerialiser::validateHtmlOutput()
         validateReply = qnam->post(validateReq, htmlData);
         QEventLoop replyWaitLoop;
         QObject::connect(validateReply, &QNetworkReply::finished, &replyWaitLoop, &QEventLoop::quit);
+#    if (QT_VERSION < QT_VERSION_CHECK(5, 15, 0))
+        QObject::connect(validateReply, static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error), &replyWaitLoop,
+                         &QEventLoop::quit);
+#    else
         QObject::connect(validateReply, &QNetworkReply::errorOccurred, &replyWaitLoop, &QEventLoop::quit);
+#    endif
         QObject::connect(validateReply, &QNetworkReply::sslErrors, validateReply,
                          static_cast<void (QNetworkReply::*)()>(&QNetworkReply::ignoreSslErrors));
         replyWaitLoop.exec();
