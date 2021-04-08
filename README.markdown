@@ -3,12 +3,8 @@
 This library is a collection of utilities for Qt's Model/View framework.
 
 ### Status
-| **CI** | **master** | **dev** |
-|--------|------------|---------|
-| [Windows](https://ci.appveyor.com/project/VSRonin/qtmodelutilities) | ![Appveyor Build status](https://ci.appveyor.com/api/projects/status/3x8h2laxlbh9wc7c/branch/master?svg=true)|
-| [Ubuntu](https://github.com/VSRonin/QtModelUtilities/actions/workflows/ubuntu.yml) | ![Ubuntu Build Status](https://github.com/VSRonin/QtModelUtilities/actions/workflows/ubuntu.yml/badge.svg?branch=master) |
-| [MacOS](https://github.com/VSRonin/QtModelUtilities/actions/workflows/macos.yml) | ![MacOS Build Status](https://github.com/VSRonin/QtModelUtilities/actions/workflows/macos.yml/badge.svg?branch=master) |
-| [Ubuntu Qt 5.1](https://travis-ci.org/VSRonin/QtModelUtilities) | ![Ubuntu Qt 5.1 Build Status](https://travis-ci.org/VSRonin/QtModelUtilities.svg?branch=master) |
+[![Build Status](https://github.com/VSRonin/QtModelUtilities/actions/workflows/buildtest.yml/badge.svg?branch=master)](https://github.com/VSRonin/QtModelUtilities/actions)
+[![Qt 5.1 Build Status](https://travis-ci.org/VSRonin/QtModelUtilities.svg?branch=master)](https://travis-ci.org/VSRonin/QtModelUtilities)
 
 ### Contents
 
@@ -23,7 +19,7 @@ This library is a collection of utilities for Qt's Model/View framework.
 If your system is compatible with one of the main platforms you can download the pre-compiled dinamically linked library from [the releases page](https://github.com/VSRonin/QtModelUtilities/releases).
 
 #### Build from Source
-This library uses [CMake](https://cmake.org/) as build system and allows usage both using static and dynamic linking. 
+This library uses [CMake](https://cmake.org/) as build system and allows usage both using static and dynamic linking as well as customising what parts of the library you want to build. 
 See [INSTALL](https://vsronin.github.io/QtModelUtilities/md__i_n_s_t_a_l_l.html) for detailed build instructions.
 
 ### Platforms
@@ -41,9 +37,9 @@ The library should be compatible with all platform supported by Qt, the CI will 
 
 A reduced suite of tests, to ensure compatibility, is also run on:
 
-+ Ubuntu Trusty gcc 6 64bit Qt 5.1
 + Ubuntu g++ 64bit Qt 5.12
-+ Ubuntu g++ 64bit Qt 5.9
++ Ubuntu Xenial g++ 64bit Qt 5.9
++ Ubuntu Trusty gcc 6 64bit Qt 5.1
 
 ### Examples
 

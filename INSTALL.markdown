@@ -5,7 +5,7 @@ Once you installed CMake, open a terminal window with the C++ compiler and Qt en
 On Windows MSVC, for example, it consist in calling `vcvarsall.bat` from the compiler folder and `qtenv2.bat` from the bin folder of Qt.
 
 Now you can call CMake passing arguments to customise the build. The first choice is the generator. It is passed via the `-G "Generator"` argument
-You can find a list of generators in the [CMake documentation](https://cmake.org/cmake/help/v3.3/manual/cmake-generators.7.html);
+You can find a list of generators in the [CMake documentation](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html);
 the most commonly used ones are `-G "Unix Makefiles"` on linux and macOS, `-G "MinGW Makefiles"` on Windows MinGW and `-G "NMake Makefiles"` on Windows MSVC.
 It's also advisable to create a "build" folder inside the downloaded source tree to separate the build artefacts from the original sources.
 
@@ -28,7 +28,6 @@ You can also specify an number of arguments to customise the build even further:
 | `-DBUILD_DOCS=OFF` | Disables the creation of the documentation in HTML format. This option is automatically set if [Doxygen](www.doxygen.org) is not installed |
 | `-DBUILD_ROLEMASKPROXY=OFF` | Exclude the Role Mask Proxy Model module of the library |
 | `-DBUILD_MODELSERIALISATION=OFF` | Exclude the Model Serialisation module of the library |
-| `-DBUILD_TRANSPOSEPROXY=OFF` | Exclude the Transpose Proxy Model module of the library |
 | `-DBUILD_INSERTPROXY=OFF` | Exclude the Insert Proxy Model module of the library |
 | `-DOPTIMISE_FOR_MANY_ROLES=ON` | Some of the models are optimised so that they work best if every cell in the model holds no more than around 20 different roles. This is in line with how Qt's native models are optimised. If you plan to store more roles per cell you can enable this option to improve performance |
 | `-DTEST_OUTPUT_XML=ON` | This is mainly used by the CI. If this option is set, the tests will generate an xml file with results rather than printing them to the console |

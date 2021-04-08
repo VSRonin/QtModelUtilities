@@ -1,4 +1,4 @@
-name: Ubuntu LTS Versions
+name: Old LTS Versions
 on: 
   push:
     branches:
@@ -6,8 +6,6 @@ on:
       - dev
     paths-ignore:
       - '.travis.yml'
-      - '.appveyor.yml'
-      - 'modelutilities.pri'
       - 'docs/**'
       - '**.markdown'
       - '**.md'
@@ -18,101 +16,77 @@ on:
       - dev
     paths-ignore:
       - '.travis.yml'
-      - '.appveyor.yml'
-      - 'modelutilities.pri'
       - 'docs/**'
       - '**.markdown'
       - '**.md'
       - 'LICENSE'
 jobs:
     build512:
-        name: Ubuntu LTS Build
-        runs-on: ubuntu-latest
+        name: Qt Old LTS Builds
+        runs-on: ${{ matrix.platforms.os }}
         strategy:
+          fail-fast: false
           matrix:
-              qt_ver: [5.12.10]
-        steps:
-          - name: Install Dependencies
-            run: |
-              sudo apt-get update -y
-              sudo apt-get install libxcb-icccm4 libxcb-xkb1 libxcb-icccm4 libxcb-image0 libxcb-render-util0 libxcb-randr0 libxcb-keysyms1 libxcb-xinerama0 libxcb-xinput-dev
-              export PATH=$PATH:$PWD/build/x64/lib
-              export PATH=$PATH:$PWD/build/x64/bin
-          - name: Install Qt
-            uses: jurplel/install-qt-action@v2
-            with:
-              version: ${{ matrix.qt_ver }}
-              host: 'linux'
-              target: 'desktop'
-          - uses: actions/checkout@v2
-          - name: Create Build Directory
-            run: |
-              mkdir build
-          - name: Debug Build Qt ${{ matrix.qt_ver }}
-            run: |
-              cd build
-              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" ../
-              cmake --build .
-              cmake --build . --target install
-          - name: Test Debug
-            uses: GabrielBB/xvfb-action@v1
-            with:
-              working-directory: ./build
-              run: ctest --verbose
-          - name: Release Build Qt ${{ matrix.qt_ver }}
-            run: |
-              cd build
-              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" ../
-              cmake --build .
-              cmake --build . --target install
-          - name: Test Release
-            uses: GabrielBB/xvfb-action@v1
-            with:
-              working-directory: ./build
-              run: ctest --verbose
-    build59:
-        name: Ubuntu LTS Build
-        runs-on: ubuntu-16.04
-        strategy:
-          matrix:
-              qt_ver: [5.9.9]
+              platforms:
+                - { os: ubuntu-latest, qt_ver: 5.12.10}
+                - { os: ubuntu-16.04, qt_ver: 5.9.9 }
         steps:
           - name: Install Dependencies
             run: |
               sudo apt-get update -y
               sudo apt-get install libxcb-icccm4 libxcb-xkb1 libxcb-icccm4 libxcb-image0 libxcb-render-util0 libxcb-randr0 libxcb-keysyms1 libxcb-xinerama0
-              export PATH=$PATH:$PWD/build/x64/lib
-              export PATH=$PATH:$PWD/build/x64/bin
+              export PATH=$PATH:$PWD/build/installed/lib
+              export PATH=$PATH:$PWD/build/installed/bin
           - name: Install Qt
             uses: jurplel/install-qt-action@v2
             with:
-              version: ${{ matrix.qt_ver }}
-              host: 'linux'
-              target: 'desktop'
-          - uses: actions/checkout@v2
+              version: ${{ matrix.platforms.qt_ver }}
+          - name: Git Checkout
+            uses: actions/checkout@v2
+            with:
+              fetch-depth: 0
           - name: Create Build Directory
             run: |
               mkdir build
+              cd build
+              mkdir debug
+              mkdir release
           - name: Debug Build Qt ${{ matrix.qt_ver }}
             run: |
-              cd build
-              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" ../
+              cd build/debug
+              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_DEBUG_POSTFIX=d -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="../installed" ../../
+              cmake --build .
+              cmake --build . --target install
+              cd ../release
+              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="../installed" ../../
               cmake --build .
               cmake --build . --target install
           - name: Test Debug
+            id: rundebugtests
+            continue-on-error: true
             uses: GabrielBB/xvfb-action@v1
             with:
-              working-directory: ./build
-              run: ctest --verbose
-          - name: Release Build Qt ${{ matrix.qt_ver }}
-            run: |
-              cd build
-              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" ../
-              cmake --build .
-              cmake --build . --target install
+              working-directory: ./build/debug
+              run: cmake --build . --target test
           - name: Test Release
+            id: runreleasetests
             uses: GabrielBB/xvfb-action@v1
             with:
-              working-directory: ./build
-              run: ctest --verbose
+              working-directory: ./build/release
+              run: cmake --build . --target test
+          - name: Prepare Test Report
+            if: ${{ always() && (steps.rundebugtests.outcome == 'failure' || steps.runreleasetests.outcome == 'failure') }}
+            uses: ./ci/processtestresults
+            with:
+                qt-tests: build/TestResults
+                junit-output: build/TestResults/junitresult.xml
+                html-output: build/TestResults/testsreport.html
+          - name: Publish Test Report
+            if: ${{ always() && (steps.rundebugtests.outcome == 'failure' || steps.runreleasetests.outcome == 'failure') }}
+            uses: actions/upload-artifact@v2
+            with:
+                name: Qt${{ matrix.platforms.qt_ver }}
+                path: |
+                  build/TestResults/junitresult.xml
+                  build/TestResults/testsreport.html
           

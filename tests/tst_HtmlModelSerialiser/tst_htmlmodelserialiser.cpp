@@ -82,14 +82,24 @@ void tst_HtmlModelSerialiser::validateHtmlOutput()
     serialiser.addRoleToSave(Qt::UserRole + 1);
     QByteArray htmlData;
     QVERIFY(serialiser.saveModel(&htmlData));
-    QNetworkRequest validateReq(QUrl(QStringLiteral("https://validator.w3.org/nu/?out=json")));
-    validateReq.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("text/html; charset=utf-8"));
-    QNetworkReply *validateReply = qnam->post(validateReq, htmlData);
-    QEventLoop replyWaitLoop;
-    QObject::connect(validateReply, &QNetworkReply::finished, &replyWaitLoop, &QEventLoop::quit);
-    replyWaitLoop.exec();
-    QJsonParseError parseError;
+    QNetworkReply *validateReply = nullptr;
+    for (int attempt = 3; attempt > 0; --attempt) {
+        QNetworkRequest validateReq(QUrl(QStringLiteral("https://validator.w3.org/nu/?out=json")));
+        validateReq.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("text/html; charset=utf-8"));
+        validateReply = qnam->post(validateReq, htmlData);
+        QEventLoop replyWaitLoop;
+        QObject::connect(validateReply, &QNetworkReply::finished, &replyWaitLoop, &QEventLoop::quit);
+        QObject::connect(validateReply, &QNetworkReply::errorOccurred, &replyWaitLoop, &QEventLoop::quit);
+        QObject::connect(validateReply, &QNetworkReply::sslErrors, validateReply,
+                         static_cast<void (QNetworkReply::*)()>(&QNetworkReply::ignoreSslErrors));
+        replyWaitLoop.exec();
+        if (validateReply->error() == QNetworkReply::NoError)
+            break;
+    }
+    if (validateReply->error() != QNetworkReply::NoError)
+        QSKIP("Communication with online html validator failed");
     const QByteArray replyData = validateReply->readAll();
+    QJsonParseError parseError;
     const QJsonDocument replyDoc = QJsonDocument::fromJson(replyData, &parseError);
     QCOMPARE(parseError.error, QJsonParseError::NoError);
     QVERIFY(replyDoc.isObject());
@@ -97,7 +107,7 @@ void tst_HtmlModelSerialiser::validateHtmlOutput()
     QVERIFY(replyObj.contains(QStringLiteral("messages")));
     QVERIFY(replyObj.value(QStringLiteral("messages")).isArray());
     const QJsonArray msgArr = replyObj.value(QStringLiteral("messages")).toArray();
-    for (auto&& i : msgArr) {
+    for (auto &&i : msgArr) {
         QVERIFY(i.isObject());
         const QJsonObject msgObject = i.toObject();
         QVERIFY(msgObject.contains(QStringLiteral("type")));
@@ -117,11 +127,9 @@ void tst_HtmlModelSerialiser::validateHtmlOutput_data()
     QTest::newRow("List Single Role") << static_cast<const QAbstractItemModel *>(createStringModel(this));
 #ifdef QT_GUI_LIB
     QTest::newRow("Tree Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(true, true, this));
-
     QTest::newRow("Table Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, this));
     QTest::newRow("Table Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(false, true, this));
     QTest::newRow("Tree Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(true, false, this));
-
     QTest::newRow("abvbavole") << static_cast<const QAbstractItemModel *>(createStringModel(this));
 #endif
 }
