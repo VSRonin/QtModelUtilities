@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['mergedisplayedit',['mergeDisplayEdit',['../class_role_mask_proxy_model.html#a9696b14ae2cf0ecc2a5b03b2f3b4ca88',1,'RoleMaskProxyModel']]],
-  ['model',['model',['../class_abstract_model_serialiser.html#aed65069ff5b57f8601a50f22c2a2b1f2',1,'AbstractModelSerialiser']]]
+  ['firstcolumnisheader_183',['firstColumnIsHeader',['../class_csv_model_serialiser.html#a0f6a1976e2ae762548938df7b6d9f6fa',1,'CsvModelSerialiser']]],
+  ['firstrowisheader_184',['firstRowIsHeader',['../class_csv_model_serialiser.html#ac682bc6a9b37cd9283552083da6db89a',1,'CsvModelSerialiser']]]
 ];

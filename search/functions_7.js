@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['mapfromsource',['mapFromSource',['../class_insert_proxy_model.html#a4e2bd8163337f90fb7cad0360dff70ad',1,'InsertProxyModel::mapFromSource()'],['../class_transpose_proxy_model.html#a0a52193d2b3e8ca58119fbd1091ba22f',1,'TransposeProxyModel::mapFromSource()']]],
-  ['maptosource',['mapToSource',['../class_insert_proxy_model.html#a4b2e8da5d66ac198d0e4acb7259eec7e',1,'InsertProxyModel::mapToSource()'],['../class_transpose_proxy_model.html#a694b113960d27e2c67299049a233d395',1,'TransposeProxyModel::mapToSource()']]],
-  ['maskedrolessets',['maskedRolesSets',['../class_role_mask_proxy_model.html#a94bbdeb692cf86ff1cab3f2de615b00b',1,'RoleMaskProxyModel']]],
-  ['modeldefaultroles',['modelDefaultRoles',['../class_abstract_multi_role_serialiser.html#a4b66b3f99a0232a8611231c76531e837',1,'AbstractMultiRoleSerialiser']]],
-  ['movecolumns',['moveColumns',['../class_insert_proxy_model.html#a42730d234d5b6150619d5008e4b46d7f',1,'InsertProxyModel::moveColumns()'],['../class_transpose_proxy_model.html#a2deeec9ecd319e8d072574905ccd9faf',1,'TransposeProxyModel::moveColumns()']]],
-  ['moverows',['moveRows',['../class_insert_proxy_model.html#abeb734994dcb190c367533af3aa5aa03',1,'InsertProxyModel::moveRows()'],['../class_transpose_proxy_model.html#a9bc8b70d212f5ebbb3b4d4673581a51e',1,'TransposeProxyModel::moveRows()']]]
+  ['index_129',['index',['../class_insert_proxy_model.html#a568df312bfbbee45da5c6937cb6fd176',1,'InsertProxyModel']]],
+  ['insertcolumns_130',['insertColumns',['../class_insert_proxy_model.html#ac080109e4c1238a83f44fbc66546a7ea',1,'InsertProxyModel']]],
+  ['insertproxymodel_131',['InsertProxyModel',['../class_insert_proxy_model.html#abe73020e91293ea8cde8a9fa45f07650',1,'InsertProxyModel::InsertProxyModel(QObject *parent=Q_NULLPTR)'],['../class_insert_proxy_model.html#a7a9992fa73d59df5bd41227ae8af6392',1,'InsertProxyModel::InsertProxyModel(InsertProxyModelPrivate &amp;dptr, QObject *parent)']]],
+  ['insertrows_132',['insertRows',['../class_insert_proxy_model.html#a938bad6059352548c8932b28c0b57bdf',1,'InsertProxyModel']]],
+  ['itemdata_133',['itemData',['../class_role_mask_proxy_model.html#a9a4f2c933484b04a1ef724336f8c9cb1',1,'RoleMaskProxyModel']]]
 ];

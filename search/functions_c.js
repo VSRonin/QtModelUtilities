@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['_7eabstractmodelserialiser',['~AbstractModelSerialiser',['../class_abstract_model_serialiser.html#a4c6206a42de61790ce1b6036ddc779a1',1,'AbstractModelSerialiser']]],
-  ['_7eabstractmultiroleserialiser',['~AbstractMultiRoleSerialiser',['../class_abstract_multi_role_serialiser.html#ac5bc7009217114b517c12a7672742c93',1,'AbstractMultiRoleSerialiser']]],
-  ['_7eabstractsingleroleserialiser',['~AbstractSingleRoleSerialiser',['../class_abstract_single_role_serialiser.html#afab1e07a697986999b9704e5950c3114',1,'AbstractSingleRoleSerialiser']]],
-  ['_7einsertproxymodel',['~InsertProxyModel',['../class_insert_proxy_model.html#a46cbda46e49c23772cb3bb010e0180de',1,'InsertProxyModel']]],
-  ['_7erolemaskproxymodel',['~RoleMaskProxyModel',['../class_role_mask_proxy_model.html#aa816754403a11ecce7e91caa33182514',1,'RoleMaskProxyModel']]],
-  ['_7etransposeproxymodel',['~TransposeProxyModel',['../class_transpose_proxy_model.html#abbf1d53fb8bbcd722a743b2688045645',1,'TransposeProxyModel']]],
-  ['_7etreemapproxymodel',['~TreeMapProxyModel',['../class_tree_map_proxy_model.html#ac188e9ca18f43d6bbf4281d3cc20a15e',1,'TreeMapProxyModel']]]
+  ['removecolumns_146',['removeColumns',['../class_insert_proxy_model.html#a6a27a80fb2392810d89aa732f84026f0',1,'InsertProxyModel']]],
+  ['removemaskedrole_147',['removeMaskedRole',['../class_role_mask_proxy_model.html#a3a1487f83e8e803f95369435b886cec8',1,'RoleMaskProxyModel']]],
+  ['removeroletosave_148',['removeRoleToSave',['../class_abstract_model_serialiser.html#affa8c20bda7c8a3f5b6c05b63481753a',1,'AbstractModelSerialiser::removeRoleToSave()'],['../class_abstract_single_role_serialiser.html#a8af11e6bd1d45304bbfea2b48e1cf638',1,'AbstractSingleRoleSerialiser::removeRoleToSave()']]],
+  ['removerows_149',['removeRows',['../class_insert_proxy_model.html#a5555845f3080f79d1eddeba02dd4eebe',1,'InsertProxyModel']]],
+  ['resetroletosave_150',['resetRoleToSave',['../class_abstract_model_serialiser.html#ae49884f2809cc21f2499321147215812',1,'AbstractModelSerialiser::resetRoleToSave()'],['../class_abstract_single_role_serialiser.html#a5c50fb4aa5d8b0d7c52f374952216db7',1,'AbstractSingleRoleSerialiser::resetRoleToSave()']]],
+  ['rolemaskproxymodel_151',['RoleMaskProxyModel',['../class_role_mask_proxy_model.html#aeac66ef94eec9f7d97193c94773b7d8d',1,'RoleMaskProxyModel::RoleMaskProxyModel(QObject *parent=Q_NULLPTR)'],['../class_role_mask_proxy_model.html#a458cf9a9f36bc5d2b12b176d5bb05dce',1,'RoleMaskProxyModel::RoleMaskProxyModel(RoleMaskProxyModelPrivate &amp;dptr, QObject *parent)']]],
+  ['rowcount_152',['rowCount',['../class_insert_proxy_model.html#a824c9783a484233d635e259dcafa24af',1,'InsertProxyModel']]]
 ];

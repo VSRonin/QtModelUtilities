@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['haschildren',['hasChildren',['../class_insert_proxy_model.html#a9574b2d597d0d34fcc9bc81acd909fb4',1,'InsertProxyModel::hasChildren()'],['../class_transpose_proxy_model.html#a08356ee0a0ef4ce92b856fdf679e88fb',1,'TransposeProxyModel::hasChildren()']]],
-  ['headerdata',['headerData',['../class_insert_proxy_model.html#a69a851657f38d5ba8e04edb8ba133966',1,'InsertProxyModel::headerData()'],['../class_transpose_proxy_model.html#a9c04d87c8cd8e9388fb8881202d9520a',1,'TransposeProxyModel::headerData()']]]
+  ['flagforextra_122',['flagForExtra',['../class_insert_proxy_model.html#aeee4ee9ae2aa028f38c34efd37982b78',1,'InsertProxyModel']]],
+  ['flags_123',['flags',['../class_insert_proxy_model.html#ac26c0b7174bcf87f4111b3c8b3f82663',1,'InsertProxyModel']]],
+  ['format_124',['format',['../class_json_model_serialiser.html#ae047e3e61997497a53d0c7dafd182b2c',1,'JsonModelSerialiser']]],
+  ['fromjsonobject_125',['fromJsonObject',['../class_json_model_serialiser.html#a8ab980a89fc8aff2f2a2e65f70f7f02d',1,'JsonModelSerialiser']]]
 ];
