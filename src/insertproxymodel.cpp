@@ -193,14 +193,12 @@ InsertProxyModel::InsertProxyModel(QObject *parent)
 { }
 
 /*!
-Constructor used only while subclassing the private class.
-Not part of the public API
+\internal
 */
 InsertProxyModel::InsertProxyModel(InsertProxyModelPrivate &dptr, QObject *parent)
     : QAbstractProxyModel(parent)
     , m_dptr(&dptr)
 {
-    Q_ASSERT(m_dptr);
 }
 
 /*!
