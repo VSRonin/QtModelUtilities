@@ -1,5 +1,5 @@
-#ifndef tst_rootindexproxymodel_h__
-#define tst_rootindexproxymodel_h__
+#ifndef TST_ROOTINDEXPROXYMODEL_H
+#define TST_ROOTINDEXPROXYMODEL_H
 
 #include <QObject>
 class QAbstractItemModel;
@@ -10,7 +10,12 @@ class tst_RootIndexProxyModel : public QObject
 private Q_SLOTS:
     void showRoot();
     void showRoot_data();
+    void replaceModel();
+    void replaceModel_data();
+    void switchRoot();
+    void rootMoves();
+    void rootRemoved();
 protected:
     void compareModels(const QAbstractItemModel* source,const QAbstractItemModel* proxy, const QModelIndex& sourcePar, const QModelIndex& proxyPar);
 };
-#endif // tst_rootindexproxymodel_h__
+#endif // TST_ROOTINDEXPROXYMODEL_H

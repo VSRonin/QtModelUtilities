@@ -35,6 +35,7 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles) override;
     QSize span(const QModelIndex &index) const override;
+    void setSourceModel(QAbstractItemModel *sourceModel) override;
 Q_SIGNALS:
     void rootIndexChanged();
 protected:

@@ -10,8 +10,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 \****************************************************************************/
-#ifndef rootindexproxy_p_h__
-#define rootindexproxy_p_h__
+#ifndef ROOTINDEXPROXY_P_H
+#define ROOTINDEXPROXY_P_H
 #include "rootindexproxymodel.h"
 #include "private/modelutilities_common_p.h"
 class RootIndexProxyModelPrivate
@@ -19,10 +19,22 @@ class RootIndexProxyModelPrivate
     Q_DECLARE_PUBLIC(RootIndexProxyModel)
     Q_DISABLE_COPY(RootIndexProxyModelPrivate)
     RootIndexProxyModelPrivate(RootIndexProxyModel *q);
+    QVector<QMetaObject::Connection> m_sourceConnections;
     QPersistentModelIndex m_rootIndex;
     RootIndexProxyModel *q_ptr;
-    bool isDescendant(QModelIndex idx) const;
+    bool isDescendant(QModelIndex childIdx, const QModelIndex& parentIdx) const;
     void resetRootOnModelChange();
+    void checkRootRowRemoved(const QModelIndex &parent, int first, int last);
+    void checkRootColumnsRemoved(const QModelIndex &parent, int first, int last);
+    void onRowsAboutToBeInserted(const QModelIndex &parent, int first, int last);
+    void onRowsInserted(const QModelIndex &parent, int first, int last);
+    void onRowsAboutToBeRemoved(const QModelIndex &parent, int first, int last);
+    void onRowsRemoved(const QModelIndex &parent, int first, int last);
+    void onColumnsAboutToBeInserted(const QModelIndex &parent, int first, int last);
+    void onColumnsInserted(const QModelIndex &parent, int first, int last);
+    void onColumnsAboutToBeRemoved(const QModelIndex &parent, int first, int last);
+    void onColumnsRemoved(const QModelIndex &parent, int first, int last);
+    void onDataChanged(const QModelIndex &topLeft,const QModelIndex &bottomRight, const QVector<int>& roles);
 };
 
-#endif // rootindexproxy_p_h__
+#endif // ROOTINDEXPROXY_P_H
