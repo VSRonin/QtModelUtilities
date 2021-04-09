@@ -10,8 +10,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 \****************************************************************************/
-#ifndef rolemaskproxymodel_h__
-#define rolemaskproxymodel_h__
+#ifndef ROLEMASKPROXYMODEL_H
+#define ROLEMASKPROXYMODEL_H
 #include "modelutilities_global.h"
 #include <QIdentityProxyModel>
 #include <QList>
@@ -57,4 +57,4 @@ protected:
 private:
     RoleMaskProxyModelPrivate *d_ptr;
 };
-#endif // rolemaskproxymodel_h__
+#endif // ROLEMASKPROXYMODEL_H

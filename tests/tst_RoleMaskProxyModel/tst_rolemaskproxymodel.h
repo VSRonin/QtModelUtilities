@@ -1,5 +1,5 @@
-#ifndef tst_rolemaskproxymodel_h__
-#define tst_rolemaskproxymodel_h__
+#ifndef TST_ROLEMASKPROXYMODEL_H
+#define TST_ROLEMASKPROXYMODEL_H
 
 #include <QObject>
 #include <array>
@@ -44,4 +44,4 @@ private:
                                 const QModelIndexList &magicNumerIndexes, const bool userRoleEditable,
                                 const QModelIndex &sourceParent = QModelIndex(), const QModelIndex &proxyParent = QModelIndex());
 };
-#endif // tst_rolemaskproxymodel_h__
+#endif // TST_ROLEMASKPROXYMODEL_H

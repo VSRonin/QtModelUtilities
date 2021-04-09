@@ -10,8 +10,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 \****************************************************************************/
-#ifndef modelutilities_global_h__
-#define modelutilities_global_h__
+#ifndef MODELUTILITIES_GLOBAL_H
+#define MODELUTILITIES_GLOBAL_H
 #include <QtGlobal>
 #ifndef MODELUTILITIES_STATIC
 #    if defined(MODELUTILITIES_LIB)
@@ -22,4 +22,4 @@
 #else
 #    define MODELUTILITIES_EXPORT
 #endif
-#endif // modelutilities_global_h__
+#endif // MODELUTILITIES_GLOBAL_H

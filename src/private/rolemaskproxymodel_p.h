@@ -10,8 +10,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 \****************************************************************************/
-#ifndef rolemaskproxymodel_p_h__
-#define rolemaskproxymodel_p_h__
+#ifndef ROLEMASKPROXYMODEL_P_H
+#define ROLEMASKPROXYMODEL_P_H
 #include <QPersistentModelIndex>
 #include <QHash>
 #include <QSet>
@@ -36,4 +36,4 @@ class RoleMaskProxyModelPrivate
     void interceptDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 };
 
-#endif // rolemaskproxymodel_p_h__
+#endif // ROLEMASKPROXYMODEL_P_H

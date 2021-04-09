@@ -1,5 +1,5 @@
-#ifndef tst_jsonmodelserialiser_h__
-#define tst_jsonmodelserialiser_h__
+#ifndef TST_JSONMODELSERIALISER_H
+#define TST_JSONMODELSERIALISER_H
 #include <QObject>
 #include <tst_serialiserscommon.h>
 class QAbstractItemModel;

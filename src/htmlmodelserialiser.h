@@ -10,8 +10,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 \****************************************************************************/
-#ifndef htmlmodelserialiser_h__
-#define htmlmodelserialiser_h__
+#ifndef HTMLMODELSERIALISER_H
+#define HTMLMODELSERIALISER_H
 
 #include "modelutilities_global.h"
 #include "abstractstringserialiser.h"
@@ -37,4 +37,4 @@ public:
 protected:
     HtmlModelSerialiser(HtmlModelSerialiserPrivate &d, QObject *parent);
 };
-#endif // htmlmodelserialiser_h__
+#endif // HTMLMODELSERIALISER_H

@@ -11,8 +11,8 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef csvmodelserialiser_h__
-#define csvmodelserialiser_h__
+#ifndef CSVMODELSERIALISER_H
+#define CSVMODELSERIALISER_H
 
 #include "modelutilities_global.h"
 #include "abstractsingleroleserialiser.h"
@@ -56,4 +56,4 @@ protected:
 QTextStream &operator<<(QTextStream &stream, const QAbstractItemModel &model);
 QTextStream &operator>>(QTextStream &stream, QAbstractItemModel &model);
 #endif
-#endif // csvmodelserialiser_h__
+#endif // CSVMODELSERIALISER_H

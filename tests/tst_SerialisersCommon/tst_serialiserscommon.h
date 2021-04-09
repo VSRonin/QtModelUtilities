@@ -1,5 +1,5 @@
-#ifndef tst_serialisers_common_h__
-#define tst_serialisers_common_h__
+#ifndef TST_SERIALISERS_COMMON_H
+#define TST_SERIALISERS_COMMON_H
 #include <QModelIndex>
 #include <QStringListModel>
 #include <random>

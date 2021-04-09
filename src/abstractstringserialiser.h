@@ -11,8 +11,8 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef abstractmodelserialiser_h__
-#define abstractmodelserialiser_h__
+#ifndef ABSTRACTMODELSERIALISER_H
+#define ABSTRACTMODELSERIALISER_H
 #include "modelutilities_global.h"
 #include "abstractmodelserialiser.h"
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
@@ -40,4 +40,4 @@ protected:
     AbstractStringSerialiser(AbstractStringSerialiserPrivate &d, QObject *parent);
 };
 
-#endif // abstractmodelserialiser_h__
+#endif // ABSTRACTMODELSERIALISER_H

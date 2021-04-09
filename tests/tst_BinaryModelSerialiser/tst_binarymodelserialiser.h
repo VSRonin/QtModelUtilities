@@ -1,5 +1,5 @@
-#ifndef tst_binarymodelserialiser_h__
-#define tst_binarymodelserialiser_h__
+#ifndef TST_BINARYMODELSERIALISER_H
+#define TST_BINARYMODELSERIALISER_H
 #include <QObject>
 #include <tst_serialiserscommon.h>
 class QAbstractItemModel;
@@ -14,4 +14,4 @@ private Q_SLOTS:
     void basicSaveLoadFile_data() { basicSaveLoadData(this); }
     void basicSaveLoadStream_data() { basicSaveLoadData(this); }
 };
-#endif
+#endif // TST_BINARYMODELSERIALISER_H

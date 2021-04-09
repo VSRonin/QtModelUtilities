@@ -10,8 +10,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 \****************************************************************************/
-#ifndef modelutilities_common_p_h__
-#define modelutilities_common_p_h__
+#ifndef MODELUTILITIES_COMMON_P_H
+#define MODELUTILITIES_COMMON_P_H
 
 #include <QVariant>
 #ifdef OPTIMISE_FOR_MANY_ROLES
@@ -46,4 +46,4 @@ T convertFromContainer(const RolesContainer &other)
         result.insert(i.key(), i.value());
     return result;
 }
-#endif // modelutilities_common_p_h__
+#endif // MODELUTILITIES_COMMON_P_H

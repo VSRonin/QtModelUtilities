@@ -10,8 +10,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 \****************************************************************************/
-#ifndef insertproxy_p_h__
-#define insertproxy_p_h__
+#ifndef INSERTPROXY_P_H
+#define INSERTPROXY_P_H
 #include "insertproxymodel.h"
 #include "private/modelutilities_common_p.h"
 #include <QHash>
@@ -63,4 +63,4 @@ class InsertProxyModelPrivate
     InsertProxyModel *q_ptr;
 };
 
-#endif // insertproxy_p_h__
+#endif // INSERTPROXY_P_H

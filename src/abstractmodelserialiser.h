@@ -11,9 +11,8 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef abstractmultiroleserialiser_h__
-#define abstractmultiroleserialiser_h__
-
+#ifndef ABSTRACTMULTIROLESERIALISER_H
+#define ABSTRACTMULTIROLESERIALISER_H
 #include "modelutilities_global.h"
 #include <QObject>
 #include <QScopedPointer>
@@ -56,4 +55,4 @@ protected:
     AbstractModelSerialiser(AbstractModelSerialiserPrivate &d, QObject *parent);
     QScopedPointer<AbstractModelSerialiserPrivate> d_ptr;
 };
-#endif // abstractmultiroleserialiser_h__
+#endif // ABSTRACTMULTIROLESERIALISER_H

@@ -11,8 +11,8 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef jsonmodelserialiser_h__
-#define jsonmodelserialiser_h__
+#ifndef JSONMODELSERIALISER_H
+#define JSONMODELSERIALISER_H
 
 #include "modelutilities_global.h"
 #include "abstractstringserialiser.h"
@@ -42,4 +42,4 @@ public Q_SLOTS:
 protected:
     JsonModelSerialiser(JsonModelSerialiserPrivate &d, QObject *parent);
 };
-#endif // jsonmodelserialiser_h__*/
+#endif // JSONMODELSERIALISER_H

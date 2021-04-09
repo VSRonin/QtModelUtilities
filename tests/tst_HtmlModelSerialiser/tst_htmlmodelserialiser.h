@@ -1,5 +1,5 @@
-#ifndef tst_htmlmodelserialiser_h__
-#define tst_htmlmodelserialiser_h__
+#ifndef TST_HTMLMODELSERIALISER_H
+#define TST_HTMLMODELSERIALISER_H
 #include <QObject>
 #include <tst_serialiserscommon.h>
 class QAbstractItemModel;

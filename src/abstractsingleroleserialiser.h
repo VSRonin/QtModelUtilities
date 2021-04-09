@@ -11,8 +11,8 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef abstractsingleroleserialiser_h__
-#define abstractsingleroleserialiser_h__
+#ifndef ABSTRACTSINGLEROLESERIALISER_H
+#define ABSTRACTSINGLEROLESERIALISER_H
 
 #include "modelutilities_global.h"
 #include "abstractstringserialiser.h"
@@ -38,4 +38,4 @@ public:
 protected:
     AbstractSingleRoleSerialiser(AbstractSingleRoleSerialiserPrivate &d, QObject *parent);
 };
-#endif // abstractsingleroleserialiser_h__
+#endif // ABSTRACTSINGLEROLESERIALISER_H

@@ -11,8 +11,8 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef binarymodelserialiser_h__
-#define binarymodelserialiser_h__
+#ifndef BINARYMODELSERIALISER_H
+#define BINARYMODELSERIALISER_H
 #include "modelutilities_global.h"
 #include "abstractmodelserialiser.h"
 class BinaryModelSerialiserPrivate;
@@ -45,4 +45,4 @@ protected:
 QDataStream &operator<<(QDataStream &stream, const QAbstractItemModel &model);
 QDataStream &operator>>(QDataStream &stream, QAbstractItemModel &model);
 #endif
-#endif // binarymodelserialiser_h__
+#endif // BINARYMODELSERIALISER_H
