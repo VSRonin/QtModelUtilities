@@ -8,10 +8,10 @@ This library is a collection of utilities for Qt's Model/View framework.
 
 ### Contents
 
-+ [Role Mask Proxy Model](https://vsronin.github.io/QtModelUtilities/md__r_e_a_d_m_e__role__mask__proxy__model.html): A proxy that will act as a mask on top of the source model to intercept data.
-+ [Insert Proxy Model](https://vsronin.github.io/QtModelUtilities/md__r_e_a_d_m_e__insert__proxy__model.html): A proxy to add an extra row, column or both to allow users to insert new sections with a familiar interface.
-+ [Root Index Proxy Model](https://vsronin.github.io/QtModelUtilities/md__r_e_a_d_m_e__root__index__proxy__model.html): A proxy to only show the portion of the model that are branches to a particular index.
-+ [Model Serialisation](https://vsronin.github.io/QtModelUtilities/md__r_e_a_d_m_e__model__serialisation.html): Implements a general method to serialise QAbstractItemModel based models to various common formats.
++ [Role Mask Proxy Model](READMERoleMaskProxyModel.markdown): A proxy that will act as a mask on top of the source model to intercept data.
++ [Insert Proxy Model](READMERoleMaskProxyModel.markdown): A proxy to add an extra row, column or both to allow users to insert new sections with a familiar interface.
++ [Root Index Proxy Model](READMERootIndexProxyModel.markdown): A proxy to only show the portion of the model that are branches to a particular index.
++ [Model Serialisation](READMEModelSerialisation.markdown): Implements a general method to serialise QAbstractItemModel based models to various common formats.
 + ~~Transpose Proxy Model: A proxy model to [transpose](https://en.wikipedia.org/wiki/Transpose#Examples) the original model.~~ Now part of Qt: QTransposeProxyModel
 
 ### Installation
@@ -21,7 +21,7 @@ If your system is compatible with one of the main platforms you can download the
 
 #### Build from Source
 This library uses [CMake](https://cmake.org/) as build system and allows usage both using static and dynamic linking as well as customising what parts of the library you want to build. 
-See [INSTALL](https://vsronin.github.io/QtModelUtilities/md__i_n_s_t_a_l_l.html) for detailed build instructions.
+See [INSTALL](INSTALL.markdown) for detailed build instructions.
 
 #### Using the Library
 Once you installed/unpacked your library in a directory (e.g. `path/to/QtModelUtilities`)
