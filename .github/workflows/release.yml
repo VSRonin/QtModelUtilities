@@ -1,0 +1,79 @@
+name: Releases
+on: 
+  push:
+    tags:
+      - "*"
+jobs:
+    release:
+        name: ${{ matrix.platforms.friendly_name }} Qt ${{ matrix.qt_ver }} Release
+        runs-on: ${{ matrix.platforms.os }}
+        strategy:
+          max-parallel: 1
+          matrix:
+              qt_ver: [5.15.2,6.0.2]
+              platforms:
+                - { os: windows-latest, generator: "NMake Makefiles", debug_postfix: d, compression: ZIP, friendly_name: MSVC }
+                - { os: windows-latest, generator: "MinGW Makefiles", debug_postfix: d, compression: ZIP, friendly_name: MinGW }
+                - { os: ubuntu-latest, generator: "Unix Makefiles", debug_postfix: d, compression: TGZ, friendly_name: Ubuntu }
+                - { os: macos-latest, generator: "Unix Makefiles", debug_postfix: _debug, compression: ZIP, friendly_name: MacOS }
+        steps:
+          - name: Install Qt
+            if: ${{ matrix.platforms.friendly_name != 'MinGW' }}
+            uses: jurplel/install-qt-action@v2
+            with:
+              version: ${{ matrix.qt_ver }}
+          - name: Install Qt MinGW
+            if: ${{ matrix.platforms.friendly_name == 'MinGW' }}
+            uses: jurplel/install-qt-action@v2
+            with:
+              version: ${{ matrix.qt_ver }}
+              arch: win64_mingw81
+          - name: Git Checkout
+            uses: actions/checkout@v2
+            with:
+              fetch-depth: 0
+          - name: Create Build Directory
+            run: |
+              mkdir build
+              cd build
+              mkdir shared-Debug
+              mkdir shared-Release
+          - name: Set up MSVC environment
+            if: ${{ matrix.platforms.friendly_name == 'MSVC' }}
+            uses: ilammy/msvc-dev-cmd@v1
+          - name: Install Linux Dependencies
+            if: ${{ runner.os == 'Linux' }}
+            run: |
+              sudo apt-get update -y
+              sudo apt-get install libxcb-icccm4 libxcb-xkb1 libxcb-icccm4 libxcb-image0 libxcb-render-util0 libxcb-randr0 libxcb-keysyms1 libxcb-xinerama0 libxcb-xinput-dev
+          - name: Build ${{ matrix.platforms.friendly_name }} Qt ${{ matrix.qt_ver }}
+            run: |
+              cd build/shared-Debug
+              cmake -G"${{ matrix.platforms.generator }}" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=${{ matrix.platforms.debug_postfix }} -DCMAKE_INSTALL_PREFIX="../installed" ../../
+              cmake --build .
+              cd ../shared-Release
+              cmake -G"${{ matrix.platforms.generator }}" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX="../installed" ../../
+              cmake --build .
+          - name: Create Package
+            run: |
+              cd build
+              cpack -G ${{ matrix.platforms.compression }} --config ../cmake/modules/package.cmake
+          - name: Publish Release
+            uses: ncipollo/release-action@v1
+            with:
+              artifacts: "build/QtModelUtilities*.*"
+              token: ${{ secrets.GITHUB_TOKEN }}
+              allowUpdates: true
+              artifactErrorsFailBuild: true
+              draft: true
+    removedraft:
+        name: Remove Draft from Release
+        runs-on: ubuntu-latest
+        needs: release
+        steps:
+          - name: Publish Release
+            uses: ncipollo/release-action@v1
+            with:
+              token: ${{ secrets.GITHUB_TOKEN }}
+              allowUpdates: true
+              draft: false

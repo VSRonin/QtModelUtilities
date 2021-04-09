@@ -9,6 +9,9 @@ By default the row/column is committed as soon as there is any data in any cell
 
 Only flat models are supported. Branches of a tree will be hidden by the proxy
 
+### Class Documentation
++ InsertProxyModel
+
 ### Dependencies
 
 + Qt Core

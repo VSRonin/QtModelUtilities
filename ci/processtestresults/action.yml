@@ -1,0 +1,145 @@
+name: Qt Test to JUnit
+description: Converts the xml output of Qt Test to a detailed JUnit format and a human readable report
+branding:
+  icon: zap
+  color: green
+inputs:
+  qt-tests:
+    description: Folder of Qt test results
+    required: true
+    default: 'test-results'
+  junit-output:
+    description: Output filename including optional path for the JUnit xml
+    required: true
+    default: JUnitResults.xml
+  html-output:
+    description: Output filename including optional path for the human readable report
+    required: true
+    default: TestResults.html
+runs:
+  using: "composite"
+  steps:
+    - shell: pwsh
+      run: |
+        pushd "${{ inputs.qt-tests }}"
+        $xmlOut = new-object System.Xml.XmlDocument;
+        $xmlOut.AppendChild($xmlOut.CreateXmlDeclaration("1.0","UTF-8",$null));
+        $rootXmlOut = $xmlOut.CreateElement("testsuites");
+        $xmlOut.AppendChild($rootXmlOut);
+        $totalPass = 0;
+        $totalFail = 0;
+        $totalError = 0;
+        $totalSkip = 0;
+        $totalTime = 0;
+        $crashMessage = $null;
+        Get-ChildItem ".\" -Filter "*.xml" | Foreach-Object {
+            $XmlDocument = $null;
+            $localPass = 0;
+            $localFail = 0;
+            $localError = 0;
+            $localSkip = 0;
+            $localTime = 0;
+            $currentFilePath = $_.FullName;
+            $testSuiteName = $_.BaseName;
+            if([bool]((Get-Content -Path $currentFilePath) -as [xml])){
+                [xml]$XmlDocument = (Get-Content -Path $currentFilePath) -as [xml];
+            }
+            else{
+                $localError = 1;
+                $rawFilecontent = [IO.File]::ReadAllText($currentFilePath);
+                if([string]::IsNullOrEmpty($rawFilecontent)){
+                    $crashMessage = "Output file is empty: " + $currentFilePath;
+                }
+                else{
+                    $crashMessage = $rawFilecontent;
+                    $rawFileMatch = [regex]::match($rawFilecontent,"(?s)(.+<\/TestCase>)(.*)");
+                    if($rawFileMatch.Success){
+                        if([bool](($rawFileMatch.captures.groups[1].value) -as [xml])){
+                            [xml]$XmlDocument = ($rawFileMatch.captures.groups[1].value) -as [xml];
+                            $crashMessage = $rawFileMatch.captures.groups[2].value;
+                        }
+                    }
+                }
+            }
+            $testSuiteXmlOut = $rootXmlOut.AppendChild($xmlOut.CreateElement("testsuite"));
+            if($XmlDocument -ne $null){
+                $testClassName = $XmlDocument.TestCase.name;
+                $testSuiteXmlOut.SetAttribute("name",$testSuiteName);
+                $testSuitePropertiesXmlOut = $testSuiteXmlOut.AppendChild($xmlOut.CreateElement("properties"));
+                $testSuitePropertiesPropertyXmlOut = $testSuitePropertiesXmlOut.AppendChild($xmlOut.CreateElement("property"));
+                $testSuitePropertiesPropertyXmlOut.SetAttribute("name","QtVersion");
+                $testSuitePropertiesPropertyXmlOut.SetAttribute("value",($XmlDocument.TestCase.Environment.QtVersion));
+                $testSuitePropertiesPropertyXmlOut = $testSuitePropertiesXmlOut.AppendChild($xmlOut.CreateElement("property"));
+                $testSuitePropertiesPropertyXmlOut.SetAttribute("name","QtBuild");
+                $testSuitePropertiesPropertyXmlOut.SetAttribute("value",($XmlDocument.TestCase.Environment.QtBuild));
+                $testSuitePropertiesPropertyXmlOut = $testSuitePropertiesXmlOut.AppendChild($xmlOut.CreateElement("property"));
+                $testSuitePropertiesPropertyXmlOut.SetAttribute("name","QTestVersion");
+                $testSuitePropertiesPropertyXmlOut.SetAttribute("value",($XmlDocument.TestCase.Environment.QTestVersion));
+                foreach($testFunction in $XmlDocument.SelectNodes("//TestFunction")){
+                    $testFunctionName = $testFunction.name;
+                    $countIncidents = $testFunction.ChildNodes.Count;
+                    $testFunctionTime = [decimal]$testFunction.Duration.msecs;
+                    $localTime = $localTime +$testFunctionTime;
+                    foreach($incident in $testFunction.ChildNodes){
+                        if($incident.Name -ne "Incident" -and $incident.Name -ne "Message"){
+                            continue;
+                        }
+                        $incidentName = $testFunctionName;
+                        if($incident.DataTag -ne $null){
+                            $incidentName = $incidentName + " - " + $incident.DataTag.InnerText;
+                        }
+                        $incidentName = ($incidentName);
+                        $testSuitetestcaseXmlOut = $testSuiteXmlOut.AppendChild($xmlOut.CreateElement("testcase"));
+                        $testSuitetestcaseXmlOut.SetAttribute("name",$incidentName);
+                        $testSuitetestcaseXmlOut.SetAttribute("classname",$testClassName);
+                        $testSuitetestcaseXmlOut.SetAttribute("time",[math]::Round($testFunctionTime/(1000*$countIncidents),3));
+                        if($incident.type -eq "skip"){
+                            ++$localSkip;
+                            $testSuitetestcaseSkipXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("skipped"));
+                            $testSuitetestcaseSkipXmlOut.SetAttribute("message","file: " + ($incident.file + "`nline: " + $incident.line + "`n" + $incident.Description.InnerText));
+                        }
+                        ElseIf ($incident.type -eq "fail"){
+                            ++$localFail;
+                            $testSuitetestcaseSkipXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("failure"));
+                            $testSuitetestcaseSkipXmlOut.SetAttribute("message",("file: " + $incident.file + "`nline: " + $incident.line + "`n" + $incident.Description.InnerText));
+                        }
+                        ElseIf ($incident.type -eq "qdebug" -or $incident.type -eq "qwarn" -or $incident.type -eq "system" -or $incident.type -eq "qfatal"){
+                            $testSuitetestcaseCerrXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("system-err"));
+                            $testSuitetestcaseCerrXmlOut.AppendChild($xmlOut.CreateTextNode(($incident.Description.InnerText)));
+                        }
+                        else{
+                            ++$localPass;
+                        }
+                    };
+                };
+            }
+            if($localError -eq 1){
+                $testSuitetestcaseXmlOut = $testSuiteXmlOut.AppendChild($xmlOut.CreateElement("testcase"));
+                $testSuitetestcaseXmlOut.SetAttribute("name","SystemError");
+                $testSuitetestcaseXmlOut.SetAttribute("classname",$testClassName);
+                $testSuitetestcaseErrorXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("error"));
+                $testSuitetestcaseErrorXmlOut.SetAttribute("message",($crashMessage));
+            }
+            $testSuiteXmlOut.SetAttribute("time",[math]::Round($localTime/1000,3));
+            $testSuiteXmlOut.SetAttribute("skipped",$localSkip);
+            $testSuiteXmlOut.SetAttribute("tests",$localSkip+$localFail+$localError+$localPass);
+            $testSuiteXmlOut.SetAttribute("failures",$localFail);
+            $testSuiteXmlOut.SetAttribute("errors",$localError);
+            $totalTime = $totalTime + $localTime;
+            $totalSkip = $totalSkip + $localSkip;
+            $totalError = $totalError + $localError;
+            $totalFail = $totalFail + $localFail;
+            $totalPass = $totalPass + $localPass;
+        };
+        $rootXmlOut.SetAttribute("time",[math]::Round($totalTime/1000,3));
+        $rootXmlOut.SetAttribute("failures",$totalFail);
+        $rootXmlOut.SetAttribute("errors",$totalError);
+        $rootXmlOut.SetAttribute("tests",$totalPass);
+        popd
+        $xmlOut.save("${{ inputs.junit-output }}");
+    - shell: pwsh
+      run: |
+        $npmBinPath = npm bin
+        npm install xunit-viewer
+        & $npmBinPath/xunit-viewer -r "${{ inputs.junit-output }}" -o "${{ inputs.html-output }}" -t "${{ github.repository }}"
+        Start-Sleep 10

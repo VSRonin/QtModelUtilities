@@ -4,7 +4,8 @@
 #include <QObject>
 #include <QList>
 class QAbstractItemModel;
-class tst_InsertProxyModel : public QObject{
+class tst_InsertProxyModel : public QObject
+{
     Q_OBJECT
 private Q_SLOTS:
     void initTestCase();
@@ -30,5 +31,7 @@ private Q_SLOTS:
     void testDataForCorner();
     void testSort();
     void testSort_data();
+    void testInsertOnEmptyModel();
+    void testResetModel();
 };
 #endif // tst_insertproxymodel_h__

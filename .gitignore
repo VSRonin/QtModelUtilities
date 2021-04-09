@@ -433,3 +433,11 @@ target_wrapper.*
 # QtCtreator CMake
 CMakeLists.txt.user*
 /docs/htmldocs.html
+
+# Auto License Header files
+*.licenseheader
+
+# Model Test From Qt
+modeltest.cpp 
+modeltest.h 
+/RunClangFormat.bat

@@ -1,0 +1,38 @@
+name: clang-format Check
+on: 
+  push:
+    branches:
+      - master
+      - dev
+    paths-ignore:
+      - '.travis.yml'
+      - '.appveyor.yml'
+      - 'modelutilities.pri'
+      - 'docs/**'
+      - '**.markdown'
+      - '**.md'
+      - 'LICENSE'
+      - '**CMakeLists.txt'
+      - 'cmake/**'
+  pull_request:
+    branches:
+      - master
+      - dev
+    paths-ignore:
+      - '.travis.yml'
+      - '.appveyor.yml'
+      - 'modelutilities.pri'
+      - 'docs/**'
+      - '**.markdown'
+      - '**.md'
+      - 'LICENSE'
+      - '**CMakeLists.txt'
+      - 'cmake/**'
+jobs:
+  formatting-check:
+    name: Formatting Check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run clang-format style check for C/C++ programs.
+      uses: jidicula/clang-format-action@v3.2.0
