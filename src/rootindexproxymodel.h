@@ -29,6 +29,12 @@ public:
     void setRootIndex(const QModelIndex& root);
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const override;
     QModelIndex mapFromSource(const QModelIndex &sourceIndex) const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    QMap<int, QVariant> itemData(const QModelIndex &index) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles) override;
+    QSize span(const QModelIndex &index) const override;
 Q_SIGNALS:
     void rootIndexChanged();
 protected:

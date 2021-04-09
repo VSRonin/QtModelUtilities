@@ -37,12 +37,29 @@ QAbstractItemModel *createTreeModel(QObject *parent)
     return result;
 }
 
+void tst_RootIndexProxyModel::showRoot()
+{
+#ifdef QT_GUI_LIB
+    QFETCH(QAbstractItemModel *, baseModel);
+    QFETCH(QModelIndex, root);
+    RootIndexProxyModel proxyModel;
+    new ModelTest(&proxyModel, baseModel);
+    proxyModel.setSourceModel(baseModel);
+    proxyModel.setRootIndex(root);
+    compareModels(baseModel,&proxyModel,root,QModelIndex());
+    baseModel->deleteLater();
+#else
+    QSKIP("This test requires the Qt GUI module");
+#endif
+}
+
 void tst_RootIndexProxyModel::showRoot_data()
 {
     QTest::addColumn<QAbstractItemModel *>("baseModel");
     QTest::addColumn<QModelIndex>("root");
     QAbstractItemModel *baseModel = createTreeModel(this);
     QTest::newRow("Child") << baseModel << baseModel->index(1,0);
+    baseModel = createTreeModel(this);
     QTest::newRow("Grandchild") << baseModel << baseModel->index(2,0,baseModel->index(1,0));
 }
 
@@ -65,17 +82,7 @@ void tst_RootIndexProxyModel::compareModels(const QAbstractItemModel *source, co
     }
 }
 
-void tst_RootIndexProxyModel::showRoot()
-{
-    QFETCH(QAbstractItemModel *, baseModel);
-    QFETCH(QModelIndex, root);
-    RootIndexProxyModel proxyModel;
-    new ModelTest(&proxyModel, baseModel);
-    proxyModel.setSourceModel(baseModel);
-    proxyModel.setRootIndex(root);
-    compareModels(baseModel,&proxyModel,root,QModelIndex());
-    baseModel->deleteLater();
-}
+
 
 
 

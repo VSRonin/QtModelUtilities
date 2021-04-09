@@ -13,6 +13,7 @@
 #include "private/rootindexproxymodel_p.h"
 #include "rootindexproxymodel.h"
 #include <functional>
+#include <QSize>
 RootIndexProxyModelPrivate::RootIndexProxyModelPrivate(RootIndexProxyModel *q)
     : q_ptr(q)
 {
@@ -111,15 +112,69 @@ QModelIndex RootIndexProxyModel::mapFromSource(const QModelIndex &sourceIndex) c
 /*!
 \reimp
 */
+QVariant RootIndexProxyModel::data(const QModelIndex &index, int role) const{
+    if(!index.isValid())
+        return QVariant();
+    return QIdentityProxyModel::data(index,role);
+}
+
+/*!
+\reimp
+*/
+Qt::ItemFlags RootIndexProxyModel::flags(const QModelIndex &index) const{
+    if(!index.isValid())
+        return Qt::NoItemFlags;
+    return QIdentityProxyModel::flags(index);
+}
+
+/*!
+\reimp
+*/
+QMap<int, QVariant> RootIndexProxyModel::itemData(const QModelIndex &index) const{
+    if(!index.isValid())
+        return QMap<int, QVariant>();
+    return QIdentityProxyModel::itemData(index);
+}
+
+/*!
+\reimp
+*/
+bool RootIndexProxyModel::setData(const QModelIndex &index, const QVariant &value, int role){
+    if(!index.isValid())
+        return false;
+    return QIdentityProxyModel::setData(index,value,role);
+}
+
+/*!
+\reimp
+*/
+bool RootIndexProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles){
+    if(!index.isValid())
+        return false;
+    return QIdentityProxyModel::setItemData(index,roles);
+}
+
+/*!
+\reimp
+*/
+QSize RootIndexProxyModel::span(const QModelIndex &index) const{
+    if(!index.isValid())
+        return QSize();
+    return QIdentityProxyModel::span(index);
+}
+
+/*!
+\reimp
+*/
 QModelIndex RootIndexProxyModel::mapToSource(const QModelIndex &proxyIndex) const
 {
-    if (!proxyIndex.isValid())
-        return QModelIndex();
     if (!sourceModel())
         return QModelIndex();
+    Q_D(const RootIndexProxyModel);
+    if (!proxyIndex.isValid())
+        return d->m_rootIndex;
     if(proxyIndex.internalPointer())
         return QIdentityProxyModel::mapToSource(proxyIndex);
-    Q_D(const RootIndexProxyModel);
     return sourceModel()->index(proxyIndex.row(),proxyIndex.column(),d->m_rootIndex);
 }
 
