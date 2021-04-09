@@ -11,6 +11,7 @@ option(BUILD_DOCS "Enables or disables the build of the documentation" OFF)
 option(BUILD_ROLEMASKPROXY "Enables or disables the build of Role Mask Proxy Model" ON)
 option(BUILD_MODELSERIALISATION "Enables or disables the build of Model Serialisation" ON)
 option(BUILD_INSERTPROXY "Enables or disables the build of Insert Proxy Model" ON)
+option(BUILD_ROOTINDEXPROXY "Enables or disables the build of Root Index Proxy Model" ON)
 option(OPTIMISE_FOR_MANY_ROLES "Set this property to ON if you plan to store more than 20 different roles in the models to optimise performance" OFF)
 
 include(CTest)

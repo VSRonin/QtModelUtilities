@@ -43,6 +43,12 @@ if(BUILD_INSERTPROXY)
     set(modelutilities_INSTALL_INCLUDE insertproxymodel.h includes/InsertProxyModel ${modelutilities_INSTALL_INCLUDE})
     source_group(InsertProxyModel FILES ${insertproxy_SRCS})
 endif()
+if(BUILD_ROOTINDEXPROXY)
+    set(rootindexproxy_SRCS rootindexproxymodel.cpp rootindexproxymodel.h private/rootindexproxymodel_p.h)
+    set(modelutilities_SRCS ${rootindexproxy_SRCS} ${modelutilities_SRCS})
+    set(modelutilities_INSTALL_INCLUDE rootindexproxymodel.h includes/RootIndexProxyModel ${modelutilities_INSTALL_INCLUDE})
+    source_group(RootIndexModel FILES ${rootindexproxy_SRCS})
+endif()
 if(BUILD_MODELSERIALISATION)
     set(modelserialisation_SRCS
         abstractmodelserialiser.cpp
