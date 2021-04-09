@@ -35,5 +35,3 @@ You can also specify an number of arguments to customise the build even further:
 After running CMake you can call `cmake --build .` to compile the project.
 You can call `cmake --build . --target test` or `ctest` to run the unit tests.
 Finally you can call `cmake --build . --target install` to install the library in the destination specified by `-DCMAKE_INSTALL_PREFIX=`.
-
-To use the library add the path to the directory where you installed the library to `CMAKE_PREFIX_PATH`, the you can use `find_package(QtModelUtilities)`/`target_link_libraries(MyApp PRIVATE QtModelUtilities::QtModelUtilities)` to use it in your CMake project.
