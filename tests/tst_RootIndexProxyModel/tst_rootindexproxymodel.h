@@ -17,7 +17,7 @@ private Q_SLOTS:
     void rootRemoved();
     void sourceMoveRows();
     void sourceMoveColumns();
-    void sourceSort();
+    void sourceSortDescendantOfRoot();
 protected:
     void compareModels(const QAbstractItemModel* source,const QAbstractItemModel* proxy, const QModelIndex& sourcePar, const QModelIndex& proxyPar);
 };
