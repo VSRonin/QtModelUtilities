@@ -1,5 +1,5 @@
 /****************************************************************************\
-   Copyright 2018 Luca Beldi
+   Copyright 2021 Luca Beldi
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
@@ -22,6 +22,10 @@ class RootIndexProxyModelPrivate
     QVector<QMetaObject::Connection> m_sourceConnections;
     QPersistentModelIndex m_rootIndex;
     RootIndexProxyModel *q_ptr;
+    bool m_rootRowDeleted;
+    bool m_rootColumnDeleted;
+    QList<QPersistentModelIndex> layoutChangePersistentIndexes;
+    QModelIndexList proxyIndexes;
     bool isDescendant(QModelIndex childIdx, const QModelIndex& parentIdx) const;
     void resetRootOnModelChange();
     void checkRootRowRemoved(const QModelIndex &parent, int first, int last);
@@ -30,11 +34,17 @@ class RootIndexProxyModelPrivate
     void onRowsInserted(const QModelIndex &parent, int first, int last);
     void onRowsAboutToBeRemoved(const QModelIndex &parent, int first, int last);
     void onRowsRemoved(const QModelIndex &parent, int first, int last);
+    void onRowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destParent, int dest);
+    void onRowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destParent, int dest);
+    void onColumnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destParent, int dest);
+    void onColumnsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destParent, int dest);
     void onColumnsAboutToBeInserted(const QModelIndex &parent, int first, int last);
     void onColumnsInserted(const QModelIndex &parent, int first, int last);
     void onColumnsAboutToBeRemoved(const QModelIndex &parent, int first, int last);
     void onColumnsRemoved(const QModelIndex &parent, int first, int last);
     void onDataChanged(const QModelIndex &topLeft,const QModelIndex &bottomRight, const QVector<int>& roles);
+    void onLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &sourceParents, QAbstractItemModel::LayoutChangeHint hint);
+    void onLayoutChanged(const QList<QPersistentModelIndex> &sourceParents, QAbstractItemModel::LayoutChangeHint hint);
 };
 
 #endif // ROOTINDEXPROXY_P_H

@@ -170,6 +170,21 @@ void tst_RootIndexProxyModel::rootRemoved()
     compareModels(baseModel,&proxyModel,QModelIndex(),QModelIndex());
 }
 
+void tst_RootIndexProxyModel::sourceMoveRows()
+{
+    QSKIP("No tree model implements row movement");
+}
+
+void tst_RootIndexProxyModel::sourceMoveColumns()
+{
+    QSKIP("No tree model implements column movement");
+}
+
+void tst_RootIndexProxyModel::sourceSort()
+{
+
+}
+
 void tst_RootIndexProxyModel::compareModels(const QAbstractItemModel *source, const QAbstractItemModel *proxy, const QModelIndex &sourcePar, const QModelIndex &proxyPar)
 {
     const int maxR = source->rowCount(sourcePar);
