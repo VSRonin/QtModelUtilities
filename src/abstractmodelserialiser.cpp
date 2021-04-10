@@ -73,7 +73,8 @@ AbstractModelSerialiser::AbstractModelSerialiser(const QAbstractItemModel *model
 \internal
 */
 AbstractModelSerialiser::AbstractModelSerialiser(AbstractModelSerialiserPrivate &d, QObject *parent)
-    : d_ptr(&d)
+    : QObject(parent)
+    , d_ptr(&d)
 { }
 
 /*!
