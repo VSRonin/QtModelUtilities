@@ -260,23 +260,21 @@ void RootIndexProxyModelPrivate::onDataChanged(const QModelIndex &topLeft, const
 void RootIndexProxyModelPrivate::onLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &sourceParents, QAbstractItemModel::LayoutChangeHint hint)
 {
     Q_Q(RootIndexProxyModel);
-    if(sourceParents.isEmpty())
-        return;
     QList<QPersistentModelIndex> parents;
     parents.reserve(sourceParents.size());
+    bool addedInvalidIndex =false;
     for (const QPersistentModelIndex &parent : sourceParents) {
-        if(isDescendant(m_rootIndex,parent))
-            continue;
-        if (!parent.isValid()) {
-            parents << QPersistentModelIndex();
+        if (!parent.isValid()||isDescendant(m_rootIndex,parent)) {
+            if(!addedInvalidIndex){
+                addedInvalidIndex=true;
+                parents << QPersistentModelIndex();
+            }
             continue;
         }
         const QModelIndex mappedParent = q->mapFromSource(parent);
         Q_ASSERT(mappedParent.isValid());
         parents << mappedParent;
     }
-    if(parents.isEmpty())
-        return;
     q->layoutAboutToBeChanged(parents, hint);
     const auto proxyPersistentIndexes = q->persistentIndexList();
     for (const QModelIndex &proxyPersistentIndex : proxyPersistentIndexes) {
@@ -291,26 +289,26 @@ void RootIndexProxyModelPrivate::onLayoutAboutToBeChanged(const QList<QPersisten
 void RootIndexProxyModelPrivate::onLayoutChanged(const QList<QPersistentModelIndex> &sourceParents, QAbstractItemModel::LayoutChangeHint hint)
 {
     Q_Q(RootIndexProxyModel);
-    for (int i = 0; i < proxyIndexes.size(); ++i) {
+    for (int i = 0; i < proxyIndexes.size(); ++i)
         q->changePersistentIndex(proxyIndexes.at(i), q->mapFromSource(layoutChangePersistentIndexes.at(i)));
-    }
     layoutChangePersistentIndexes.clear();
     proxyIndexes.clear();
     QList<QPersistentModelIndex> parents;
     parents.reserve(sourceParents.size());
+    bool addedInvalidIndex =false;
     for (const QPersistentModelIndex &parent : sourceParents) {
-        if(isDescendant(m_rootIndex,parent))
-            continue;
-        if (!parent.isValid()) {
-            parents << QPersistentModelIndex();
+        if (!parent.isValid() || isDescendant(m_rootIndex,parent)) {
+            if(!addedInvalidIndex){
+                addedInvalidIndex=true;
+                parents << QPersistentModelIndex();
+            }
             continue;
         }
         const QModelIndex mappedParent = q->mapFromSource(parent);
         Q_ASSERT(mappedParent.isValid());
         parents << mappedParent;
     }
-    if(!parents.isEmpty())
-        q->layoutChanged(parents, hint);
+    q->layoutChanged(parents, hint);
 }
 
 
@@ -379,25 +377,6 @@ void RootIndexProxyModel::setSourceModel(QAbstractItemModel *sourceModel){
     d->m_sourceConnections.clear();
     QIdentityProxyModel::setSourceModel(sourceModel);
     if(sourceModel){
-        using namespace std::placeholders;
-        d->m_sourceConnections
-            << connect(sourceModel,&QAbstractItemModel::rowsAboutToBeRemoved,std::bind(&RootIndexProxyModelPrivate::onRowsAboutToBeRemoved,d,_1,_2,_3))
-            << connect(sourceModel,&QAbstractItemModel::columnsAboutToBeRemoved,std::bind(&RootIndexProxyModelPrivate::onColumnsAboutToBeRemoved,d,_1,_2,_3))
-            << connect(sourceModel,&QAbstractItemModel::rowsRemoved,std::bind(&RootIndexProxyModelPrivate::onRowsRemoved,d,_1,_2,_3))
-            << connect(sourceModel,&QAbstractItemModel::columnsRemoved,std::bind(&RootIndexProxyModelPrivate::onColumnsRemoved,d,_1,_2,_3))
-            << connect(sourceModel,&QAbstractItemModel::rowsAboutToBeInserted,std::bind(&RootIndexProxyModelPrivate::onRowsAboutToBeInserted,d,_1,_2,_3))
-            << connect(sourceModel,&QAbstractItemModel::columnsAboutToBeInserted,std::bind(&RootIndexProxyModelPrivate::onColumnsAboutToBeInserted,d,_1,_2,_3))
-            << connect(sourceModel,&QAbstractItemModel::rowsInserted,std::bind(&RootIndexProxyModelPrivate::onRowsInserted,d,_1,_2,_3))
-            << connect(sourceModel,&QAbstractItemModel::columnsInserted,std::bind(&RootIndexProxyModelPrivate::onColumnsInserted,d,_1,_2,_3))
-            << connect(sourceModel,&QAbstractItemModel::dataChanged,std::bind(&RootIndexProxyModelPrivate::onDataChanged,d,_1,_2,_3))
-            << connect(sourceModel,&QAbstractItemModel::rowsAboutToBeMoved,std::bind(&RootIndexProxyModelPrivate::onRowsAboutToBeRemoved,d,_1,_2,_3))
-            << connect(sourceModel,&QAbstractItemModel::columnsAboutToBeMoved,std::bind(&RootIndexProxyModelPrivate::onColumnsAboutToBeRemoved,d,_1,_2,_3))
-            << connect(sourceModel,&QAbstractItemModel::rowsMoved,std::bind(&RootIndexProxyModelPrivate::onRowsRemoved,d,_1,_2,_3))
-            << connect(sourceModel,&QAbstractItemModel::columnsMoved,std::bind(&RootIndexProxyModelPrivate::onColumnsRemoved,d,_1,_2,_3))
-
-            << connect(sourceModel,&QAbstractItemModel::rowsAboutToBeRemoved,std::bind(&RootIndexProxyModelPrivate::checkRootRowRemoved,d,_1,_2,_3))
-            << connect(sourceModel,&QAbstractItemModel::columnsAboutToBeRemoved,std::bind(&RootIndexProxyModelPrivate::checkRootColumnsRemoved,d,_1,_2,_3))
-        ;
         Q_ASSUME(disconnect(sourceModel, SIGNAL(rowsAboutToBeInserted(QModelIndex,int,int)), this, SLOT(_q_sourceRowsAboutToBeInserted(QModelIndex,int,int))));
         Q_ASSUME(disconnect(sourceModel, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(_q_sourceRowsInserted(QModelIndex,int,int))));
         Q_ASSUME(disconnect(sourceModel, SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)), this, SLOT(_q_sourceRowsAboutToBeRemoved(QModelIndex,int,int))));
@@ -411,9 +390,29 @@ void RootIndexProxyModel::setSourceModel(QAbstractItemModel *sourceModel){
         Q_ASSUME(disconnect(sourceModel, SIGNAL(columnsMoved(QModelIndex,int,int,QModelIndex,int)), this, SLOT(_q_sourceColumnsMoved(QModelIndex,int,int,QModelIndex,int))));
         Q_ASSUME(disconnect(sourceModel, SIGNAL(rowsAboutToBeMoved(QModelIndex,int,int,QModelIndex,int)), this, SLOT(_q_sourceRowsAboutToBeMoved(QModelIndex,int,int,QModelIndex,int))));
         Q_ASSUME(disconnect(sourceModel, SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)), this, SLOT(_q_sourceRowsMoved(QModelIndex,int,int,QModelIndex,int))));
-
         Q_ASSUME(disconnect(sourceModel, SIGNAL(layoutAboutToBeChanged(QList<QPersistentModelIndex>,QAbstractItemModel::LayoutChangeHint)), this, SLOT(_q_sourceLayoutAboutToBeChanged(QList<QPersistentModelIndex>,QAbstractItemModel::LayoutChangeHint))));
         Q_ASSUME(disconnect(sourceModel, SIGNAL(layoutChanged(QList<QPersistentModelIndex>,QAbstractItemModel::LayoutChangeHint)), this, SLOT(_q_sourceLayoutChanged(QList<QPersistentModelIndex>,QAbstractItemModel::LayoutChangeHint))));
+        using namespace std::placeholders;
+        d->m_sourceConnections
+            << connect(sourceModel,&QAbstractItemModel::rowsAboutToBeRemoved,std::bind(&RootIndexProxyModelPrivate::onRowsAboutToBeRemoved,d,_1,_2,_3))
+            << connect(sourceModel,&QAbstractItemModel::columnsAboutToBeRemoved,std::bind(&RootIndexProxyModelPrivate::onColumnsAboutToBeRemoved,d,_1,_2,_3))
+            << connect(sourceModel,&QAbstractItemModel::rowsRemoved,std::bind(&RootIndexProxyModelPrivate::onRowsRemoved,d,_1,_2,_3))
+            << connect(sourceModel,&QAbstractItemModel::columnsRemoved,std::bind(&RootIndexProxyModelPrivate::onColumnsRemoved,d,_1,_2,_3))
+            << connect(sourceModel,&QAbstractItemModel::rowsAboutToBeInserted,std::bind(&RootIndexProxyModelPrivate::onRowsAboutToBeInserted,d,_1,_2,_3))
+            << connect(sourceModel,&QAbstractItemModel::columnsAboutToBeInserted,std::bind(&RootIndexProxyModelPrivate::onColumnsAboutToBeInserted,d,_1,_2,_3))
+            << connect(sourceModel,&QAbstractItemModel::rowsInserted,std::bind(&RootIndexProxyModelPrivate::onRowsInserted,d,_1,_2,_3))
+            << connect(sourceModel,&QAbstractItemModel::columnsInserted,std::bind(&RootIndexProxyModelPrivate::onColumnsInserted,d,_1,_2,_3))
+            << connect(sourceModel,&QAbstractItemModel::dataChanged,std::bind(&RootIndexProxyModelPrivate::onDataChanged,d,_1,_2,_3))
+            << connect(sourceModel,&QAbstractItemModel::rowsAboutToBeMoved,std::bind(&RootIndexProxyModelPrivate::onRowsAboutToBeMoved,d,_1,_2,_3,_4,_5))
+            << connect(sourceModel,&QAbstractItemModel::columnsAboutToBeMoved,std::bind(&RootIndexProxyModelPrivate::onColumnsAboutToBeMoved,d,_1,_2,_3,_4,_5))
+            << connect(sourceModel,&QAbstractItemModel::rowsMoved,std::bind(&RootIndexProxyModelPrivate::onRowsMoved,d,_1,_2,_3,_4,_5))
+            << connect(sourceModel,&QAbstractItemModel::columnsMoved,std::bind(&RootIndexProxyModelPrivate::onColumnsMoved,d,_1,_2,_3,_4,_5))
+            << connect(sourceModel,&QAbstractItemModel::layoutAboutToBeChanged,std::bind(&RootIndexProxyModelPrivate::onLayoutAboutToBeChanged,d,_1,_2))
+            << connect(sourceModel,&QAbstractItemModel::layoutChanged,std::bind(&RootIndexProxyModelPrivate::onLayoutChanged,d,_1,_2))
+
+            << connect(sourceModel,&QAbstractItemModel::rowsAboutToBeRemoved,std::bind(&RootIndexProxyModelPrivate::checkRootRowRemoved,d,_1,_2,_3))
+            << connect(sourceModel,&QAbstractItemModel::columnsAboutToBeRemoved,std::bind(&RootIndexProxyModelPrivate::checkRootColumnsRemoved,d,_1,_2,_3))
+        ;
     }
 }
 

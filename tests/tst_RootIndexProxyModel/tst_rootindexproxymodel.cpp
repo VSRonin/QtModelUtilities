@@ -37,6 +37,15 @@ QAbstractItemModel *createTreeModel(QObject *parent)
     return result;
 }
 
+void tst_RootIndexProxyModel::autoParent(){
+    QObject* parentObj = new QObject;
+    auto testItem = new RootIndexProxyModel(parentObj);
+    QSignalSpy testItemDestroyedSpy(testItem, SIGNAL(destroyed(QObject*)));
+    QVERIFY(testItemDestroyedSpy.isValid());
+    delete parentObj;
+    QCOMPARE(testItemDestroyedSpy.count(),1);
+}
+
 void tst_RootIndexProxyModel::showRoot()
 {
 #ifdef QT_GUI_LIB
@@ -99,6 +108,39 @@ void tst_RootIndexProxyModel::replaceModel_data()
     baseModel = createTreeModel(this);
     replaceModel = createTreeModel(this);
     QTest::newRow("Grandchild") << baseModel << baseModel->index(1,0) << replaceModel << replaceModel->index(2,0,replaceModel->index(1,0));
+}
+
+void tst_RootIndexProxyModel::sourceDataChanged()
+{
+#ifdef QT_GUI_LIB
+    QFETCH(QAbstractItemModel *, baseModel);
+    QFETCH(QModelIndex, changeIndex);
+    QFETCH(const int, expectedSignals);
+    RootIndexProxyModel proxyModel;
+    new ModelTest(&proxyModel, baseModel);
+    proxyModel.setSourceModel(baseModel);
+    proxyModel.setRootIndex(baseModel->index(1,0, baseModel->index(1,0)));
+    QSignalSpy proxyDataChangeSpy(&proxyModel, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)));
+    QVERIFY(proxyDataChangeSpy.isValid());
+    baseModel->setData(changeIndex,QStringLiteral("Hello"));
+    QCOMPARE(proxyDataChangeSpy.count(),expectedSignals);
+#else
+    QSKIP("This test requires the Qt GUI module");
+#endif
+}
+
+void tst_RootIndexProxyModel::sourceDataChanged_data(){
+    QTest::addColumn<QAbstractItemModel *>("baseModel");
+    QTest::addColumn<QModelIndex>("changeIndex");
+    QTest::addColumn<const int>("expectedSignals");
+    QAbstractItemModel *baseModel = createTreeModel(this);
+    QTest::newRow("Sibling of Root") << baseModel << baseModel->index(0,0, baseModel->index(1,0)) << 0;
+    baseModel = createTreeModel(this);
+    QTest::newRow("Ancestor of Root") << baseModel << baseModel->index(0,0) << 0;
+    baseModel = createTreeModel(this);
+    QTest::newRow("Root") << baseModel << baseModel->index(1,0, baseModel->index(1,0)) << 0;
+    baseModel = createTreeModel(this);
+    QTest::newRow("Descendant of Root") << baseModel << baseModel->index(0,0,baseModel->index(1,0, baseModel->index(1,0))) << 1;
 }
 
 void tst_RootIndexProxyModel::switchRoot()
@@ -237,6 +279,50 @@ void tst_RootIndexProxyModel::sourceSortDescendantOfRoot()
     QSKIP("This test requires the Qt GUI module");
 #endif
 }
+
+void tst_RootIndexProxyModel::sourceSortAncestorOfRoot()
+{
+#ifdef QT_GUI_LIB
+    QStandardItemModel baseModel;
+    baseModel.insertColumn(0);
+    baseModel.insertRows(0,3);
+    for(int i=0;i<baseModel.rowCount();++i){
+        const QModelIndex grandparent = baseModel.index(i,0);
+        baseModel.setData(grandparent,QChar('Z'-i));
+        baseModel.insertColumn(0,grandparent);
+        baseModel.insertRows(0,3,grandparent);
+        for(int j=0;j<baseModel.rowCount(grandparent);++j){
+            const QModelIndex parent = baseModel.index(j,0,grandparent);
+            baseModel.setData(parent,QChar('Z'-i)+QString::number(j+1));
+            baseModel.insertColumn(0,parent);
+            baseModel.insertRows(0,3,parent);
+            for(int h=0;h<baseModel.rowCount(parent);++h)
+                baseModel.setData(baseModel.index(h,0,parent),QChar('Z'-i)+QString::number(j+1)+QChar('a'+h));
+        }
+    }
+    RootIndexProxyModel proxyModel;
+    new ModelTest(&proxyModel, &baseModel);
+    proxyModel.setSourceModel(&baseModel);
+    proxyModel.setRootIndex(baseModel.index(0,0));
+    const QPersistentModelIndex Z3aIdx = proxyModel.index(0,0,proxyModel.index(2,0));
+    QVERIFY(Z3aIdx.isValid());
+    QCOMPARE(Z3aIdx.data().toString(),QStringLiteral("Z3a"));
+    QSignalSpy proxyLayChangeSpy(&proxyModel, SIGNAL(layoutChanged(QList<QPersistentModelIndex>, QAbstractItemModel::LayoutChangeHint)));
+    QVERIFY(proxyLayChangeSpy.isValid());
+    baseModel.sort(0);
+    QCOMPARE(Z3aIdx.row(),0);
+    QCOMPARE(Z3aIdx.data().toString(),QStringLiteral("Z3a"));
+    QCOMPARE(proxyLayChangeSpy.count(), 1);
+    QModelIndex Z1Idx = proxyModel.index(0,0);
+    QCOMPARE(proxyModel.index(0,0,Z1Idx).data().toString(),QStringLiteral("Z1a"));
+    QCOMPARE(proxyModel.index(1,0,Z1Idx).data().toString(),QStringLiteral("Z1b"));
+    QCOMPARE(proxyModel.index(2,0,Z1Idx).data().toString(),QStringLiteral("Z1c"));
+#else
+    QSKIP("This test requires the Qt GUI module");
+#endif
+}
+
+
 
 void tst_RootIndexProxyModel::compareModels(const QAbstractItemModel *source, const QAbstractItemModel *proxy, const QModelIndex &sourcePar, const QModelIndex &proxyPar)
 {
