@@ -323,8 +323,8 @@ HtmlModelSerialiser::HtmlModelSerialiser(HtmlModelSerialiserPrivate &d, QObject 
 \property HtmlModelSerialiser::printStartDocument
 \accessors %printStartDocument(), setPrintStartDocument()
 \brief This property determines if the start of the html document should be written
-\details If this property is set to \c true (the default) the serialiser will write the \c <html> starting block.
-Set this to false to save the model as part of a larger html document or if you want to specify your custom css in the \c <head>
+\details If this property is set to \c true (the default) the serialiser will write the \c \<html\> starting block.
+Set this to false to save the model as part of a larger html document or if you want to specify your custom css in the \c \<head\>
 */
 bool HtmlModelSerialiser::printStartDocument() const
 {
