@@ -7,6 +7,7 @@ class tst_JsonModelSerialiser : public QObject, public tst_SerialiserCommon
 {
     Q_OBJECT
 private Q_SLOTS:
+    void autoParent();
     void basicSaveLoadByteArray();
     void basicSaveLoadFile();
     void basicSaveLoadObject();

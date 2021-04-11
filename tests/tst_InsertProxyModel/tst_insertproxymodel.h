@@ -8,6 +8,7 @@ class tst_InsertProxyModel : public QObject
 {
     Q_OBJECT
 private Q_SLOTS:
+    void autoParent();
     void initTestCase();
     void testData();
     void testData_data();

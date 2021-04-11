@@ -13,7 +13,16 @@
 #    include <QNetworkReply>
 #    include <QNetworkRequest>
 #endif
+#include <QSignalSpy>
 
+void tst_HtmlModelSerialiser::autoParent(){
+    QObject* parentObj = new QObject;
+    auto testItem = new HtmlModelSerialiser(parentObj);
+    QSignalSpy testItemDestroyedSpy(testItem, SIGNAL(destroyed(QObject*)));
+    QVERIFY(testItemDestroyedSpy.isValid());
+    delete parentObj;
+    QCOMPARE(testItemDestroyedSpy.count(),1);
+}
 void tst_HtmlModelSerialiser::initTestCase()
 {
 #ifdef QT_NETWORK_LIB
@@ -52,7 +61,7 @@ void tst_HtmlModelSerialiser::basicSaveLoadNested()
 {
     QFETCH(const QAbstractItemModel *, sourceModel);
     QFETCH(QAbstractItemModel *, destinationModel);
-    HtmlModelSerialiser serialiser(sourceModel);
+    HtmlModelSerialiser serialiser(sourceModel,nullptr);
     serialiser.addRoleToSave(Qt::UserRole + 1);
     QByteArray dataArray;
     QBuffer serialisedHtmlNested(&dataArray);
@@ -78,7 +87,7 @@ void tst_HtmlModelSerialiser::validateHtmlOutput()
 {
 #ifdef QT_NETWORK_LIB
     QFETCH(const QAbstractItemModel *, sourceModel);
-    HtmlModelSerialiser serialiser(sourceModel);
+    HtmlModelSerialiser serialiser(sourceModel,nullptr);
     serialiser.addRoleToSave(Qt::UserRole + 1);
     QByteArray htmlData;
     QVERIFY(serialiser.saveModel(&htmlData));

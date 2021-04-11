@@ -25,8 +25,9 @@ class MODELUTILITIES_EXPORT JsonModelSerialiser : public AbstractStringSerialise
     Q_DECLARE_PRIVATE(JsonModelSerialiser)
     Q_DISABLE_COPY(JsonModelSerialiser)
 public:
-    JsonModelSerialiser(QAbstractItemModel *model = Q_NULLPTR, QObject *parent = Q_NULLPTR);
-    JsonModelSerialiser(const QAbstractItemModel *model, QObject *parent = Q_NULLPTR);
+    explicit JsonModelSerialiser(QObject *parent = Q_NULLPTR);
+    JsonModelSerialiser(QAbstractItemModel *model, QObject *parent);
+    JsonModelSerialiser(const QAbstractItemModel *model, QObject *parent);
     bool saveModel(QIODevice *destination) const Q_DECL_OVERRIDE;
     bool saveModel(QByteArray *destination) const Q_DECL_OVERRIDE;
     bool saveModel(QString *destination) const Q_DECL_OVERRIDE;

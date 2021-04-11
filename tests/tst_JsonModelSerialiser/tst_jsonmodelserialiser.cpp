@@ -4,6 +4,16 @@
 #include <QByteArray>
 #include <QFile>
 #include <QJsonObject>
+#include <QSignalSpy>
+
+void tst_JsonModelSerialiser::autoParent(){
+    QObject* parentObj = new QObject;
+    auto testItem = new JsonModelSerialiser(parentObj);
+    QSignalSpy testItemDestroyedSpy(testItem, SIGNAL(destroyed(QObject*)));
+    QVERIFY(testItemDestroyedSpy.isValid());
+    delete parentObj;
+    QCOMPARE(testItemDestroyedSpy.count(),1);
+}
 
 void tst_JsonModelSerialiser::basicSaveLoadByteArray()
 {
@@ -36,7 +46,7 @@ void tst_JsonModelSerialiser::validateJsonOutput()
 {
     QFETCH(const QAbstractItemModel *, sourceModel);
     QByteArray modelData;
-    JsonModelSerialiser serialiser(sourceModel);
+    JsonModelSerialiser serialiser(sourceModel,nullptr);
     serialiser.saveModel(&modelData);
     QJsonParseError parseErr;
     QJsonDocument::fromJson(modelData, &parseErr);
@@ -59,7 +69,7 @@ void tst_JsonModelSerialiser::basicSaveLoadObject()
 {
     QFETCH(const QAbstractItemModel *, sourceModel);
     QFETCH(QAbstractItemModel *, destinationModel);
-    JsonModelSerialiser serialiser(sourceModel);
+    JsonModelSerialiser serialiser(sourceModel,nullptr);
     serialiser.addRoleToSave(Qt::UserRole + 1);
     QJsonObject writeObject = serialiser.toJsonObject();
     QVERIFY(!writeObject.isEmpty());

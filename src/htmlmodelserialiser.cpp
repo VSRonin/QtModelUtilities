@@ -293,6 +293,15 @@ QVariant HtmlModelSerialiserPrivate::readHtmlVariant(QXmlStreamReader &reader, i
 }
 
 /*!
+Constructs a serialiser
+*/
+HtmlModelSerialiser::HtmlModelSerialiser(QObject *parent)
+    : AbstractStringSerialiser(*new HtmlModelSerialiserPrivate(this), parent)
+{
+
+}
+
+/*!
 Constructs a serialiser operating over \a model
 */
 HtmlModelSerialiser::HtmlModelSerialiser(QAbstractItemModel *model, QObject *parent)

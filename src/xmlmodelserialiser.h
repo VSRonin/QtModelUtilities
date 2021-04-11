@@ -26,8 +26,9 @@ class MODELUTILITIES_EXPORT XmlModelSerialiser : public AbstractStringSerialiser
     Q_DECLARE_PRIVATE(XmlModelSerialiser)
     Q_DISABLE_COPY(XmlModelSerialiser)
 public:
-    XmlModelSerialiser(QAbstractItemModel *model = Q_NULLPTR, QObject *parent = Q_NULLPTR);
-    XmlModelSerialiser(const QAbstractItemModel *model, QObject *parent = Q_NULLPTR);
+    explicit XmlModelSerialiser(QObject *parent = Q_NULLPTR);
+    XmlModelSerialiser(QAbstractItemModel *model, QObject *parent);
+    XmlModelSerialiser(const QAbstractItemModel *model, QObject *parent);
     ~XmlModelSerialiser();
     bool printStartDocument() const;
     void setPrintStartDocument(bool val);

@@ -21,6 +21,15 @@ AbstractSingleRoleSerialiserPrivate::AbstractSingleRoleSerialiserPrivate(Abstrac
 }
 
 /*!
+Construct a serialiser
+*/
+AbstractSingleRoleSerialiser::AbstractSingleRoleSerialiser(QObject *parent)
+    : AbstractStringSerialiser(*new AbstractSingleRoleSerialiserPrivate(this), parent)
+{
+
+}
+
+/*!
 Construct a read/write serialiser
 */
 AbstractSingleRoleSerialiser::AbstractSingleRoleSerialiser(QAbstractItemModel *model, QObject *parent)

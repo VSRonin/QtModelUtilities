@@ -5,7 +5,7 @@
 #    include <QStandardItemModel>
 #endif
 #include <QSortFilterProxyModel>
-#include <QtTest/QSignalSpy>
+#include <QSignalSpy>
 #include <QList>
 #include <QVariant>
 #include <random>
@@ -67,6 +67,15 @@ QAbstractItemModel *createTreeModel(QObject *parent)
     }
 #endif
     return result;
+}
+
+void tst_RoleMaskProxyModel::autoParent(){
+    QObject* parentObj = new QObject;
+    auto testItem = new RoleMaskProxyModel(parentObj);
+    QSignalSpy testItemDestroyedSpy(testItem, SIGNAL(destroyed(QObject*)));
+    QVERIFY(testItemDestroyedSpy.isValid());
+    delete parentObj;
+    QCOMPARE(testItemDestroyedSpy.count(),1);
 }
 
 void tst_RoleMaskProxyModel::initTestCase()

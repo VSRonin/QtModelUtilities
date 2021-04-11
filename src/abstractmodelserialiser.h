@@ -29,8 +29,9 @@ class MODELUTILITIES_EXPORT AbstractModelSerialiser : public QObject
     Q_DECLARE_PRIVATE(AbstractModelSerialiser)
     Q_DISABLE_COPY(AbstractModelSerialiser)
 public:
-    AbstractModelSerialiser(QAbstractItemModel *model = Q_NULLPTR, QObject *parent = Q_NULLPTR);
-    AbstractModelSerialiser(const QAbstractItemModel *model, QObject *parent = Q_NULLPTR);
+    explicit AbstractModelSerialiser(QObject *parent = Q_NULLPTR);
+    AbstractModelSerialiser(QAbstractItemModel *model, QObject *parent);
+    AbstractModelSerialiser(const QAbstractItemModel *model, QObject *parent);
     virtual ~AbstractModelSerialiser() = 0;
     virtual const QList<int> &rolesToSave() const;
     virtual void setRoleToSave(const QList<int> &val);

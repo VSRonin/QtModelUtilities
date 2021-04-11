@@ -8,6 +8,7 @@ class tst_HtmlModelSerialiser : public QObject, public tst_SerialiserCommon
 {
     Q_OBJECT
 private Q_SLOTS:
+    void autoParent();
     void initTestCase();
     void basicSaveLoadByteArray();
     void basicSaveLoadFile();

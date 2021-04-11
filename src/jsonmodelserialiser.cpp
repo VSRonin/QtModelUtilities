@@ -279,6 +279,15 @@ QJsonObject JsonModelSerialiserPrivate::toJsonObject(const QModelIndex &parent) 
 }
 
 /*!
+Constructs a serialiser
+*/
+JsonModelSerialiser::JsonModelSerialiser(QObject *parent)
+    : AbstractStringSerialiser(*new JsonModelSerialiserPrivate(this), parent)
+{
+
+}
+
+/*!
 Constructs a serialiser operating over \a model
 */
 JsonModelSerialiser::JsonModelSerialiser(QAbstractItemModel *model, QObject *parent)

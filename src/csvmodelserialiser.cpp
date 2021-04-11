@@ -246,6 +246,15 @@ void CsvModelSerialiser::setFirstColumnIsHeader(bool val)
 }
 
 /*!
+Constructs a serialiser
+*/
+CsvModelSerialiser::CsvModelSerialiser(QObject *parent)
+    : AbstractSingleRoleSerialiser(*new CsvModelSerialiserPrivate(this), parent)
+{
+
+}
+
+/*!
 Constructs a serialiser operating over \a model
 */
 CsvModelSerialiser::CsvModelSerialiser(QAbstractItemModel *model, QObject *parent)

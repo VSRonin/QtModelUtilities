@@ -24,8 +24,9 @@ class MODELUTILITIES_EXPORT AbstractSingleRoleSerialiser : public AbstractString
     Q_DECLARE_PRIVATE(AbstractSingleRoleSerialiser)
     Q_DISABLE_COPY(AbstractSingleRoleSerialiser)
 public:
-    AbstractSingleRoleSerialiser(QAbstractItemModel *model = Q_NULLPTR, QObject *parent = Q_NULLPTR);
-    AbstractSingleRoleSerialiser(const QAbstractItemModel *model, QObject *parent = Q_NULLPTR);
+    explicit AbstractSingleRoleSerialiser(QObject *parent = Q_NULLPTR);
+    AbstractSingleRoleSerialiser(QAbstractItemModel *model, QObject *parent);
+    AbstractSingleRoleSerialiser(const QAbstractItemModel *model, QObject *parent);
     ~AbstractSingleRoleSerialiser() = 0;
     int roleToSave() const;
     void setRoleToSave(int val);

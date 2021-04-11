@@ -23,8 +23,9 @@ class MODELUTILITIES_EXPORT HtmlModelSerialiser : public AbstractStringSerialise
     Q_DECLARE_PRIVATE(HtmlModelSerialiser)
     Q_DISABLE_COPY(HtmlModelSerialiser)
 public:
-    HtmlModelSerialiser(QAbstractItemModel *model = Q_NULLPTR, QObject *parent = Q_NULLPTR);
-    HtmlModelSerialiser(const QAbstractItemModel *model, QObject *parent = Q_NULLPTR);
+    explicit HtmlModelSerialiser(QObject *parent = Q_NULLPTR);
+    HtmlModelSerialiser(QAbstractItemModel *model, QObject *parent);
+    HtmlModelSerialiser(const QAbstractItemModel *model, QObject *parent);
     bool printStartDocument() const;
     void setPrintStartDocument(bool val);
     bool saveModel(QIODevice *destination) const Q_DECL_OVERRIDE;

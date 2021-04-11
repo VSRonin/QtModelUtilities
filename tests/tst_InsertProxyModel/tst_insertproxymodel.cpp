@@ -5,7 +5,7 @@
 #    include <QStandardItemModel>
 #endif
 #include <QtTest/QTest>
-#include <QtTest/QSignalSpy>
+#include <QSignalSpy>
 #include "../modeltestmanager.h"
 #include <QSortFilterProxyModel>
 
@@ -83,6 +83,16 @@ QAbstractItemModel *createTreeModel(QObject *parent)
 #endif
     return result;
 }
+
+void tst_InsertProxyModel::autoParent(){
+    QObject* parentObj = new QObject;
+    auto testItem = new InsertProxyModel(parentObj);
+    QSignalSpy testItemDestroyedSpy(testItem, SIGNAL(destroyed(QObject*)));
+    QVERIFY(testItemDestroyedSpy.isValid());
+    delete parentObj;
+    QCOMPARE(testItemDestroyedSpy.count(),1);
+}
+
 void tst_InsertProxyModel::testCommitSubclass_data()
 {
     QTest::addColumn<QAbstractItemModel *>("baseModel");

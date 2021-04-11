@@ -10,6 +10,7 @@ class tst_RoleMaskProxyModel : public QObject
 {
     Q_OBJECT
 private Q_SLOTS:
+    void autoParent();
     void initTestCase();
     void testUseRoleMask();
     void testUseRoleMask_data();
