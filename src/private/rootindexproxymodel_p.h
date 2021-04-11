@@ -26,7 +26,7 @@ class RootIndexProxyModelPrivate
     bool m_rootColumnDeleted;
     QList<QPersistentModelIndex> layoutChangePersistentIndexes;
     QModelIndexList proxyIndexes;
-    bool isDescendant(QModelIndex childIdx, const QModelIndex& parentIdx) const;
+    bool isDescendant(QModelIndex childIdx, const QModelIndex &parentIdx) const;
     void resetRootOnModelChange();
     void checkRootRowRemoved(const QModelIndex &parent, int first, int last);
     void checkRootColumnsRemoved(const QModelIndex &parent, int first, int last);
@@ -42,7 +42,7 @@ class RootIndexProxyModelPrivate
     void onColumnsInserted(const QModelIndex &parent, int first, int last);
     void onColumnsAboutToBeRemoved(const QModelIndex &parent, int first, int last);
     void onColumnsRemoved(const QModelIndex &parent, int first, int last);
-    void onDataChanged(const QModelIndex &topLeft,const QModelIndex &bottomRight, const QVector<int>& roles);
+    void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
     void onLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &sourceParents, QAbstractItemModel::LayoutChangeHint hint);
     void onLayoutChanged(const QList<QPersistentModelIndex> &sourceParents, QAbstractItemModel::LayoutChangeHint hint);
 };

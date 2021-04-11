@@ -297,9 +297,7 @@ Constructs a serialiser
 */
 HtmlModelSerialiser::HtmlModelSerialiser(QObject *parent)
     : AbstractStringSerialiser(*new HtmlModelSerialiserPrivate(this), parent)
-{
-
-}
+{ }
 
 /*!
 Constructs a serialiser operating over \a model

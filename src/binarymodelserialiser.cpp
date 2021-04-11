@@ -291,9 +291,7 @@ Constructs a serialiser
 */
 BinaryModelSerialiser::BinaryModelSerialiser(QObject *parent)
     : AbstractModelSerialiser(*new BinaryModelSerialiserPrivate(this), parent)
-{
-
-}
+{ }
 
 /*!
 Constructs a serialiser operating over \a model

@@ -386,9 +386,7 @@ Constructs a serialiser
 */
 XmlModelSerialiser::XmlModelSerialiser(QObject *parent)
     : AbstractStringSerialiser(*new XmlModelSerialiserPrivate(this), parent)
-{
-
-}
+{ }
 
 /*!
 Constructs a serialiser operating over \a model

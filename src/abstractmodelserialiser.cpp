@@ -53,9 +53,7 @@ Constructs a serialiser
 AbstractModelSerialiser::AbstractModelSerialiser(QObject *parent)
     : QObject(parent)
     , d_ptr(new AbstractModelSerialiserPrivate(this))
-{
-
-}
+{ }
 
 /*!
 Constructs a serialiser operating over \a model

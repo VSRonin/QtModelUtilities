@@ -198,8 +198,7 @@ InsertProxyModel::InsertProxyModel(QObject *parent)
 InsertProxyModel::InsertProxyModel(InsertProxyModelPrivate &dptr, QObject *parent)
     : QAbstractProxyModel(parent)
     , m_dptr(&dptr)
-{
-}
+{ }
 
 /*!
 Destructor

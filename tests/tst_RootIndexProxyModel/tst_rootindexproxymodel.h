@@ -22,7 +22,8 @@ private Q_SLOTS:
     void sourceSortAncestorOfRoot();
     void sourceDataChanged();
     void sourceDataChanged_data();
+
 protected:
-    void compareModels(const QAbstractItemModel* source,const QAbstractItemModel* proxy, const QModelIndex& sourcePar, const QModelIndex& proxyPar);
+    void compareModels(const QAbstractItemModel *source, const QAbstractItemModel *proxy, const QModelIndex &sourcePar, const QModelIndex &proxyPar);
 };
 #endif // TST_ROOTINDEXPROXYMODEL_H

@@ -7,13 +7,14 @@
 #include <QXmlStreamWriter>
 #include <QSignalSpy>
 
-void tst_XmlModelSerialiser::autoParent(){
-    QObject* parentObj = new QObject;
+void tst_XmlModelSerialiser::autoParent()
+{
+    QObject *parentObj = new QObject;
     auto testItem = new XmlModelSerialiser(parentObj);
-    QSignalSpy testItemDestroyedSpy(testItem, SIGNAL(destroyed(QObject*)));
+    QSignalSpy testItemDestroyedSpy(testItem, SIGNAL(destroyed(QObject *)));
     QVERIFY(testItemDestroyedSpy.isValid());
     delete parentObj;
-    QCOMPARE(testItemDestroyedSpy.count(),1);
+    QCOMPARE(testItemDestroyedSpy.count(), 1);
 }
 
 void tst_XmlModelSerialiser::basicSaveLoadByteArray()
@@ -47,7 +48,7 @@ void tst_XmlModelSerialiser::basicSaveLoadStream()
 {
     QFETCH(const QAbstractItemModel *, sourceModel);
     QFETCH(QAbstractItemModel *, destinationModel);
-    XmlModelSerialiser serialiser(sourceModel,nullptr);
+    XmlModelSerialiser serialiser(sourceModel, nullptr);
     serialiser.addRoleToSave(Qt::UserRole + 1);
     QTemporaryFile serialisedXmlStream;
     QVERIFY(serialisedXmlStream.open());
@@ -66,7 +67,7 @@ void tst_XmlModelSerialiser::basicSaveLoadNested()
 {
     QFETCH(const QAbstractItemModel *, sourceModel);
     QFETCH(QAbstractItemModel *, destinationModel);
-    XmlModelSerialiser serialiser(sourceModel,nullptr);
+    XmlModelSerialiser serialiser(sourceModel, nullptr);
     serialiser.addRoleToSave(Qt::UserRole + 1);
     QTemporaryFile serialisedXmlNested;
     QVERIFY(serialisedXmlNested.open());
@@ -89,7 +90,7 @@ void tst_XmlModelSerialiser::validateXmlOutput()
 {
     QFETCH(const QAbstractItemModel *, sourceModel);
     QByteArray modelData;
-    XmlModelSerialiser serialiser(sourceModel,nullptr);
+    XmlModelSerialiser serialiser(sourceModel, nullptr);
     serialiser.saveModel(&modelData);
     QXmlStreamReader xmlReader(modelData);
     while (!xmlReader.atEnd())

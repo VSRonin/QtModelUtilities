@@ -283,9 +283,7 @@ Constructs a serialiser
 */
 JsonModelSerialiser::JsonModelSerialiser(QObject *parent)
     : AbstractStringSerialiser(*new JsonModelSerialiserPrivate(this), parent)
-{
-
-}
+{ }
 
 /*!
 Constructs a serialiser operating over \a model

@@ -69,13 +69,14 @@ QAbstractItemModel *createTreeModel(QObject *parent)
     return result;
 }
 
-void tst_RoleMaskProxyModel::autoParent(){
-    QObject* parentObj = new QObject;
+void tst_RoleMaskProxyModel::autoParent()
+{
+    QObject *parentObj = new QObject;
     auto testItem = new RoleMaskProxyModel(parentObj);
-    QSignalSpy testItemDestroyedSpy(testItem, SIGNAL(destroyed(QObject*)));
+    QSignalSpy testItemDestroyedSpy(testItem, SIGNAL(destroyed(QObject *)));
     QVERIFY(testItemDestroyedSpy.isValid());
     delete parentObj;
-    QCOMPARE(testItemDestroyedSpy.count(),1);
+    QCOMPARE(testItemDestroyedSpy.count(), 1);
 }
 
 void tst_RoleMaskProxyModel::initTestCase()

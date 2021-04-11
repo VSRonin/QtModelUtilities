@@ -26,7 +26,7 @@ public:
     explicit RootIndexProxyModel(QObject *parent = Q_NULLPTR);
     ~RootIndexProxyModel();
     QModelIndex rootIndex() const;
-    void setRootIndex(const QModelIndex& root);
+    void setRootIndex(const QModelIndex &root);
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const override;
     QModelIndex mapFromSource(const QModelIndex &sourceIndex) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -38,6 +38,7 @@ public:
     void setSourceModel(QAbstractItemModel *sourceModel) override;
 Q_SIGNALS:
     void rootIndexChanged();
+
 protected:
     RootIndexProxyModel(RootIndexProxyModelPrivate &dptr, QObject *parent);
     RootIndexProxyModelPrivate *m_dptr;
