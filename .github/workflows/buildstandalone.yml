@@ -55,7 +55,7 @@ jobs:
               sudo apt-get install libxcb-icccm4 libxcb-xkb1 libxcb-icccm4 libxcb-image0 libxcb-render-util0 libxcb-randr0 libxcb-keysyms1 libxcb-xinerama0 libxcb-xinput-dev
               export PATH=$PATH:$PWD/build/installed/lib
               export PATH=$PATH:$PWD/build/installed/bin
-          - name: ${{ matrix.modules.friendly_name }} Qt${{ matrix.qt_ver }} No Gui:${{ matrix.no_gui }} No Widgets:${{ matrix.no_widgets }} Many Roles:${{ matrix.many_roles }}
+          - name: ${{ matrix.modules.friendly_name }} Qt${{ matrix.qt_ver }}
             shell: pwsh
             run: |
               cd build/debug
