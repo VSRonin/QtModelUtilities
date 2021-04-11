@@ -117,7 +117,7 @@ void tst_RootIndexProxyModel::sourceDataChanged()
 #ifdef QT_GUI_LIB
     QFETCH(QAbstractItemModel *, baseModel);
     QFETCH(QModelIndex, changeIndex);
-    QFETCH(const int, expectedSignals);
+    QFETCH(int, expectedSignals);
     RootIndexProxyModel proxyModel;
     new ModelTest(&proxyModel, baseModel);
     proxyModel.setSourceModel(baseModel);
@@ -135,7 +135,7 @@ void tst_RootIndexProxyModel::sourceDataChanged_data()
 {
     QTest::addColumn<QAbstractItemModel *>("baseModel");
     QTest::addColumn<QModelIndex>("changeIndex");
-    QTest::addColumn<const int>("expectedSignals");
+    QTest::addColumn<int>("expectedSignals");
     QAbstractItemModel *baseModel = createTreeModel(this);
     QTest::newRow("Sibling of Root") << baseModel << baseModel->index(0, 0, baseModel->index(1, 0)) << 0;
     baseModel = createTreeModel(this);
