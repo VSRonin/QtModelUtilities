@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.2)
-project(ModelUtilitiesLib LANGUAGES CXX)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
@@ -122,12 +121,12 @@ if(modelutilities_SRCS)
     if(OPTIMISE_FOR_MANY_ROLES)
         target_compile_definitions(modelutilities PRIVATE OPTIMISE_FOR_MANY_ROLES)
     endif()
-    target_link_libraries(modelutilities PUBLIC Qt${QT_VERSION_MAJOR}::Core)
+    target_link_libraries(modelutilities PRIVATE Qt${QT_VERSION_MAJOR}::Core)
     if(NOT NO_GUI)
-        target_link_libraries(modelutilities PUBLIC Qt${QT_VERSION_MAJOR}::Gui)
+        target_link_libraries(modelutilities PRIVATE Qt${QT_VERSION_MAJOR}::Gui)
     endif()
     if(NOT NO_WIDGETS)
-        target_link_libraries(modelutilities PUBLIC Qt${QT_VERSION_MAJOR}::Widgets)
+        target_link_libraries(modelutilities PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
     endif()
 
 

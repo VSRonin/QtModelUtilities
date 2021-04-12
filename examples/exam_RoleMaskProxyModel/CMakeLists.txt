@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.5)
-project(exam_RoleMaskProxyModel LANGUAGES CXX)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Gui Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Gui Widgets REQUIRED)
@@ -10,10 +9,6 @@ set(exam_RoleMaskProxyModel_EditableSQL_SRCS
     dbresource.qrc
 )
 add_executable(exam_RoleMaskProxyModel_Highlight WIN32 exam_rolemaskhighlight.cpp)
-
-if(BUILD_STATIC_LIBS)
-    target_compile_definitions(exam_RoleMaskProxyModel_Highlight PRIVATE MODELUTILITIES_STATIC)
-endif()
 
 target_include_directories(exam_RoleMaskProxyModel_Highlight PRIVATE ../../src ../../src/includes)
 target_link_libraries(exam_RoleMaskProxyModel_Highlight PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets modelutilities)
