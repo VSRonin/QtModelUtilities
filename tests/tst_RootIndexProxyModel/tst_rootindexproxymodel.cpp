@@ -59,7 +59,6 @@ void tst_RootIndexProxyModel::showRoot()
     QCOMPARE(proxyModel.rootIndex(), root);
     compareModels(baseModel, &proxyModel, root, QModelIndex());
     baseModel->deleteLater();
-
 }
 
 void tst_RootIndexProxyModel::showRoot_data()
@@ -95,7 +94,6 @@ void tst_RootIndexProxyModel::replaceModel()
     QCOMPARE(proxyModel.rootIndex(), replaceRoot);
     baseModel->deleteLater();
     replaceModel->deleteLater();
-
 }
 void tst_RootIndexProxyModel::replaceModel_data()
 {
@@ -130,7 +128,6 @@ void tst_RootIndexProxyModel::sourceDataChanged()
     QVERIFY(proxyDataChangeSpy.isValid());
     baseModel->setData(changeIndex, QStringLiteral("Hello"));
     QCOMPARE(proxyDataChangeSpy.count(), expectedSignals);
-
 }
 
 void tst_RootIndexProxyModel::sourceDataChanged_data()

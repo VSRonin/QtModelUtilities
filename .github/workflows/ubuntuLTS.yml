@@ -87,6 +87,6 @@ jobs:
             with:
                 name: Qt${{ matrix.platforms.qt_ver }}
                 path: |
-                  build/TestResults/junitresult.xml
+                  build/TestResults/*.xml
                   build/TestResults/testsreport.html
           

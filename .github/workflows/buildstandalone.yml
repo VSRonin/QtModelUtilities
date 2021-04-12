@@ -92,5 +92,5 @@ jobs:
             with:
                 name: ${{ matrix.modules.friendly_name }}-Qt${{ matrix.qt_ver }}
                 path: |
-                  build/TestResults/junitresult.xml
+                  build/TestResults/*.xml
                   build/TestResults/testsreport.html

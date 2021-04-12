@@ -517,7 +517,7 @@ QModelIndex RootIndexProxyModel::mapFromSource(const QModelIndex &sourceIndex) c
     if (!sourceIndex.isValid())
         return QModelIndex();
     Q_D(const RootIndexProxyModel);
-    if (!d->m_rootIndex.isValid()){
+    if (d->m_rootIndex.isValid()) {
         if (!d->isDescendant(sourceIndex, d->m_rootIndex))
             return QModelIndex();
     }
@@ -527,14 +527,14 @@ QModelIndex RootIndexProxyModel::mapFromSource(const QModelIndex &sourceIndex) c
 /*!
 \reimp
 */
-QModelIndex RootIndexProxyModel::index(int row, int column, const QModelIndex& parent) const
+QModelIndex RootIndexProxyModel::index(int row, int column, const QModelIndex &parent) const
 {
     Q_ASSERT(!parent.isValid() || parent.model() == this);
-    if(!sourceModel())
+    if (!sourceModel())
         return QModelIndex();
     Q_D(const RootIndexProxyModel);
     QModelIndex sourceParent;
-    if(parent.isValid())
+    if (parent.isValid())
         sourceParent = mapToSource(parent);
     else
         sourceParent = d->m_rootIndex;
@@ -545,14 +545,14 @@ QModelIndex RootIndexProxyModel::index(int row, int column, const QModelIndex& p
 /*!
 \reimp
 */
-int RootIndexProxyModel::columnCount(const QModelIndex& parent) const
+int RootIndexProxyModel::columnCount(const QModelIndex &parent) const
 {
     Q_ASSERT(!parent.isValid() || parent.model() == this);
-    if(!sourceModel())
+    if (!sourceModel())
         return 0;
     Q_D(const RootIndexProxyModel);
     QModelIndex sourceParent;
-    if(parent.isValid())
+    if (parent.isValid())
         sourceParent = mapToSource(parent);
     else
         sourceParent = d->m_rootIndex;
@@ -562,14 +562,14 @@ int RootIndexProxyModel::columnCount(const QModelIndex& parent) const
 /*!
 \reimp
 */
-int RootIndexProxyModel::rowCount(const QModelIndex& parent) const
+int RootIndexProxyModel::rowCount(const QModelIndex &parent) const
 {
     Q_ASSERT(!parent.isValid() || parent.model() == this);
-    if(!sourceModel())
+    if (!sourceModel())
         return 0;
     Q_D(const RootIndexProxyModel);
     QModelIndex sourceParent;
-    if(parent.isValid())
+    if (parent.isValid())
         sourceParent = mapToSource(parent);
     else
         sourceParent = d->m_rootIndex;
@@ -579,14 +579,14 @@ int RootIndexProxyModel::rowCount(const QModelIndex& parent) const
 /*!
 \reimp
 */
-bool RootIndexProxyModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent)
+bool RootIndexProxyModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
 {
     Q_ASSERT(!parent.isValid() || parent.model() == this);
-    if(!sourceModel())
+    if (!sourceModel())
         return 0;
     Q_D(const RootIndexProxyModel);
     QModelIndex sourceParent;
-    if(parent.isValid())
+    if (parent.isValid())
         sourceParent = mapToSource(parent);
     else
         sourceParent = d->m_rootIndex;
@@ -599,9 +599,9 @@ bool RootIndexProxyModel::dropMimeData(const QMimeData* data, Qt::DropAction act
 QModelIndex RootIndexProxyModel::sibling(int row, int column, const QModelIndex &idx) const
 {
     Q_ASSERT(!idx.isValid() || idx.model() == this);
-    if(!sourceModel())
+    if (!sourceModel())
         return QModelIndex();
-    if(!idx.isValid())
+    if (!idx.isValid())
         return QModelIndex();
     return mapFromSource(sourceModel()->sibling(row, column, mapToSource(idx)));
 }
@@ -609,14 +609,14 @@ QModelIndex RootIndexProxyModel::sibling(int row, int column, const QModelIndex 
 /*!
 \reimp
 */
-bool RootIndexProxyModel::insertColumns(int column, int count, const QModelIndex& parent)
+bool RootIndexProxyModel::insertColumns(int column, int count, const QModelIndex &parent)
 {
     Q_ASSERT(!parent.isValid() || parent.model() == this);
-    if(!sourceModel())
+    if (!sourceModel())
         return 0;
     Q_D(RootIndexProxyModel);
     QModelIndex sourceParent;
-    if(parent.isValid())
+    if (parent.isValid())
         sourceParent = mapToSource(parent);
     else
         sourceParent = d->m_rootIndex;
@@ -625,49 +625,50 @@ bool RootIndexProxyModel::insertColumns(int column, int count, const QModelIndex
 /*!
 \reimp
 */
-bool RootIndexProxyModel::insertRows(int row, int count, const QModelIndex& parent)
+bool RootIndexProxyModel::insertRows(int row, int count, const QModelIndex &parent)
 {
     Q_ASSERT(!parent.isValid() || parent.model() == this);
-    if(!sourceModel())
+    if (!sourceModel())
         return 0;
     Q_D(RootIndexProxyModel);
     QModelIndex sourceParent;
-    if(parent.isValid())
+    if (parent.isValid())
         sourceParent = mapToSource(parent);
     else
         sourceParent = d->m_rootIndex;
     return sourceModel()->insertRows(row, count, sourceParent);
 }
 
-
 /*!
 \reimp
 */
-bool RootIndexProxyModel::removeColumns(int column, int count, const QModelIndex& parent)
+bool RootIndexProxyModel::removeColumns(int column, int count, const QModelIndex &parent)
 {
     Q_ASSERT(!parent.isValid() || parent.model() == this);
-    if(!sourceModel())
+    if (!sourceModel())
         return false;
     Q_D(RootIndexProxyModel);
     QModelIndex sourceParent;
-    if(parent.isValid())
+    if (parent.isValid())
         sourceParent = mapToSource(parent);
     else
         sourceParent = d->m_rootIndex;
     return sourceModel()->removeColumns(column, count, sourceParent);
 }
 
+
+
 /*!
 \reimp
 */
-bool RootIndexProxyModel::removeRows(int row, int count, const QModelIndex& parent)
+bool RootIndexProxyModel::removeRows(int row, int count, const QModelIndex &parent)
 {
     Q_ASSERT(!parent.isValid() || parent.model() == this);
-    if(!sourceModel())
+    if (!sourceModel())
         return false;
     Q_D(RootIndexProxyModel);
     QModelIndex sourceParent;
-    if(parent.isValid())
+    if (parent.isValid())
         sourceParent = mapToSource(parent);
     else
         sourceParent = d->m_rootIndex;
@@ -680,11 +681,11 @@ bool RootIndexProxyModel::removeRows(int row, int count, const QModelIndex& pare
 bool RootIndexProxyModel::hasChildren(const QModelIndex &parent) const
 {
     Q_ASSERT(!parent.isValid() || parent.model() == this);
-    if(!sourceModel())
+    if (!sourceModel())
         return false;
     Q_D(const RootIndexProxyModel);
     QModelIndex sourceParent;
-    if(parent.isValid())
+    if (parent.isValid())
         sourceParent = mapToSource(parent);
     else
         sourceParent = d->m_rootIndex;
@@ -697,11 +698,11 @@ bool RootIndexProxyModel::hasChildren(const QModelIndex &parent) const
 bool RootIndexProxyModel::canFetchMore(const QModelIndex &parent) const
 {
     Q_ASSERT(!parent.isValid() || parent.model() == this);
-    if(!sourceModel())
+    if (!sourceModel())
         return false;
     Q_D(const RootIndexProxyModel);
     QModelIndex sourceParent;
-    if(parent.isValid())
+    if (parent.isValid())
         sourceParent = mapToSource(parent);
     else
         sourceParent = d->m_rootIndex;
@@ -714,11 +715,11 @@ bool RootIndexProxyModel::canFetchMore(const QModelIndex &parent) const
 void RootIndexProxyModel::fetchMore(const QModelIndex &parent)
 {
     Q_ASSERT(!parent.isValid() || parent.model() == this);
-    if(!sourceModel())
+    if (!sourceModel())
         return;
     Q_D(RootIndexProxyModel);
     QModelIndex sourceParent;
-    if(parent.isValid())
+    if (parent.isValid())
         sourceParent = mapToSource(parent);
     else
         sourceParent = d->m_rootIndex;
@@ -728,51 +729,50 @@ void RootIndexProxyModel::fetchMore(const QModelIndex &parent)
 /*!
 \reimp
 */
-bool RootIndexProxyModel::moveColumns(const QModelIndex &sourceParent, int sourceColumn, int count, const QModelIndex &destinationParent, int destinationChild)
+bool RootIndexProxyModel::moveColumns(const QModelIndex &sourceParent, int sourceColumn, int count, const QModelIndex &destinationParent,
+                                      int destinationChild)
 {
     Q_ASSERT(!sourceParent.isValid() || sourceParent.model() == this);
     Q_ASSERT(!destinationParent.isValid() || destinationParent.model() == this);
-    if(!sourceModel())
+    if (!sourceModel())
         return false;
     Q_D(RootIndexProxyModel);
     QModelIndex srcParent;
-    if(sourceParent.isValid())
+    if (sourceParent.isValid())
         srcParent = mapToSource(sourceParent);
     else
         srcParent = d->m_rootIndex;
     QModelIndex destParent;
-    if(destinationParent.isValid())
+    if (destinationParent.isValid())
         destParent = mapToSource(destinationParent);
     else
         destParent = d->m_rootIndex;
-    return sourceModel()->moveColumns(srcParent,sourceColumn,count,destParent,destinationChild);
+    return sourceModel()->moveColumns(srcParent, sourceColumn, count, destParent, destinationChild);
 }
 
 /*!
 \reimp
 */
-bool RootIndexProxyModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild)
+bool RootIndexProxyModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent,
+                                   int destinationChild)
 {
     Q_ASSERT(!sourceParent.isValid() || sourceParent.model() == this);
     Q_ASSERT(!destinationParent.isValid() || destinationParent.model() == this);
-    if(!sourceModel())
+    if (!sourceModel())
         return false;
     Q_D(RootIndexProxyModel);
     QModelIndex srcParent;
-    if(sourceParent.isValid())
+    if (sourceParent.isValid())
         srcParent = mapToSource(sourceParent);
     else
         srcParent = d->m_rootIndex;
     QModelIndex destParent;
-    if(destinationParent.isValid())
+    if (destinationParent.isValid())
         destParent = mapToSource(destinationParent);
     else
         destParent = d->m_rootIndex;
-    return sourceModel()->moveColumns(srcParent,sourceRow,count,destParent,destinationChild);
+    return sourceModel()->moveColumns(srcParent, sourceRow, count, destParent, destinationChild);
 }
-
-
-
 
 /*!
 \class RootIndexProxyModel

@@ -36,19 +36,20 @@ public:
     bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles) override;
     QSize span(const QModelIndex &index) const override;
     void setSourceModel(QAbstractItemModel *sourceModel) override;
-    QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-    bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent) override;
+    bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) override;
     QModelIndex sibling(int row, int column, const QModelIndex &idx) const override;
-    bool insertRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
-    bool insertColumns(int column, int count, const QModelIndex& parent = QModelIndex()) override;
-    bool removeColumns(int column, int count, const QModelIndex& parent = QModelIndex()) override;
-    bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
+    bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+    bool insertColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
+    bool removeColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
+    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     bool hasChildren(const QModelIndex &parent) const override;
     bool canFetchMore(const QModelIndex &parent) const override;
     void fetchMore(const QModelIndex &parent) override;
-    bool moveColumns(const QModelIndex &sourceParent, int sourceColumn, int count, const QModelIndex &destinationParent, int destinationChild) override;
+    bool moveColumns(const QModelIndex &sourceParent, int sourceColumn, int count, const QModelIndex &destinationParent,
+                     int destinationChild) override;
     bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild) override;
 Q_SIGNALS:
     void rootIndexChanged();

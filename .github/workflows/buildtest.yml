@@ -124,5 +124,5 @@ jobs:
             with:
                 name: ${{ matrix.platforms.friendly_name }}-Qt${{ matrix.qt_ver }}-Shared${{ matrix.shared_lib }}-NoGui${{ matrix.no_gui }}-NoWidgets${{ matrix.no_widgets }}-ManyRoles${{ matrix.many_roles }}
                 path: |
-                  build/TestResults/junitresult.xml
+                  build/TestResults/*.xml
                   build/TestResults/testsreport.html
