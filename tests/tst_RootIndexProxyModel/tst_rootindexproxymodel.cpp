@@ -49,7 +49,7 @@ void tst_RootIndexProxyModel::autoParent()
 
 void tst_RootIndexProxyModel::showRoot()
 {
-#ifdef QT_GUI_LIB
+
     QFETCH(QAbstractItemModel *, baseModel);
     QFETCH(QModelIndex, root);
     RootIndexProxyModel proxyModel;
@@ -59,13 +59,12 @@ void tst_RootIndexProxyModel::showRoot()
     QCOMPARE(proxyModel.rootIndex(), root);
     compareModels(baseModel, &proxyModel, root, QModelIndex());
     baseModel->deleteLater();
-#else
-    QSKIP("This test requires the Qt GUI module");
-#endif
+
 }
 
 void tst_RootIndexProxyModel::showRoot_data()
 {
+#ifdef QT_GUI_LIB
     QTest::addColumn<QAbstractItemModel *>("baseModel");
     QTest::addColumn<QModelIndex>("root");
     QTest::newRow("Parent") << createTreeModel(this) << QModelIndex();
@@ -73,10 +72,13 @@ void tst_RootIndexProxyModel::showRoot_data()
     QTest::newRow("Child") << baseModel << baseModel->index(1, 0);
     baseModel = createTreeModel(this);
     QTest::newRow("Grandchild") << baseModel << baseModel->index(2, 0, baseModel->index(1, 0));
+#else
+    QSKIP("This test requires the Qt GUI module");
+#endif
 }
 void tst_RootIndexProxyModel::replaceModel()
 {
-#ifdef QT_GUI_LIB
+
     QFETCH(QAbstractItemModel *, baseModel);
     QFETCH(QModelIndex, baseRoot);
     QFETCH(QAbstractItemModel *, replaceModel);
@@ -93,12 +95,11 @@ void tst_RootIndexProxyModel::replaceModel()
     QCOMPARE(proxyModel.rootIndex(), replaceRoot);
     baseModel->deleteLater();
     replaceModel->deleteLater();
-#else
-    QSKIP("This test requires the Qt GUI module");
-#endif
+
 }
 void tst_RootIndexProxyModel::replaceModel_data()
 {
+#ifdef QT_GUI_LIB
     QTest::addColumn<QAbstractItemModel *>("baseModel");
     QTest::addColumn<QModelIndex>("baseRoot");
     QTest::addColumn<QAbstractItemModel *>("replaceModel");
@@ -110,11 +111,14 @@ void tst_RootIndexProxyModel::replaceModel_data()
     baseModel = createTreeModel(this);
     replaceModel = createTreeModel(this);
     QTest::newRow("Grandchild") << baseModel << baseModel->index(1, 0) << replaceModel << replaceModel->index(2, 0, replaceModel->index(1, 0));
+#else
+    QSKIP("This test requires the Qt GUI module");
+#endif
 }
 
 void tst_RootIndexProxyModel::sourceDataChanged()
 {
-#ifdef QT_GUI_LIB
+
     QFETCH(QAbstractItemModel *, baseModel);
     QFETCH(QModelIndex, changeIndex);
     QFETCH(int, expectedSignals);
@@ -126,13 +130,12 @@ void tst_RootIndexProxyModel::sourceDataChanged()
     QVERIFY(proxyDataChangeSpy.isValid());
     baseModel->setData(changeIndex, QStringLiteral("Hello"));
     QCOMPARE(proxyDataChangeSpy.count(), expectedSignals);
-#else
-    QSKIP("This test requires the Qt GUI module");
-#endif
+
 }
 
 void tst_RootIndexProxyModel::sourceDataChanged_data()
 {
+#ifdef QT_GUI_LIB
     QTest::addColumn<QAbstractItemModel *>("baseModel");
     QTest::addColumn<QModelIndex>("changeIndex");
     QTest::addColumn<int>("expectedSignals");
@@ -144,6 +147,9 @@ void tst_RootIndexProxyModel::sourceDataChanged_data()
     QTest::newRow("Root") << baseModel << baseModel->index(1, 0, baseModel->index(1, 0)) << 0;
     baseModel = createTreeModel(this);
     QTest::newRow("Descendant of Root") << baseModel << baseModel->index(0, 0, baseModel->index(1, 0, baseModel->index(1, 0))) << 1;
+#else
+    QSKIP("This test requires the Qt GUI module");
+#endif
 }
 
 void tst_RootIndexProxyModel::switchRoot()
