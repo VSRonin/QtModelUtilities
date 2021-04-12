@@ -20,7 +20,7 @@ You can also specify an number of arguments to customise the build even further:
 
 | Argument | Effect |
 |----------|--------|
-| `-DBUILD_STATIC_LIBS=ON` | Builds a statically linked library instead of a dynamic one |
+| `-DBUILD_SHARED_LIBS=ON` | Builds a dynamically linked library instead of a static one |
 | `-DBUILD_TESTING=ON` | Compiles the unit tests included in the sources |
 | `-DBUILD_EXAMPLES=ON` | Compiles the examples of use included in the sources |
 | `-DNO_GUI=ON` | Disables all functionalities that require the QtGUI module. This option is automatically set if the module is not installed |

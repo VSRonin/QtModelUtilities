@@ -59,11 +59,11 @@ jobs:
             shell: pwsh
             run: |
               cd build/debug
-              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_DEBUG_POSTFIX=d -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_ROOTINDEXPROXY=${{ matrix.modules.rootindexproxy }} -DBUILD_ROLEMASKPROXY=${{ matrix.modules.rolemaskproxy }} -DBUILD_INSERTPROXY=${{ matrix.modules.insertproxy }} -DBUILD_MODELSERIALISATION=${{ matrix.modules.modelserialisation }} -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="../installed" ../../
+              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_DEBUG_POSTFIX=d -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_ROOTINDEXPROXY=${{ matrix.modules.rootindexproxy }} -DBUILD_ROLEMASKPROXY=${{ matrix.modules.rolemaskproxy }} -DBUILD_INSERTPROXY=${{ matrix.modules.insertproxy }} -DBUILD_MODELSERIALISATION=${{ matrix.modules.modelserialisation }} -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="../installed" ../../
               cmake --build .
               cmake --build . --target install
               cd ../release
-              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_ROOTINDEXPROXY=${{ matrix.modules.rootindexproxy }} -DBUILD_ROLEMASKPROXY=${{ matrix.modules.rolemaskproxy }} -DBUILD_INSERTPROXY=${{ matrix.modules.insertproxy }} -DBUILD_MODELSERIALISATION=${{ matrix.modules.modelserialisation }} -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="../installed" ../../
+              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_ROOTINDEXPROXY=${{ matrix.modules.rootindexproxy }} -DBUILD_ROLEMASKPROXY=${{ matrix.modules.rolemaskproxy }} -DBUILD_INSERTPROXY=${{ matrix.modules.insertproxy }} -DBUILD_MODELSERIALISATION=${{ matrix.modules.modelserialisation }} -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="../installed" ../../
               cmake --build .
               cmake --build . --target install
           - name: Debug Test

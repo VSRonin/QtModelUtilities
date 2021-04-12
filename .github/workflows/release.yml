@@ -38,6 +38,8 @@ jobs:
               cd build
               mkdir shared-Debug
               mkdir shared-Release
+              mkdir static-Debug
+              mkdir static-Release
           - name: Set up MSVC environment
             if: ${{ matrix.platforms.friendly_name == 'MSVC' }}
             uses: ilammy/msvc-dev-cmd@v1
@@ -46,19 +48,28 @@ jobs:
             run: |
               sudo apt-get update -y
               sudo apt-get install libxcb-icccm4 libxcb-xkb1 libxcb-icccm4 libxcb-image0 libxcb-render-util0 libxcb-randr0 libxcb-keysyms1 libxcb-xinerama0 libxcb-xinput-dev
-          - name: Build ${{ matrix.platforms.friendly_name }} Qt ${{ matrix.qt_ver }}
+          - name: Build Debug ${{ matrix.platforms.friendly_name }} Qt ${{ matrix.qt_ver }}
+            if: ${{ runner.os != 'Linux' }}
             run: |
               cd build/shared-Debug
-              cmake -G"${{ matrix.platforms.generator }}" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=${{ matrix.platforms.debug_postfix }} -DCMAKE_INSTALL_PREFIX="../installed" ../../
+              cmake -G"${{ matrix.platforms.generator }}" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=${{ matrix.platforms.debug_postfix }} -DCMAKE_INSTALL_PREFIX="../installed" ../../
               cmake --build .
-              cd ../shared-Release
-              cmake -G"${{ matrix.platforms.generator }}" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX="../installed" ../../
+              cd ../static-Debug
+              cmake -G"${{ matrix.platforms.generator }}" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_STATIC_LIBRARY_SUFFIX=_static -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=${{ matrix.platforms.debug_postfix }} -DCMAKE_INSTALL_PREFIX="../installed" ../../
+              cmake --build .
+          - name: Build Release ${{ matrix.platforms.friendly_name }} Qt ${{ matrix.qt_ver }}
+            run: |
+              cd build/shared-Release
+              cmake -G"${{ matrix.platforms.generator }}" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX="../installed" ../../
+              cmake --build .
+              cd ../static-Release
+              cmake -G"${{ matrix.platforms.generator }}" -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_STATIC_LIBRARY_SUFFIX=_static -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX="../installed" ../../
               cmake --build .
           - name: Create Package
             run: |
               cd build
               cpack -G ${{ matrix.platforms.compression }} --config ../cmake/modules/package.cmake
-          - name: Publish Release
+          - name: Publish Package to Release
             uses: ncipollo/release-action@v1
             with:
               artifacts: "build/QtModelUtilities*.*"
@@ -66,10 +77,48 @@ jobs:
               allowUpdates: true
               artifactErrorsFailBuild: true
               draft: true
+    createdocs:
+        name: Create docs package and publish to gh-pages
+        runs-on: ubuntu-latest
+        needs: release
+        steps:
+          - name: Install Qt
+            uses: jurplel/install-qt-action@v2
+          - name: Git Checkout
+            uses: actions/checkout@v2
+            with:
+              fetch-depth: 0
+          - name: Create Build Directory
+            run: |
+              mkdir build
+          - name: Install Linux Dependencies
+            run: |
+              sudo apt-get update -y
+              sudo apt-get install doxygen mscgen dia graphviz -y
+          - name: Create Docs
+            run: |
+              cd build
+              cmake -G"Unix Makefiles" -DBUILD_DOCS=ON -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_ROOTINDEXPROXY=OFF -DBUILD_ROLEMASKPROXY=OFF -DBUILD_INSERTPROXY=OFF -DBUILD_MODELSERIALISATION=OFF -DCMAKE_INSTALL_PREFIX="./installed" ../
+              cmake --build .
+              cmake --build . --target install
+              7z a -tzip -y QtModelUtilities-Docs.zip ./installed/docs/*
+          - name: Publish Docs to Release
+            uses: ncipollo/release-action@v1
+            with:
+              artifacts: "build/QtModelUtilities-Docs.zip"
+              token: ${{ secrets.GITHUB_TOKEN }}
+              allowUpdates: true
+              artifactErrorsFailBuild: true
+              draft: true
+          - name: Upload to gh-pages
+            uses: peaceiris/actions-gh-pages@v3
+            with:
+              github_token: ${{ secrets.GITHUB_TOKEN }}
+              publish_dir: ./build/installed/docs/html
     removedraft:
         name: Remove Draft from Release
         runs-on: ubuntu-latest
-        needs: release
+        needs: [release, createdocs]
         steps:
           - name: Publish Release
             uses: ncipollo/release-action@v1

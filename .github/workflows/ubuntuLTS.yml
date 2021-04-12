@@ -54,11 +54,11 @@ jobs:
           - name: Build Qt ${{ matrix.platforms.qt_ver }}
             run: |
               cd build/debug
-              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_DEBUG_POSTFIX=d -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="../installed" ../../
+              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_DEBUG_POSTFIX=d -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="../installed" ../../
               cmake --build .
               cmake --build . --target install
               cd ../release
-              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="../installed" ../../
+              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="../installed" ../../
               cmake --build .
               cmake --build . --target install
           - name: Test Debug

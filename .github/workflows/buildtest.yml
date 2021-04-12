@@ -22,13 +22,13 @@ on:
       - 'LICENSE'
 jobs:
     build:
-        name: Build and Test ${{ matrix.platforms.friendly_name }}
+        name: Build and Test ${{ matrix.platforms.friendly_name }} Qt${{ matrix.qt_ver }} dll${{ matrix.shared_lib }} NoGui${{ matrix.no_gui }} NoWidgets${{ matrix.no_widgets }} ManyRoles${{ matrix.many_roles }}
         runs-on: ${{ matrix.platforms.os }}
         strategy:
           fail-fast: false
           matrix:
               qt_ver: [5.15.2,6.0.2]
-              static_lib: [OFF,ON]
+              shared_lib: [ON,OFF]
               no_widgets: [OFF,ON]
               no_gui: [OFF,ON]
               many_roles: [OFF,ON]
@@ -73,15 +73,15 @@ jobs:
               sudo apt-get install libxcb-icccm4 libxcb-xkb1 libxcb-icccm4 libxcb-image0 libxcb-render-util0 libxcb-randr0 libxcb-keysyms1 libxcb-xinerama0 libxcb-xinput-dev
               export PATH=$PATH:$PWD/build/installed/lib
               export PATH=$PATH:$PWD/build/installed/bin
-          - name: ${{ matrix.platforms.friendly_name }} Qt${{ matrix.qt_ver }} Static:${{ matrix.static_lib }} No Gui:${{ matrix.no_gui }} No Widgets:${{ matrix.no_widgets }} Many Roles:${{ matrix.many_roles }}
+          - name: ${{ matrix.platforms.friendly_name }} Qt${{ matrix.qt_ver }} Static:${{ matrix.shared_lib }} No Gui:${{ matrix.no_gui }} No Widgets:${{ matrix.no_widgets }} Many Roles:${{ matrix.many_roles }}
             shell: pwsh
             run: |
               cd build/debug
-              cmake -G"${{ matrix.platforms.generator }}" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_DEBUG_POSTFIX=d -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=${{ matrix.static_lib }} -DCMAKE_INSTALL_PREFIX="../installed" -DNO_WIDGETS=${{ matrix.no_widgets }} -DNO_GUI=${{ matrix.no_gui }} -DOPTIMISE_FOR_MANY_ROLES=${{ matrix.many_roles }} ../../
+              cmake -G"${{ matrix.platforms.generator }}" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_DEBUG_POSTFIX=d -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=${{ matrix.shared_lib }} -DCMAKE_INSTALL_PREFIX="../installed" -DNO_WIDGETS=${{ matrix.no_widgets }} -DNO_GUI=${{ matrix.no_gui }} -DOPTIMISE_FOR_MANY_ROLES=${{ matrix.many_roles }} ../../
               cmake --build .
               cmake --build . --target install
               cd ../release
-              cmake -G"${{ matrix.platforms.generator }}" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=${{ matrix.static_lib }} -DCMAKE_INSTALL_PREFIX="../installed" -DNO_WIDGETS=${{ matrix.no_widgets }} -DNO_GUI=${{ matrix.no_gui }} -DOPTIMISE_FOR_MANY_ROLES=${{ matrix.many_roles }} ../../
+              cmake -G"${{ matrix.platforms.generator }}" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=${{ matrix.shared_lib }} -DCMAKE_INSTALL_PREFIX="../installed" -DNO_WIDGETS=${{ matrix.no_widgets }} -DNO_GUI=${{ matrix.no_gui }} -DOPTIMISE_FOR_MANY_ROLES=${{ matrix.many_roles }} ../../
               cmake --build .
               cmake --build . --target install
           - name: Linux Debug Test
@@ -122,7 +122,7 @@ jobs:
             if: ${{ always() && (steps.runtests.outcome == 'failure' || steps.runlinuxdebugtests.outcome == 'failure' || steps.runlinuxreleasetests.outcome == 'failure') }}
             uses: actions/upload-artifact@v2
             with:
-                name: ${{ matrix.platforms.friendly_name }}-Qt${{ matrix.qt_ver }}-Static${{ matrix.static_lib }}-NoGui${{ matrix.no_gui }}-NoWidgets${{ matrix.no_widgets }}-ManyRoles${{ matrix.many_roles }}
+                name: ${{ matrix.platforms.friendly_name }}-Qt${{ matrix.qt_ver }}-Shared${{ matrix.shared_lib }}-NoGui${{ matrix.no_gui }}-NoWidgets${{ matrix.no_widgets }}-ManyRoles${{ matrix.many_roles }}
                 path: |
                   build/TestResults/junitresult.xml
                   build/TestResults/testsreport.html
