@@ -29,6 +29,7 @@ install(TARGETS exam_RoleMaskProxyModel_Highlight
 )
 
 if("${Qt${QT_VERSION_MAJOR}Sql_FOUND}")
+    message(STATUS "Found Qt Sql ${Qt${QT_VERSION_MAJOR}Sql_VERSION}")
     add_executable(exam_RoleMaskProxyModel_EditableSQL WIN32 exam_rolemaskeditablesql.cpp dbresource.qrc)
     target_include_directories(exam_RoleMaskProxyModel_EditableSQL PRIVATE ../../src ../../src/includes)
     target_link_libraries(exam_RoleMaskProxyModel_EditableSQL PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql modelutilities)

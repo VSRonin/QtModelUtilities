@@ -13,20 +13,20 @@ QAbstractItemModel *createTreeModel(QObject *parent)
     QAbstractItemModel *result = nullptr;
 #ifdef QT_GUI_LIB
     result = new QStandardItemModel(parent);
-    result->insertRows(0, 3);
     result->insertColumns(0, 3);
+    result->insertRows(0, 3);
     for (int i = 0; i < result->rowCount(); ++i) {
         for (int j = 0; j < result->columnCount(); ++j)
             result->setData(result->index(i, j), QStringLiteral("%1,%2").arg(i).arg(j));
         const QModelIndex parIdx = result->index(i, 0);
-        result->insertRows(0, 4, parIdx);
         result->insertColumns(0, 2, parIdx);
+        result->insertRows(0, 4, parIdx);
         for (int k = 0; k < result->rowCount(parIdx); ++k) {
             for (int h = 0; h < result->columnCount(parIdx); ++h)
                 result->setData(result->index(k, h, parIdx), QStringLiteral("%1,%2,%3").arg(i).arg(k).arg(h));
             const QModelIndex grandParIdx = result->index(i, 0, parIdx);
-            result->insertRows(0, 6, grandParIdx);
             result->insertColumns(0, 2, grandParIdx);
+            result->insertRows(0, 6, grandParIdx);
             for (int j = 0; j < result->rowCount(grandParIdx); ++j) {
                 for (int h = 0; h < result->columnCount(grandParIdx); ++h)
                     result->setData(result->index(j, h, grandParIdx), QStringLiteral("%1,%2,%3,%4").arg(i).arg(k).arg(j).arg(h));
@@ -67,10 +67,10 @@ void tst_RootIndexProxyModel::showRoot_data()
 #ifdef QT_GUI_LIB
     QTest::addColumn<QAbstractItemModel *>("baseModel");
     QTest::addColumn<QModelIndex>("root");
-    QTest::newRow("Parent") << createTreeModel(this) << QModelIndex();
-    QAbstractItemModel *baseModel = createTreeModel(this);
+    QTest::newRow("Parent") << createTreeModel(nullptr) << QModelIndex();
+    QAbstractItemModel *baseModel = createTreeModel(nullptr);
     QTest::newRow("Child") << baseModel << baseModel->index(1, 0);
-    baseModel = createTreeModel(this);
+    baseModel = createTreeModel(nullptr);
     QTest::newRow("Grandchild") << baseModel << baseModel->index(2, 0, baseModel->index(1, 0));
 #else
     QSKIP("This test requires the Qt GUI module");
@@ -274,7 +274,7 @@ void tst_RootIndexProxyModel::sourceSortDescendantOfRoot()
     const QPersistentModelIndex B3zIdx = proxyModel.index(0, 0, proxyModel.index(2, 0));
     QVERIFY(B3zIdx.isValid());
     QCOMPARE(B3zIdx.data().toString(), QStringLiteral("B3z"));
-    QSignalSpy proxyLayChangeSpy(&proxyModel, SIGNAL(layoutChanged(QList<QPersistentModelIndex>, QAbstractItemModel::LayoutChangeHint)));
+    QSignalSpy proxyLayChangeSpy(&proxyModel, SIGNAL(layoutChanged()));
     QVERIFY(proxyLayChangeSpy.isValid());
     baseModel.sort(0);
     QCOMPARE(B3zIdx.row(), 2);
@@ -316,7 +316,7 @@ void tst_RootIndexProxyModel::sourceSortAncestorOfRoot()
     const QPersistentModelIndex Z3aIdx = proxyModel.index(0, 0, proxyModel.index(2, 0));
     QVERIFY(Z3aIdx.isValid());
     QCOMPARE(Z3aIdx.data().toString(), QStringLiteral("Z3a"));
-    QSignalSpy proxyLayChangeSpy(&proxyModel, SIGNAL(layoutChanged(QList<QPersistentModelIndex>, QAbstractItemModel::LayoutChangeHint)));
+    QSignalSpy proxyLayChangeSpy(&proxyModel, SIGNAL(layoutChanged()));
     QVERIFY(proxyLayChangeSpy.isValid());
     baseModel.sort(0);
     QCOMPARE(Z3aIdx.row(), 0);

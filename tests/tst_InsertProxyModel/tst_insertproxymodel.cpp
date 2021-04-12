@@ -603,7 +603,7 @@ void tst_InsertProxyModel::testInsertOnEmptyModel()
     QCOMPARE(baseModel2.index(0, 1).data().toString(), QStringLiteral("London"));
     QVERIFY(!baseModel2.index(0, 0).data().isValid());
 #    if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)                                                                                                    \
-         && (QT_VERSION < QT_VERSION_CHECK(6, 0, 0) || QT_VERSION > QT_VERSION_CHECK(6, 0, 2))) // QTBUG-92220
+         && (QT_VERSION < QT_VERSION_CHECK(6, 0, 0) || QT_VERSION > QT_VERSION_CHECK(6, 0, 3))) // QTBUG-92220
     QStandardItemModel baseModel3;
     InsertProxyModel proxyModel3;
     new ModelTest(&proxyModel3, this);

@@ -27,7 +27,7 @@ jobs:
         strategy:
           fail-fast: false
           matrix:
-              qt_ver: [5.15.2,6.0.2]
+              qt_ver: [5.15.2,6.0.3]
               shared_lib: [ON,OFF]
               no_widgets: [OFF,ON]
               no_gui: [OFF,ON]
