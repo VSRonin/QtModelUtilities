@@ -29,18 +29,11 @@ public:
     void setRootIndex(const QModelIndex &root);
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const override;
     QModelIndex mapFromSource(const QModelIndex &sourceIndex) const override;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
-    QMap<int, QVariant> itemData(const QModelIndex &index) const override;
-    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
-    bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles) override;
-    QSize span(const QModelIndex &index) const override;
     void setSourceModel(QAbstractItemModel *sourceModel) override;
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) override;
-    QModelIndex sibling(int row, int column, const QModelIndex &idx) const override;
     bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     bool insertColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
     bool removeColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;

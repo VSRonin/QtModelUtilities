@@ -149,6 +149,194 @@ void tst_RootIndexProxyModel::sourceDataChanged_data()
 #endif
 }
 
+void tst_RootIndexProxyModel::insertRow()
+{
+#ifdef QT_GUI_LIB
+    QAbstractItemModel *baseModel = createTreeModel(this);
+    RootIndexProxyModel proxyModel;
+    new ModelTest(&proxyModel, baseModel);
+    proxyModel.setSourceModel(baseModel);
+    proxyModel.setRootIndex(baseModel->index(1, 0));
+    QSignalSpy proxyRowsAboutToBeInsertedSpy(&proxyModel, SIGNAL(rowsAboutToBeInserted(QModelIndex,int,int)));
+    QVERIFY(proxyRowsAboutToBeInsertedSpy.isValid());
+    QSignalSpy proxyRowsInsertedSpy(&proxyModel, SIGNAL(rowsInserted(QModelIndex,int,int)));
+    QVERIFY(proxyRowsInsertedSpy.isValid());
+    QSignalSpy sourceRowsAboutToBeInsertedSpy(baseModel, SIGNAL(rowsAboutToBeInserted(QModelIndex,int,int)));
+    QVERIFY(sourceRowsAboutToBeInsertedSpy.isValid());
+    QSignalSpy sourceRowsInsertedSpy(baseModel, SIGNAL(rowsInserted(QModelIndex,int,int)));
+    QVERIFY(sourceRowsInsertedSpy.isValid());
+    int oldRowCount = baseModel->rowCount(baseModel->index(1, 0));
+    QCOMPARE(oldRowCount, proxyModel.rowCount());
+    proxyModel.insertRows(1,1);
+    QCOMPARE(oldRowCount+1, proxyModel.rowCount());
+    QCOMPARE(oldRowCount+1, baseModel->rowCount(baseModel->index(1, 0)));
+    QCOMPARE(proxyRowsAboutToBeInsertedSpy.count(),1);
+    QList<QVariant> arguments = proxyRowsAboutToBeInsertedSpy.takeFirst();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(),QModelIndex());
+    QCOMPARE(arguments.at(1).value<int>(),1);
+    QCOMPARE(arguments.at(2).value<int>(),1);
+    QCOMPARE(proxyRowsInsertedSpy.count(),1);
+    arguments = proxyRowsInsertedSpy.takeFirst();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(),QModelIndex());
+    QCOMPARE(arguments.at(1).value<int>(),1);
+    QCOMPARE(arguments.at(2).value<int>(),1);
+    QCOMPARE(sourceRowsAboutToBeInsertedSpy.count(),1);
+    arguments = sourceRowsAboutToBeInsertedSpy.takeFirst();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(),baseModel->index(1, 0));
+    QCOMPARE(arguments.at(1).value<int>(),1);
+    QCOMPARE(arguments.at(2).value<int>(),1);
+    QCOMPARE(sourceRowsInsertedSpy.count(),1);
+    arguments = sourceRowsInsertedSpy.takeFirst();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(),baseModel->index(1, 0));
+    QCOMPARE(arguments.at(1).value<int>(),1);
+    QCOMPARE(arguments.at(2).value<int>(),1);
+    baseModel->deleteLater();
+#else
+    QSKIP("This test requires the Qt GUI module");
+#endif
+}
+
+void tst_RootIndexProxyModel::insertColumn()
+{
+#ifdef QT_GUI_LIB
+    QAbstractItemModel *baseModel = createTreeModel(this);
+    RootIndexProxyModel proxyModel;
+    new ModelTest(&proxyModel, baseModel);
+    proxyModel.setSourceModel(baseModel);
+    proxyModel.setRootIndex(baseModel->index(1, 0));
+    QSignalSpy proxyColumnsAboutToBeInsertedSpy(&proxyModel, SIGNAL(columnsAboutToBeInserted(QModelIndex,int,int)));
+    QVERIFY(proxyColumnsAboutToBeInsertedSpy.isValid());
+    QSignalSpy proxyColumnsInsertedSpy(&proxyModel, SIGNAL(columnsInserted(QModelIndex,int,int)));
+    QVERIFY(proxyColumnsInsertedSpy.isValid());
+    QSignalSpy sourceColumnsAboutToBeInsertedSpy(baseModel, SIGNAL(columnsAboutToBeInserted(QModelIndex,int,int)));
+    QVERIFY(sourceColumnsAboutToBeInsertedSpy.isValid());
+    QSignalSpy sourceColumnsInsertedSpy(baseModel, SIGNAL(columnsInserted(QModelIndex,int,int)));
+    QVERIFY(sourceColumnsInsertedSpy.isValid());
+    int oldColCount = baseModel->columnCount(baseModel->index(1, 0));
+    QCOMPARE(oldColCount, proxyModel.columnCount());
+    proxyModel.insertColumns(1,1);
+    QCOMPARE(oldColCount+1, proxyModel.columnCount());
+    QCOMPARE(oldColCount+1, baseModel->columnCount(baseModel->index(1, 0)));
+    QCOMPARE(proxyColumnsAboutToBeInsertedSpy.count(),1);
+    QList<QVariant> arguments = proxyColumnsAboutToBeInsertedSpy.takeFirst();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(),QModelIndex());
+    QCOMPARE(arguments.at(1).value<int>(),1);
+    QCOMPARE(arguments.at(2).value<int>(),1);
+    QCOMPARE(proxyColumnsInsertedSpy.count(),1);
+    arguments = proxyColumnsInsertedSpy.takeFirst();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(),QModelIndex());
+    QCOMPARE(arguments.at(1).value<int>(),1);
+    QCOMPARE(arguments.at(2).value<int>(),1);
+    QCOMPARE(sourceColumnsAboutToBeInsertedSpy.count(),1);
+    arguments = sourceColumnsAboutToBeInsertedSpy.takeFirst();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(),baseModel->index(1, 0));
+    QCOMPARE(arguments.at(1).value<int>(),1);
+    QCOMPARE(arguments.at(2).value<int>(),1);
+    QCOMPARE(sourceColumnsInsertedSpy.count(),1);
+    arguments = sourceColumnsInsertedSpy.takeFirst();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(),baseModel->index(1, 0));
+    QCOMPARE(arguments.at(1).value<int>(),1);
+    QCOMPARE(arguments.at(2).value<int>(),1);
+    baseModel->deleteLater();
+#else
+    QSKIP("This test requires the Qt GUI module");
+#endif
+}
+
+void tst_RootIndexProxyModel::removeRow()
+{
+#ifdef QT_GUI_LIB
+    QAbstractItemModel *baseModel = createTreeModel(this);
+    RootIndexProxyModel proxyModel;
+    new ModelTest(&proxyModel, baseModel);
+    proxyModel.setSourceModel(baseModel);
+    proxyModel.setRootIndex(baseModel->index(1, 0));
+    QSignalSpy proxyRowsAboutToBeRemovedSpy(&proxyModel, SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)));
+    QVERIFY(proxyRowsAboutToBeRemovedSpy.isValid());
+    QSignalSpy proxyRowsRemovedSpy(&proxyModel, SIGNAL(rowsRemoved(QModelIndex,int,int)));
+    QVERIFY(proxyRowsRemovedSpy.isValid());
+    QSignalSpy sourceRowsAboutToBeRemovedSpy(baseModel, SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)));
+    QVERIFY(sourceRowsAboutToBeRemovedSpy.isValid());
+    QSignalSpy sourceRowsRemovedSpy(baseModel, SIGNAL(rowsRemoved(QModelIndex,int,int)));
+    QVERIFY(sourceRowsRemovedSpy.isValid());
+    int oldRowCount = baseModel->rowCount(baseModel->index(1, 0));
+    QCOMPARE(oldRowCount, proxyModel.rowCount());
+    proxyModel.removeRows(1,1);
+    QCOMPARE(oldRowCount-1, proxyModel.rowCount());
+    QCOMPARE(oldRowCount-1, baseModel->rowCount(baseModel->index(1, 0)));
+    QCOMPARE(proxyRowsAboutToBeRemovedSpy.count(),1);
+    QList<QVariant> arguments = proxyRowsAboutToBeRemovedSpy.takeFirst();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(),QModelIndex());
+    QCOMPARE(arguments.at(1).value<int>(),1);
+    QCOMPARE(arguments.at(2).value<int>(),1);
+    QCOMPARE(proxyRowsRemovedSpy.count(),1);
+    arguments = proxyRowsRemovedSpy.takeFirst();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(),QModelIndex());
+    QCOMPARE(arguments.at(1).value<int>(),1);
+    QCOMPARE(arguments.at(2).value<int>(),1);
+    QCOMPARE(sourceRowsAboutToBeRemovedSpy.count(),1);
+    arguments = sourceRowsAboutToBeRemovedSpy.takeFirst();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(),baseModel->index(1, 0));
+    QCOMPARE(arguments.at(1).value<int>(),1);
+    QCOMPARE(arguments.at(2).value<int>(),1);
+    QCOMPARE(sourceRowsRemovedSpy.count(),1);
+    arguments = sourceRowsRemovedSpy.takeFirst();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(),baseModel->index(1, 0));
+    QCOMPARE(arguments.at(1).value<int>(),1);
+    QCOMPARE(arguments.at(2).value<int>(),1);
+    baseModel->deleteLater();
+#else
+    QSKIP("This test requires the Qt GUI module");
+#endif
+}
+
+void tst_RootIndexProxyModel::removeColumn()
+{
+#ifdef QT_GUI_LIB
+    QAbstractItemModel *baseModel = createTreeModel(this);
+    RootIndexProxyModel proxyModel;
+    new ModelTest(&proxyModel, baseModel);
+    proxyModel.setSourceModel(baseModel);
+    proxyModel.setRootIndex(baseModel->index(1, 0));
+    QSignalSpy proxyColumnsAboutToBeRemovedSpy(&proxyModel, SIGNAL(columnsAboutToBeRemoved(QModelIndex,int,int)));
+    QVERIFY(proxyColumnsAboutToBeRemovedSpy.isValid());
+    QSignalSpy proxyColumnsRemovedSpy(&proxyModel, SIGNAL(columnsRemoved(QModelIndex,int,int)));
+    QVERIFY(proxyColumnsRemovedSpy.isValid());
+    QSignalSpy sourceColumnsAboutToBeRemovedSpy(baseModel, SIGNAL(columnsAboutToBeRemoved(QModelIndex,int,int)));
+    QVERIFY(sourceColumnsAboutToBeRemovedSpy.isValid());
+    QSignalSpy sourceColumnsRemovedSpy(baseModel, SIGNAL(columnsRemoved(QModelIndex,int,int)));
+    QVERIFY(sourceColumnsRemovedSpy.isValid());
+    int oldColCount = baseModel->columnCount(baseModel->index(1, 0));
+    QCOMPARE(oldColCount, proxyModel.columnCount());
+    proxyModel.removeColumns(1,1);
+    QCOMPARE(oldColCount-1, proxyModel.columnCount());
+    QCOMPARE(oldColCount-1, baseModel->columnCount(baseModel->index(1, 0)));
+    QCOMPARE(proxyColumnsAboutToBeRemovedSpy.count(),1);
+    QList<QVariant> arguments = proxyColumnsAboutToBeRemovedSpy.takeFirst();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(),QModelIndex());
+    QCOMPARE(arguments.at(1).value<int>(),1);
+    QCOMPARE(arguments.at(2).value<int>(),1);
+    QCOMPARE(proxyColumnsRemovedSpy.count(),1);
+    arguments = proxyColumnsRemovedSpy.takeFirst();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(),QModelIndex());
+    QCOMPARE(arguments.at(1).value<int>(),1);
+    QCOMPARE(arguments.at(2).value<int>(),1);
+    QCOMPARE(sourceColumnsAboutToBeRemovedSpy.count(),1);
+    arguments = sourceColumnsAboutToBeRemovedSpy.takeFirst();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(),baseModel->index(1, 0));
+    QCOMPARE(arguments.at(1).value<int>(),1);
+    QCOMPARE(arguments.at(2).value<int>(),1);
+    QCOMPARE(sourceColumnsRemovedSpy.count(),1);
+    arguments = sourceColumnsRemovedSpy.takeFirst();
+    QCOMPARE(arguments.at(0).value<QModelIndex>(),baseModel->index(1, 0));
+    QCOMPARE(arguments.at(1).value<int>(),1);
+    QCOMPARE(arguments.at(2).value<int>(),1);
+    baseModel->deleteLater();
+#else
+    QSKIP("This test requires the Qt GUI module");
+#endif
+}
+
 void tst_RootIndexProxyModel::switchRoot()
 {
 #ifdef QT_GUI_LIB

@@ -346,12 +346,14 @@ RootIndexProxyModel::~RootIndexProxyModel()
 \details The root index is an index of the source model used as root by all elements of the proxy model
 */
 
+//! Getter for rootIndex property
 QModelIndex RootIndexProxyModel::rootIndex() const
 {
     Q_D(const RootIndexProxyModel);
     return d->m_rootIndex;
 }
 
+//! Setter for rootIndex property
 void RootIndexProxyModel::setRootIndex(const QModelIndex &root)
 {
     Q_ASSERT_X(!root.isValid() || root.model() == sourceModel(), "RootIndexProxyModel::setRootIndex",
@@ -437,65 +439,6 @@ void RootIndexProxyModel::setSourceModel(QAbstractItemModel *sourceModel)
     }
 }
 
-/*!
-\reimp
-*/
-QVariant RootIndexProxyModel::data(const QModelIndex &index, int role) const
-{
-    if (!index.isValid())
-        return QVariant();
-    return QIdentityProxyModel::data(index, role);
-}
-
-/*!
-\reimp
-*/
-Qt::ItemFlags RootIndexProxyModel::flags(const QModelIndex &index) const
-{
-    if (!index.isValid())
-        return Qt::NoItemFlags;
-    return QIdentityProxyModel::flags(index);
-}
-
-/*!
-\reimp
-*/
-QMap<int, QVariant> RootIndexProxyModel::itemData(const QModelIndex &index) const
-{
-    if (!index.isValid())
-        return QMap<int, QVariant>();
-    return QIdentityProxyModel::itemData(index);
-}
-
-/*!
-\reimp
-*/
-bool RootIndexProxyModel::setData(const QModelIndex &index, const QVariant &value, int role)
-{
-    if (!index.isValid())
-        return false;
-    return QIdentityProxyModel::setData(index, value, role);
-}
-
-/*!
-\reimp
-*/
-bool RootIndexProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles)
-{
-    if (!index.isValid())
-        return false;
-    return QIdentityProxyModel::setItemData(index, roles);
-}
-
-/*!
-\reimp
-*/
-QSize RootIndexProxyModel::span(const QModelIndex &index) const
-{
-    if (!index.isValid())
-        return QSize();
-    return QIdentityProxyModel::span(index);
-}
 
 /*!
 \reimp
@@ -591,19 +534,6 @@ bool RootIndexProxyModel::dropMimeData(const QMimeData *data, Qt::DropAction act
     else
         sourceParent = d->m_rootIndex;
     return sourceModel()->dropMimeData(data, action, row, column, sourceParent);
-}
-
-/*!
-\reimp
-*/
-QModelIndex RootIndexProxyModel::sibling(int row, int column, const QModelIndex &idx) const
-{
-    Q_ASSERT(!idx.isValid() || idx.model() == this);
-    if (!sourceModel())
-        return QModelIndex();
-    if (!idx.isValid())
-        return QModelIndex();
-    return mapFromSource(sourceModel()->sibling(row, column, mapToSource(idx)));
 }
 
 /*!

@@ -22,7 +22,10 @@ private Q_SLOTS:
     void sourceSortAncestorOfRoot();
     void sourceDataChanged();
     void sourceDataChanged_data();
-
+    void insertRow();
+    void insertColumn();
+    void removeRow();
+    void removeColumn();
 protected:
     void compareModels(const QAbstractItemModel *source, const QAbstractItemModel *proxy, const QModelIndex &sourcePar, const QModelIndex &proxyPar);
 };
