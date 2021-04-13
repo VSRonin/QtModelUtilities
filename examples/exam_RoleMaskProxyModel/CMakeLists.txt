@@ -10,7 +10,7 @@ set(exam_RoleMaskProxyModel_EditableSQL_SRCS
 add_executable(exam_RoleMaskProxyModel_Highlight WIN32 exam_rolemaskhighlight.cpp)
 target_include_directories(exam_RoleMaskProxyModel_Highlight PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(exam_RoleMaskProxyModel_Highlight PRIVATE ../../src ../../src/includes)
-target_link_libraries(exam_RoleMaskProxyModel_Highlight PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets modelutilities)
+target_link_libraries(exam_RoleMaskProxyModel_Highlight PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets QtModelUtilities::QtModelUtilities)
 set_target_properties(exam_RoleMaskProxyModel_Highlight PROPERTIES 
     AUTOMOC ON
     CXX_STANDARD 11
@@ -27,7 +27,7 @@ if("${Qt${QT_VERSION_MAJOR}Sql_FOUND}")
     add_executable(exam_RoleMaskProxyModel_EditableSQL WIN32 exam_rolemaskeditablesql.cpp dbresource.qrc)
     target_include_directories(exam_RoleMaskProxyModel_EditableSQL PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
     target_include_directories(exam_RoleMaskProxyModel_EditableSQL PRIVATE ../../src ../../src/includes)
-    target_link_libraries(exam_RoleMaskProxyModel_EditableSQL PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql modelutilities)
+    target_link_libraries(exam_RoleMaskProxyModel_EditableSQL PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql QtModelUtilities::QtModelUtilities)
     set_target_properties(exam_RoleMaskProxyModel_EditableSQL PROPERTIES 
         AUTOMOC ON
         AUTORCC ON

@@ -8,8 +8,8 @@ add_executable(exam_InsertProxyModel_Commit WIN32 exam_inserproxycommit.cpp)
 target_include_directories(exam_InsertProxyModel_Subclass PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(exam_InsertProxyModel_Commit PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(exam_InsertProxyModel_Subclass PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets modelutilities)
-target_link_libraries(exam_InsertProxyModel_Commit PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets modelutilities)
+target_link_libraries(exam_InsertProxyModel_Subclass PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets QtModelUtilities::QtModelUtilities)
+target_link_libraries(exam_InsertProxyModel_Commit PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets QtModelUtilities::QtModelUtilities)
 
 set_target_properties(exam_InsertProxyModel_Subclass PROPERTIES
     AUTOMOC ON

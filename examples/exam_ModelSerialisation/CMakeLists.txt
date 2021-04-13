@@ -4,7 +4,7 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Gui Widgets REQUIRED)
 
 add_executable(exam_ModelSerialisation WIN32 exam_modelserialisation.cpp)
 target_include_directories(exam_ModelSerialisation PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(exam_ModelSerialisation PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets modelutilities)
+target_link_libraries(exam_ModelSerialisation PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets QtModelUtilities::QtModelUtilities)
 set_target_properties(exam_ModelSerialisation PROPERTIES
     AUTOMOC ON
     CXX_STANDARD 11
