@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.9)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
@@ -112,7 +112,11 @@ if(modelutilities_SRCS)
     include(GNUInstallDirs)
     add_library(QtModelUtilities ${modelutilities_SRCS})
     add_library(QtModelUtilities::QtModelUtilities ALIAS QtModelUtilities)
-    generate_export_header(QtModelUtilities STATIC_DEFINE MODELUTILITIES_STATIC EXPORT_MACRO_NAME MODELUTILITIES_EXPORT EXPORT_FILE_NAME globaldefs/modelutilities_global.h)
+    generate_export_header(QtModelUtilities
+        STATIC_DEFINE MODELUTILITIES_STATIC
+        EXPORT_MACRO_NAME MODELUTILITIES_EXPORT
+        EXPORT_FILE_NAME globaldefs/modelutilities_global.h
+    )
     target_include_directories(QtModelUtilities PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/globaldefs>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
@@ -158,7 +162,7 @@ if(modelutilities_SRCS)
         COMPONENT QtModelUtilities_Development
     )
     install(TARGETS QtModelUtilities
-        EXPORT QtModelUtilitiesTargetsRuntime
+        EXPORT QtModelUtilitiesTargets
         RUNTIME
             DESTINATION ${CMAKE_INSTALL_BINDIR}
             COMPONENT QtModelUtilities_Runtime
@@ -166,28 +170,15 @@ if(modelutilities_SRCS)
             DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT QtModelUtilities_Runtime
             NAMELINK_SKIP
-    )
-    install(TARGETS QtModelUtilities
-        EXPORT QtModelUtilitiesTargetsDevelopment
         INCLUDES
             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
             COMPONENT QtModelUtilities_Development
-        LIBRARY
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            COMPONENT QtModelUtilities_Development
-            NAMELINK_ONLY
         ARCHIVE
             DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT QtModelUtilities_Development
     )
-    install(EXPORT QtModelUtilitiesTargetsRuntime
-            FILE QtModelUtilitiesTargetsRuntime.cmake
-            NAMESPACE QtModelUtilities::
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/QtModelUtilities
-            COMPONENT QtModelUtilities_Runtime
-    )
-    install(EXPORT QtModelUtilitiesTargetsDevelopment
-            FILE QtModelUtilitiesTargetsDevelopment.cmake
+    install(EXPORT QtModelUtilitiesTargets
+            FILE QtModelUtilitiesTargets.cmake
             NAMESPACE QtModelUtilities::
             DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/QtModelUtilities
             COMPONENT QtModelUtilities_Development

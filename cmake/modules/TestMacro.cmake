@@ -1,4 +1,5 @@
 macro(BasicTest TestName)
+    cmake_minimum_required(VERSION 3.9)
     set(targetName "tst_${TestName}")
     set(testProjectName "tst${TestName}")
     string(TOLOWER ${TestName} TestSourceFileName)
