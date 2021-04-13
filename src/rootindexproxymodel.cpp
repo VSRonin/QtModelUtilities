@@ -439,7 +439,6 @@ void RootIndexProxyModel::setSourceModel(QAbstractItemModel *sourceModel)
     }
 }
 
-
 /*!
 \reimp
 */
