@@ -4,7 +4,6 @@ find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Gui)
 message(STATUS "Found Qt Core ${Qt5Core_VERSION}")
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 if(NOT "${Qt${QT_VERSION_MAJOR}Gui_FOUND}")
     set(NO_GUI ON)
@@ -29,7 +28,6 @@ if(BUILD_DOCS)
     endif()
 endif()
 
-set(modelutilities_INSTALL_INCLUDE modelutilities_global.h)
 if(BUILD_ROLEMASKPROXY)
     set(rolemaskproxy_SRCS rolemaskproxymodel.cpp rolemaskproxymodel.h private/rolemaskproxymodel_p.h)
     set(modelutilities_SRCS ${rolemaskproxy_SRCS} ${modelutilities_SRCS})
@@ -104,13 +102,22 @@ if(BUILD_DOCS)
         COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/DoxygenConfig.doxyfile
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating API documentation with Doxygen"
-        VERBATIM )
+        VERBATIM
+    )
     install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs/html DESTINATION docs COMPONENT documentation)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/docs/htmldocs.html DESTINATION docs COMPONENT documentation)
 endif()
 if(modelutilities_SRCS)
-    set(modelutilities_SRCS modelutilities_global.h ${modelutilities_SRCS})
+    include(GenerateExportHeader)
+    include(GNUInstallDirs)
     add_library(modelutilities ${modelutilities_SRCS})
+    generate_export_header(modelutilities STATIC_DEFINE MODELUTILITIES_STATIC EXPORT_MACRO_NAME MODELUTILITIES_EXPORT EXPORT_FILE_NAME globaldefs/modelutilities_global.h)
+    target_include_directories(modelutilities PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/globaldefs>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/includes>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+    )
     if(NOT BUILD_SHARED_LIBS)
         target_compile_definitions(modelutilities PUBLIC MODELUTILITIES_STATIC)
     endif()
@@ -131,6 +138,9 @@ if(modelutilities_SRCS)
         AUTOMOC ON
         CXX_STANDARD 11
         CXX_STANDARD_REQUIRED ON
+        CXX_VISIBILITY_PRESET hidden
+        VISIBILITY_INLINES_HIDDEN ON
+        SOVERSION ${VERSION_MAJOR}
         VERSION ${VERSION_SHORT}
         EXPORT_NAME "QtModelUtilities"
         ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib"
@@ -142,22 +152,26 @@ if(modelutilities_SRCS)
         VERSION ${VERSION_SHORT}
         COMPATIBILITY SameMajorVersion
     )
-    install(FILES ${modelutilities_INSTALL_INCLUDE}
-        DESTINATION include
+    install(FILES ${modelutilities_INSTALL_INCLUDE} "${CMAKE_CURRENT_BINARY_DIR}/modelutilities_global.h"
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     )
     install(TARGETS modelutilities
         EXPORT modelutilitiesTargets
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        INCLUDES DESTINATION include
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT QtModelUtilities_Runtime
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT QtModelUtilities_Runtime
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT QtModelUtilities_Development
     )
     install(EXPORT modelutilitiesTargets
             FILE QtModelUtilitiesTargets.cmake
             NAMESPACE QtModelUtilities::
-            DESTINATION lib/cmake/QtModelUtilities
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/QtModelUtilities
+            COMPONENT QtModelUtilities_Development
     )
     install(FILES "QtModelUtilitiesConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/QtModelUtilitiesConfigVersion.cmake"
-        DESTINATION lib/cmake/QtModelUtilities
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/QtModelUtilities
     )
 endif()

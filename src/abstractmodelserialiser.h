@@ -13,7 +13,7 @@
 
 #ifndef ABSTRACTMULTIROLESERIALISER_H
 #define ABSTRACTMULTIROLESERIALISER_H
-#include "modelutilities_global.h"
+#include <modelutilities_global.h>
 #include <QObject>
 #include <QScopedPointer>
 #include <QAbstractItemModel>

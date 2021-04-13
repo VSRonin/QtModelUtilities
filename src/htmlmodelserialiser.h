@@ -13,7 +13,6 @@
 #ifndef HTMLMODELSERIALISER_H
 #define HTMLMODELSERIALISER_H
 
-#include "modelutilities_global.h"
 #include "abstractstringserialiser.h"
 class HtmlModelSerialiserPrivate;
 class MODELUTILITIES_EXPORT HtmlModelSerialiser : public AbstractStringSerialiser

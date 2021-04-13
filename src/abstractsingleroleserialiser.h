@@ -14,7 +14,6 @@
 #ifndef ABSTRACTSINGLEROLESERIALISER_H
 #define ABSTRACTSINGLEROLESERIALISER_H
 
-#include "modelutilities_global.h"
 #include "abstractstringserialiser.h"
 class AbstractSingleRoleSerialiserPrivate;
 class MODELUTILITIES_EXPORT AbstractSingleRoleSerialiser : public AbstractStringSerialiser

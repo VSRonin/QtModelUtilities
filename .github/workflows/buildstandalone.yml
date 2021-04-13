@@ -27,7 +27,7 @@ jobs:
         strategy:
           fail-fast: false
           matrix:
-              qt_ver: [5.15.2,6.0.3]
+              qt_ver: [5.15.2,6.0.2]
               modules:
                 - { friendly_name: RoleMaskProxyModel, rolemaskproxy: ON, insertproxy: OFF, modelserialisation: OFF, rootindexproxy: OFF}
                 - { friendly_name: InsertProxyModel, rolemaskproxy: OFF, insertproxy: ON, modelserialisation: OFF, rootindexproxy: OFF}

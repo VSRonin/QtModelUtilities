@@ -10,7 +10,7 @@ jobs:
         strategy:
           max-parallel: 1
           matrix:
-              qt_ver: [5.15.2,6.0.3]
+              qt_ver: [5.15.2,6.0.2]
               platforms:
                 - { os: windows-latest, generator: "NMake Makefiles", debug_postfix: d, compression: ZIP, friendly_name: MSVC }
                 - { os: windows-latest, generator: "MinGW Makefiles", debug_postfix: d, compression: ZIP, friendly_name: MinGW }

@@ -13,7 +13,7 @@
 
 #ifndef ROOTINDEXPROXY_H
 #define ROOTINDEXPROXY_H
-#include "modelutilities_global.h"
+#include <modelutilities_global.h>
 #include <QIdentityProxyModel>
 class RootIndexProxyModelPrivate;
 class MODELUTILITIES_EXPORT RootIndexProxyModel : public QIdentityProxyModel

@@ -13,7 +13,7 @@
 
 #ifndef BINARYMODELSERIALISER_H
 #define BINARYMODELSERIALISER_H
-#include "modelutilities_global.h"
+
 #include "abstractmodelserialiser.h"
 class BinaryModelSerialiserPrivate;
 class MODELUTILITIES_EXPORT BinaryModelSerialiser : public AbstractModelSerialiser

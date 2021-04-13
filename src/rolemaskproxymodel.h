@@ -12,7 +12,7 @@
 \****************************************************************************/
 #ifndef ROLEMASKPROXYMODEL_H
 #define ROLEMASKPROXYMODEL_H
-#include "modelutilities_global.h"
+#include <modelutilities_global.h>
 #include <QIdentityProxyModel>
 #include <QList>
 #include <QSet>

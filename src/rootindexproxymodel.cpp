@@ -656,8 +656,6 @@ bool RootIndexProxyModel::removeColumns(int column, int count, const QModelIndex
     return sourceModel()->removeColumns(column, count, sourceParent);
 }
 
-
-
 /*!
 \reimp
 */

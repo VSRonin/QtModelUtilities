@@ -13,7 +13,7 @@
 
 #ifndef INSERTPROXY_H
 #define INSERTPROXY_H
-#include "modelutilities_global.h"
+#include <modelutilities_global.h>
 #include <QAbstractProxyModel>
 #include <QVariant>
 class InsertProxyModelPrivate;

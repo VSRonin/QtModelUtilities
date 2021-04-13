@@ -14,7 +14,6 @@
 #ifndef JSONMODELSERIALISER_H
 #define JSONMODELSERIALISER_H
 
-#include "modelutilities_global.h"
 #include "abstractstringserialiser.h"
 #include <QJsonObject>
 #include <QJsonDocument>

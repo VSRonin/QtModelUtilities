@@ -14,7 +14,6 @@
 #ifndef XMLMODELSERIALISER_H
 #define XMLMODELSERIALISER_H
 
-#include "modelutilities_global.h"
 #include "abstractstringserialiser.h"
 class XmlModelSerialiserPrivate;
 class QXmlStreamWriter;

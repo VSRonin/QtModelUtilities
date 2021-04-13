@@ -14,7 +14,6 @@
 #ifndef CSVMODELSERIALISER_H
 #define CSVMODELSERIALISER_H
 
-#include "modelutilities_global.h"
 #include "abstractsingleroleserialiser.h"
 class CsvModelSerialiserPrivate;
 class QTextStream;
