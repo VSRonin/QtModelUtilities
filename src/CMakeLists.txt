@@ -110,31 +110,32 @@ endif()
 if(modelutilities_SRCS)
     include(GenerateExportHeader)
     include(GNUInstallDirs)
-    add_library(modelutilities ${modelutilities_SRCS})
-    generate_export_header(modelutilities STATIC_DEFINE MODELUTILITIES_STATIC EXPORT_MACRO_NAME MODELUTILITIES_EXPORT EXPORT_FILE_NAME globaldefs/modelutilities_global.h)
-    target_include_directories(modelutilities PUBLIC
+    add_library(QtModelUtilities ${modelutilities_SRCS})
+    add_library(QtModelUtilities::QtModelUtilities ALIAS QtModelUtilities)
+    generate_export_header(QtModelUtilities STATIC_DEFINE MODELUTILITIES_STATIC EXPORT_MACRO_NAME MODELUTILITIES_EXPORT EXPORT_FILE_NAME globaldefs/modelutilities_global.h)
+    target_include_directories(QtModelUtilities PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/globaldefs>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/includes>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     )
     if(NOT BUILD_SHARED_LIBS)
-        target_compile_definitions(modelutilities PUBLIC MODELUTILITIES_STATIC)
+        target_compile_definitions(QtModelUtilities PUBLIC MODELUTILITIES_STATIC)
     endif()
-    target_compile_definitions(modelutilities PRIVATE MODELUTILITIES_LIB)
+    target_compile_definitions(QtModelUtilities PRIVATE MODELUTILITIES_LIB)
     if(OPTIMISE_FOR_MANY_ROLES)
-        target_compile_definitions(modelutilities PRIVATE OPTIMISE_FOR_MANY_ROLES)
+        target_compile_definitions(QtModelUtilities PRIVATE OPTIMISE_FOR_MANY_ROLES)
     endif()
-    target_link_libraries(modelutilities PRIVATE Qt${QT_VERSION_MAJOR}::Core)
+    target_link_libraries(QtModelUtilities PRIVATE Qt${QT_VERSION_MAJOR}::Core)
     if(NOT NO_GUI)
-        target_link_libraries(modelutilities PRIVATE Qt${QT_VERSION_MAJOR}::Gui)
+        target_link_libraries(QtModelUtilities PRIVATE Qt${QT_VERSION_MAJOR}::Gui)
     endif()
     if(NOT NO_WIDGETS)
-        target_link_libraries(modelutilities PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+        target_link_libraries(QtModelUtilities PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
     endif()
 
 
-    set_target_properties(modelutilities PROPERTIES
+    set_target_properties(QtModelUtilities PROPERTIES
         AUTOMOC ON
         CXX_STANDARD 11
         CXX_STANDARD_REQUIRED ON
@@ -152,26 +153,47 @@ if(modelutilities_SRCS)
         VERSION ${VERSION_SHORT}
         COMPATIBILITY SameMajorVersion
     )
-    install(FILES ${modelutilities_INSTALL_INCLUDE} "${CMAKE_CURRENT_BINARY_DIR}/modelutilities_global.h"
+    install(FILES ${modelutilities_INSTALL_INCLUDE} "${CMAKE_CURRENT_BINARY_DIR}/globaldefs/modelutilities_global.h"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT QtModelUtilities_Development
     )
-    install(TARGETS modelutilities
-        EXPORT modelutilitiesTargets
-        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    install(TARGETS QtModelUtilities
+        EXPORT QtModelUtilitiesTargetsRuntime
+        RUNTIME
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
             COMPONENT QtModelUtilities_Runtime
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT QtModelUtilities_Runtime
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            NAMELINK_SKIP
+    )
+    install(TARGETS QtModelUtilities
+        EXPORT QtModelUtilitiesTargetsDevelopment
+        INCLUDES
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+            COMPONENT QtModelUtilities_Development
+        LIBRARY
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT QtModelUtilities_Development
+            NAMELINK_ONLY
+        ARCHIVE
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT QtModelUtilities_Development
     )
-    install(EXPORT modelutilitiesTargets
-            FILE QtModelUtilitiesTargets.cmake
+    install(EXPORT QtModelUtilitiesTargetsRuntime
+            FILE QtModelUtilitiesTargetsRuntime.cmake
+            NAMESPACE QtModelUtilities::
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/QtModelUtilities
+            COMPONENT QtModelUtilities_Runtime
+    )
+    install(EXPORT QtModelUtilitiesTargetsDevelopment
+            FILE QtModelUtilitiesTargetsDevelopment.cmake
             NAMESPACE QtModelUtilities::
             DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/QtModelUtilities
             COMPONENT QtModelUtilities_Development
     )
     install(FILES "QtModelUtilitiesConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/QtModelUtilitiesConfigVersion.cmake"
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/QtModelUtilities
+        COMPONENT QtModelUtilities_Development
     )
 endif()
