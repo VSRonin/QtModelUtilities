@@ -28,6 +28,7 @@ public:
     int columnCount() const;
     int rowCount() const;
     void insertColumns(int column, int count);
+    void removeColumns(int column, int count);
     void insertRows(int row, int count);
     void removeRows(int row, int count);
     int row() const;

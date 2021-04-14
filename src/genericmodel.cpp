@@ -57,21 +57,49 @@ int GenericModelItem::rowCount() const
 void GenericModelItem::insertColumns(int column, int count)
 {
     if(m_rowCount>0){
-        for(int i=column+(m_colCount*(m_rowCount-1));i>=0;i-=qMax(1,m_colCount)){
-            for(int j=i;j<i-column+m_colCount;++j)
-                children.at(j)->m_column+=count;
-            Q_ASSERT((i-column)%qMax(m_colCount,1)==0);
-            const int rowIndex = (i-column)/qMax(m_colCount,1);
-            children.insert(i,count,nullptr);
-            for(int j=0;j<count;++j){
+        if(m_colCount==0){
+            Q_ASSERT(column==0);
+            children.insert(column,count*m_rowCount,nullptr);
+            const int childrenSize = children.size();
+            for(int j=0;j<childrenSize;++j){
                 auto newChild = new GenericModelItem(this);
-                newChild->m_column=i+j;
-                newChild->m_row=rowIndex;
-                children[i+j]=newChild;
+                newChild->m_column=j%childrenSize;
+                newChild->m_row=j/childrenSize;
+                children[j]=newChild;
+            }
+        }
+        else{
+            for(int i=column+(m_colCount*(m_rowCount-1));i>=0;i-=qMax(1,m_colCount)){
+                for(int j=i;j<i-column+m_colCount;++j)
+                    children.at(j)->m_column+=count;
+                Q_ASSERT((i-column)%qMax(m_colCount,1)==0);
+                const int rowIndex = (i-column)/qMax(m_colCount,1);
+                children.insert(i,count,nullptr);
+                for(int j=0;j<count;++j){
+                    auto newChild = new GenericModelItem(this);
+                    newChild->m_column=i+j;
+                    newChild->m_row=rowIndex;
+                    children[i+j]=newChild;
+                }
             }
         }
     }
     m_colCount+=count;
+}
+
+void GenericModelItem::removeColumns(int column, int count)
+{
+    if(m_rowCount>0){
+        for(int i=column+(m_colCount*(m_rowCount-1));i>=0;i-=qMax(1,m_colCount)){
+            for(int j=i+count;j<i-column+m_colCount;++j)
+                children.at(j)->m_column-=count;
+            const auto endRemoveIter = children.begin()+i+count;
+            const auto startRemoveIter = children.begin()+i;
+            qDeleteAll(startRemoveIter,endRemoveIter);
+            children.erase(startRemoveIter,endRemoveIter);
+        }
+    }
+    m_colCount-=count;
 }
 
 void GenericModelItem::insertRows(int row, int count)
@@ -92,13 +120,16 @@ void GenericModelItem::insertRows(int row, int count)
 
 void GenericModelItem::removeRows(int row, int count)
 {
-    Q_ASSERT((row+count)*m_colCount<=children.size());
-    const auto endRemoveIter = children.begin()+((row+count)*m_colCount);
-    const auto startRemoveIter = children.begin()+(row*m_colCount);
-    for(auto i=endRemoveIter, iEnd = children.end();i!=iEnd;++i)
-        (*i)->m_row-=count;
-    qDeleteAll(startRemoveIter,endRemoveIter);
-    children.erase(startRemoveIter,endRemoveIter);
+    if(m_colCount>0){
+        Q_ASSERT((row+count)*m_colCount<=children.size());
+        const auto endRemoveIter = children.begin()+((row+count)*m_colCount);
+        const auto startRemoveIter = children.begin()+(row*m_colCount);
+        for(auto i=endRemoveIter, iEnd = children.end();i!=iEnd;++i)
+            (*i)->m_row-=count;
+        qDeleteAll(startRemoveIter,endRemoveIter);
+        children.erase(startRemoveIter,endRemoveIter);
+    }
+    m_rowCount-=count;
 }
 
 int GenericModelItem::row() const{
@@ -170,6 +201,14 @@ void GenericModelPrivate::insertRows(int row, int count, const QModelIndex &pare
     item->insertRows(row,count);
 }
 
+void GenericModelPrivate::removeColumns(int column, int count, const QModelIndex &parent)
+{
+    if(!parent.isValid())
+        hHeaderData.erase(hHeaderData.begin()+column,hHeaderData.begin()+column+count);
+    GenericModelItem* item = itemForIndex(parent);
+    item->removeColumns(column,count);
+}
+
 void GenericModelPrivate::removeRows(int row, int count, const QModelIndex &parent)
 {
     if(!parent.isValid())
@@ -208,7 +247,7 @@ GenericModel::~GenericModel()
 bool GenericModel::insertColumns(int column, int count, const QModelIndex &parent)
 {
     Q_ASSERT(!parent.isValid() || parent.model()==this);
-    if(count <=0 || column<0 || column>columnCount())
+    if(count <=0 || column<0 || column>columnCount(parent))
         return false;
     beginInsertColumns(parent,column,column+count-1);
     Q_D(GenericModel);
@@ -223,7 +262,7 @@ bool GenericModel::insertColumns(int column, int count, const QModelIndex &paren
 bool GenericModel::insertRows(int row, int count, const QModelIndex &parent)
 {
     Q_ASSERT(!parent.isValid() || parent.model()==this);
-    if(count <=0 || row<0 || row>rowCount())
+    if(count <=0 || row<0 || row>rowCount(parent))
         return false;
     beginInsertRows(parent,row,row+count-1);
     Q_D(GenericModel);
@@ -237,8 +276,14 @@ bool GenericModel::insertRows(int row, int count, const QModelIndex &parent)
 */
 bool GenericModel::removeColumns(int column, int count, const QModelIndex &parent)
 {
-    return false;
-    // TODO
+    Q_ASSERT(!parent.isValid() || parent.model()==this);
+    if(count <=0 || column<0 || column+count-1>columnCount(parent))
+        return false;
+    beginRemoveColumns(parent,column,column+count-1);
+    Q_D(GenericModel);
+    d->removeColumns(column,count,parent);
+    endRemoveColumns();
+    return true;
 }
 
 /*!
@@ -247,7 +292,7 @@ bool GenericModel::removeColumns(int column, int count, const QModelIndex &paren
 bool GenericModel::removeRows(int row, int count, const QModelIndex &parent)
 {
     Q_ASSERT(!parent.isValid() || parent.model()==this);
-    if(count <=0 || row<0 || row+count-1>rowCount())
+    if(count <=0 || row<0 || row+count-1>rowCount(parent))
         return false;
     beginRemoveRows(parent,row,row+count-1);
     Q_D(GenericModel);
@@ -280,10 +325,13 @@ QMap<int, QVariant> GenericModel::itemData(const QModelIndex &index) const
 QModelIndex GenericModel::index(int row, int column, const QModelIndex &parent) const
 {
     Q_ASSERT(!parent.isValid() || parent.model()==this);
-    Q_ASSERT(row>=0 && row<rowCount());
-    Q_ASSERT(column>=0 && column<columnCount());
+    if(row<0 || column<0)
+        return QModelIndex();
     Q_D(const GenericModel);
-    return createIndex(row,column,d->itemForIndex(parent)->childAt(row,column));
+    GenericModelItem* parentItem = d->itemForIndex(parent);
+    if(row>=parentItem->rowCount() || column>=parentItem->columnCount())
+        return QModelIndex();
+    return createIndex(row,column,parentItem->childAt(row,column));
 }
 
 /*!
@@ -445,22 +493,25 @@ bool GenericModel::setData(const QModelIndex &index, const QVariant &value, int 
     GenericModelItem* const item = d->itemForIndex(index);
     if(d->m_mergeDisplayEdit && role==Qt::EditRole)
         role=Qt::DisplayRole;
+    QVector<int> rolesToEmit{role};
+    if(d->m_mergeDisplayEdit && role==Qt::DisplayRole)
+        rolesToEmit.append(Qt::EditRole);
     const auto roleIter = item->data.find(role);
     if(roleIter==item->data.end()){
         if(value.isValid()){
             item->data.insert(role,value);
-            dataChanged(index,index,{role});
+            dataChanged(index,index,rolesToEmit);
         }
         return true;
     }
     if(!value.isValid()){
         item->data.erase(roleIter);
-        dataChanged(index,index,{role});
+        dataChanged(index,index,rolesToEmit);
         return true;
     }
     if(value!=roleIter.value()){
         roleIter.value()=value;
-        dataChanged(index,index,{role});
+        dataChanged(index,index,rolesToEmit);
     }
     return true;
 }
