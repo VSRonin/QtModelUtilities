@@ -29,10 +29,11 @@ jobs:
           matrix:
               qt_ver: [5.15.2,6.0.2]
               modules:
-                - { friendly_name: RoleMaskProxyModel, rolemaskproxy: ON, insertproxy: OFF, modelserialisation: OFF, rootindexproxy: OFF}
-                - { friendly_name: InsertProxyModel, rolemaskproxy: OFF, insertproxy: ON, modelserialisation: OFF, rootindexproxy: OFF}
-                - { friendly_name: ModelSerialisation, rolemaskproxy: OFF, insertproxy: OFF, modelserialisation: ON, rootindexproxy: OFF}
-                - { friendly_name: RootIndexProxyModel, rolemaskproxy: OFF, insertproxy: OFF, modelserialisation: OFF, rootindexproxy: ON}
+                - { friendly_name: RoleMaskProxyModel, rolemaskproxy: ON, insertproxy: OFF, modelserialisation: OFF, rootindexproxy: OFF, genericmodel: OFF}
+                - { friendly_name: InsertProxyModel, rolemaskproxy: OFF, insertproxy: ON, modelserialisation: OFF, rootindexproxy: OFF, genericmodel: OFF}
+                - { friendly_name: ModelSerialisation, rolemaskproxy: OFF, insertproxy: OFF, modelserialisation: ON, rootindexproxy: OFF, genericmodel: OFF}
+                - { friendly_name: RootIndexProxyModel, rolemaskproxy: OFF, insertproxy: OFF, modelserialisation: OFF, rootindexproxy: ON, genericmodel: OFF}
+                - { friendly_name: GenericModel, rolemaskproxy: OFF, insertproxy: OFF, modelserialisation: OFF, rootindexproxy: OFF, genericmodel: ON}
         steps:
           - name: Install Qt
             uses: jurplel/install-qt-action@v2
@@ -53,17 +54,15 @@ jobs:
             run: |
               sudo apt-get update -y
               sudo apt-get install libxcb-icccm4 libxcb-xkb1 libxcb-icccm4 libxcb-image0 libxcb-render-util0 libxcb-randr0 libxcb-keysyms1 libxcb-xinerama0 libxcb-xinput-dev
-              export PATH=$PATH:$PWD/build/installed/lib
-              export PATH=$PATH:$PWD/build/installed/bin
           - name: ${{ matrix.modules.friendly_name }} Qt${{ matrix.qt_ver }}
             shell: pwsh
             run: |
               cd build/debug
-              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_DEBUG_POSTFIX=d -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_ROOTINDEXPROXY=${{ matrix.modules.rootindexproxy }} -DBUILD_ROLEMASKPROXY=${{ matrix.modules.rolemaskproxy }} -DBUILD_INSERTPROXY=${{ matrix.modules.insertproxy }} -DBUILD_MODELSERIALISATION=${{ matrix.modules.modelserialisation }} -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="../installed" ../../
+              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_DEBUG_POSTFIX=d -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_GENERICMODEL=${{ matrix.modules.genericmodel }} -DBUILD_ROOTINDEXPROXY=${{ matrix.modules.rootindexproxy }} -DBUILD_ROLEMASKPROXY=${{ matrix.modules.rolemaskproxy }} -DBUILD_INSERTPROXY=${{ matrix.modules.insertproxy }} -DBUILD_MODELSERIALISATION=${{ matrix.modules.modelserialisation }} -DBUILD_SHARED_LIBS=ON ../../
               cmake --build .
               cmake --build . --target install
               cd ../release
-              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_ROOTINDEXPROXY=${{ matrix.modules.rootindexproxy }} -DBUILD_ROLEMASKPROXY=${{ matrix.modules.rolemaskproxy }} -DBUILD_INSERTPROXY=${{ matrix.modules.insertproxy }} -DBUILD_MODELSERIALISATION=${{ matrix.modules.modelserialisation }} -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="../installed" ../../
+              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_GENERICMODEL=${{ matrix.modules.genericmodel }} -DBUILD_ROOTINDEXPROXY=${{ matrix.modules.rootindexproxy }} -DBUILD_ROLEMASKPROXY=${{ matrix.modules.rolemaskproxy }} -DBUILD_INSERTPROXY=${{ matrix.modules.insertproxy }} -DBUILD_MODELSERIALISATION=${{ matrix.modules.modelserialisation }} -DBUILD_SHARED_LIBS=ON ../../
               cmake --build .
               cmake --build . --target install
           - name: Debug Test

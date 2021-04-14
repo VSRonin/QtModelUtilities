@@ -14,7 +14,8 @@ private Q_SLOTS:
     void insertColumn_data();
     void insertColumn();
     void data();
+
 private:
-    void fillTable(QAbstractItemModel* model) const;
+    void fillTable(QAbstractItemModel *model) const;
 };
 #endif // TST_GENERICMODEL_H

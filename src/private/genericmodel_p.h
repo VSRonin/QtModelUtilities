@@ -16,13 +16,14 @@
 #include "private/modelutilities_common_p.h"
 #include <QVector>
 #include <QSize>
-class GenericModelItem{
+class GenericModelItem
+{
 public:
     GenericModelItem();
-    GenericModelItem(GenericModelItem* par);
+    GenericModelItem(GenericModelItem *par);
     virtual ~GenericModelItem();
-    GenericModelItem* childAt(int row, int col) const;
-    GenericModelItem* parent;
+    GenericModelItem *childAt(int row, int col) const;
+    GenericModelItem *parent;
     RolesContainer data;
     Qt::ItemFlags flags;
     int columnCount() const;
@@ -35,7 +36,8 @@ public:
     int column() const;
     void setMergeDisplayEdit(bool val);
     QSize span() const;
-    void setSpan(const QSize& sz);
+    void setSpan(const QSize &sz);
+
 private:
     int m_colCount;
     int m_rowCount;
@@ -43,7 +45,7 @@ private:
     int m_column;
     int m_rowSpan;
     int m_colSpan;
-    QVector<GenericModelItem*> children;
+    QVector<GenericModelItem *> children;
 };
 
 class GenericModelPrivate
@@ -52,8 +54,8 @@ class GenericModelPrivate
     Q_DISABLE_COPY(GenericModelPrivate)
     GenericModelPrivate(GenericModel *q);
     virtual ~GenericModelPrivate();
-    GenericModelItem *itemForIndex(const QModelIndex& idx) const;
-    QModelIndex indexForItem(GenericModelItem* item) const;
+    GenericModelItem *itemForIndex(const QModelIndex &idx) const;
+    QModelIndex indexForItem(GenericModelItem *item) const;
     void insertColumns(int column, int count, const QModelIndex &parent = QModelIndex());
     void insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
     void removeColumns(int column, int count, const QModelIndex &parent = QModelIndex());
@@ -65,8 +67,9 @@ class GenericModelPrivate
     QVector<RolesContainer> vHeaderData;
     QVector<RolesContainer> hHeaderData;
     bool m_mergeDisplayEdit;
+
 public:
-    static void setMergeDisplayEdit(bool val, RolesContainer& container);
+    static void setMergeDisplayEdit(bool val, RolesContainer &container);
 };
 
 #endif // GENERICMODEL_P_H
