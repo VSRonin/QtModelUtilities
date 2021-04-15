@@ -24,7 +24,6 @@ int main(int argc, char *argv[])
     }
     for (int j = 0; j < baseModel->columnCount(); ++j)
         baseModel->setHeaderData(j, Qt::Horizontal, j + 1);
-    baseModel->setSpan(baseModel->index(2, 1), QSize(3, 2));
 
     // Create a view for the model
     QTreeView *baseView = new QTreeView(&mainWid);

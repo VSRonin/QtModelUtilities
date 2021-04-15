@@ -35,15 +35,15 @@ void tst_GenericModel::insertRow()
     QVERIFY(rowsInsertedSpy.isValid());
 
     QCOMPARE(testModel.rowCount(), 0);
-    testModel.insertRow(-1);
+    QVERIFY(!testModel.insertRow(-1));
     QCOMPARE(testModel.rowCount(), 0);
     QCOMPARE(rowsAboutToBeInsertedSpy.count(), 0);
     QCOMPARE(rowsInsertedSpy.count(), 0);
-    testModel.insertRow(1);
+    QVERIFY(!testModel.insertRow(1));
     QCOMPARE(testModel.rowCount(), 0);
     QCOMPARE(rowsAboutToBeInsertedSpy.count(), 0);
     QCOMPARE(rowsInsertedSpy.count(), 0);
-    testModel.insertRow(0);
+    QVERIFY(testModel.insertRow(0));
     QCOMPARE(testModel.rowCount(), 1);
     for (QSignalSpy *spy : {&rowsInsertedSpy, &rowsAboutToBeInsertedSpy}) {
         QCOMPARE(spy->count(), 1);
@@ -52,7 +52,7 @@ void tst_GenericModel::insertRow()
         QCOMPARE(args.at(1).toInt(), 0);
         QCOMPARE(args.at(0).value<QModelIndex>(), QModelIndex());
     }
-    testModel.insertRow(0);
+    QVERIFY(testModel.insertRow(0));
     QCOMPARE(testModel.rowCount(), 2);
     for (QSignalSpy *spy : {&rowsInsertedSpy, &rowsAboutToBeInsertedSpy}) {
         QCOMPARE(spy->count(), 1);
@@ -61,7 +61,7 @@ void tst_GenericModel::insertRow()
         QCOMPARE(args.at(1).toInt(), 0);
         QCOMPARE(args.at(0).value<QModelIndex>(), QModelIndex());
     }
-    testModel.insertRow(1);
+    QVERIFY(testModel.insertRow(1));
     QCOMPARE(testModel.rowCount(), 3);
     for (QSignalSpy *spy : {&rowsInsertedSpy, &rowsAboutToBeInsertedSpy}) {
         QCOMPARE(spy->count(), 1);
@@ -70,7 +70,7 @@ void tst_GenericModel::insertRow()
         QCOMPARE(args.at(1).toInt(), 1);
         QCOMPARE(args.at(0).value<QModelIndex>(), QModelIndex());
     }
-    testModel.insertRow(3);
+    QVERIFY(testModel.insertRow(3));
     QCOMPARE(testModel.rowCount(), 4);
     for (QSignalSpy *spy : {&rowsInsertedSpy, &rowsAboutToBeInsertedSpy}) {
         QCOMPARE(spy->count(), 1);
@@ -79,6 +79,80 @@ void tst_GenericModel::insertRow()
         QCOMPARE(args.at(1).toInt(), 3);
         QCOMPARE(args.at(0).value<QModelIndex>(), QModelIndex());
     }
+}
+
+void tst_GenericModel::insertRows_data()
+{
+    QTest::addColumn<int>("insertCol");
+    QTest::newRow("No Columns") << 0;
+    QTest::newRow("One Column") << 1;
+    QTest::newRow("Multiple Columns") << 3;
+}
+
+void tst_GenericModel::insertRows()
+{
+    QFETCH(int, insertCol);
+    GenericModel testModel;
+    ModelTest probe(&testModel, nullptr);
+    if (insertCol > 0)
+        testModel.insertColumns(0, insertCol);
+    QVERIFY(testModel.insertRow(0));
+    testModel.setHeaderData(0,Qt::Vertical,1);
+
+    QSignalSpy rowsAboutToBeInsertedSpy(&testModel, SIGNAL(rowsAboutToBeInserted(QModelIndex, int, int)));
+    QVERIFY(rowsAboutToBeInsertedSpy.isValid());
+    QSignalSpy rowsInsertedSpy(&testModel, SIGNAL(rowsInserted(QModelIndex, int, int)));
+    QVERIFY(rowsInsertedSpy.isValid());
+
+    QVERIFY(testModel.insertRows(0, 1));
+    QCOMPARE(testModel.rowCount(), 2);
+    for (QSignalSpy *spy : {&rowsInsertedSpy, &rowsAboutToBeInsertedSpy}) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 0);
+        QCOMPARE(args.at(1).toInt(), 0);
+        QCOMPARE(args.at(0).value<QModelIndex>(), QModelIndex());
+    }
+    QCOMPARE(testModel.headerData(1,Qt::Vertical).toInt(),1);
+
+    QVERIFY(testModel.insertRows(0, 2));
+    QCOMPARE(testModel.rowCount(), 4);
+    for (QSignalSpy *spy : {&rowsInsertedSpy, &rowsAboutToBeInsertedSpy}) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 1);
+        QCOMPARE(args.at(1).toInt(), 0);
+        QCOMPARE(args.at(0).value<QModelIndex>(), QModelIndex());
+    }
+    QCOMPARE(testModel.headerData(3,Qt::Vertical).toInt(),1);
+
+    QVERIFY(testModel.insertRows(2, 2));
+    QCOMPARE(testModel.rowCount(), 6);
+    for (QSignalSpy *spy : {&rowsInsertedSpy, &rowsAboutToBeInsertedSpy}) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 3);
+        QCOMPARE(args.at(1).toInt(), 2);
+        QCOMPARE(args.at(0).value<QModelIndex>(), QModelIndex());
+    }
+    QCOMPARE(testModel.headerData(5,Qt::Vertical).toInt(),1);
+
+    QVERIFY(!testModel.insertRows(0, 0));
+    QCOMPARE(testModel.rowCount(), 6);
+    for (QSignalSpy *spy : {&rowsInsertedSpy, &rowsAboutToBeInsertedSpy})
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertRows(2, 0));
+    QCOMPARE(testModel.rowCount(), 6);
+    for (QSignalSpy *spy : {&rowsInsertedSpy, &rowsAboutToBeInsertedSpy})
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertRows(-1, 2));
+    QCOMPARE(testModel.rowCount(), 6);
+    for (QSignalSpy *spy : {&rowsInsertedSpy, &rowsAboutToBeInsertedSpy})
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertRows(7, 2));
+    QCOMPARE(testModel.rowCount(), 6);
+    for (QSignalSpy *spy : {&rowsInsertedSpy, &rowsAboutToBeInsertedSpy})
+        QCOMPARE(spy->count(), 0);
 }
 
 void tst_GenericModel::insertColumn_data()
@@ -146,6 +220,423 @@ void tst_GenericModel::insertColumn()
         QCOMPARE(args.at(2).toInt(), 3);
         QCOMPARE(args.at(1).toInt(), 3);
         QCOMPARE(args.at(0).value<QModelIndex>(), QModelIndex());
+    }
+}
+
+void tst_GenericModel::insertColumns_data()
+{
+    QTest::addColumn<int>("insertRow");
+    QTest::newRow("No Rows") << 0;
+    QTest::newRow("One Row") << 1;
+    QTest::newRow("Multiple Rows") << 3;
+}
+
+void tst_GenericModel::insertColumns()
+{
+    QFETCH(int, insertRow);
+    GenericModel testModel;
+    ModelTest probe(&testModel, nullptr);
+    if (insertRow > 0)
+        testModel.insertRows(0, insertRow);
+    QVERIFY(testModel.insertColumn(0));
+    testModel.setHeaderData(0,Qt::Horizontal,1);
+
+    QSignalSpy columnsAboutToBeInsertedSpy(&testModel, SIGNAL(columnsAboutToBeInserted(QModelIndex, int, int)));
+    QVERIFY(columnsAboutToBeInsertedSpy.isValid());
+    QSignalSpy columnsInsertedSpy(&testModel, SIGNAL(columnsInserted(QModelIndex, int, int)));
+    QVERIFY(columnsInsertedSpy.isValid());
+    QSignalSpy* const spyArr[] = {&columnsInsertedSpy, &columnsAboutToBeInsertedSpy};
+
+    QVERIFY(testModel.insertColumns(0, 1));
+    QCOMPARE(testModel.columnCount(), 2);
+    for (QSignalSpy *spy : spyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 0);
+        QCOMPARE(args.at(1).toInt(), 0);
+        QCOMPARE(args.at(0).value<QModelIndex>(), QModelIndex());
+    }
+    QCOMPARE(testModel.headerData(1,Qt::Horizontal).toInt(),1);
+
+    QVERIFY(testModel.insertColumns(0, 2));
+    QCOMPARE(testModel.columnCount(), 4);
+    for (QSignalSpy *spy : spyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 1);
+        QCOMPARE(args.at(1).toInt(), 0);
+        QCOMPARE(args.at(0).value<QModelIndex>(), QModelIndex());
+    }
+    QCOMPARE(testModel.headerData(3,Qt::Horizontal).toInt(),1);
+
+    QVERIFY(testModel.insertColumns(2, 2));
+    QCOMPARE(testModel.columnCount(), 6);
+    for (QSignalSpy *spy : spyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 3);
+        QCOMPARE(args.at(1).toInt(), 2);
+        QCOMPARE(args.at(0).value<QModelIndex>(), QModelIndex());
+    }
+    QCOMPARE(testModel.headerData(5,Qt::Horizontal).toInt(),1);
+
+    QVERIFY(!testModel.insertColumns(0, 0));
+    QCOMPARE(testModel.columnCount(), 6);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertColumns(2, 0));
+    QCOMPARE(testModel.columnCount(), 6);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertColumns(-1, 2));
+    QCOMPARE(testModel.columnCount(), 6);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertColumns(7, 2));
+    QCOMPARE(testModel.columnCount(), 6);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+}
+
+void tst_GenericModel::insertChildren()
+{
+    GenericModel testModel;
+    ModelTest probe(&testModel, nullptr);
+    testModel.insertColumns(0, 3);
+    testModel.insertRows(0, 5);
+
+    QSignalSpy rowsAboutToBeInsertedSpy(&testModel, SIGNAL(rowsAboutToBeInserted(QModelIndex, int, int)));
+    QVERIFY(rowsAboutToBeInsertedSpy.isValid());
+    QSignalSpy rowsInsertedSpy(&testModel, SIGNAL(rowsInserted(QModelIndex, int, int)));
+    QVERIFY(rowsInsertedSpy.isValid());
+    QSignalSpy columnsAboutToBeInsertedSpy(&testModel, SIGNAL(columnsAboutToBeInserted(QModelIndex, int, int)));
+    QVERIFY(columnsAboutToBeInsertedSpy.isValid());
+    QSignalSpy columnsInsertedSpy(&testModel, SIGNAL(columnsInserted(QModelIndex, int, int)));
+    QVERIFY(columnsInsertedSpy.isValid());
+    QSignalSpy* const colSpyArr[] = {&columnsInsertedSpy, &columnsAboutToBeInsertedSpy};
+    QSignalSpy* const rowSpyArr[] = {&rowsInsertedSpy, &rowsAboutToBeInsertedSpy};
+    QSignalSpy* const spyArr[] = {&rowsInsertedSpy, &rowsAboutToBeInsertedSpy,&columnsInsertedSpy, &columnsAboutToBeInsertedSpy};
+
+    QModelIndex parentIdx = testModel.index(0,0);
+    QVERIFY(!testModel.insertRows(-1,1,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertRows(1,1,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertRows(0,0,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertColumns(-1,1,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertColumns(1,1,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertColumns(0,0,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(testModel.insertRows(0,1,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),1);
+    QCOMPARE(testModel.rowCount(),5);
+    QCOMPARE(testModel.columnCount(parentIdx),0);
+    for (QSignalSpy *spy : colSpyArr)
+        QCOMPARE(spy->count(), 0);
+    for (QSignalSpy *spy : rowSpyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 0);
+        QCOMPARE(args.at(1).toInt(), 0);
+        QCOMPARE(args.at(0).value<QModelIndex>(), parentIdx);
+    }
+    QVERIFY(testModel.insertColumns(0,1,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),1);
+    QCOMPARE(testModel.columnCount(),3);
+    QCOMPARE(testModel.rowCount(parentIdx),1);
+    for (QSignalSpy *spy : rowSpyArr)
+        QCOMPARE(spy->count(), 0);
+    for (QSignalSpy *spy : colSpyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 0);
+        QCOMPARE(args.at(1).toInt(), 0);
+        QCOMPARE(args.at(0).value<QModelIndex>(), parentIdx);
+    }
+    QVERIFY(testModel.insertRows(1,2,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),3);
+    QCOMPARE(testModel.rowCount(),5);
+    QCOMPARE(testModel.columnCount(parentIdx),1);
+    for (QSignalSpy *spy : colSpyArr)
+        QCOMPARE(spy->count(), 0);
+    for (QSignalSpy *spy : rowSpyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 2);
+        QCOMPARE(args.at(1).toInt(), 1);
+        QCOMPARE(args.at(0).value<QModelIndex>(), parentIdx);
+    }
+    QVERIFY(testModel.insertColumns(1,3,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),4);
+    QCOMPARE(testModel.columnCount(),3);
+    QCOMPARE(testModel.rowCount(parentIdx),3);
+    for (QSignalSpy *spy : rowSpyArr)
+        QCOMPARE(spy->count(), 0);
+    for (QSignalSpy *spy : colSpyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 3);
+        QCOMPARE(args.at(1).toInt(), 1);
+        QCOMPARE(args.at(0).value<QModelIndex>(), parentIdx);
+    }
+
+    parentIdx = testModel.index(2,1);
+    QVERIFY(!testModel.insertRows(-1,1,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertRows(1,1,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertRows(0,0,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertColumns(-1,1,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertColumns(1,1,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertColumns(0,0,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+
+
+    QVERIFY(testModel.insertRows(0,1,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),1);
+    QCOMPARE(testModel.rowCount(),5);
+    QCOMPARE(testModel.columnCount(parentIdx),0);
+    for (QSignalSpy *spy : colSpyArr)
+        QCOMPARE(spy->count(), 0);
+    for (QSignalSpy *spy : rowSpyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 0);
+        QCOMPARE(args.at(1).toInt(), 0);
+        QCOMPARE(args.at(0).value<QModelIndex>(), parentIdx);
+    }
+    QVERIFY(testModel.insertColumns(0,1,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),1);
+    QCOMPARE(testModel.columnCount(),3);
+    QCOMPARE(testModel.rowCount(parentIdx),1);
+    for (QSignalSpy *spy : rowSpyArr)
+        QCOMPARE(spy->count(), 0);
+    for (QSignalSpy *spy : colSpyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 0);
+        QCOMPARE(args.at(1).toInt(), 0);
+        QCOMPARE(args.at(0).value<QModelIndex>(), parentIdx);
+    }
+
+    QVERIFY(testModel.insertRows(1,2,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),3);
+    QCOMPARE(testModel.rowCount(),5);
+    QCOMPARE(testModel.columnCount(parentIdx),1);
+    for (QSignalSpy *spy : colSpyArr)
+        QCOMPARE(spy->count(), 0);
+    for (QSignalSpy *spy : rowSpyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 2);
+        QCOMPARE(args.at(1).toInt(), 1);
+        QCOMPARE(args.at(0).value<QModelIndex>(), parentIdx);
+    }
+    QVERIFY(testModel.insertColumns(1,3,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),4);
+    QCOMPARE(testModel.columnCount(),3);
+    QCOMPARE(testModel.rowCount(parentIdx),3);
+    for (QSignalSpy *spy : rowSpyArr)
+        QCOMPARE(spy->count(), 0);
+    for (QSignalSpy *spy : colSpyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 3);
+        QCOMPARE(args.at(1).toInt(), 1);
+        QCOMPARE(args.at(0).value<QModelIndex>(), parentIdx);
+    }
+
+    parentIdx = testModel.index(0,0,testModel.index(0,0));
+    QVERIFY(!testModel.insertRows(-1,1,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertRows(1,1,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertRows(0,0,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertColumns(-1,1,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertColumns(1,1,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertColumns(0,0,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+
+
+    QVERIFY(testModel.insertColumns(0,1,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),1);
+    QCOMPARE(testModel.columnCount(),3);
+    QCOMPARE(testModel.rowCount(parentIdx),0);
+    for (QSignalSpy *spy : rowSpyArr)
+        QCOMPARE(spy->count(), 0);
+    for (QSignalSpy *spy : colSpyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 0);
+        QCOMPARE(args.at(1).toInt(), 0);
+        QCOMPARE(args.at(0).value<QModelIndex>(), parentIdx);
+    }
+    QVERIFY(testModel.insertRows(0,1,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),1);
+    QCOMPARE(testModel.rowCount(),5);
+    QCOMPARE(testModel.columnCount(parentIdx),1);
+    for (QSignalSpy *spy : colSpyArr)
+        QCOMPARE(spy->count(), 0);
+    for (QSignalSpy *spy : rowSpyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 0);
+        QCOMPARE(args.at(1).toInt(), 0);
+        QCOMPARE(args.at(0).value<QModelIndex>(), parentIdx);
+    }
+
+
+    QVERIFY(testModel.insertRows(1,2,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),3);
+    QCOMPARE(testModel.rowCount(),5);
+    QCOMPARE(testModel.columnCount(parentIdx),1);
+    for (QSignalSpy *spy : colSpyArr)
+        QCOMPARE(spy->count(), 0);
+    for (QSignalSpy *spy : rowSpyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 2);
+        QCOMPARE(args.at(1).toInt(), 1);
+        QCOMPARE(args.at(0).value<QModelIndex>(), parentIdx);
+    }
+    QVERIFY(testModel.insertColumns(1,3,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),4);
+    QCOMPARE(testModel.columnCount(),3);
+    QCOMPARE(testModel.rowCount(parentIdx),3);
+    for (QSignalSpy *spy : rowSpyArr)
+        QCOMPARE(spy->count(), 0);
+    for (QSignalSpy *spy : colSpyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 3);
+        QCOMPARE(args.at(1).toInt(), 1);
+        QCOMPARE(args.at(0).value<QModelIndex>(), parentIdx);
+    }
+
+    parentIdx = testModel.index(2,1,testModel.index(0,0));
+    QVERIFY(!testModel.insertRows(-1,1,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertRows(1,1,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertRows(0,0,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertColumns(-1,1,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertColumns(1,1,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+    QVERIFY(!testModel.insertColumns(0,0,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),0);
+    for (QSignalSpy *spy : spyArr)
+        QCOMPARE(spy->count(), 0);
+
+
+    QVERIFY(testModel.insertRows(0,1,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),1);
+    QCOMPARE(testModel.rowCount(),5);
+    QCOMPARE(testModel.columnCount(parentIdx),0);
+    for (QSignalSpy *spy : colSpyArr)
+        QCOMPARE(spy->count(), 0);
+    for (QSignalSpy *spy : rowSpyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 0);
+        QCOMPARE(args.at(1).toInt(), 0);
+        QCOMPARE(args.at(0).value<QModelIndex>(), parentIdx);
+    }
+    QVERIFY(testModel.insertColumns(0,1,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),1);
+    QCOMPARE(testModel.columnCount(),3);
+    QCOMPARE(testModel.rowCount(parentIdx),1);
+    for (QSignalSpy *spy : rowSpyArr)
+        QCOMPARE(spy->count(), 0);
+    for (QSignalSpy *spy : colSpyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 0);
+        QCOMPARE(args.at(1).toInt(), 0);
+        QCOMPARE(args.at(0).value<QModelIndex>(), parentIdx);
+    }
+
+    QVERIFY(testModel.insertRows(1,2,parentIdx));
+    QCOMPARE(testModel.rowCount(parentIdx),3);
+    QCOMPARE(testModel.rowCount(),5);
+    QCOMPARE(testModel.columnCount(parentIdx),1);
+    for (QSignalSpy *spy : colSpyArr)
+        QCOMPARE(spy->count(), 0);
+    for (QSignalSpy *spy : rowSpyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 2);
+        QCOMPARE(args.at(1).toInt(), 1);
+        QCOMPARE(args.at(0).value<QModelIndex>(), parentIdx);
+    }
+    QVERIFY(testModel.insertColumns(1,3,parentIdx));
+    QCOMPARE(testModel.columnCount(parentIdx),4);
+    QCOMPARE(testModel.columnCount(),3);
+    QCOMPARE(testModel.rowCount(parentIdx),3);
+    for (QSignalSpy *spy : rowSpyArr)
+        QCOMPARE(spy->count(), 0);
+    for (QSignalSpy *spy : colSpyArr) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(2).toInt(), 3);
+        QCOMPARE(args.at(1).toInt(), 1);
+        QCOMPARE(args.at(0).value<QModelIndex>(), parentIdx);
     }
 }
 

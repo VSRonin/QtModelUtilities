@@ -22,8 +22,8 @@ GenericModelItem::GenericModelItem(GenericModelItem *par)
     , flags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled)
     , m_colCount(0)
     , m_rowCount(0)
-    , m_row(0)
-    , m_column(0)
+    , m_row(-1)
+    , m_column(-1)
     , m_rowSpan(1)
     , m_colSpan(1)
 { }
@@ -54,24 +54,27 @@ void GenericModelItem::insertColumns(int column, int count)
     if (m_rowCount > 0) {
         if (m_colCount == 0) {
             Q_ASSERT(column == 0);
-            children.insert(column, count * m_rowCount, nullptr);
-            const int childrenSize = children.size();
+            Q_ASSERT(children.isEmpty());
+            const int childrenSize = count * m_rowCount;
+            children.reserve(childrenSize);
             for (int j = 0; j < childrenSize; ++j) {
                 auto newChild = new GenericModelItem(this);
-                newChild->m_column = j % childrenSize;
-                newChild->m_row = j / childrenSize;
-                children[j] = newChild;
+                newChild->m_column = j % count;
+                newChild->m_row = j / count;
+                children.append(newChild);
             }
         } else {
-            for (int i = column + (m_colCount * (m_rowCount - 1)); i >= 0; i -= qMax(1, m_colCount)) {
+            for (int i = column + (m_colCount * (m_rowCount - 1)); i >= 0; i -= m_colCount) {
+                Q_ASSERT((i - column) % m_colCount == 0);
+                const int rowIndex = (i - column) / m_colCount;
+                if(rowIndex<0)
+                    continue;
                 for (int j = i; j < i - column + m_colCount; ++j)
                     children.at(j)->m_column += count;
-                Q_ASSERT((i - column) % qMax(m_colCount, 1) == 0);
-                const int rowIndex = (i - column) / qMax(m_colCount, 1);
                 children.insert(i, count, nullptr);
                 for (int j = 0; j < count; ++j) {
                     auto newChild = new GenericModelItem(this);
-                    newChild->m_column = i + j;
+                    newChild->m_column = column + j;
                     newChild->m_row = rowIndex;
                     children[i + j] = newChild;
                 }
@@ -79,6 +82,13 @@ void GenericModelItem::insertColumns(int column, int count)
         }
     }
     m_colCount += count;
+#ifdef QT_DEBUG
+    Q_ASSERT(m_colCount*m_rowCount==children.size());
+    for(int i=0;i<children.size();++i){
+        Q_ASSERT(children.at(i)->row()==i / m_colCount);
+        Q_ASSERT(children.at(i)->column()==i % m_colCount);
+    }
+#endif
 }
 
 void GenericModelItem::removeColumns(int column, int count)
@@ -94,6 +104,13 @@ void GenericModelItem::removeColumns(int column, int count)
         }
     }
     m_colCount -= count;
+#ifdef QT_DEBUG
+    Q_ASSERT(m_colCount*m_rowCount==children.size());
+    for(int i=0;i<children.size();++i){
+        Q_ASSERT(children.at(i)->row()==i / m_colCount);
+        Q_ASSERT(children.at(i)->column()==i % m_colCount);
+    }
+#endif
 }
 
 void GenericModelItem::insertRows(int row, int count)
@@ -110,6 +127,13 @@ void GenericModelItem::insertRows(int row, int count)
         }
     }
     m_rowCount += count;
+#ifdef QT_DEBUG
+    Q_ASSERT(m_colCount*m_rowCount==children.size());
+    for(int i=0;i<children.size();++i){
+        Q_ASSERT(children.at(i)->row()==i / m_colCount);
+        Q_ASSERT(children.at(i)->column()==i % m_colCount);
+    }
+#endif
 }
 
 void GenericModelItem::removeRows(int row, int count)
@@ -124,6 +148,13 @@ void GenericModelItem::removeRows(int row, int count)
         children.erase(startRemoveIter, endRemoveIter);
     }
     m_rowCount -= count;
+#ifdef QT_DEBUG
+    Q_ASSERT(m_colCount*m_rowCount==children.size());
+    for(int i=0;i<children.size();++i){
+        Q_ASSERT(children.at(i)->row()==i / m_colCount);
+        Q_ASSERT(children.at(i)->column()==i % m_colCount);
+    }
+#endif
 }
 
 int GenericModelItem::row() const

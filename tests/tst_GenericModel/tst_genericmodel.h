@@ -11,8 +11,13 @@ private Q_SLOTS:
     void autoParent();
     void insertRow_data();
     void insertRow();
+    void insertRows_data();
+    void insertRows();
     void insertColumn_data();
     void insertColumn();
+    void insertColumns_data();
+    void insertColumns();
+    void insertChildren();
     void data();
 
 private:
