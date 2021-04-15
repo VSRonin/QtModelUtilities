@@ -19,8 +19,10 @@ private Q_SLOTS:
     void insertColumns();
     void insertChildren();
     void data();
-
+    void headerData_data();
+    void headerData();
 private:
     void fillTable(QAbstractItemModel *model) const;
 };
+Q_DECLARE_METATYPE(Qt::Orientation)
 #endif // TST_GENERICMODEL_H

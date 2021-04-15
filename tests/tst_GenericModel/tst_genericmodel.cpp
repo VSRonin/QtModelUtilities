@@ -649,16 +649,16 @@ void tst_GenericModel::data()
     QSignalSpy dataChangedSpy(&testModel, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)));
     QVERIFY(dataChangedSpy.isValid());
 
-    testModel.setData(QModelIndex(), 13);
+    QVERIFY(!testModel.setData(QModelIndex(), 13));
     QCOMPARE(dataChangedSpy.count(), 0);
-    testModel.setData(testModel.index(0, 0), QVariant());
+    QVERIFY(testModel.setData(testModel.index(0, 0), QVariant()));
     QCOMPARE(dataChangedSpy.count(), 0);
 
     for (int r = 0; r < testModel.rowCount(); ++r) {
         for (int c = 0; c < testModel.columnCount(); ++c) {
             const QModelIndex idx = testModel.index(r, c);
             const QString displayString = QStringLiteral("%1,%2").arg(r).arg(c);
-            testModel.setData(idx, displayString);
+            QVERIFY(testModel.setData(idx, displayString));
             QCOMPARE(testModel.data(idx).toString(), displayString);
             QCOMPARE(dataChangedSpy.count(), 1);
             auto args = dataChangedSpy.takeFirst();
@@ -667,21 +667,25 @@ void tst_GenericModel::data()
             QVector<int> rolesVector = args.at(2).value<QVector<int>>();
             QVERIFY(rolesVector.contains(Qt::EditRole));
             QVERIFY(rolesVector.contains(Qt::DisplayRole));
+            QVERIFY(testModel.setData(idx, displayString));
+            QCOMPARE(dataChangedSpy.count(), 0);
             const QString tooltipString = QStringLiteral("Tooltip %1,%2").arg(r).arg(c);
-            testModel.setData(idx, tooltipString, Qt::ToolTipRole);
+            QVERIFY(testModel.setData(idx, tooltipString, Qt::ToolTipRole));
             QCOMPARE(testModel.data(idx, Qt::ToolTipRole).toString(), tooltipString);
             QCOMPARE(dataChangedSpy.count(), 1);
             args = dataChangedSpy.takeFirst();
             QCOMPARE(args.at(0).value<QModelIndex>(), idx);
             QCOMPARE(args.at(1).value<QModelIndex>(), idx);
             QCOMPARE(args.at(2).value<QVector<int>>(), QVector<int>{Qt::ToolTipRole});
-            testModel.setData(idx, r + c, Qt::UserRole + 5);
+            QVERIFY(testModel.setData(idx, r + c, Qt::UserRole + 5));
             QCOMPARE(idx.data(Qt::UserRole + 5).toInt(), r + c);
             QCOMPARE(dataChangedSpy.count(), 1);
             args = dataChangedSpy.takeFirst();
             QCOMPARE(args.at(0).value<QModelIndex>(), idx);
             QCOMPARE(args.at(1).value<QModelIndex>(), idx);
             QCOMPARE(args.at(2).value<QVector<int>>(), QVector<int>{Qt::UserRole + 5});
+            QVERIFY(testModel.setData(idx, r + c, Qt::UserRole + 5));
+            QCOMPARE(dataChangedSpy.count(), 0);
 
             QMap<int, QVariant> itemData = testModel.itemData(idx);
             QCOMPARE(itemData.size(), 4);
@@ -697,7 +701,7 @@ void tst_GenericModel::data()
             testModel.insertColumn(0, idx);
             testModel.insertRow(0, idx);
             const QModelIndex childIdx = testModel.index(0, 0, idx);
-            testModel.setData(childIdx, displayString);
+            QVERIFY(testModel.setData(childIdx, displayString));
             QCOMPARE(testModel.data(childIdx).toString(), displayString);
             QCOMPARE(dataChangedSpy.count(), 1);
             args = dataChangedSpy.takeFirst();
@@ -706,7 +710,7 @@ void tst_GenericModel::data()
             rolesVector = args.at(2).value<QVector<int>>();
             QVERIFY(rolesVector.contains(Qt::EditRole));
             QVERIFY(rolesVector.contains(Qt::DisplayRole));
-            testModel.setData(childIdx, r + c, Qt::UserRole + 5);
+            QVERIFY(testModel.setData(childIdx, r + c, Qt::UserRole + 5));
             QCOMPARE(childIdx.data(Qt::UserRole + 5).toInt(), r + c);
             QCOMPARE(dataChangedSpy.count(), 1);
             args = dataChangedSpy.takeFirst();
@@ -727,11 +731,69 @@ void tst_GenericModel::data()
     QVERIFY(testModel.itemData(QModelIndex()).isEmpty());
 }
 
+void tst_GenericModel::headerData_data(){
+    QTest::addColumn<Qt::Orientation>("orientation");
+    QTest::newRow("Vertical") << Qt::Vertical;
+    QTest::newRow("Horizontal") << Qt::Horizontal;
+}
+
+void tst_GenericModel::headerData()
+{
+    QFETCH(Qt::Orientation, orientation);
+    GenericModel testModel;
+    ModelTest probe(&testModel, nullptr);
+    fillTable(&testModel);
+    const int endIter = orientation == Qt::Vertical ? testModel.rowCount() : testModel.columnCount();
+    QSignalSpy headerDataChangedSpy( &testModel, SIGNAL(headerDataChanged(Qt::Orientation,int,int)));
+    QVERIFY(headerDataChangedSpy.isValid());
+    QSignalSpy dataChangedSpy(&testModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)));
+    QVERIFY(dataChangedSpy.isValid());
+    for(int i=0;i<endIter;++i){
+        const QString headString = QStringLiteral("Header %1").arg(i);
+        QVERIFY(testModel.setHeaderData(i,orientation,headString));
+        QCOMPARE(testModel.headerData(i,orientation),headString);
+        QCOMPARE(dataChangedSpy.count(),0);
+        QCOMPARE(headerDataChangedSpy.count(),1);
+        auto args = headerDataChangedSpy.takeFirst();
+        QCOMPARE(args.at(0),orientation);
+        QCOMPARE(args.at(1),i);
+        QCOMPARE(args.at(2),i);
+        QVERIFY(testModel.setHeaderData(i,orientation,headString));
+        QCOMPARE(dataChangedSpy.count(),0);
+        QCOMPARE(headerDataChangedSpy.count(),0);
+
+        QVERIFY(testModel.setHeaderData(i,orientation,i,Qt::UserRole));
+        QCOMPARE(testModel.headerData(i,orientation,Qt::UserRole),i);
+        QCOMPARE(dataChangedSpy.count(),0);
+        QCOMPARE(headerDataChangedSpy.count(),1);
+        args = headerDataChangedSpy.takeFirst();
+        QCOMPARE(args.at(0),orientation);
+        QCOMPARE(args.at(1),i);
+        QCOMPARE(args.at(2),i);
+        QVERIFY(testModel.setHeaderData(i,orientation,i,Qt::UserRole));
+        QCOMPARE(dataChangedSpy.count(),0);
+        QCOMPARE(headerDataChangedSpy.count(),0);
+
+    }
+    QVERIFY(!testModel.headerData(endIter, orientation).isValid());
+    QVERIFY(!testModel.headerData(-1, orientation).isValid());
+    QVERIFY(!testModel.setHeaderData(endIter, orientation, 13));
+    QCOMPARE(dataChangedSpy.count(),0);
+    QCOMPARE(headerDataChangedSpy.count(),0);
+    QVERIFY(!testModel.setHeaderData(-1, orientation, 13));
+    QCOMPARE(dataChangedSpy.count(),0);
+    QCOMPARE(headerDataChangedSpy.count(),0);
+    QVERIFY(!testModel.headerData(endIter, orientation).isValid());
+    QVERIFY(!testModel.headerData(-1, orientation).isValid());
+
+}
+
 void tst_GenericModel::fillTable(QAbstractItemModel *model) const
 {
     model->insertColumns(0, 3);
     model->insertRows(0, 5);
     for (int r = 0; r < model->rowCount(); ++r) {
+        model->setHeaderData(r,Qt::Vertical,r);
         for (int c = 0; c < model->columnCount(); ++c) {
             const QModelIndex idx = model->index(r, c);
             model->setData(idx, QStringLiteral("%1,%2").arg(r).arg(c));
@@ -739,4 +801,6 @@ void tst_GenericModel::fillTable(QAbstractItemModel *model) const
             model->setData(idx, c, Qt::UserRole + 1);
         }
     }
+    for (int c = 0; c < model->columnCount(); ++c)
+        model->setHeaderData(c,Qt::Horizontal,c);
 }
