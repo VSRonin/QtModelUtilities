@@ -17,7 +17,18 @@ private Q_SLOTS:
     void insertColumn();
     void insertColumns_data();
     void insertColumns();
+    void removeRow_data();
+    void removeRow();
+    void removeRows_data();
+    void removeRows();
+    void removeColumn_data();
+    void removeColumn();
+    void removeColumns_data();
+    void removeColumns();
+    void insertChildren_data();
     void insertChildren();
+    void removeChildren_data();
+    void removeChildren();
     void data();
     void headerData_data();
     void headerData();

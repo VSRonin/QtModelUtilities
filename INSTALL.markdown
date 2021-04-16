@@ -29,8 +29,11 @@ You can also specify an number of arguments to customise the build even further:
 | `-DBUILD_ROLEMASKPROXY=OFF` | Exclude the Role Mask Proxy Model module of the library |
 | `-DBUILD_MODELSERIALISATION=OFF` | Exclude the Model Serialisation module of the library |
 | `-DBUILD_INSERTPROXY=OFF` | Exclude the Insert Proxy Model module of the library |
+| `-DBUILD_GENERICMODEL=OFF` | Exclude the Generic Model module of the library |
+| `-DBUILD_ROOTINDEXPROXY=OFF` | Exclude the Root Index Proxy Model module of the library |
 | `-DOPTIMISE_FOR_MANY_ROLES=ON` | Some of the models are optimised so that they work best if every cell in the model holds no more than around 20 different roles. This is in line with how Qt's native models are optimised. If you plan to store more roles per cell you can enable this option to improve performance |
 | `-DTEST_OUTPUT_XML=ON` | This is mainly used by the CI. If this option is set, the tests will generate an xml file with results rather than printing them to the console |
+
 
 After running CMake you can call `cmake --build .` to compile the project.
 You can call `cmake --build . --target test` or `ctest` to run the unit tests.

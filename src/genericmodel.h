@@ -21,6 +21,7 @@ class MODELUTILITIES_EXPORT GenericModel : public QAbstractItemModel
 {
     Q_OBJECT
     Q_PROPERTY(bool mergeDisplayEdit READ mergeDisplayEdit WRITE setMergeDisplayEdit NOTIFY mergeDisplayEditChanged)
+    Q_PROPERTY(int sortRole READ sortRole WRITE setSortRole NOTIFY sortRoleChanged)
     Q_DISABLE_COPY(GenericModel)
     Q_DECLARE_PRIVATE_D(m_dptr, GenericModel)
 public:
@@ -49,16 +50,19 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) override;
     bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles) override;
-    // void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
+    void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
+    void sort(int column, const QModelIndex& parent, Qt::SortOrder order = Qt::AscendingOrder);
     QSize span(const QModelIndex &index) const override;
     bool setSpan(const QModelIndex &index, const QSize &size);
     // Qt::DropActions supportedDragActions() const override;
     // Qt::DropActions supportedDropActions() const override;
     bool mergeDisplayEdit() const;
     void setMergeDisplayEdit(bool val);
+    int sortRole() const;
+    void setSortRole(int role);
 Q_SIGNALS:
     void mergeDisplayEditChanged(bool val);
-
+    void sortRoleChanged(int val);
 protected:
     GenericModel(GenericModelPrivate &dptr, QObject *parent);
     GenericModelPrivate *m_dptr;

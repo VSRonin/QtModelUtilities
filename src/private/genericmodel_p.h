@@ -67,7 +67,7 @@ class GenericModelPrivate
     QVector<RolesContainer> vHeaderData;
     QVector<RolesContainer> hHeaderData;
     bool m_mergeDisplayEdit;
-
+    int sort_role;
 public:
     static void setMergeDisplayEdit(bool val, RolesContainer &container);
 };

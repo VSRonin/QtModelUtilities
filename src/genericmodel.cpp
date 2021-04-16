@@ -194,6 +194,7 @@ GenericModelPrivate::GenericModelPrivate(GenericModel *q)
     : q_ptr(q)
     , root(new GenericModelItem)
     , m_mergeDisplayEdit(true)
+    , sort_role(Qt::DisplayRole)
 {
     Q_ASSERT(q_ptr);
 }
@@ -306,7 +307,7 @@ bool GenericModel::insertRows(int row, int count, const QModelIndex &parent)
 bool GenericModel::removeColumns(int column, int count, const QModelIndex &parent)
 {
     Q_ASSERT(!parent.isValid() || parent.model() == this);
-    if (count <= 0 || column < 0 || column + count - 1 > columnCount(parent))
+    if (count <= 0 || column < 0 || column + count - 1 >= columnCount(parent))
         return false;
     beginRemoveColumns(parent, column, column + count - 1);
     Q_D(GenericModel);
@@ -321,7 +322,7 @@ bool GenericModel::removeColumns(int column, int count, const QModelIndex &paren
 bool GenericModel::removeRows(int row, int count, const QModelIndex &parent)
 {
     Q_ASSERT(!parent.isValid() || parent.model() == this);
-    if (count <= 0 || row < 0 || row + count - 1 > rowCount(parent))
+    if (count <= 0 || row < 0 || row + count - 1 >= rowCount(parent))
         return false;
     beginRemoveRows(parent, row, row + count - 1);
     Q_D(GenericModel);
@@ -577,6 +578,14 @@ bool GenericModel::setItemData(const QModelIndex &index, const QMap<int, QVarian
 
 /*!
 \reimp
+*/
+void GenericModel::sort(int column, Qt::SortOrder order)
+{
+    sort(column,QModelIndex(),order);
+}
+
+/*!
+\reimp
 \details At the moment no view provided by Qt supports this
 */
 QSize GenericModel::span(const QModelIndex &index) const
@@ -630,6 +639,28 @@ void GenericModel::setMergeDisplayEdit(bool val)
     d->m_mergeDisplayEdit = val;
     mergeDisplayEditChanged(d->m_mergeDisplayEdit);
     d->signalAllChanged({Qt::DisplayRole, Qt::EditRole});
+}
+
+/*!
+\property QSortFilterProxyModel::sortRole
+\accessors %sortRole(), setSortRole()
+\notifier sortRoleChanged()
+\brief the item role that is used to query the source model's data when sorting items
+
+The default value is Qt::DisplayRole.
+*/
+int GenericModel::sortRole() const
+{
+    Q_D(const GenericModel);
+    return d->sort_role;
+}
+void GenericModel::setSortRole(int role)
+{
+    Q_D(GenericModel);
+    if (d->sort_role == role)
+        return;
+    d->sort_role = role;
+    sortRoleChanged(role);
 }
 
 void GenericModelPrivate::signalAllChanged(const QVector<int> &roles, const QModelIndex &parent)
