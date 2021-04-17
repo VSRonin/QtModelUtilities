@@ -1000,7 +1000,7 @@ void tst_GenericModel::sortList()
     QCOMPARE(layoutAboutToBeChangedSpy.count(),1);
     QCOMPARE(layoutChangedSpy.count(),1);
     for(int i=0;i<5;++i)
-        QCOMPARE(testModel.data(testModel.index(i,0)).toInt(),i);
+        QCOMPARE(testModel.data(testModel.index(i,0)).toInt(),i+1);
     QCOMPARE(oneIndex.data().toInt(),1);
     QCOMPARE(fiveIndex.data().toInt(),5);
     QCOMPARE(oneIndex.row(),0);
@@ -1010,7 +1010,7 @@ void tst_GenericModel::sortList()
     QCOMPARE(layoutAboutToBeChangedSpy.count(),2);
     QCOMPARE(layoutChangedSpy.count(),2);
     for(int i=0;i<5;++i)
-        QCOMPARE(testModel.data(testModel.index(i,0)).toInt(),i);
+        QCOMPARE(testModel.data(testModel.index(i,0)).toInt(),i+1);
     QCOMPARE(oneIndex.data().toInt(),1);
     QCOMPARE(fiveIndex.data().toInt(),5);
     QCOMPARE(oneIndex.row(),0);
@@ -1025,6 +1025,262 @@ void tst_GenericModel::sortList()
     QCOMPARE(fiveIndex.data().toInt(),5);
     QCOMPARE(oneIndex.row(),4);
     QCOMPARE(fiveIndex.row(),0);
+}
+
+void tst_GenericModel::sortTable()
+{
+    GenericModel testModel;
+    ModelTest probe(&testModel, nullptr);
+    QSignalSpy layoutAboutToBeChangedSpy( &testModel, SIGNAL(layoutAboutToBeChanged()));
+    QVERIFY(layoutAboutToBeChangedSpy.isValid());
+    QSignalSpy layoutChangedSpy(&testModel, SIGNAL(layoutChanged()));
+    QVERIFY(layoutChangedSpy.isValid());
+
+    testModel.insertColumns(0,2);
+    testModel.insertRows(0,5);
+    testModel.setData(testModel.index(0,1),3);
+    testModel.setData(testModel.index(1,1),1);
+    testModel.setData(testModel.index(2,1),4);
+    testModel.setData(testModel.index(3,1),2);
+    testModel.setData(testModel.index(4,1),5);
+
+    testModel.setData(testModel.index(0,0),QChar('e'));
+    testModel.setData(testModel.index(1,0),QChar('b'));
+    testModel.setData(testModel.index(2,0),QChar('d'));
+    testModel.setData(testModel.index(3,0),QChar('a'));
+    testModel.setData(testModel.index(4,0),QChar('c'));
+    QPersistentModelIndex oneIndex(testModel.index(1,1));
+    QPersistentModelIndex fiveIndex(testModel.index(4,1));
+    QPersistentModelIndex bIndex(testModel.index(1,0));
+    QPersistentModelIndex cIndex(testModel.index(4,0));
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(fiveIndex.data().toInt(),5);
+    QCOMPARE(bIndex.data().value<QChar>(),QChar('b'));
+    QCOMPARE(cIndex.data().value<QChar>(),QChar('c'));
+
+    testModel.sort(1,Qt::AscendingOrder);
+    QCOMPARE(layoutAboutToBeChangedSpy.count(),1);
+    QCOMPARE(layoutChangedSpy.count(),1);
+    for(int i=0;i<5;++i)
+        QCOMPARE(testModel.data(testModel.index(i,1)).toInt(),i+1);
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(fiveIndex.data().toInt(),5);
+    QCOMPARE(bIndex.data().value<QChar>(),QChar('b'));
+    QCOMPARE(cIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(oneIndex.row(),0);
+    QCOMPARE(fiveIndex.row(),4);
+    QCOMPARE(bIndex.row(),0);
+    QCOMPARE(cIndex.row(),4);
+
+    testModel.sort(1,Qt::AscendingOrder);
+    QCOMPARE(layoutAboutToBeChangedSpy.count(),2);
+    QCOMPARE(layoutChangedSpy.count(),2);
+    for(int i=0;i<5;++i)
+        QCOMPARE(testModel.data(testModel.index(i,1)).toInt(),i+1);
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(fiveIndex.data().toInt(),5);
+    QCOMPARE(bIndex.data().value<QChar>(),QChar('b'));
+    QCOMPARE(cIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(oneIndex.row(),0);
+    QCOMPARE(fiveIndex.row(),4);
+    QCOMPARE(bIndex.row(),0);
+    QCOMPARE(cIndex.row(),4);
+
+    testModel.sort(1,Qt::DescendingOrder);
+    QCOMPARE(layoutAboutToBeChangedSpy.count(),3);
+    QCOMPARE(layoutChangedSpy.count(),3);
+    for(int i=0;i<5;++i)
+        QCOMPARE(testModel.data(testModel.index(i,1)).toInt(),5-i);
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(fiveIndex.data().toInt(),5);
+    QCOMPARE(bIndex.data().value<QChar>(),QChar('b'));
+    QCOMPARE(cIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(oneIndex.row(),4);
+    QCOMPARE(fiveIndex.row(),0);
+    QCOMPARE(bIndex.row(),4);
+    QCOMPARE(cIndex.row(),0);
+
+    testModel.sort(0,Qt::AscendingOrder);
+    QCOMPARE(layoutAboutToBeChangedSpy.count(),4);
+    QCOMPARE(layoutChangedSpy.count(),4);
+    for(int i=0;i<5;++i)
+        QCOMPARE(testModel.data(testModel.index(i,0)).value<QChar>(),QChar('a'+i));
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(fiveIndex.data().toInt(),5);
+    QCOMPARE(bIndex.data().value<QChar>(),QChar('b'));
+    QCOMPARE(cIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(oneIndex.row(),1);
+    QCOMPARE(fiveIndex.row(),2);
+    QCOMPARE(bIndex.row(),1);
+    QCOMPARE(cIndex.row(),2);
+}
+
+void tst_GenericModel::sortByRole()
+{
+    GenericModel testModel;
+    ModelTest probe(&testModel, nullptr);
+    testModel.setSortRole(Qt::UserRole);
+    QSignalSpy layoutAboutToBeChangedSpy( &testModel, SIGNAL(layoutAboutToBeChanged()));
+    QVERIFY(layoutAboutToBeChangedSpy.isValid());
+    QSignalSpy layoutChangedSpy(&testModel, SIGNAL(layoutChanged()));
+    QVERIFY(layoutChangedSpy.isValid());
+
+    testModel.insertColumn(0);
+    testModel.insertRows(0,5);
+    testModel.setData(testModel.index(0,0),3);
+    testModel.setData(testModel.index(1,0),1);
+    testModel.setData(testModel.index(2,0),4);
+    testModel.setData(testModel.index(3,0),2);
+    testModel.setData(testModel.index(4,0),5);
+    testModel.setData(testModel.index(0,0),QStringLiteral("Charles"),Qt::UserRole);
+    testModel.setData(testModel.index(1,0),QStringLiteral("Emma"),Qt::UserRole);
+    testModel.setData(testModel.index(2,0),QStringLiteral("Bob"),Qt::UserRole);
+    testModel.setData(testModel.index(3,0),QStringLiteral("Daniel"),Qt::UserRole);
+    testModel.setData(testModel.index(4,0),QStringLiteral("Alice"),Qt::UserRole);
+    QPersistentModelIndex oneIndex(testModel.index(1,0));
+    QPersistentModelIndex fiveIndex(testModel.index(4,0));
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(fiveIndex.data().toInt(),5);
+
+    testModel.sort(0,Qt::AscendingOrder);
+    QCOMPARE(layoutAboutToBeChangedSpy.count(),1);
+    QCOMPARE(layoutChangedSpy.count(),1);
+    for(int i=0;i<5;++i)
+        QCOMPARE(testModel.data(testModel.index(i,0)).toInt(),5-i);
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(fiveIndex.data().toInt(),5);
+    QCOMPARE(oneIndex.row(),4);
+    QCOMPARE(fiveIndex.row(),0);
+}
+
+void tst_GenericModel::sortTree()
+{
+    GenericModel testModel;
+    ModelTest probe(&testModel, nullptr);
+    QSignalSpy layoutAboutToBeChangedSpy( &testModel, SIGNAL(layoutAboutToBeChanged()));
+    QVERIFY(layoutAboutToBeChangedSpy.isValid());
+    QSignalSpy layoutChangedSpy(&testModel, SIGNAL(layoutChanged()));
+    QVERIFY(layoutChangedSpy.isValid());
+
+    testModel.insertColumn(0);
+    testModel.insertRows(0,5);
+    testModel.setData(testModel.index(0,0),3);
+    testModel.setData(testModel.index(1,0),1);
+    testModel.setData(testModel.index(2,0),4);
+    testModel.setData(testModel.index(3,0),2);
+    testModel.setData(testModel.index(4,0),5);
+    const QModelIndex parIdx = testModel.index(1,0);
+    testModel.insertColumn(0,parIdx);
+    testModel.insertRows(0,3,parIdx);
+    testModel.setData(testModel.index(0,0,parIdx),3);
+    testModel.setData(testModel.index(1,0,parIdx),4);
+    testModel.setData(testModel.index(2,0,parIdx),1);
+    QPersistentModelIndex oneIndex(testModel.index(1,0));
+    QPersistentModelIndex fiveIndex(testModel.index(4,0));
+    QPersistentModelIndex childFourIndex(testModel.index(1,0,parIdx));
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(fiveIndex.data().toInt(),5);
+    QCOMPARE(childFourIndex.data().toInt(),4);
+
+    testModel.sort(0,QModelIndex(),Qt::AscendingOrder,false);
+    QCOMPARE(layoutAboutToBeChangedSpy.count(),1);
+    QCOMPARE(layoutChangedSpy.count(),1);
+    for(int i=0;i<5;++i)
+        QCOMPARE(testModel.data(testModel.index(i,0)).toInt(),i+1);
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(fiveIndex.data().toInt(),5);
+    QCOMPARE(childFourIndex.data().toInt(),4);
+    QCOMPARE(oneIndex.row(),0);
+    QCOMPARE(fiveIndex.row(),4);
+    QCOMPARE(childFourIndex.row(),1);
+}
+
+void tst_GenericModel::sortTreeChildren()
+{
+    GenericModel testModel;
+    ModelTest probe(&testModel, nullptr);
+    QSignalSpy layoutAboutToBeChangedSpy( &testModel, SIGNAL(layoutAboutToBeChanged()));
+    QVERIFY(layoutAboutToBeChangedSpy.isValid());
+    QSignalSpy layoutChangedSpy(&testModel, SIGNAL(layoutChanged()));
+    QVERIFY(layoutChangedSpy.isValid());
+
+    testModel.insertColumn(0);
+    testModel.insertRows(0,5);
+    testModel.setData(testModel.index(0,0),3);
+    testModel.setData(testModel.index(1,0),1);
+    testModel.setData(testModel.index(2,0),4);
+    testModel.setData(testModel.index(3,0),2);
+    testModel.setData(testModel.index(4,0),5);
+    const QModelIndex parIdx = testModel.index(1,0);
+    testModel.insertColumn(0,parIdx);
+    testModel.insertRows(0,3,parIdx);
+    testModel.setData(testModel.index(0,0,parIdx),3);
+    testModel.setData(testModel.index(1,0,parIdx),4);
+    testModel.setData(testModel.index(2,0,parIdx),1);
+    QPersistentModelIndex oneIndex(testModel.index(1,0));
+    QPersistentModelIndex fiveIndex(testModel.index(4,0));
+    QPersistentModelIndex childFourIndex(testModel.index(1,0,parIdx));
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(fiveIndex.data().toInt(),5);
+    QCOMPARE(childFourIndex.data().toInt(),4);
+
+    testModel.sort(0,parIdx,Qt::AscendingOrder,false);
+    QCOMPARE(layoutAboutToBeChangedSpy.count(),1);
+    QCOMPARE(layoutChangedSpy.count(),1);
+    QCOMPARE(testModel.data(testModel.index(0,0,parIdx)).toInt(),1);
+    QCOMPARE(testModel.data(testModel.index(1,0,parIdx)).toInt(),3);
+    QCOMPARE(testModel.data(testModel.index(2,0,parIdx)).toInt(),4);
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(fiveIndex.data().toInt(),5);
+    QCOMPARE(childFourIndex.data().toInt(),4);
+    QCOMPARE(oneIndex.row(),1);
+    QCOMPARE(fiveIndex.row(),4);
+    QCOMPARE(childFourIndex.row(),2);
+}
+
+void tst_GenericModel::sortTreeRecursive()
+{
+    GenericModel testModel;
+    ModelTest probe(&testModel, nullptr);
+    QSignalSpy layoutAboutToBeChangedSpy( &testModel, SIGNAL(layoutAboutToBeChanged()));
+    QVERIFY(layoutAboutToBeChangedSpy.isValid());
+    QSignalSpy layoutChangedSpy(&testModel, SIGNAL(layoutChanged()));
+    QVERIFY(layoutChangedSpy.isValid());
+
+    testModel.insertColumn(0);
+    testModel.insertRows(0,5);
+    testModel.setData(testModel.index(0,0),3);
+    testModel.setData(testModel.index(1,0),1);
+    testModel.setData(testModel.index(2,0),4);
+    testModel.setData(testModel.index(3,0),2);
+    testModel.setData(testModel.index(4,0),5);
+    const QModelIndex parIdx = testModel.index(1,0);
+    testModel.insertColumn(0,parIdx);
+    testModel.insertRows(0,3,parIdx);
+    testModel.setData(testModel.index(0,0,parIdx),3);
+    testModel.setData(testModel.index(1,0,parIdx),4);
+    testModel.setData(testModel.index(2,0,parIdx),1);
+    QPersistentModelIndex oneIndex(testModel.index(1,0));
+    QPersistentModelIndex fiveIndex(testModel.index(4,0));
+    QPersistentModelIndex childFourIndex(testModel.index(1,0,parIdx));
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(fiveIndex.data().toInt(),5);
+    QCOMPARE(childFourIndex.data().toInt(),4);
+
+    testModel.sort(0,Qt::AscendingOrder);
+    QCOMPARE(layoutAboutToBeChangedSpy.count(),1);
+    QCOMPARE(layoutChangedSpy.count(),1);
+    for(int i=0;i<5;++i)
+        QCOMPARE(testModel.data(testModel.index(i,0)).toInt(),i+1);
+    QCOMPARE(testModel.data(testModel.index(0,0,parIdx)).toInt(),1);
+    QCOMPARE(testModel.data(testModel.index(1,0,parIdx)).toInt(),3);
+    QCOMPARE(testModel.data(testModel.index(2,0,parIdx)).toInt(),4);
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(fiveIndex.data().toInt(),5);
+    QCOMPARE(childFourIndex.data().toInt(),4);
+    QCOMPARE(oneIndex.row(),0);
+    QCOMPARE(fiveIndex.row(),4);
+    QCOMPARE(childFourIndex.row(),2);
 }
 
 void tst_GenericModel::fillTable(QAbstractItemModel *model) const

@@ -33,6 +33,11 @@ private Q_SLOTS:
     void headerData_data();
     void headerData();
     void sortList();
+    void sortTable();
+    void sortByRole();
+    void sortTree();
+    void sortTreeChildren();
+    void sortTreeRecursive();
 private:
     void fillTable(QAbstractItemModel *model) const;
 };

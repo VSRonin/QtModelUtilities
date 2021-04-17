@@ -202,8 +202,8 @@ void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, b
     if(children.isEmpty() || column>=m_colCount)
         return;
     if(recursive){
-        for(GenericModelItem* item : children)
-            item->sortChildren(column,role,order,recursive,persistentIndexes);
+        for(int i=0,maxI=children.size();i<maxI;++i)
+            children.at(i)->sortChildren(column,role,order,recursive,persistentIndexes);
     }
     QVector<GenericModelItem*> columnChildren;
     columnChildren.reserve(m_rowCount);
@@ -228,16 +228,16 @@ void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, b
     for(int toRow=0,maxRow=columnChildren.size();toRow<maxRow;++toRow){
         GenericModelItem* const columnChild = columnChildren.at(toRow);
         const int fromRow = columnChild->m_row;
-        if(toRow==fromRow)
-            continue;
         for(int i=m_colCount*fromRow;i<m_colCount*(fromRow+1);++i){
             GenericModelItem* const iChild = children.at(i);
-            QModelIndex fromIdx = m_model->createIndex(iChild->m_row,iChild->m_column,iChild);
-            if(persistentIndexes.contains(fromIdx)){
-                changedPersistentIndexesFrom.append(fromIdx);
-                changedPersistentIndexesTo.append(m_model->createIndex(toRow,iChild->m_column,iChild));
+            if(toRow!=fromRow){
+                QModelIndex fromIdx = m_model->createIndex(iChild->m_row,iChild->m_column,iChild);
+                if(persistentIndexes.contains(fromIdx)){
+                    changedPersistentIndexesFrom.append(fromIdx);
+                    changedPersistentIndexesTo.append(m_model->createIndex(toRow,iChild->m_column,iChild));
+                }
+                iChild->m_row=toRow;
             }
-            iChild->m_row=toRow;
             newChildren.append(iChild);
         }
     }
@@ -549,6 +549,16 @@ QVariant GenericModel::headerData(int section, Qt::Orientation orientation, int 
     if (section >= rowCount())
         return QVariant();
     return d->vHeaderData.at(section).value(role);
+}
+
+/*!
+\reimp
+*/
+QStringList GenericModel::mimeTypes() const
+{
+    QStringList types = QAbstractItemModel::mimeTypes();
+    types << QStringLiteral("application/x-genericmodeldatalist");
+    return types;
 }
 
 /*!
