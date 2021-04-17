@@ -12,10 +12,13 @@
 \****************************************************************************/
 #include "private/genericmodel_p.h"
 #include "genericmodel.h"
+#include <QDateTime>
 
-GenericModelItem::GenericModelItem()
-    : GenericModelItem(nullptr)
-{ }
+GenericModelItem::GenericModelItem(GenericModel* model)
+    : GenericModelItem(static_cast<GenericModelItem *>(nullptr))
+{
+    m_model = model;
+}
 
 GenericModelItem::GenericModelItem(GenericModelItem *par)
     : parent(par)
@@ -26,7 +29,10 @@ GenericModelItem::GenericModelItem(GenericModelItem *par)
     , m_column(-1)
     , m_rowSpan(1)
     , m_colSpan(1)
-{ }
+{
+    if(par)
+        m_model = par->m_model;
+}
 
 GenericModelItem::~GenericModelItem()
 {
@@ -185,6 +191,95 @@ void GenericModelItem::setSpan(const QSize &sz)
     m_colSpan = sz.width();
 }
 
+void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, bool recursive)
+{
+    sortChildren(column,role,order,recursive,m_model->persistentIndexList());
+}
+
+void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, bool recursive, const QModelIndexList& persistentIndexes)
+{
+    Q_ASSERT(column>=0);
+    if(children.isEmpty() || column>=m_colCount)
+        return;
+    if(recursive){
+        for(GenericModelItem* item : children)
+            item->sortChildren(column,role,order,recursive,persistentIndexes);
+    }
+    QVector<GenericModelItem*> columnChildren;
+    columnChildren.reserve(m_rowCount);
+    for(int i=column,maxI=children.size();i<maxI;i+=m_colCount){
+        GenericModelItem* columnChild= children.at(i);
+        columnChildren.append(columnChild);
+    }
+    const auto lessComparison = [role](const GenericModelItem* a, const GenericModelItem* b)->bool{
+        return GenericModelPrivate::isVariantLessThan(a->data.value(role),b->data.value(role));
+    };
+    const auto greaterComparison = [role](const GenericModelItem*  a, const GenericModelItem* b)->bool{
+        return GenericModelPrivate::isVariantLessThan(b->data.value(role),a->data.value(role));
+    };
+    if(order==Qt::AscendingOrder)
+        std::stable_sort(columnChildren.begin(),columnChildren.end(),lessComparison);
+    else
+        std::stable_sort(columnChildren.begin(),columnChildren.end(),greaterComparison);
+
+    QVector<GenericModelItem*> newChildren;
+    newChildren.reserve(children.size());
+    QModelIndexList changedPersistentIndexesFrom, changedPersistentIndexesTo;
+    for(int toRow=0,maxRow=columnChildren.size();toRow<maxRow;++toRow){
+        GenericModelItem* const columnChild = columnChildren.at(toRow);
+        const int fromRow = columnChild->m_row;
+        if(toRow==fromRow)
+            continue;
+        for(int i=m_colCount*fromRow;i<m_colCount*(fromRow+1);++i){
+            GenericModelItem* const iChild = children.at(i);
+            QModelIndex fromIdx = m_model->createIndex(iChild->m_row,iChild->m_column,iChild);
+            if(persistentIndexes.contains(fromIdx)){
+                changedPersistentIndexesFrom.append(fromIdx);
+                changedPersistentIndexesTo.append(m_model->createIndex(toRow,iChild->m_column,iChild));
+            }
+            iChild->m_row=toRow;
+            newChildren.append(iChild);
+        }
+    }
+    Q_ASSERT(newChildren.size()==children.size());
+    Q_ASSERT(std::all_of(newChildren.constBegin(),newChildren.constEnd(),[](const GenericModelItem* a)->bool{return a!=nullptr;}));
+    children=newChildren;
+    m_model->changePersistentIndexList(changedPersistentIndexesFrom, changedPersistentIndexesTo);
+}
+
+bool GenericModelPrivate::isVariantLessThan(const QVariant &left, const QVariant &right)
+{
+    if (left.userType() == QVariant::Invalid)
+        return false;
+    if (right.userType() == QVariant::Invalid)
+        return true;
+    switch (left.userType()) {
+    case QVariant::Int:
+        return left.toInt() < right.toInt();
+    case QVariant::UInt:
+        return left.toUInt() < right.toUInt();
+    case QVariant::LongLong:
+        return left.toLongLong() < right.toLongLong();
+    case QVariant::ULongLong:
+        return left.toULongLong() < right.toULongLong();
+    case QMetaType::Float:
+        return left.toFloat() < right.toFloat();
+    case QVariant::Double:
+        return left.toDouble() < right.toDouble();
+    case QVariant::Char:
+        return left.toChar() < right.toChar();
+    case QVariant::Date:
+        return left.toDate() < right.toDate();
+    case QVariant::Time:
+        return left.toTime() < right.toTime();
+    case QVariant::DateTime:
+        return left.toDateTime() < right.toDateTime();
+    case QVariant::String:
+    default:
+        return left.toString().compare(right.toString()) < 0;
+    }
+}
+
 GenericModelPrivate::~GenericModelPrivate()
 {
     delete root;
@@ -192,9 +287,9 @@ GenericModelPrivate::~GenericModelPrivate()
 
 GenericModelPrivate::GenericModelPrivate(GenericModel *q)
     : q_ptr(q)
-    , root(new GenericModelItem)
+    , root(new GenericModelItem(q))
     , m_mergeDisplayEdit(true)
-    , sort_role(Qt::DisplayRole)
+    , sortRole(Qt::DisplayRole)
 {
     Q_ASSERT(q_ptr);
 }
@@ -585,6 +680,24 @@ void GenericModel::sort(int column, Qt::SortOrder order)
 }
 
 /*!
+\brief Sorts all children of \a parent by \a column in the given \a order.
+\details The role used for the sorting is determined by sortRole.
+If \a recursive is set to true the sorting will propagate down the hierarchy of the model
+*/
+void GenericModel::sort(int column, const QModelIndex &parent, Qt::SortOrder order, bool recursive)
+{
+    if(column<0 || column>=columnCount(parent) || rowCount(parent)==0)
+        return;
+    QList<QPersistentModelIndex> parents;
+    if(parent.isValid())
+        parents.append(parent);
+    layoutAboutToBeChanged(parents,QAbstractItemModel::VerticalSortHint);
+    Q_D(GenericModel);
+    d->itemForIndex(parent)->sortChildren(column,d->sortRole,order,recursive);
+    layoutChanged(parents,QAbstractItemModel::VerticalSortHint);
+}
+
+/*!
 \reimp
 \details At the moment no view provided by Qt supports this
 */
@@ -652,14 +765,14 @@ The default value is Qt::DisplayRole.
 int GenericModel::sortRole() const
 {
     Q_D(const GenericModel);
-    return d->sort_role;
+    return d->sortRole;
 }
 void GenericModel::setSortRole(int role)
 {
     Q_D(GenericModel);
-    if (d->sort_role == role)
+    if (d->sortRole == role)
         return;
-    d->sort_role = role;
+    d->sortRole = role;
     sortRoleChanged(role);
 }
 

@@ -32,6 +32,7 @@ private Q_SLOTS:
     void data();
     void headerData_data();
     void headerData();
+    void sortList();
 private:
     void fillTable(QAbstractItemModel *model) const;
 };

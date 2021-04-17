@@ -24,6 +24,7 @@ class MODELUTILITIES_EXPORT GenericModel : public QAbstractItemModel
     Q_PROPERTY(int sortRole READ sortRole WRITE setSortRole NOTIFY sortRoleChanged)
     Q_DISABLE_COPY(GenericModel)
     Q_DECLARE_PRIVATE_D(m_dptr, GenericModel)
+    friend class GenericModelItem;
 public:
     explicit GenericModel(QObject *parent = Q_NULLPTR);
     ~GenericModel();
@@ -51,7 +52,7 @@ public:
     bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) override;
     bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles) override;
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
-    void sort(int column, const QModelIndex& parent, Qt::SortOrder order = Qt::AscendingOrder);
+    void sort(int column, const QModelIndex& parent, Qt::SortOrder order = Qt::AscendingOrder, bool recursive = true);
     QSize span(const QModelIndex &index) const override;
     bool setSpan(const QModelIndex &index, const QSize &size);
     // Qt::DropActions supportedDragActions() const override;

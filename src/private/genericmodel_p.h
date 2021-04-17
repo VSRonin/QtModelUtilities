@@ -19,7 +19,7 @@
 class GenericModelItem
 {
 public:
-    GenericModelItem();
+    GenericModelItem(GenericModel* model);
     GenericModelItem(GenericModelItem *par);
     virtual ~GenericModelItem();
     GenericModelItem *childAt(int row, int col) const;
@@ -37,7 +37,7 @@ public:
     void setMergeDisplayEdit(bool val);
     QSize span() const;
     void setSpan(const QSize &sz);
-
+    void sortChildren(int column, int role, Qt::SortOrder order, bool recursive);
 private:
     int m_colCount;
     int m_rowCount;
@@ -45,7 +45,9 @@ private:
     int m_column;
     int m_rowSpan;
     int m_colSpan;
+    GenericModel* m_model;
     QVector<GenericModelItem *> children;
+    void sortChildren(int column, int role, Qt::SortOrder order, bool recursive, const QModelIndexList& persistentIndexes);
 };
 
 class GenericModelPrivate
@@ -67,9 +69,10 @@ class GenericModelPrivate
     QVector<RolesContainer> vHeaderData;
     QVector<RolesContainer> hHeaderData;
     bool m_mergeDisplayEdit;
-    int sort_role;
+    int sortRole;
 public:
     static void setMergeDisplayEdit(bool val, RolesContainer &container);
+    static bool isVariantLessThan(const QVariant &left, const QVariant &right);
 };
 
 #endif // GENERICMODEL_P_H

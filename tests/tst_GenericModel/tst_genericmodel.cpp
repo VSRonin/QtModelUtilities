@@ -975,6 +975,58 @@ void tst_GenericModel::headerData()
 
 }
 
+void tst_GenericModel::sortList()
+{
+    GenericModel testModel;
+    ModelTest probe(&testModel, nullptr);
+    QSignalSpy layoutAboutToBeChangedSpy( &testModel, SIGNAL(layoutAboutToBeChanged()));
+    QVERIFY(layoutAboutToBeChangedSpy.isValid());
+    QSignalSpy layoutChangedSpy(&testModel, SIGNAL(layoutChanged()));
+    QVERIFY(layoutChangedSpy.isValid());
+
+    testModel.insertColumn(0);
+    testModel.insertRows(0,5);
+    testModel.setData(testModel.index(0,0),3);
+    testModel.setData(testModel.index(1,0),1);
+    testModel.setData(testModel.index(2,0),4);
+    testModel.setData(testModel.index(3,0),2);
+    testModel.setData(testModel.index(4,0),5);
+    QPersistentModelIndex oneIndex(testModel.index(1,0));
+    QPersistentModelIndex fiveIndex(testModel.index(4,0));
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(fiveIndex.data().toInt(),5);
+
+    testModel.sort(0,Qt::AscendingOrder);
+    QCOMPARE(layoutAboutToBeChangedSpy.count(),1);
+    QCOMPARE(layoutChangedSpy.count(),1);
+    for(int i=0;i<5;++i)
+        QCOMPARE(testModel.data(testModel.index(i,0)).toInt(),i);
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(fiveIndex.data().toInt(),5);
+    QCOMPARE(oneIndex.row(),0);
+    QCOMPARE(fiveIndex.row(),4);
+
+    testModel.sort(0,Qt::AscendingOrder);
+    QCOMPARE(layoutAboutToBeChangedSpy.count(),2);
+    QCOMPARE(layoutChangedSpy.count(),2);
+    for(int i=0;i<5;++i)
+        QCOMPARE(testModel.data(testModel.index(i,0)).toInt(),i);
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(fiveIndex.data().toInt(),5);
+    QCOMPARE(oneIndex.row(),0);
+    QCOMPARE(fiveIndex.row(),4);
+
+    testModel.sort(0,Qt::DescendingOrder);
+    QCOMPARE(layoutAboutToBeChangedSpy.count(),3);
+    QCOMPARE(layoutChangedSpy.count(),3);
+    for(int i=0;i<5;++i)
+        QCOMPARE(testModel.data(testModel.index(i,0)).toInt(),5-i);
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(fiveIndex.data().toInt(),5);
+    QCOMPARE(oneIndex.row(),4);
+    QCOMPARE(fiveIndex.row(),0);
+}
+
 void tst_GenericModel::fillTable(QAbstractItemModel *model) const
 {
     model->insertColumns(0, 3);
