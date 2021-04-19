@@ -196,6 +196,33 @@ void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, b
     sortChildren(column,role,order,recursive,m_model->persistentIndexList());
 }
 
+void GenericModelItem::moveChildRows(int sourceRow, int count, int destinationChild)
+{
+    const auto sourceBegin = children.begin()+(sourceRow*m_colCount);
+    const auto sourceEnd = children.begin()+((sourceRow+count)*m_colCount);
+    const auto destination = children.begin()+(destinationChild*m_colCount);
+    if(destinationChild<sourceRow){
+        for(auto i=destination;i!=sourceBegin;++i)
+            (*i)->m_row+=count;
+        for(auto i=sourceBegin;i!=sourceEnd;++i)
+            (*i)->m_row-=sourceRow-destinationChild;
+        std::rotate(destination,sourceBegin,sourceEnd);
+    }
+    else{
+        for(auto i=sourceEnd;i!=destination;++i)
+            (*i)->m_row-=count;
+        for(auto i=sourceBegin;i!=sourceEnd;++i)
+            (*i)->m_row+=destinationChild-(sourceRow+count);
+        std::rotate(sourceBegin,sourceEnd,destination);
+    }
+#ifdef QT_DEBUG
+    for(int i=0;i<children.size();++i){
+        Q_ASSERT(children.at(i)->row()==i / m_colCount);
+        Q_ASSERT(children.at(i)->column()==i % m_colCount);
+    }
+#endif
+}
+
 void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, bool recursive, const QModelIndexList& persistentIndexes)
 {
     Q_ASSERT(column>=0);
@@ -340,6 +367,19 @@ void GenericModelPrivate::removeRows(int row, int count, const QModelIndex &pare
         vHeaderData.erase(vHeaderData.begin() + row, vHeaderData.begin() + row + count);
     GenericModelItem *item = itemForIndex(parent);
     item->removeRows(row, count);
+}
+
+void GenericModelPrivate::moveRowsSameParent(const QModelIndex &sourceParent, int sourceRow, int count, int destinationChild)
+{
+    GenericModelItem *item = itemForIndex(sourceParent);
+    item->moveChildRows(sourceRow, count, destinationChild);
+}
+
+void GenericModelPrivate::moveRowsDifferentParent(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild)
+{
+    GenericModelItem *sourceItem = itemForIndex(sourceParent);
+    GenericModelItem *destinationItem = itemForIndex(destinationParent);
+
 }
 
 /*!
@@ -554,12 +594,40 @@ QVariant GenericModel::headerData(int section, Qt::Orientation orientation, int 
 /*!
 \reimp
 */
-QStringList GenericModel::mimeTypes() const
+bool GenericModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild)
+{
+    Q_ASSERT(!sourceParent.isValid() || sourceParent.model() == this);
+    Q_ASSERT(!destinationParent.isValid() || destinationParent.model() == this);
+    const int rowCnt = rowCount(sourceParent);
+    if(destinationChild<0||sourceRow<0 || sourceRow+count-1>= rowCnt)
+        return false;
+    if(sourceParent!=destinationParent){
+        if(destinationChild> rowCount(destinationParent))
+            return false;
+
+    }
+    else if(destinationChild>rowCnt)
+        return false;
+    if(!beginMoveRows(sourceParent,sourceRow,sourceRow+count-1,destinationParent,destinationChild))
+        return false;
+    Q_D(GenericModel);
+    if(sourceParent!=destinationParent)
+        d->moveRowsDifferentParent(sourceParent,sourceRow,count,destinationParent,destinationChild);
+    else if(columnCount(sourceParent)>0)
+        d->moveRowsSameParent(sourceParent,sourceRow,count,destinationChild);
+    endMoveRows();
+    return true;
+}
+
+/*!
+\reimp
+*/
+/*QStringList GenericModel::mimeTypes() const
 {
     QStringList types = QAbstractItemModel::mimeTypes();
     types << QStringLiteral("application/x-genericmodeldatalist");
     return types;
-}
+}*/
 
 /*!
 \reimp

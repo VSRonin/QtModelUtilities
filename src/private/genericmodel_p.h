@@ -38,6 +38,7 @@ public:
     QSize span() const;
     void setSpan(const QSize &sz);
     void sortChildren(int column, int role, Qt::SortOrder order, bool recursive);
+    void moveChildRows(int sourceRow, int count, int destinationChild);
 private:
     int m_colCount;
     int m_rowCount;
@@ -62,6 +63,8 @@ class GenericModelPrivate
     void insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
     void removeColumns(int column, int count, const QModelIndex &parent = QModelIndex());
     void removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+    void moveRowsSameParent(const QModelIndex &sourceParent, int sourceRow, int count, int destinationChild);
+    void moveRowsDifferentParent(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild);
     void setMergeDisplayEdit(bool val);
     void signalAllChanged(const QVector<int> &roles = QVector<int>(), const QModelIndex &parent = QModelIndex());
     GenericModel *q_ptr;

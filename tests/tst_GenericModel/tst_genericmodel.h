@@ -38,6 +38,8 @@ private Q_SLOTS:
     void sortTree();
     void sortTreeChildren();
     void sortTreeRecursive();
+    void moveRowsList();
+    void moveRowsTable();
 private:
     void fillTable(QAbstractItemModel *model) const;
 };

@@ -1283,6 +1283,274 @@ void tst_GenericModel::sortTreeRecursive()
     QCOMPARE(childFourIndex.row(),2);
 }
 
+void tst_GenericModel::moveRowsList()
+{
+
+    GenericModel testModel;
+    ModelTest probe(&testModel, nullptr);
+    testModel.insertColumn(0);
+    testModel.insertRows(0,6);
+    QSignalSpy rowsAboutToBeMovedSpy( &testModel, SIGNAL(rowsAboutToBeMoved(QModelIndex,int,int,QModelIndex,int)));
+    QVERIFY(rowsAboutToBeMovedSpy.isValid());
+    QSignalSpy rowsMovedSpy(&testModel, SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)));
+    QVERIFY(rowsMovedSpy.isValid());
+    QSignalSpy* spyArr[] = {&rowsAboutToBeMovedSpy,&rowsMovedSpy};
+    const auto resetData = [&testModel](){
+        for(int i=0;i<6;++i)
+            testModel.setData(testModel.index(i,0),i);
+    };
+    resetData();
+    QVERIFY(!testModel.moveRows(QModelIndex(),2,1,QModelIndex(),-1));
+    for(QSignalSpy* spy : spyArr)
+        QCOMPARE(spy->count(),0);
+    QVERIFY(!testModel.moveRows(QModelIndex(),2,1,QModelIndex(),7));
+    for(QSignalSpy* spy : spyArr)
+        QCOMPARE(spy->count(),0);
+    QVERIFY(!testModel.moveRows(QModelIndex(),-1,1,QModelIndex(),3));
+    for(QSignalSpy* spy : spyArr)
+        QCOMPARE(spy->count(),0);
+    QVERIFY(!testModel.moveRows(QModelIndex(),6,1,QModelIndex(),3));
+    for(QSignalSpy* spy : spyArr)
+        QCOMPARE(spy->count(),0);
+    QVERIFY(!testModel.moveRows(QModelIndex(),1,2,QModelIndex(),2));
+    for(QSignalSpy* spy : spyArr)
+        QCOMPARE(spy->count(),0);
+    QVERIFY(!testModel.moveRows(QModelIndex(),1,2,QModelIndex(),3));
+    for(QSignalSpy* spy : spyArr)
+        QCOMPARE(spy->count(),0);
+
+
+    QPersistentModelIndex twoIndex = testModel.index(2,0);
+    QVERIFY(testModel.moveRows(QModelIndex(),2,1,QModelIndex(),4));
+    QCOMPARE(testModel.index(0,0).data().toInt(),0);
+    QCOMPARE(testModel.index(1,0).data().toInt(),1);
+    QCOMPARE(testModel.index(2,0).data().toInt(),3);
+    QCOMPARE(testModel.index(3,0).data().toInt(),2);
+    QCOMPARE(testModel.index(4,0).data().toInt(),4);
+    QCOMPARE(testModel.index(5,0).data().toInt(),5);
+    QCOMPARE(twoIndex.data().toInt(),2);
+    QCOMPARE(twoIndex.row(),3);
+    for(QSignalSpy* spy : spyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QVERIFY(!args.at(0).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(1).toInt(),2);
+        QCOMPARE(args.at(2).toInt(),2);
+        QVERIFY(!args.at(3).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(4).toInt(),4);
+    }
+
+    resetData();
+    twoIndex = testModel.index(2,0);
+    QVERIFY(testModel.moveRows(QModelIndex(),2,1,QModelIndex(),0));
+    QCOMPARE(testModel.index(0,0).data().toInt(),2);
+    QCOMPARE(testModel.index(1,0).data().toInt(),0);
+    QCOMPARE(testModel.index(2,0).data().toInt(),1);
+    QCOMPARE(testModel.index(3,0).data().toInt(),3);
+    QCOMPARE(testModel.index(4,0).data().toInt(),4);
+    QCOMPARE(testModel.index(5,0).data().toInt(),5);
+    QCOMPARE(twoIndex.data().toInt(),2);
+    QCOMPARE(twoIndex.row(),0);
+    for(QSignalSpy* spy : spyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QVERIFY(!args.at(0).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(1).toInt(),2);
+        QCOMPARE(args.at(2).toInt(),2);
+        QVERIFY(!args.at(3).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(4).toInt(),0);
+    }
+
+    resetData();
+    twoIndex = testModel.index(2,0);
+    QVERIFY(testModel.moveRows(QModelIndex(),2,1,QModelIndex(),6));
+    QCOMPARE(testModel.index(0,0).data().toInt(),0);
+    QCOMPARE(testModel.index(1,0).data().toInt(),1);
+    QCOMPARE(testModel.index(2,0).data().toInt(),3);
+    QCOMPARE(testModel.index(3,0).data().toInt(),4);
+    QCOMPARE(testModel.index(4,0).data().toInt(),5);
+    QCOMPARE(testModel.index(5,0).data().toInt(),2);
+    QCOMPARE(twoIndex.data().toInt(),2);
+    QCOMPARE(twoIndex.row(),5);
+    for(QSignalSpy* spy : spyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QVERIFY(!args.at(0).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(1).toInt(),2);
+        QCOMPARE(args.at(2).toInt(),2);
+        QVERIFY(!args.at(3).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(4).toInt(),6);
+    }
+
+    resetData();
+    QPersistentModelIndex oneIndex = testModel.index(1,0);
+    QVERIFY(testModel.moveRows(QModelIndex(),0,2,QModelIndex(),3));
+    QCOMPARE(testModel.index(0,0).data().toInt(),2);
+    QCOMPARE(testModel.index(1,0).data().toInt(),0);
+    QCOMPARE(testModel.index(2,0).data().toInt(),1);
+    QCOMPARE(testModel.index(3,0).data().toInt(),3);
+    QCOMPARE(testModel.index(4,0).data().toInt(),4);
+    QCOMPARE(testModel.index(5,0).data().toInt(),5);
+    QCOMPARE(oneIndex.data().toInt(),1);
+    QCOMPARE(oneIndex.row(),2);
+    for(QSignalSpy* spy : spyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QVERIFY(!args.at(0).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(1).toInt(),0);
+        QCOMPARE(args.at(2).toInt(),1);
+        QVERIFY(!args.at(3).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(4).toInt(),3);
+    }
+
+}
+
+void tst_GenericModel::moveRowsTable()
+{
+    GenericModel testModel;
+    ModelTest probe(&testModel, nullptr);
+    testModel.insertColumns(0,2);
+    testModel.insertRows(0,6);
+    QSignalSpy rowsAboutToBeMovedSpy( &testModel, SIGNAL(rowsAboutToBeMoved(QModelIndex,int,int,QModelIndex,int)));
+    QVERIFY(rowsAboutToBeMovedSpy.isValid());
+    QSignalSpy rowsMovedSpy(&testModel, SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)));
+    QVERIFY(rowsMovedSpy.isValid());
+    QSignalSpy* spyArr[] = {&rowsAboutToBeMovedSpy,&rowsMovedSpy};
+    const auto resetData = [&testModel](){
+        for(int i=0;i<6;++i){
+            testModel.setData(testModel.index(i,0),i);
+            testModel.setData(testModel.index(i,1),QChar('a'+i));
+        }
+    };
+    resetData();
+    QVERIFY(!testModel.moveRows(QModelIndex(),2,1,QModelIndex(),-1));
+    for(QSignalSpy* spy : spyArr)
+        QCOMPARE(spy->count(),0);
+    QVERIFY(!testModel.moveRows(QModelIndex(),2,1,QModelIndex(),7));
+    for(QSignalSpy* spy : spyArr)
+        QCOMPARE(spy->count(),0);
+    QVERIFY(!testModel.moveRows(QModelIndex(),-1,1,QModelIndex(),3));
+    for(QSignalSpy* spy : spyArr)
+        QCOMPARE(spy->count(),0);
+    QVERIFY(!testModel.moveRows(QModelIndex(),6,1,QModelIndex(),3));
+    for(QSignalSpy* spy : spyArr)
+        QCOMPARE(spy->count(),0);
+    QVERIFY(!testModel.moveRows(QModelIndex(),1,2,QModelIndex(),2));
+    for(QSignalSpy* spy : spyArr)
+        QCOMPARE(spy->count(),0);
+    QVERIFY(!testModel.moveRows(QModelIndex(),1,2,QModelIndex(),3));
+    for(QSignalSpy* spy : spyArr)
+        QCOMPARE(spy->count(),0);
+
+
+    QPersistentModelIndex twoIndex = testModel.index(2,1);
+    QVERIFY(testModel.moveRows(QModelIndex(),2,1,QModelIndex(),4));
+    QCOMPARE(testModel.index(0,0).data().toInt(),0);
+    QCOMPARE(testModel.index(1,0).data().toInt(),1);
+    QCOMPARE(testModel.index(2,0).data().toInt(),3);
+    QCOMPARE(testModel.index(3,0).data().toInt(),2);
+    QCOMPARE(testModel.index(4,0).data().toInt(),4);
+    QCOMPARE(testModel.index(5,0).data().toInt(),5);
+    QCOMPARE(testModel.index(0,1).data().value<QChar>(),QChar('a'));
+    QCOMPARE(testModel.index(1,1).data().value<QChar>(),QChar('b'));
+    QCOMPARE(testModel.index(2,1).data().value<QChar>(),QChar('d'));
+    QCOMPARE(testModel.index(3,1).data().value<QChar>(),QChar('c'));
+    QCOMPARE(testModel.index(4,1).data().value<QChar>(),QChar('e'));
+    QCOMPARE(testModel.index(5,1).data().value<QChar>(),QChar('f'));
+    QCOMPARE(twoIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(twoIndex.row(),3);
+    for(QSignalSpy* spy : spyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QVERIFY(!args.at(0).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(1).toInt(),2);
+        QCOMPARE(args.at(2).toInt(),2);
+        QVERIFY(!args.at(3).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(4).toInt(),4);
+    }
+
+    resetData();
+    twoIndex = testModel.index(2,1);
+    QVERIFY(testModel.moveRows(QModelIndex(),2,1,QModelIndex(),0));
+    QCOMPARE(testModel.index(0,0).data().toInt(),2);
+    QCOMPARE(testModel.index(1,0).data().toInt(),0);
+    QCOMPARE(testModel.index(2,0).data().toInt(),1);
+    QCOMPARE(testModel.index(3,0).data().toInt(),3);
+    QCOMPARE(testModel.index(4,0).data().toInt(),4);
+    QCOMPARE(testModel.index(5,0).data().toInt(),5);
+    QCOMPARE(testModel.index(0,1).data().value<QChar>(),QChar('c'));
+    QCOMPARE(testModel.index(1,1).data().value<QChar>(),QChar('a'));
+    QCOMPARE(testModel.index(2,1).data().value<QChar>(),QChar('b'));
+    QCOMPARE(testModel.index(3,1).data().value<QChar>(),QChar('d'));
+    QCOMPARE(testModel.index(4,1).data().value<QChar>(),QChar('e'));
+    QCOMPARE(testModel.index(5,1).data().value<QChar>(),QChar('f'));
+    QCOMPARE(twoIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(twoIndex.row(),0);
+    for(QSignalSpy* spy : spyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QVERIFY(!args.at(0).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(1).toInt(),2);
+        QCOMPARE(args.at(2).toInt(),2);
+        QVERIFY(!args.at(3).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(4).toInt(),0);
+    }
+
+    resetData();
+    twoIndex = testModel.index(2,1);
+    QVERIFY(testModel.moveRows(QModelIndex(),2,1,QModelIndex(),6));
+    QCOMPARE(testModel.index(0,0).data().toInt(),0);
+    QCOMPARE(testModel.index(1,0).data().toInt(),1);
+    QCOMPARE(testModel.index(2,0).data().toInt(),3);
+    QCOMPARE(testModel.index(3,0).data().toInt(),4);
+    QCOMPARE(testModel.index(4,0).data().toInt(),5);
+    QCOMPARE(testModel.index(5,0).data().toInt(),2);
+    QCOMPARE(testModel.index(0,1).data().value<QChar>(),QChar('a'));
+    QCOMPARE(testModel.index(1,1).data().value<QChar>(),QChar('b'));
+    QCOMPARE(testModel.index(2,1).data().value<QChar>(),QChar('d'));
+    QCOMPARE(testModel.index(3,1).data().value<QChar>(),QChar('e'));
+    QCOMPARE(testModel.index(4,1).data().value<QChar>(),QChar('f'));
+    QCOMPARE(testModel.index(5,1).data().value<QChar>(),QChar('c'));
+    QCOMPARE(twoIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(twoIndex.row(),5);
+    for(QSignalSpy* spy : spyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QVERIFY(!args.at(0).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(1).toInt(),2);
+        QCOMPARE(args.at(2).toInt(),2);
+        QVERIFY(!args.at(3).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(4).toInt(),6);
+    }
+
+    resetData();
+    QPersistentModelIndex oneIndex = testModel.index(1,1);
+    QVERIFY(testModel.moveRows(QModelIndex(),0,2,QModelIndex(),3));
+    QCOMPARE(testModel.index(0,0).data().toInt(),2);
+    QCOMPARE(testModel.index(1,0).data().toInt(),0);
+    QCOMPARE(testModel.index(2,0).data().toInt(),1);
+    QCOMPARE(testModel.index(3,0).data().toInt(),3);
+    QCOMPARE(testModel.index(4,0).data().toInt(),4);
+    QCOMPARE(testModel.index(5,0).data().toInt(),5);
+    QCOMPARE(testModel.index(0,1).data().value<QChar>(),QChar('c'));
+    QCOMPARE(testModel.index(1,1).data().value<QChar>(),QChar('a'));
+    QCOMPARE(testModel.index(2,1).data().value<QChar>(),QChar('b'));
+    QCOMPARE(testModel.index(3,1).data().value<QChar>(),QChar('d'));
+    QCOMPARE(testModel.index(4,1).data().value<QChar>(),QChar('e'));
+    QCOMPARE(testModel.index(5,1).data().value<QChar>(),QChar('f'));
+    QCOMPARE(oneIndex.data().value<QChar>(),QChar('b'));
+    QCOMPARE(oneIndex.row(),2);
+    for(QSignalSpy* spy : spyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QVERIFY(!args.at(0).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(1).toInt(),0);
+        QCOMPARE(args.at(2).toInt(),1);
+        QVERIFY(!args.at(3).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(4).toInt(),3);
+    }
+}
+
 void tst_GenericModel::fillTable(QAbstractItemModel *model) const
 {
     model->insertColumns(0, 3);
