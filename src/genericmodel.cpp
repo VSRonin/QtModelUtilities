@@ -437,6 +437,15 @@ void GenericModelPrivate::moveRowsSameParent(const QModelIndex &sourceParent, in
 {
     GenericModelItem *item = itemForIndex(sourceParent);
     item->moveChildRows(sourceRow, count, destinationChild);
+    if(item==root){
+        const auto sourceBegin = vHeaderData.begin()+sourceRow;
+        const auto sourceEnd = vHeaderData.begin()+sourceRow+count;
+        const auto destination = vHeaderData.begin()+destinationChild;
+        if(destinationChild<sourceRow)
+            std::rotate(destination,sourceBegin,sourceEnd);
+        else
+            std::rotate(sourceBegin,sourceEnd,destination);
+    }
 }
 
 void GenericModelPrivate::moveRowsDifferentParent(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild)
@@ -447,17 +456,22 @@ void GenericModelPrivate::moveRowsDifferentParent(const QModelIndex &sourceParen
     QVector<GenericModelItem *> takenRows = sourceItem->takeRows(sourceRow,count);
     Q_ASSERT(!takenRows.isEmpty());
     if(sourceItem->columnCount()<destinationItem->columnCount()){
-        for(int colIter = count;colIter>0;--colIter){
-            for(int i=sourceItem->columnCount()*colIter;i<destinationItem->columnCount()*colIter;++i){
+        const int colsToInsert = destinationItem->columnCount()-sourceItem->columnCount();
+        for(int i=takenRows.size();i>0;i-=sourceItem->columnCount()){
+            for(int j=0;j<colsToInsert;++j){
                 GenericModelItem * padding = new GenericModelItem(q);
-                padding->setRow(takenRows.at(i-1)->row());
-                padding->setColumn(i);
-                takenRows.insert(i,padding);
+                padding->setRow(-1);
+                padding->setColumn(sourceItem->columnCount()+j);
+                takenRows.insert(i+j,padding);
             }
         }
     }
     Q_ASSERT(takenRows.size()==count*destinationItem->columnCount());
     destinationItem->insertRows(destinationChild,takenRows);
+    if(sourceItem==root)
+        vHeaderData.remove(sourceRow,count);
+    if(destinationItem==root)
+        vHeaderData.insert(destinationChild,count,RolesContainer());
 }
 
 /*!

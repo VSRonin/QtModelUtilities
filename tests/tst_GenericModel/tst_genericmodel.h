@@ -43,6 +43,8 @@ private Q_SLOTS:
     void moveRowsTreeSameBranch();
     void moveRowsNewBranch();
     void moveRowsExistingBranch();
+    void moveRowsFromRootToBranch();
+    void moveRowsFromBranchToRoot();
 private:
     void fillTable(QAbstractItemModel *model) const;
 };
