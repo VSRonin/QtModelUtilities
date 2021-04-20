@@ -33,24 +33,28 @@ if(BUILD_ROLEMASKPROXY)
     set(modelutilities_SRCS ${rolemaskproxy_SRCS} ${modelutilities_SRCS})
     set(modelutilities_INSTALL_INCLUDE rolemaskproxymodel.h includes/RoleMaskProxyModel ${modelutilities_INSTALL_INCLUDE})
     source_group(RoleMaskProxyModel FILES ${rolemaskproxy_SRCS})
+    set(modules_DEFS QTMODELUTILITIES_ROLEMASKPROXYMODEL ${modules_DEFS})
 endif()
 if(BUILD_INSERTPROXY)
     set(insertproxy_SRCS insertproxymodel.cpp insertproxymodel.h private/insertproxymodel_p.h)
     set(modelutilities_SRCS ${insertproxy_SRCS} ${modelutilities_SRCS})
     set(modelutilities_INSTALL_INCLUDE insertproxymodel.h includes/InsertProxyModel ${modelutilities_INSTALL_INCLUDE})
     source_group(InsertProxyModel FILES ${insertproxy_SRCS})
+    set(modules_DEFS QTMODELUTILITIES_INSERTPROXYMODEL ${modules_DEFS})
 endif()
 if(BUILD_ROOTINDEXPROXY)
     set(rootindexproxy_SRCS rootindexproxymodel.cpp rootindexproxymodel.h private/rootindexproxymodel_p.h)
     set(modelutilities_SRCS ${rootindexproxy_SRCS} ${modelutilities_SRCS})
     set(modelutilities_INSTALL_INCLUDE rootindexproxymodel.h includes/RootIndexProxyModel ${modelutilities_INSTALL_INCLUDE})
     source_group(RootIndexModel FILES ${rootindexproxy_SRCS})
+    set(modules_DEFS QTMODELUTILITIES_ROOTINDEXPROXYMODEL ${modules_DEFS})
 endif()
 if(BUILD_GENERICMODEL)
     set(genericmodel_SRCS genericmodel.cpp genericmodel.h private/genericmodel_p.h)
     set(modelutilities_SRCS ${genericmodel_SRCS} ${modelutilities_SRCS})
     set(modelutilities_INSTALL_INCLUDE genericmodel.h includes/GenericModel ${modelutilities_INSTALL_INCLUDE})
     source_group(GenericModel FILES ${genericmodel_SRCS})
+    set(modules_DEFS QTMODELUTILITIES_GENERICMODEL ${modules_DEFS})
 endif()
 if(BUILD_MODELSERIALISATION)
     set(modelserialisation_SRCS
@@ -98,6 +102,7 @@ if(BUILD_MODELSERIALISATION)
         ${modelutilities_INSTALL_INCLUDE}
     )
     source_group(ModelSerialisation FILES ${modelserialisation_SRCS})
+    set(modules_DEFS QTMODELUTILITIES_MODELSERIALISER ${modules_DEFS})
 endif()
 if(BUILD_DOCS)
     set(htmlDocRedirect "<!DOCTYPE html><html><head><title>Redirect</title><meta http-equiv=\"refresh\" content=\"0; url=html/index.html\" /></head><body><p><a href=\"html/index.html\">Click here if you are not redirected automatically</a></p></body></html>")
@@ -134,6 +139,7 @@ if(modelutilities_SRCS)
         target_compile_definitions(QtModelUtilities PUBLIC MODELUTILITIES_STATIC)
     endif()
     target_compile_definitions(QtModelUtilities PRIVATE MODELUTILITIES_LIB)
+    target_compile_definitions(QtModelUtilities PUBLIC modules_DEFS)
     if(OPTIMISE_FOR_MANY_ROLES)
         target_compile_definitions(QtModelUtilities PRIVATE OPTIMISE_FOR_MANY_ROLES)
     endif()
@@ -151,7 +157,7 @@ if(modelutilities_SRCS)
         CXX_STANDARD 11
         CXX_STANDARD_REQUIRED ON
         CXX_VISIBILITY_PRESET hidden
-        VISIBILITY_INLINES_HIDDEN ON
+        VISIBILITY_INLINES_HIDDEN TRUE
         SOVERSION ${VERSION_MAJOR}
         VERSION ${VERSION_SHORT}
         EXPORT_NAME "QtModelUtilities"
@@ -168,38 +174,29 @@ if(modelutilities_SRCS)
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         COMPONENT QtModelUtilities_Development
     )
-    if(CMAKE_VERSION VERSION_LESS 3.12)
+    install(TARGETS QtModelUtilities
+        EXPORT QtModelUtilitiesTargets
+        RUNTIME
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT QtModelUtilities_Runtime
+        LIBRARY
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT QtModelUtilities_Runtime
+            NAMELINK_SKIP
+        INCLUDES
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+            COMPONENT QtModelUtilities_Development
+        ARCHIVE
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT QtModelUtilities_Development
+    )
+    if(BUILD_SHARED_LIBS)
         install(TARGETS QtModelUtilities
             EXPORT QtModelUtilitiesTargets
-            RUNTIME
-                DESTINATION ${CMAKE_INSTALL_BINDIR}
-                COMPONENT QtModelUtilities_Runtime
             LIBRARY
                 DESTINATION ${CMAKE_INSTALL_LIBDIR}
-                COMPONENT QtModelUtilities_Runtime
-            INCLUDES
-                DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
                 COMPONENT QtModelUtilities_Development
-            ARCHIVE
-                DESTINATION ${CMAKE_INSTALL_LIBDIR}
-                COMPONENT QtModelUtilities_Development
-        )
-    else()
-        install(TARGETS QtModelUtilities
-            EXPORT QtModelUtilitiesTargets
-            RUNTIME
-                DESTINATION ${CMAKE_INSTALL_BINDIR}
-                COMPONENT QtModelUtilities_Runtime
-            LIBRARY
-                DESTINATION ${CMAKE_INSTALL_LIBDIR}
-                COMPONENT QtModelUtilities_Runtime
-                NAMELINK_COMPONENT QtModelUtilities_Development
-            INCLUDES
-                DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-                COMPONENT QtModelUtilities_Development
-            ARCHIVE
-                DESTINATION ${CMAKE_INSTALL_LIBDIR}
-                COMPONENT QtModelUtilities_Development
+                NAMELINK_ONLY
         )
     endif()
     install(EXPORT QtModelUtilitiesTargets

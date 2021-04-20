@@ -32,6 +32,8 @@ public:
     void removeColumns(int column, int count);
     void insertRows(int row, int count);
     void removeRows(int row, int count);
+    QVector<GenericModelItem *> takeRows(int row, int count);
+    void insertRows(int row, QVector<GenericModelItem *> rows);
     int row() const;
     int column() const;
     void setMergeDisplayEdit(bool val);
@@ -39,6 +41,8 @@ public:
     void setSpan(const QSize &sz);
     void sortChildren(int column, int role, Qt::SortOrder order, bool recursive);
     void moveChildRows(int sourceRow, int count, int destinationChild);
+    void setRow(int r);
+    void setColumn(int c);
 private:
     int m_colCount;
     int m_rowCount;
