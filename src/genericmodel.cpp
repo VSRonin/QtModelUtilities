@@ -219,6 +219,84 @@ void GenericModelItem::insertRows(int row, QVector<GenericModelItem *> rows)
 #endif
 }
 
+QVector<GenericModelItem *> GenericModelItem::takeCols(int col, int count)
+{
+    Q_ASSERT(m_rowCount > 0);
+    Q_ASSERT(count>0 && col>=0 && col+count-1<m_colCount);
+    QVector<GenericModelItem *> result;
+    result.reserve(count*m_rowCount);
+    for(int i=children.size()-m_colCount;i>=0;i-=m_colCount){
+        for(int j=col+count;j<m_colCount;++j)
+            children[i+j]->m_column-=count;
+        const auto takeBegin = children.begin()+i+col;
+        const auto takeEnd = takeBegin+count;
+        for(int j =count-1;j>=0;--j){
+            GenericModelItem * const child = children[i+col+j];
+            child->parent=nullptr;
+            child->m_column=-1;
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+            result.append(child);
+#else
+            result.prepend(child);
+#endif
+        }
+        children.erase(takeBegin,takeEnd);
+    }
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    std::reverse(result.begin(),result.end());
+#endif
+    Q_ASSERT(result.size()==count*m_rowCount);
+    m_colCount-=count;
+#ifdef QT_DEBUG
+    Q_ASSERT(m_colCount*m_rowCount==children.size());
+    for(int i=0;i<children.size();++i){
+        Q_ASSERT(children.at(i)->row()==i / m_colCount);
+        Q_ASSERT(children.at(i)->column()==i % m_colCount);
+    }
+#endif
+    return result;
+}
+
+void GenericModelItem::insertCols(int col, QVector<GenericModelItem *> cols)
+{
+    Q_ASSERT(col>=0 && col<=m_colCount);
+    Q_ASSERT(!cols.isEmpty());
+    Q_ASSERT(cols.count()%m_rowCount==0);
+    const int count = cols.count()/m_rowCount;
+    if(m_colCount==0){
+        for(int i=0;i<cols.size();++i){
+            cols[i]->parent = this;
+            cols[i]->m_column=i % count;
+        }
+        children=cols;
+    }
+    else{
+        auto colEnd = cols.end();
+        auto colBegin = colEnd-count;
+        for(int i=m_colCount*(m_rowCount-1);i>=0;i-=m_colCount){
+            for(int j=col;j<m_colCount;++j)
+                children[i+j]->m_column+=count;
+            for(int j=0;j<count;++j){
+                (*(colBegin+j))->parent = this;
+                (*(colBegin+j))->m_column = col+j;
+            }
+            children.insert(i+col,count,nullptr);
+            std::copy(colBegin,colEnd,children.begin()+(i+col));
+            colEnd=colBegin;
+            colBegin=colBegin-count;
+        }
+    }
+    m_colCount+=count;
+#ifdef QT_DEBUG
+    Q_ASSERT(m_colCount*m_rowCount==children.size());
+    Q_ASSERT(std::all_of(children.constBegin(),children.constEnd(),[](GenericModelItem* item)->bool{return item!=nullptr;}));
+    for(int i=0;i<children.size();++i){
+        Q_ASSERT(children.at(i)->row()==i / m_colCount);
+        Q_ASSERT(children.at(i)->column()==i % m_colCount);
+    }
+#endif
+}
+
 int GenericModelItem::row() const
 {
     return m_row;
@@ -270,6 +348,34 @@ void GenericModelItem::moveChildRows(int sourceRow, int count, int destinationCh
         for(auto i=sourceBegin;i!=sourceEnd;++i)
             (*i)->m_row+=destinationChild-(sourceRow+count);
         std::rotate(sourceBegin,sourceEnd,destination);
+    }
+#ifdef QT_DEBUG
+    for(int i=0;i<children.size();++i){
+        Q_ASSERT(children.at(i)->row()==i / m_colCount);
+        Q_ASSERT(children.at(i)->column()==i % m_colCount);
+    }
+#endif
+}
+
+void GenericModelItem::moveChildColumns(int sourceCol, int count, int destinationChild)
+{
+    for(int i=0;i<children.size();i+=m_colCount){
+        const auto sourceBegin = children.begin()+i+sourceCol;
+        const auto sourceEnd = children.begin()+i+sourceCol+count;
+        const auto destination = children.begin()+i+destinationChild;
+        if(destinationChild<sourceCol){
+            for(auto i=destination;i!=sourceBegin;++i)
+                (*i)->m_column+=count;
+            for(auto i=sourceBegin;i!=sourceEnd;++i)
+                (*i)->m_column-=sourceCol-destinationChild;
+            std::rotate(destination,sourceBegin,sourceEnd);
+        }else{
+            for(auto i=sourceEnd;i!=destination;++i)
+                (*i)->m_column-=count;
+            for(auto i=sourceBegin;i!=sourceEnd;++i)
+                (*i)->m_column+=destinationChild-(sourceCol+count);
+            std::rotate(sourceBegin,sourceEnd,destination);
+        }
     }
 #ifdef QT_DEBUG
     for(int i=0;i<children.size();++i){
@@ -395,6 +501,7 @@ GenericModelItem *GenericModelPrivate::itemForIndex(const QModelIndex &idx) cons
 
 QModelIndex GenericModelPrivate::indexForItem(GenericModelItem *item) const
 {
+    Q_ASSERT(item);
     Q_Q(const GenericModel);
     if (item == root)
         return QModelIndex();
@@ -472,6 +579,47 @@ void GenericModelPrivate::moveRowsDifferentParent(const QModelIndex &sourceParen
         vHeaderData.remove(sourceRow,count);
     if(destinationItem==root)
         vHeaderData.insert(destinationChild,count,RolesContainer());
+}
+
+void GenericModelPrivate::moveColumnsSameParent(const QModelIndex &sourceParent, int sourceCol, int count, int destinationChild)
+{
+    GenericModelItem *item = itemForIndex(sourceParent);
+    item->moveChildColumns(sourceCol, count, destinationChild);
+    if(item==root){
+        const auto sourceBegin = hHeaderData.begin()+sourceCol;
+        const auto sourceEnd = hHeaderData.begin()+sourceCol+count;
+        const auto destination = hHeaderData.begin()+destinationChild;
+        if(destinationChild<sourceCol)
+            std::rotate(destination,sourceBegin,sourceEnd);
+        else
+            std::rotate(sourceBegin,sourceEnd,destination);
+    }
+}
+
+void GenericModelPrivate::moveColumnsDifferentParent(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild)
+{
+    Q_Q(GenericModel);
+    GenericModelItem *sourceItem = itemForIndex(sourceParent);
+    GenericModelItem *destinationItem = itemForIndex(destinationParent);
+    QVector<GenericModelItem *> takenCols = sourceItem->takeCols(sourceRow,count);
+    Q_ASSERT(!takenCols.isEmpty());
+    if(sourceItem->rowCount()<destinationItem->rowCount()){
+        const int rowsToInsert = destinationItem->rowCount()-sourceItem->rowCount();
+        for(int j=0;j<rowsToInsert;++j){
+            for(int i=0;i<count;++i){
+                GenericModelItem * padding = new GenericModelItem(q);
+                padding->setRow(sourceItem->rowCount()+j);
+                padding->setColumn(-1);
+                takenCols.append(padding);
+            }
+        }
+    }
+    Q_ASSERT(takenCols.size()==count*destinationItem->rowCount());
+    destinationItem->insertCols(destinationChild,takenCols);
+    if(sourceItem==root)
+        hHeaderData.remove(sourceRow,count);
+    if(destinationItem==root)
+        hHeaderData.insert(destinationChild,count,RolesContainer());
 }
 
 /*!
@@ -686,6 +834,37 @@ QVariant GenericModel::headerData(int section, Qt::Orientation orientation, int 
 /*!
 \reimp
 */
+bool GenericModel::moveColumns(const QModelIndex &sourceParent, int sourceColumn, int count, const QModelIndex &destinationParent, int destinationChild)
+{
+    Q_ASSERT(!sourceParent.isValid() || sourceParent.model() == this);
+    Q_ASSERT(!destinationParent.isValid() || destinationParent.model() == this);
+    const int colCnt = columnCount(sourceParent);
+    if(destinationChild<0||sourceColumn<0 || sourceColumn+count-1>= colCnt)
+        return false;
+    if(sourceParent!=destinationParent){
+        if(destinationChild> columnCount(destinationParent))
+            return false;
+        const int sourceRowCount =rowCount(sourceParent);
+        const int destRowCount =rowCount(destinationParent);
+        if(sourceRowCount>destRowCount)
+            insertRows(destRowCount,sourceRowCount-destRowCount,destinationParent);
+    }
+    else if(destinationChild>colCnt)
+        return false;
+    if(!beginMoveColumns(sourceParent,sourceColumn,sourceColumn+count-1,destinationParent,destinationChild))
+        return false;
+    Q_D(GenericModel);
+    if(sourceParent!=destinationParent)
+        d->moveColumnsDifferentParent(sourceParent,sourceColumn,count,destinationParent,destinationChild);
+    else
+        d->moveColumnsSameParent(sourceParent,sourceColumn,count,destinationChild);
+    endMoveColumns();
+    return true;
+}
+
+/*!
+\reimp
+*/
 bool GenericModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild)
 {
     Q_ASSERT(!sourceParent.isValid() || sourceParent.model() == this);
@@ -708,7 +887,7 @@ bool GenericModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int 
     Q_D(GenericModel);
     if(sourceParent!=destinationParent)
         d->moveRowsDifferentParent(sourceParent,sourceRow,count,destinationParent,destinationChild);
-    else if(columnCount(sourceParent)>0)
+    else
         d->moveRowsSameParent(sourceParent,sourceRow,count,destinationChild);
     endMoveRows();
     return true;

@@ -34,6 +34,8 @@ public:
     void removeRows(int row, int count);
     QVector<GenericModelItem *> takeRows(int row, int count);
     void insertRows(int row, QVector<GenericModelItem *> rows);
+    QVector<GenericModelItem *> takeCols(int col, int count);
+    void insertCols(int col, QVector<GenericModelItem *> cols);
     int row() const;
     int column() const;
     void setMergeDisplayEdit(bool val);
@@ -41,7 +43,7 @@ public:
     void setSpan(const QSize &sz);
     void sortChildren(int column, int role, Qt::SortOrder order, bool recursive);
     void moveChildRows(int sourceRow, int count, int destinationChild);
-    void moveChildColumns(int sourceRow, int count, int destinationChild);
+    void moveChildColumns(int sourceCol, int count, int destinationChild);
     void setRow(int r);
     void setColumn(int c);
 private:
@@ -70,7 +72,7 @@ class GenericModelPrivate
     void removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     void moveRowsSameParent(const QModelIndex &sourceParent, int sourceRow, int count, int destinationChild);
     void moveRowsDifferentParent(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild);
-    void moveColumnsSameParent(const QModelIndex &sourceParent, int sourceRow, int count, int destinationChild);
+    void moveColumnsSameParent(const QModelIndex &sourceParent, int sourceCol, int count, int destinationChild);
     void moveColumnsDifferentParent(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild);
     void setMergeDisplayEdit(bool val);
     void signalAllChanged(const QVector<int> &roles = QVector<int>(), const QModelIndex &parent = QModelIndex());

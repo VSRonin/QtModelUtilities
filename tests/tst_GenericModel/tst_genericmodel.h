@@ -2,6 +2,7 @@
 #define TST_GENERICMODEL_H
 
 #include <QObject>
+#include <QModelIndex>
 class QAbstractItemModel;
 class QModelIndex;
 class tst_GenericModel : public QObject
@@ -45,8 +46,14 @@ private Q_SLOTS:
     void moveRowsExistingBranch();
     void moveRowsFromRootToBranch();
     void moveRowsFromBranchToRoot();
+    void moveColumnsTable();
+    void moveColumnsTreeSameBranch();
+    void moveColumnsNewBranch();
+    void moveColumnsExistingBranch();
+    void moveColumnsFromRootToBranch();
+    void moveColumnsFromBranchToRoot();
 private:
-    void fillTable(QAbstractItemModel *model) const;
+    void fillTable(QAbstractItemModel *model, int rows,int cols, const QModelIndex& parent = QModelIndex(), int shift =0) const;
 };
 Q_DECLARE_METATYPE(Qt::Orientation)
 #endif // TST_GENERICMODEL_H
