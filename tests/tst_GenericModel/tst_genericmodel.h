@@ -31,6 +31,7 @@ private Q_SLOTS:
     void removeChildren_data();
     void removeChildren();
     void data();
+    void clearData();
     void headerData_data();
     void headerData();
     void sortList();
@@ -52,6 +53,7 @@ private Q_SLOTS:
     void moveColumnsExistingBranch();
     void moveColumnsFromRootToBranch();
     void moveColumnsFromBranchToRoot();
+    void roleNames();
 private:
     void fillTable(QAbstractItemModel *model, int rows,int cols, const QModelIndex& parent = QModelIndex(), int shift =0) const;
 };

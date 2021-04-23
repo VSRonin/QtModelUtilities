@@ -446,32 +446,32 @@ void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, b
 
 bool GenericModelPrivate::isVariantLessThan(const QVariant &left, const QVariant &right)
 {
-    if (left.userType() == QVariant::Invalid)
+    if (left.userType() == QMetaType::UnknownType)
         return false;
-    if (right.userType() == QVariant::Invalid)
+    if (right.userType() == QMetaType::UnknownType)
         return true;
     switch (left.userType()) {
-    case QVariant::Int:
+    case QMetaType::Int:
         return left.toInt() < right.toInt();
-    case QVariant::UInt:
+    case QMetaType::UInt:
         return left.toUInt() < right.toUInt();
-    case QVariant::LongLong:
+    case QMetaType::LongLong:
         return left.toLongLong() < right.toLongLong();
-    case QVariant::ULongLong:
+    case QMetaType::ULongLong:
         return left.toULongLong() < right.toULongLong();
     case QMetaType::Float:
         return left.toFloat() < right.toFloat();
-    case QVariant::Double:
+    case QMetaType::Double:
         return left.toDouble() < right.toDouble();
-    case QVariant::Char:
+    case QMetaType::Char:
         return left.toChar() < right.toChar();
-    case QVariant::Date:
+    case QMetaType::QDate:
         return left.toDate() < right.toDate();
-    case QVariant::Time:
+    case QMetaType::QTime:
         return left.toTime() < right.toTime();
-    case QVariant::DateTime:
+    case QMetaType::QDateTime:
         return left.toDateTime() < right.toDateTime();
-    case QVariant::String:
+    case QMetaType::QString:
     default:
         return left.toString().compare(right.toString()) < 0;
     }
@@ -647,6 +647,48 @@ GenericModel::~GenericModel()
 }
 
 /*!
+\brief Sets the role names
+\details This method is a setter for roleNames() allowing you to customise the
+role names without subclassing the model.
+
+Pass an empty \a rNames to revert to the default role names
+*/
+void GenericModel::setRoleNames(const QHash<int, QByteArray> &rNames)
+{
+    Q_D(GenericModel);
+    if(d->m_roleNames!=rNames){
+        std::function<void(const QModelIndex&)> sendDataChanged;
+        sendDataChanged = [this,&sendDataChanged](const QModelIndex& parent){
+            const int rowC = rowCount(parent);
+            const int colC = columnCount(parent);
+            Q_ASSERT(rowC>0 && colC>0);
+            for(int r=0;r<rowC;++r){
+                for(int c=0;c<colC;++c){
+                    const QModelIndex idx = index(r,c,parent);
+                    if(hasChildren(idx))
+                        sendDataChanged(idx);
+                }
+            }
+            dataChanged(index(0,0,parent),index(rowC-1,colC-1,parent));
+        };
+        d->m_roleNames=rNames;
+        if(d->root->rowCount() > 0 && d->root->columnCount()>0)
+            sendDataChanged(QModelIndex());
+    }
+}
+
+/*!
+\reimp
+*/
+QHash<int, QByteArray> GenericModel::roleNames() const
+{
+    Q_D(const GenericModel);
+    if(d->m_roleNames.isEmpty())
+        return QAbstractItemModel::roleNames();
+    return d->m_roleNames;
+}
+
+/*!
 \reimp
 */
 bool GenericModel::insertColumns(int column, int count, const QModelIndex &parent)
@@ -772,6 +814,39 @@ QVariant GenericModel::data(const QModelIndex &index, int role) const
     if (d->m_mergeDisplayEdit && role == Qt::EditRole)
         role = Qt::DisplayRole;
     return item->data.value(role);
+}
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+/*!
+\reimp
+*/
+void GenericModel::multiData(const QModelIndex &index, QModelRoleDataSpan roleDataSpan) const{
+    Q_ASSERT(index.isValid() && index.model() == this);
+    Q_D(const GenericModel);
+    const GenericModelItem *const item = d->itemForIndex(index);
+    for (QModelRoleData &roleData : roleDataSpan){
+        int role =roleData.role();
+        if (d->m_mergeDisplayEdit && role == Qt::EditRole)
+            role = Qt::DisplayRole;
+        roleData.setData(item->data.value(role));
+    }
+}
+#endif
+
+/*!
+\reimp
+*/
+bool GenericModel::clearItemData(const QModelIndex &index){
+    if (!index.isValid())
+        return false;
+    Q_ASSERT(index.model() == this);
+    Q_D(GenericModel);
+    GenericModelItem *const item = d->itemForIndex(index);
+    if(!item->data.isEmpty()){
+        item->data.clear();
+        dataChanged(index,index);
+    }
+    return true;
 }
 
 /*!
@@ -1015,6 +1090,12 @@ bool GenericModel::setItemData(const QModelIndex &index, const QMap<int, QVarian
         } else if (editIter != newData.end()) {
             newData.erase(editIter);
         }
+    }
+    for(auto i=item->data.constBegin(), iEnd = item->data.constEnd();i!=iEnd;++i){
+        if(newData.contains(i.key()))
+            continue;
+        Q_ASSERT(!(d->m_mergeDisplayEdit && i.key()== Qt::EditRole));
+        newData.insert(i.key(),i.value());
     }
     if (item->data != newData) {
         item->data = std::move(newData);

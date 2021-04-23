@@ -82,6 +82,7 @@ class GenericModelPrivate
     QVector<RolesContainer> hHeaderData;
     bool m_mergeDisplayEdit;
     int sortRole;
+    QHash<int, QByteArray> m_roleNames;
 public:
     static void setMergeDisplayEdit(bool val, RolesContainer &container);
     static bool isVariantLessThan(const QVariant &left, const QVariant &right);

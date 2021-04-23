@@ -140,7 +140,7 @@ void tst_HtmlModelSerialiser::validateHtmlOutput_data()
 {
     QTest::addColumn<const QAbstractItemModel *>("sourceModel");
     QTest::newRow("List Single Role") << static_cast<const QAbstractItemModel *>(createStringModel(this));
-#ifdef QT_GUI_LIB
+#ifdef COMPLEX_MODEL_SUPPORT
     QTest::newRow("Tree Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(true, true, this));
     QTest::newRow("Table Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, this));
     QTest::newRow("Table Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(false, true, this));

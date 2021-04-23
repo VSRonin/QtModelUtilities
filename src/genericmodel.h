@@ -28,6 +28,8 @@ class MODELUTILITIES_EXPORT GenericModel : public QAbstractItemModel
 public:
     explicit GenericModel(QObject *parent = Q_NULLPTR);
     ~GenericModel();
+    void setRoleNames(const QHash<int, QByteArray>& rNames);
+    QHash<int, QByteArray> roleNames() const override;
     bool insertColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
     bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     bool removeColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
@@ -60,6 +62,12 @@ public:
     void setMergeDisplayEdit(bool val);
     int sortRole() const;
     void setSortRole(int role);
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    void multiData(const QModelIndex &index, QModelRoleDataSpan roleDataSpan) const override;
+    bool clearItemData(const QModelIndex &index) override;
+#else
+    bool clearItemData(const QModelIndex &index);
+#endif
 Q_SIGNALS:
     void mergeDisplayEditChanged(bool val);
     void sortRoleChanged(int val);

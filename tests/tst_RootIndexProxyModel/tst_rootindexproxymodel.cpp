@@ -1,9 +1,6 @@
 #include "tst_rootindexproxymodel.h"
 #include <QStringListModel>
 #include <rootindexproxymodel.h>
-#ifdef QT_GUI_LIB
-#    include <QStandardItemModel>
-#endif
 #include <QtTest/QTest>
 #include <QtTest/QSignalSpy>
 #include "../modeltestmanager.h"
@@ -11,8 +8,8 @@
 QAbstractItemModel *createTreeModel(QObject *parent)
 {
     QAbstractItemModel *result = nullptr;
-#ifdef QT_GUI_LIB
-    result = new QStandardItemModel(parent);
+#ifdef COMPLEX_MODEL_SUPPORT
+    result = new ComplexModel(parent);
     result->insertColumns(0, 3);
     result->insertRows(0, 3);
     for (int i = 0; i < result->rowCount(); ++i) {
@@ -63,7 +60,7 @@ void tst_RootIndexProxyModel::showRoot()
 
 void tst_RootIndexProxyModel::showRoot_data()
 {
-#ifdef QT_GUI_LIB
+#ifdef COMPLEX_MODEL_SUPPORT
     QTest::addColumn<QAbstractItemModel *>("baseModel");
     QTest::addColumn<QModelIndex>("root");
     QTest::newRow("Parent") << createTreeModel(nullptr) << QModelIndex();
@@ -72,7 +69,7 @@ void tst_RootIndexProxyModel::showRoot_data()
     baseModel = createTreeModel(nullptr);
     QTest::newRow("Grandchild") << baseModel << baseModel->index(2, 0, baseModel->index(1, 0));
 #else
-    QSKIP("This test requires the Qt GUI module");
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
 }
 void tst_RootIndexProxyModel::replaceModel()
@@ -97,7 +94,7 @@ void tst_RootIndexProxyModel::replaceModel()
 }
 void tst_RootIndexProxyModel::replaceModel_data()
 {
-#ifdef QT_GUI_LIB
+#ifdef COMPLEX_MODEL_SUPPORT
     QTest::addColumn<QAbstractItemModel *>("baseModel");
     QTest::addColumn<QModelIndex>("baseRoot");
     QTest::addColumn<QAbstractItemModel *>("replaceModel");
@@ -110,7 +107,7 @@ void tst_RootIndexProxyModel::replaceModel_data()
     replaceModel = createTreeModel(this);
     QTest::newRow("Grandchild") << baseModel << baseModel->index(1, 0) << replaceModel << replaceModel->index(2, 0, replaceModel->index(1, 0));
 #else
-    QSKIP("This test requires the Qt GUI module");
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
 }
 
@@ -132,7 +129,7 @@ void tst_RootIndexProxyModel::sourceDataChanged()
 
 void tst_RootIndexProxyModel::sourceDataChanged_data()
 {
-#ifdef QT_GUI_LIB
+#ifdef COMPLEX_MODEL_SUPPORT
     QTest::addColumn<QAbstractItemModel *>("baseModel");
     QTest::addColumn<QModelIndex>("changeIndex");
     QTest::addColumn<int>("expectedSignals");
@@ -145,13 +142,13 @@ void tst_RootIndexProxyModel::sourceDataChanged_data()
     baseModel = createTreeModel(this);
     QTest::newRow("Descendant of Root") << baseModel << baseModel->index(0, 0, baseModel->index(1, 0, baseModel->index(1, 0))) << 1;
 #else
-    QSKIP("This test requires the Qt GUI module");
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
 }
 
 void tst_RootIndexProxyModel::insertRow()
 {
-#ifdef QT_GUI_LIB
+#ifdef COMPLEX_MODEL_SUPPORT
     QAbstractItemModel *baseModel = createTreeModel(this);
     RootIndexProxyModel proxyModel;
     new ModelTest(&proxyModel, baseModel);
@@ -192,13 +189,13 @@ void tst_RootIndexProxyModel::insertRow()
     QCOMPARE(arguments.at(2).value<int>(), 1);
     baseModel->deleteLater();
 #else
-    QSKIP("This test requires the Qt GUI module");
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
 }
 
 void tst_RootIndexProxyModel::insertColumn()
 {
-#ifdef QT_GUI_LIB
+#ifdef COMPLEX_MODEL_SUPPORT
     QAbstractItemModel *baseModel = createTreeModel(this);
     RootIndexProxyModel proxyModel;
     new ModelTest(&proxyModel, baseModel);
@@ -239,13 +236,13 @@ void tst_RootIndexProxyModel::insertColumn()
     QCOMPARE(arguments.at(2).value<int>(), 1);
     baseModel->deleteLater();
 #else
-    QSKIP("This test requires the Qt GUI module");
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
 }
 
 void tst_RootIndexProxyModel::removeRow()
 {
-#ifdef QT_GUI_LIB
+#ifdef COMPLEX_MODEL_SUPPORT
     QAbstractItemModel *baseModel = createTreeModel(this);
     RootIndexProxyModel proxyModel;
     new ModelTest(&proxyModel, baseModel);
@@ -286,13 +283,13 @@ void tst_RootIndexProxyModel::removeRow()
     QCOMPARE(arguments.at(2).value<int>(), 1);
     baseModel->deleteLater();
 #else
-    QSKIP("This test requires the Qt GUI module");
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
 }
 
 void tst_RootIndexProxyModel::removeColumn()
 {
-#ifdef QT_GUI_LIB
+#ifdef COMPLEX_MODEL_SUPPORT
     QAbstractItemModel *baseModel = createTreeModel(this);
     RootIndexProxyModel proxyModel;
     new ModelTest(&proxyModel, baseModel);
@@ -333,13 +330,13 @@ void tst_RootIndexProxyModel::removeColumn()
     QCOMPARE(arguments.at(2).value<int>(), 1);
     baseModel->deleteLater();
 #else
-    QSKIP("This test requires the Qt GUI module");
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
 }
 
 void tst_RootIndexProxyModel::switchRoot()
 {
-#ifdef QT_GUI_LIB
+#ifdef COMPLEX_MODEL_SUPPORT
     QAbstractItemModel *baseModel = createTreeModel(this);
     RootIndexProxyModel proxyModel;
     new ModelTest(&proxyModel, baseModel);
@@ -361,13 +358,13 @@ void tst_RootIndexProxyModel::switchRoot()
     compareModels(baseModel, &proxyModel, baseModel->index(2, 0, baseModel->index(1, 0)), QModelIndex());
     baseModel->deleteLater();
 #else
-    QSKIP("This test requires the Qt GUI module");
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
 }
 
 void tst_RootIndexProxyModel::rootMoves()
 {
-#ifdef QT_GUI_LIB
+#ifdef COMPLEX_MODEL_SUPPORT
     QAbstractItemModel *baseModel = createTreeModel(this);
     RootIndexProxyModel proxyModel;
     new ModelTest(&proxyModel, baseModel);
@@ -387,13 +384,13 @@ void tst_RootIndexProxyModel::rootMoves()
     QCOMPARE(proxyModel.rootIndex(), baseModel->index(2, 1));
     compareModels(baseModel, &proxyModel, baseModel->index(2, 1), QModelIndex());
 #else
-    QSKIP("This test requires the Qt GUI module");
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
 }
 
 void tst_RootIndexProxyModel::rootRemoved()
 {
-#ifdef QT_GUI_LIB
+#ifdef COMPLEX_MODEL_SUPPORT
     QAbstractItemModel *baseModel = createTreeModel(this);
     RootIndexProxyModel proxyModel;
     new ModelTest(&proxyModel, baseModel);
@@ -418,7 +415,7 @@ void tst_RootIndexProxyModel::rootRemoved()
     QCOMPARE(proxyResetSpy.count(), 3);
     compareModels(baseModel, &proxyModel, QModelIndex(), QModelIndex());
 #else
-    QSKIP("This test requires the Qt GUI module");
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
 }
 
@@ -434,8 +431,8 @@ void tst_RootIndexProxyModel::sourceMoveColumns()
 
 void tst_RootIndexProxyModel::sourceSortDescendantOfRoot()
 {
-#ifdef QT_GUI_LIB
-    QStandardItemModel baseModel;
+#ifdef COMPLEX_MODEL_SUPPORT
+    ComplexModel baseModel;
     baseModel.insertColumn(0);
     baseModel.insertRows(0, 3);
     for (int i = 0; i < baseModel.rowCount(); ++i) {
@@ -470,14 +467,14 @@ void tst_RootIndexProxyModel::sourceSortDescendantOfRoot()
     QCOMPARE(proxyModel.index(1, 0, B1Idx).data().toString(), QStringLiteral("B1y"));
     QCOMPARE(proxyModel.index(2, 0, B1Idx).data().toString(), QStringLiteral("B1z"));
 #else
-    QSKIP("This test requires the Qt GUI module");
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
 }
 
 void tst_RootIndexProxyModel::sourceSortAncestorOfRoot()
 {
-#ifdef QT_GUI_LIB
-    QStandardItemModel baseModel;
+#ifdef COMPLEX_MODEL_SUPPORT
+    ComplexModel baseModel;
     baseModel.insertColumn(0);
     baseModel.insertRows(0, 3);
     for (int i = 0; i < baseModel.rowCount(); ++i) {
@@ -512,7 +509,7 @@ void tst_RootIndexProxyModel::sourceSortAncestorOfRoot()
     QCOMPARE(proxyModel.index(1, 0, Z1Idx).data().toString(), QStringLiteral("Z1b"));
     QCOMPARE(proxyModel.index(2, 0, Z1Idx).data().toString(), QStringLiteral("Z1c"));
 #else
-    QSKIP("This test requires the Qt GUI module");
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
 }
 

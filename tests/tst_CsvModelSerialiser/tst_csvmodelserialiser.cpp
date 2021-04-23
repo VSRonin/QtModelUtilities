@@ -174,9 +174,9 @@ void tst_CsvModelSerialiser::basicSaveLoadData(QObject *parent)
     QTest::newRow("List Single Role") << static_cast<const QAbstractItemModel *>(createStringModel(this))
                                       << static_cast<QAbstractItemModel *>(new QStringListModel(this));
     QTest::newRow("List Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createStringModel(this)) << createStringModel(this);
-#ifdef QT_GUI_LIB
+#ifdef COMPLEX_MODEL_SUPPORT
     QTest::newRow("Table Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, this))
-                                       << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
+                                       << static_cast<QAbstractItemModel *>(new ComplexModel(this));
     QTest::newRow("Table Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, this))
                                                  << createComplexModel(false, false, this);
 #endif

@@ -1,9 +1,6 @@
 #include <QtTest/QTest>
 #include <QStringListModel>
 #include <rolemaskproxymodel.h>
-#ifdef QT_GUI_LIB
-#    include <QStandardItemModel>
-#endif
 #include <QSortFilterProxyModel>
 #include <QSignalSpy>
 #include <QList>
@@ -26,8 +23,8 @@ QAbstractItemModel *createListModel(QObject *parent)
 QAbstractItemModel *createTableModel(QObject *parent)
 {
     QAbstractItemModel *result = nullptr;
-#ifdef QT_GUI_LIB
-    result = new QStandardItemModel(parent);
+#ifdef COMPLEX_MODEL_SUPPORT
+    result = new ComplexModel(parent);
     result->insertRows(0, 5);
     result->insertColumns(0, 3);
     for (int i = 0; i < result->rowCount(); ++i) {
@@ -44,8 +41,8 @@ QAbstractItemModel *createTableModel(QObject *parent)
 QAbstractItemModel *createTreeModel(QObject *parent)
 {
     QAbstractItemModel *result = nullptr;
-#ifdef QT_GUI_LIB
-    result = new QStandardItemModel(parent);
+#ifdef COMPLEX_MODEL_SUPPORT
+    result = new ComplexModel(parent);
     result->insertRows(0, 5);
     result->insertColumns(0, 3);
     for (int i = 0; i < result->rowCount(); ++i) {
@@ -196,7 +193,7 @@ void tst_RoleMaskProxyModel::testProperties()
 }
 void tst_RoleMaskProxyModel::testInsertColumn()
 {
-#if defined(QT_GUI_LIB)
+#ifdef COMPLEX_MODEL_SUPPORT
     QFETCH(QAbstractItemModel *, baseModel);
     if (!baseModel)
         return;
@@ -223,7 +220,7 @@ void tst_RoleMaskProxyModel::testInsertColumn()
     QVERIFY(baseModel->removeColumn(insertIndex, parentIndex));
     baseModel->deleteLater();
 #else
-    QSKIP("This test requires the Qt GUI module");
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
 }
 
@@ -689,8 +686,7 @@ void tst_RoleMaskProxyModel::testSetItemDataDataChanged()
     QCOMPARE(argList.at(0).value<QModelIndex>(), proxyIdX);
     QCOMPARE(argList.at(1).value<QModelIndex>(), proxyIdX);
     auto rolesVector = argList.at(2).value<QVector<int>>();
-#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
-    // bug fixed by Qt commit 1382374deaa4a854aeb542e6c8f7e1841f2abb10
+#ifndef SKIP_QTBUG_45114
     QCOMPARE(rolesVector.size(), 2);
     QVERIFY(!rolesVector.contains(Qt::TextAlignmentRole));
     QVERIFY(rolesVector.contains(Qt::ToolTipRole));
@@ -699,8 +695,7 @@ void tst_RoleMaskProxyModel::testSetItemDataDataChanged()
     argList = proxyDataChangeSpy.takeFirst();
     QCOMPARE(argList.at(0).value<QModelIndex>(), proxyIdX);
     QCOMPARE(argList.at(1).value<QModelIndex>(), proxyIdX);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
-    // bug fixed by Qt commit 1382374deaa4a854aeb542e6c8f7e1841f2abb10
+#ifndef SKIP_QTBUG_45114
     rolesVector = argList.at(2).value<QVector<int>>();
     QCOMPARE(rolesVector.size(), 2);
     QVERIFY(rolesVector.contains(Qt::DisplayRole));
@@ -718,8 +713,9 @@ void tst_RoleMaskProxyModel::testSetItemDataDataChanged()
     itemDataSet.clear();
     itemDataSet[Qt::UserRole] = 6;
     QVERIFY(proxyModel.setItemData(proxyIdX, itemDataSet));
-    // requures QTBUG-67511 to be fixed before it works on models other than QStandardItemModel
-    // QCOMPARE(proxyDataChangeSpy.size(), 0);
+#ifndef SKIP_QTBUG_67511
+    QCOMPARE(proxyDataChangeSpy.size(), 0);
+#endif
     baseModel->deleteLater();
 }
 
@@ -794,8 +790,7 @@ void tst_RoleMaskProxyModel::testSetItemData()
     QCOMPARE(proxyModel.data(proxyIdX, Qt::EditRole).toString(), QStringLiteral("Test"));
     QCOMPARE(proxyModel.data(proxyIdX, Qt::UserRole).toInt(), 5);
     QCOMPARE(proxyModel.data(proxyIdX, Qt::ToolTipRole).toString(), QStringLiteral("ToolTip"));
-#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
-    // bug fixed by Qt commit 1382374deaa4a854aeb542e6c8f7e1841f2abb10
+#ifndef SKIP_QTBUG_45114
     QCOMPARE(proxyModel.data(proxyIdX, Qt::TextAlignmentRole).toInt(), Qt::AlignRight);
 #endif
     baseModel->deleteLater();

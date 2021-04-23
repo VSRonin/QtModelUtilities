@@ -95,12 +95,12 @@ QAbstractItemModel *tst_SerialiserCommon::createStringModel(QObject *parent)
         itmesList.append(QStringLiteral("Item ") + QString::number(itemsDist(generator)));
     return new QStringListModel(itmesList, parent);
 }
-#ifdef QT_GUI_LIB
+#ifdef COMPLEX_MODEL_SUPPORT
 void tst_SerialiserCommon::insertBranch(QAbstractItemModel *model, const QModelIndex &parent, bool multiRoles, int subBranches)
 {
     Q_ASSERT(model);
     Q_ASSERT(!parent.isValid() || parent.model() == model);
-    const QBrush randomBrushes[] = {QBrush(Qt::red), QBrush(Qt::blue), QBrush(Qt::green), QBrush(Qt::yellow), QBrush(Qt::magenta), QBrush(Qt::cyan)};
+    const int randomBrushes[] = {Qt::red, Qt::blue, Qt::green, Qt::yellow, Qt::magenta, Qt::cyan};
     std::uniform_int_distribution<int> colorDistribution(0, (sizeof(randomBrushes) / sizeof(randomBrushes[0])) - 1);
     std::uniform_int_distribution<int> coulmnsDist(2, 5);
     std::uniform_int_distribution<int> rowsDist(3, 6);
@@ -125,7 +125,7 @@ void tst_SerialiserCommon::insertBranch(QAbstractItemModel *model, const QModelI
 
 QAbstractItemModel *tst_SerialiserCommon::createComplexModel(bool tree, bool multiRoles, QObject *parent)
 {
-    QStandardItemModel *result = new QStandardItemModel(parent);
+    ComplexModel *result = new ComplexModel(parent);
     insertBranch(result, QModelIndex(), multiRoles, tree ? 2 : 0);
     for (int i = 0; i < result->rowCount(); ++i) {
         result->setHeaderData(i, Qt::Vertical, QStringLiteral("Row %1").arg(i));
@@ -147,19 +147,19 @@ void tst_SerialiserCommon::basicSaveLoadData(QObject *parent)
     QTest::newRow("List Single Role") << static_cast<const QAbstractItemModel *>(createStringModel(parent))
                                       << static_cast<QAbstractItemModel *>(new QStringListModel(parent));
     QTest::newRow("List Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createStringModel(parent)) << createStringModel(parent);
-#ifdef QT_GUI_LIB
+#ifdef COMPLEX_MODEL_SUPPORT
     QTest::newRow("Table Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, parent))
-                                       << static_cast<QAbstractItemModel *>(new QStandardItemModel(parent));
+                                       << static_cast<QAbstractItemModel *>(new ComplexModel(parent));
     QTest::newRow("Table Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(false, true, parent))
-                                       << static_cast<QAbstractItemModel *>(new QStandardItemModel(parent));
+                                       << static_cast<QAbstractItemModel *>(new ComplexModel(parent));
     QTest::newRow("Table Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, parent))
                                                  << createComplexModel(false, false, parent);
     QTest::newRow("Table Multi Roles Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(false, true, parent))
                                                  << createComplexModel(false, true, parent);
     QTest::newRow("Tree Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(true, false, parent))
-                                      << static_cast<QAbstractItemModel *>(new QStandardItemModel(parent));
+                                      << static_cast<QAbstractItemModel *>(new ComplexModel(parent));
     QTest::newRow("Tree Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(true, true, parent))
-                                      << static_cast<QAbstractItemModel *>(new QStandardItemModel(parent));
+                                      << static_cast<QAbstractItemModel *>(new ComplexModel(parent));
     QTest::newRow("Tree Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(true, false, parent))
                                                 << createComplexModel(true, false, parent);
     QTest::newRow("Tree Multi Roles Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(true, true, parent))

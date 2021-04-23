@@ -17,7 +17,9 @@ void tst_GenericModel::autoParent()
 void tst_GenericModel::insertRow_data()
 {
     QTest::addColumn<int>("insertCol");
+#ifndef SKIP_QTBUG_92220
     QTest::newRow("No Columns") << 0;
+#endif
     QTest::newRow("One Column") << 1;
     QTest::newRow("Multiple Columns") << 3;
 }
@@ -84,7 +86,9 @@ void tst_GenericModel::insertRow()
 void tst_GenericModel::insertRows_data()
 {
     QTest::addColumn<int>("insertCol");
+#ifndef SKIP_QTBUG_92220
     QTest::newRow("No Columns") << 0;
+#endif
     QTest::newRow("One Column") << 1;
     QTest::newRow("Multiple Columns") << 3;
 }
@@ -159,8 +163,10 @@ void tst_GenericModel::insertColumn_data()
 {
     QTest::addColumn<int>("insertRow");
     QTest::newRow("No Rows") << 0;
+#ifndef SKIP_QTBUG_92220
     QTest::newRow("One Row") << 1;
     QTest::newRow("Multiple Rows") << 3;
+#endif
 }
 
 void tst_GenericModel::insertColumn()
@@ -227,8 +233,10 @@ void tst_GenericModel::insertColumns_data()
 {
     QTest::addColumn<int>("insertRow");
     QTest::newRow("No Rows") << 0;
+#ifndef SKIP_QTBUG_92220
     QTest::newRow("One Row") << 1;
     QTest::newRow("Multiple Rows") << 3;
+#endif
 }
 
 void tst_GenericModel::insertColumns()
@@ -302,8 +310,10 @@ void tst_GenericModel::removeColumn_data()
 {
     QTest::addColumn<int>("insertRow");
     QTest::newRow("No Columns") << 0;
+#ifndef SKIP_QTBUG_92220
     QTest::newRow("One Column") << 1;
     QTest::newRow("Multiple Columns") << 3;
+#endif
 }
 
 void tst_GenericModel::removeColumn()
@@ -371,8 +381,10 @@ void tst_GenericModel::removeColumns_data()
 {
     QTest::addColumn<int>("insertRow");
     QTest::newRow("No Rows") << 0;
+#ifndef SKIP_QTBUG_92220
     QTest::newRow("One Row") << 1;
     QTest::newRow("Multiple Rows") << 3;
+#endif
 
 }
 void tst_GenericModel::removeColumns()
@@ -444,7 +456,7 @@ void tst_GenericModel::removeColumns()
 void tst_GenericModel::removeRow_data()
 {
     QTest::addColumn<int>("insertCol");
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 1, 1)) // QTBUG-92886
+#ifndef SKIP_QTBUG_92886
     QTest::newRow("No Columns") << 0;
 #endif
     QTest::newRow("One Column") << 1;
@@ -515,7 +527,7 @@ void tst_GenericModel::removeRow()
 void tst_GenericModel::removeRows_data()
 {
     QTest::addColumn<int>("insertCol");
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 1, 1)) // QTBUG-92886
+#ifndef SKIP_QTBUG_92886
     QTest::newRow("No Columns") << 0;
 #endif
     QTest::newRow("One Column") << 1;
@@ -655,26 +667,26 @@ void tst_GenericModel::insertChildren()
     QCOMPARE(testModel->columnCount(parentIdx),0);
     for (QSignalSpy *spy : spyArr)
         QCOMPARE(spy->count(), 0);
-    QVERIFY(testModel->insertRows(0,1,parentIdx));
-    QCOMPARE(testModel->rowCount(parentIdx),1);
-    QCOMPARE(testModel->rowCount(),5);
-    QCOMPARE(testModel->columnCount(parentIdx),0);
-    for (QSignalSpy *spy : colSpyArr)
+    QVERIFY(testModel->insertColumns(0,1,parentIdx));
+    QCOMPARE(testModel->columnCount(parentIdx),1);
+    QCOMPARE(testModel->columnCount(),3);
+    QCOMPARE(testModel->rowCount(parentIdx),0);
+    for (QSignalSpy *spy : rowSpyArr)
         QCOMPARE(spy->count(), 0);
-    for (QSignalSpy *spy : rowSpyArr) {
+    for (QSignalSpy *spy : colSpyArr) {
         QCOMPARE(spy->count(), 1);
         const auto args = spy->takeFirst();
         QCOMPARE(args.at(2).toInt(), 0);
         QCOMPARE(args.at(1).toInt(), 0);
         QCOMPARE(args.at(0).value<QModelIndex>(), parentIdx);
     }
-    QVERIFY(testModel->insertColumns(0,1,parentIdx));
-    QCOMPARE(testModel->columnCount(parentIdx),1);
-    QCOMPARE(testModel->columnCount(),3);
+    QVERIFY(testModel->insertRows(0,1,parentIdx));
     QCOMPARE(testModel->rowCount(parentIdx),1);
-    for (QSignalSpy *spy : rowSpyArr)
+    QCOMPARE(testModel->rowCount(),5);
+    QCOMPARE(testModel->columnCount(parentIdx),1);
+    for (QSignalSpy *spy : colSpyArr)
         QCOMPARE(spy->count(), 0);
-    for (QSignalSpy *spy : colSpyArr) {
+    for (QSignalSpy *spy : rowSpyArr) {
         QCOMPARE(spy->count(), 1);
         const auto args = spy->takeFirst();
         QCOMPARE(args.at(2).toInt(), 0);
@@ -750,8 +762,8 @@ void tst_GenericModel::removeChildren()
     QSignalSpy* const rowSpyArr[] = {&rowsRemovedSpy, &rowsAboutToBeRemovedSpy};
     QSignalSpy* const spyArr[] = {&rowsRemovedSpy, &rowsAboutToBeRemovedSpy,&columnsRemovedSpy, &columnsAboutToBeRemovedSpy};
 
-    testModel->insertRows(0,20,parentIdx);
     testModel->insertColumns(0,7,parentIdx);
+    testModel->insertRows(0,20,parentIdx);
     QVERIFY(!testModel->removeRows(-1,1,parentIdx));
     QCOMPARE(testModel->rowCount(parentIdx),20);
     for (QSignalSpy *spy : spyArr)
@@ -922,6 +934,27 @@ void tst_GenericModel::data()
     QVERIFY(testModel.itemData(QModelIndex()).isEmpty());
 }
 
+void tst_GenericModel::clearData()
+{
+    GenericModel testModel;
+    ModelTest probe(&testModel, nullptr);
+    fillTable(&testModel,5,3);
+    QSignalSpy dataChangedSpy(&testModel, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)));
+    QVERIFY(dataChangedSpy.isValid());
+    QVERIFY(!testModel.clearItemData(QModelIndex()));
+    QCOMPARE(dataChangedSpy.count(), 0);
+
+    QVERIFY(testModel.clearItemData(testModel.index(0,0)));
+    QVERIFY(!testModel.index(0,0).data().isValid());
+    QVERIFY(testModel.itemData(testModel.index(0,0)).isEmpty());
+    QCOMPARE(dataChangedSpy.count(), 1);
+    auto args = dataChangedSpy.takeFirst();
+    QCOMPARE(args.at(0).value<QModelIndex>(), testModel.index(0,0));
+    QCOMPARE(args.at(1).value<QModelIndex>(), testModel.index(0,0));
+    QVERIFY(testModel.clearItemData(testModel.index(0,0)));
+    QCOMPARE(dataChangedSpy.count(), 0);
+}
+
 void tst_GenericModel::headerData_data(){
     QTest::addColumn<Qt::Orientation>("orientation");
     QTest::newRow("Vertical") << Qt::Vertical;
@@ -946,7 +979,7 @@ void tst_GenericModel::headerData()
         QCOMPARE(dataChangedSpy.count(),0);
         QCOMPARE(headerDataChangedSpy.count(),1);
         auto args = headerDataChangedSpy.takeFirst();
-        QCOMPARE(args.at(0),orientation);
+        QCOMPARE(args.at(0).toInt(),orientation);
         QCOMPARE(args.at(1),i);
         QCOMPARE(args.at(2),i);
         QVERIFY(testModel.setHeaderData(i,orientation,headString));
@@ -958,7 +991,7 @@ void tst_GenericModel::headerData()
         QCOMPARE(dataChangedSpy.count(),0);
         QCOMPARE(headerDataChangedSpy.count(),1);
         args = headerDataChangedSpy.takeFirst();
-        QCOMPARE(args.at(0),orientation);
+        QCOMPARE(args.at(0).toInt(),orientation);
         QCOMPARE(args.at(1),i);
         QCOMPARE(args.at(2),i);
         QVERIFY(testModel.setHeaderData(i,orientation,i,Qt::UserRole));
@@ -2468,6 +2501,49 @@ void tst_GenericModel::moveColumnsFromBranchToRoot()
     QCOMPARE(testModel.headerData(5,Qt::Horizontal).toInt(),3);
     QCOMPARE(testModel.headerData(6,Qt::Horizontal).toInt(),4);
 
+}
+
+void tst_GenericModel::roleNames()
+{
+    class FakeItemModel : public QAbstractItemModel{
+    public:
+        using QAbstractItemModel::QAbstractItemModel;
+        int columnCount(const QModelIndex & = QModelIndex()) const override {return 0;}
+        int rowCount(const QModelIndex & = QModelIndex()) const override {return 0;}
+        QModelIndex index(int , int , const QModelIndex & = QModelIndex()) const override {return QModelIndex();}
+        QVariant data(const QModelIndex &, int = Qt::DisplayRole) const override {return QVariant();}
+        QModelIndex parent(const QModelIndex &) const override {return QModelIndex();}
+    };
+    FakeItemModel dafaultModel;
+    GenericModel testModel;
+    ModelTest probe(&testModel, nullptr);
+    fillTable(&testModel,3,5);
+    fillTable(&testModel,3,5,testModel.index(0,0));
+    QSignalSpy dataChangedSpy(&testModel, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)));
+    QVERIFY(dataChangedSpy.isValid());
+
+    QCOMPARE(testModel.roleNames(), dafaultModel.roleNames());
+    testModel.setRoleNames(QHash<int,QByteArray>{std::make_pair<int>(Qt::UserRole,QByteArrayLiteral("myrole"))});
+    QCOMPARE(dataChangedSpy.count(), 2);
+    auto args = dataChangedSpy.takeFirst();
+    QCOMPARE(args.at(0).value<QModelIndex>(),testModel.index(0,0,testModel.index(0,0)));
+    QCOMPARE(args.at(1).value<QModelIndex>(),testModel.index(2,4,testModel.index(0,0)));
+    args = dataChangedSpy.takeFirst();
+    QCOMPARE(args.at(0).value<QModelIndex>(),testModel.index(0,0));
+    QCOMPARE(args.at(1).value<QModelIndex>(),testModel.index(2,4));
+    const auto roleNs = testModel.roleNames();
+    QCOMPARE(roleNs.size(),1);
+    QCOMPARE(roleNs.begin().key(),Qt::UserRole);
+    QCOMPARE(roleNs.begin().value(),QByteArrayLiteral("myrole"));
+    testModel.setRoleNames(QHash<int,QByteArray>());
+    QCOMPARE(dataChangedSpy.count(), 2);
+    args = dataChangedSpy.takeFirst();
+    QCOMPARE(args.at(0).value<QModelIndex>(),testModel.index(0,0,testModel.index(0,0)));
+    QCOMPARE(args.at(1).value<QModelIndex>(),testModel.index(2,4,testModel.index(0,0)));
+    args = dataChangedSpy.takeFirst();
+    QCOMPARE(args.at(0).value<QModelIndex>(),testModel.index(0,0));
+    QCOMPARE(args.at(1).value<QModelIndex>(),testModel.index(2,4));
+    QCOMPARE(testModel.roleNames(), dafaultModel.roleNames());
 }
 
 
