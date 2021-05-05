@@ -1,5 +1,5 @@
 # Building from sources
-The build system of this library is [CMake](https://cmake.org/), the minimum supported version is 3.3
+The build system of this library is [CMake](https://cmake.org/), the minimum supported version is 3.9
 
 Once you installed CMake, open a terminal window with the C++ compiler and Qt environment set up. The procedure is platform dependant. 
 On Windows MSVC, for example, it consist in calling `vcvarsall.bat` from the compiler folder and `qtenv2.bat` from the bin folder of Qt.
