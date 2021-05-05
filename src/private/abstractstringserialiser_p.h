@@ -21,18 +21,18 @@ class QTextCodec;
 #endif
 class AbstractStringSerialiserPrivate : public AbstractModelSerialiserPrivate
 {
-    Q_DISABLE_COPY(AbstractStringSerialiserPrivate);
+    Q_DISABLE_COPY(AbstractStringSerialiserPrivate)
     Q_DECLARE_PUBLIC(AbstractStringSerialiser)
 protected:
     AbstractStringSerialiserPrivate(AbstractStringSerialiser *q);
-    static QString variantToString(const QVariant &val);
-    static QVariant stringToVariant(const QString &val);
+    QString variantToString(const QVariant &val) const;
+    QVariant stringToVariant(const QString &val) const;
 #ifdef QT_GUI_LIB
     static QImage loadImageVariant(int type, const QString &val);
     static QString saveImageVariant(const QImage &val);
 #endif
-    static QVariant loadVariant(int type, const QString &val);
-    static QString saveVariant(const QVariant &val);
+    QVariant loadVariant(int type, const QString &val) const;
+    QString saveVariant(const QVariant &val) const;
     static int guessDecimals(double val);
     static QString guessDecimalsString(double val, QLocale *loca = Q_NULLPTR);
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))

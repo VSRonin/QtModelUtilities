@@ -47,32 +47,28 @@ QString AbstractStringSerialiserPrivate::guessDecimalsString(double val, QLocale
     return QString::number(val, 'f', guessDecimals(val));
 }
 
-QString AbstractStringSerialiserPrivate::variantToString(const QVariant &val)
+QString AbstractStringSerialiserPrivate::variantToString(const QVariant &val) const
 {
     QByteArray data;
     QDataStream outStream(&data, QIODevice::WriteOnly);
-#ifdef MS_DATASTREAM_VERSION
-    outStream.setVersion(MS_DATASTREAM_VERSION);
-#endif // MS_DATASTREAM_VERSION
+    outStream.setVersion(m_streamVersion);
     outStream << val;
     data = qCompress(data);
     return QString::fromLatin1(data.toBase64());
 }
 
-QVariant AbstractStringSerialiserPrivate::stringToVariant(const QString &val)
+QVariant AbstractStringSerialiserPrivate::stringToVariant(const QString &val) const
 {
     QByteArray data = QByteArray::fromBase64(val.toLatin1());
     data = qUncompress(data);
     QDataStream inStream(data);
-#ifdef MS_DATASTREAM_VERSION
-    inStream.setVersion(MS_DATASTREAM_VERSION);
-#endif // MS_DATASTREAM_VERSION
+    inStream.setVersion(m_streamVersion);
     QVariant result;
     inStream >> result;
     return result;
 }
 
-QVariant AbstractStringSerialiserPrivate::loadVariant(int type, const QString &val)
+QVariant AbstractStringSerialiserPrivate::loadVariant(int type, const QString &val) const
 {
     if (val.isEmpty())
         return QVariant();
@@ -150,7 +146,7 @@ QImage AbstractStringSerialiserPrivate::loadImageVariant(int type, const QString
 }
 #endif
 
-QString AbstractStringSerialiserPrivate::saveVariant(const QVariant &val)
+QString AbstractStringSerialiserPrivate::saveVariant(const QVariant &val) const
 {
     if (val.isNull())
         return QString();

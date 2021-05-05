@@ -266,7 +266,7 @@ bool HtmlModelSerialiserPrivate::readHtml(QXmlStreamReader &reader)
     return true;
 }
 
-void HtmlModelSerialiserPrivate::writeHtmlVariant(QXmlStreamWriter &writer, const QVariant &val)
+void HtmlModelSerialiserPrivate::writeHtmlVariant(QXmlStreamWriter &writer, const QVariant &val) const
 {
     if (isImageType(val.userType())) {
         writer.writeEmptyElement(QStringLiteral("img"));
@@ -277,7 +277,7 @@ void HtmlModelSerialiserPrivate::writeHtmlVariant(QXmlStreamWriter &writer, cons
     writer.writeCharacters(saveVariant(val));
 }
 
-QVariant HtmlModelSerialiserPrivate::readHtmlVariant(QXmlStreamReader &reader, int valType)
+QVariant HtmlModelSerialiserPrivate::readHtmlVariant(QXmlStreamReader &reader, int valType) const
 {
     if (isImageType(valType)) {
         if (!reader.readNextStartElement())
