@@ -33,8 +33,8 @@ protected:
     {
         return val == QMetaType::QImage || val == QMetaType::QPixmap || val == QMetaType::QBitmap;
     }
-    static void writeHtmlVariant(QXmlStreamWriter &writer, const QVariant &val);
-    static QVariant readHtmlVariant(QXmlStreamReader &reader, int valType);
+    void writeHtmlVariant(QXmlStreamWriter &writer, const QVariant &val) const;
+    QVariant readHtmlVariant(QXmlStreamReader &reader, int valType) const;
     bool m_printStartDocument;
 };
 #endif // htmlmodelserialiser_p_h__
