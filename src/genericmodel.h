@@ -56,8 +56,8 @@ public:
     void sort(int column, const QModelIndex& parent, Qt::SortOrder order = Qt::AscendingOrder, bool recursive = true);
     QSize span(const QModelIndex &index) const override;
     bool setSpan(const QModelIndex &index, const QSize &size);
-    // Qt::DropActions supportedDragActions() const override;
-    // Qt::DropActions supportedDropActions() const override;
+    Qt::DropActions supportedDragActions() const override;
+    Qt::DropActions supportedDropActions() const override;
     bool mergeDisplayEdit() const;
     void setMergeDisplayEdit(bool val);
     int sortRole() const;

@@ -13,7 +13,7 @@
 #include "private/genericmodel_p.h"
 #include "genericmodel.h"
 #include <QDateTime>
-
+#include <functional>
 GenericModelItem::GenericModelItem(GenericModel* model)
     : GenericModelItem(static_cast<GenericModelItem *>(nullptr))
 {
@@ -855,7 +855,7 @@ bool GenericModel::clearItemData(const QModelIndex &index){
 Qt::ItemFlags GenericModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
-        return Qt::NoItemFlags;
+        return Qt::ItemIsDropEnabled;
     Q_ASSERT(index.model() == this);
     Q_D(const GenericModel);
     return d->itemForIndex(index)->flags;
@@ -870,8 +870,11 @@ bool GenericModel::setFlags(const QModelIndex &index, Qt::ItemFlags flags)
         return false;
     Q_ASSERT(index.model() == this);
     Q_D(GenericModel);
-    d->itemForIndex(index)->flags = flags;
-    dataChanged(index, index);
+    GenericModelItem *const item = d->itemForIndex(index);
+    if (item->flags != flags){
+        item->flags = flags;
+        dataChanged(index, index);
+    }
     return true;
 }
 
@@ -1159,6 +1162,22 @@ bool GenericModel::setSpan(const QModelIndex &index, const QSize &size)
                                                 qMin(index.column() + size.width(), columnCount(parIdx) - 1), parIdx);
     dataChanged(index, bottomRight);
     return true;
+}
+
+/*!
+\reimp
+*/
+Qt::DropActions GenericModel::supportedDragActions() const
+{
+    return Qt::CopyAction | Qt::MoveAction;
+}
+
+/*!
+\reimp
+*/
+Qt::DropActions GenericModel::supportedDropActions() const
+{
+    return Qt::CopyAction | Qt::MoveAction;
 }
 
 /*!

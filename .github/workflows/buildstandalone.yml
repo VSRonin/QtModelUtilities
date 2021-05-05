@@ -27,7 +27,7 @@ jobs:
         strategy:
           fail-fast: false
           matrix:
-              qt_ver: [5.15.2,6.0.2]
+              qt_ver: [5.15.2,6.0.4]
               modules:
                 - { friendly_name: RoleMaskProxyModel, rolemaskproxy: ON, insertproxy: OFF, modelserialisation: OFF, rootindexproxy: OFF, genericmodel: OFF}
                 - { friendly_name: InsertProxyModel, rolemaskproxy: OFF, insertproxy: ON, modelserialisation: OFF, rootindexproxy: OFF, genericmodel: OFF}
@@ -58,11 +58,11 @@ jobs:
             shell: pwsh
             run: |
               cd build/debug
-              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_DEBUG_POSTFIX=d -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_GENERICMODEL=${{ matrix.modules.genericmodel }} -DBUILD_ROOTINDEXPROXY=${{ matrix.modules.rootindexproxy }} -DBUILD_ROLEMASKPROXY=${{ matrix.modules.rolemaskproxy }} -DBUILD_INSERTPROXY=${{ matrix.modules.insertproxy }} -DBUILD_MODELSERIALISATION=${{ matrix.modules.modelserialisation }} -DBUILD_SHARED_LIBS=ON ../../
+              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_DEBUG_POSTFIX=d -DCMAKE_INSTALL_PREFIX="../installed" -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_GENERICMODEL=${{ matrix.modules.genericmodel }} -DBUILD_ROOTINDEXPROXY=${{ matrix.modules.rootindexproxy }} -DBUILD_ROLEMASKPROXY=${{ matrix.modules.rolemaskproxy }} -DBUILD_INSERTPROXY=${{ matrix.modules.insertproxy }} -DBUILD_MODELSERIALISATION=${{ matrix.modules.modelserialisation }} -DBUILD_SHARED_LIBS=ON ../../
               cmake --build .
               cmake --build . --target install
               cd ../release
-              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_GENERICMODEL=${{ matrix.modules.genericmodel }} -DBUILD_ROOTINDEXPROXY=${{ matrix.modules.rootindexproxy }} -DBUILD_ROLEMASKPROXY=${{ matrix.modules.rolemaskproxy }} -DBUILD_INSERTPROXY=${{ matrix.modules.insertproxy }} -DBUILD_MODELSERIALISATION=${{ matrix.modules.modelserialisation }} -DBUILD_SHARED_LIBS=ON ../../
+              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX="../installed" -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_GENERICMODEL=${{ matrix.modules.genericmodel }} -DBUILD_ROOTINDEXPROXY=${{ matrix.modules.rootindexproxy }} -DBUILD_ROLEMASKPROXY=${{ matrix.modules.rolemaskproxy }} -DBUILD_INSERTPROXY=${{ matrix.modules.insertproxy }} -DBUILD_MODELSERIALISATION=${{ matrix.modules.modelserialisation }} -DBUILD_SHARED_LIBS=ON ../../
               cmake --build .
               cmake --build . --target install
           - name: Debug Test

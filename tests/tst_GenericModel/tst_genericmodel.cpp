@@ -975,25 +975,25 @@ void tst_GenericModel::headerData()
     for(int i=0;i<endIter;++i){
         const QString headString = QStringLiteral("Header %1").arg(i);
         QVERIFY(testModel.setHeaderData(i,orientation,headString));
-        QCOMPARE(testModel.headerData(i,orientation),headString);
+        QCOMPARE(testModel.headerData(i,orientation).toString(),headString);
         QCOMPARE(dataChangedSpy.count(),0);
         QCOMPARE(headerDataChangedSpy.count(),1);
         auto args = headerDataChangedSpy.takeFirst();
         QCOMPARE(args.at(0).toInt(),orientation);
-        QCOMPARE(args.at(1),i);
-        QCOMPARE(args.at(2),i);
+        QCOMPARE(args.at(1).toInt(),i);
+        QCOMPARE(args.at(2).toInt(),i);
         QVERIFY(testModel.setHeaderData(i,orientation,headString));
         QCOMPARE(dataChangedSpy.count(),0);
         QCOMPARE(headerDataChangedSpy.count(),0);
 
         QVERIFY(testModel.setHeaderData(i,orientation,i,Qt::UserRole));
-        QCOMPARE(testModel.headerData(i,orientation,Qt::UserRole),i);
+        QCOMPARE(testModel.headerData(i,orientation,Qt::UserRole).toInt(),i);
         QCOMPARE(dataChangedSpy.count(),0);
         QCOMPARE(headerDataChangedSpy.count(),1);
         args = headerDataChangedSpy.takeFirst();
         QCOMPARE(args.at(0).toInt(),orientation);
-        QCOMPARE(args.at(1),i);
-        QCOMPARE(args.at(2),i);
+        QCOMPARE(args.at(1).toInt(),i);
+        QCOMPARE(args.at(2).toInt(),i);
         QVERIFY(testModel.setHeaderData(i,orientation,i,Qt::UserRole));
         QCOMPARE(dataChangedSpy.count(),0);
         QCOMPARE(headerDataChangedSpy.count(),0);
