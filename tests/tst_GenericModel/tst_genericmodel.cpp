@@ -1101,19 +1101,19 @@ void tst_GenericModel::sortTable()
     testModel.setData(testModel.index(3,1),2);
     testModel.setData(testModel.index(4,1),5);
 
-    testModel.setData(testModel.index(0,0),QChar('e'));
-    testModel.setData(testModel.index(1,0),QChar('b'));
-    testModel.setData(testModel.index(2,0),QChar('d'));
-    testModel.setData(testModel.index(3,0),QChar('a'));
-    testModel.setData(testModel.index(4,0),QChar('c'));
+    testModel.setData(testModel.index(0,0),QChar(QLatin1Char('e')));
+    testModel.setData(testModel.index(1,0),QChar(QLatin1Char('b')));
+    testModel.setData(testModel.index(2,0),QChar(QLatin1Char('d')));
+    testModel.setData(testModel.index(3,0),QChar(QLatin1Char('a')));
+    testModel.setData(testModel.index(4,0),QChar(QLatin1Char('c')));
     QPersistentModelIndex oneIndex(testModel.index(1,1));
     QPersistentModelIndex fiveIndex(testModel.index(4,1));
     QPersistentModelIndex bIndex(testModel.index(1,0));
     QPersistentModelIndex cIndex(testModel.index(4,0));
     QCOMPARE(oneIndex.data().toInt(),1);
     QCOMPARE(fiveIndex.data().toInt(),5);
-    QCOMPARE(bIndex.data().value<QChar>(),QChar('b'));
-    QCOMPARE(cIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(bIndex.data().value<QChar>(),QChar(QLatin1Char('b')));
+    QCOMPARE(cIndex.data().value<QChar>(),QChar(QLatin1Char('c')));
 
     testModel.sort(1,Qt::AscendingOrder);
     QCOMPARE(layoutAboutToBeChangedSpy.count(),1);
@@ -1122,8 +1122,8 @@ void tst_GenericModel::sortTable()
         QCOMPARE(testModel.data(testModel.index(i,1)).toInt(),i+1);
     QCOMPARE(oneIndex.data().toInt(),1);
     QCOMPARE(fiveIndex.data().toInt(),5);
-    QCOMPARE(bIndex.data().value<QChar>(),QChar('b'));
-    QCOMPARE(cIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(bIndex.data().value<QChar>(),QChar(QLatin1Char('b')));
+    QCOMPARE(cIndex.data().value<QChar>(),QChar(QLatin1Char('c')));
     QCOMPARE(oneIndex.row(),0);
     QCOMPARE(fiveIndex.row(),4);
     QCOMPARE(bIndex.row(),0);
@@ -1136,8 +1136,8 @@ void tst_GenericModel::sortTable()
         QCOMPARE(testModel.data(testModel.index(i,1)).toInt(),i+1);
     QCOMPARE(oneIndex.data().toInt(),1);
     QCOMPARE(fiveIndex.data().toInt(),5);
-    QCOMPARE(bIndex.data().value<QChar>(),QChar('b'));
-    QCOMPARE(cIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(bIndex.data().value<QChar>(),QChar(QLatin1Char('b')));
+    QCOMPARE(cIndex.data().value<QChar>(),QChar(QLatin1Char('c')));
     QCOMPARE(oneIndex.row(),0);
     QCOMPARE(fiveIndex.row(),4);
     QCOMPARE(bIndex.row(),0);
@@ -1150,8 +1150,8 @@ void tst_GenericModel::sortTable()
         QCOMPARE(testModel.data(testModel.index(i,1)).toInt(),5-i);
     QCOMPARE(oneIndex.data().toInt(),1);
     QCOMPARE(fiveIndex.data().toInt(),5);
-    QCOMPARE(bIndex.data().value<QChar>(),QChar('b'));
-    QCOMPARE(cIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(bIndex.data().value<QChar>(),QChar(QLatin1Char('b')));
+    QCOMPARE(cIndex.data().value<QChar>(),QChar(QLatin1Char('c')));
     QCOMPARE(oneIndex.row(),4);
     QCOMPARE(fiveIndex.row(),0);
     QCOMPARE(bIndex.row(),4);
@@ -1164,8 +1164,8 @@ void tst_GenericModel::sortTable()
         QCOMPARE(testModel.data(testModel.index(i,0)).value<QChar>(),QChar('a'+i));
     QCOMPARE(oneIndex.data().toInt(),1);
     QCOMPARE(fiveIndex.data().toInt(),5);
-    QCOMPARE(bIndex.data().value<QChar>(),QChar('b'));
-    QCOMPARE(cIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(bIndex.data().value<QChar>(),QChar(QLatin1Char('b')));
+    QCOMPARE(cIndex.data().value<QChar>(),QChar(QLatin1Char('c')));
     QCOMPARE(oneIndex.row(),1);
     QCOMPARE(fiveIndex.row(),2);
     QCOMPARE(bIndex.row(),1);
@@ -1539,13 +1539,13 @@ void tst_GenericModel::moveRowsTable()
     QCOMPARE(testModel.index(3,0).data().toInt(),2);
     QCOMPARE(testModel.index(4,0).data().toInt(),4);
     QCOMPARE(testModel.index(5,0).data().toInt(),5);
-    QCOMPARE(testModel.index(0,1).data().value<QChar>(),QChar('a'));
-    QCOMPARE(testModel.index(1,1).data().value<QChar>(),QChar('b'));
-    QCOMPARE(testModel.index(2,1).data().value<QChar>(),QChar('d'));
-    QCOMPARE(testModel.index(3,1).data().value<QChar>(),QChar('c'));
-    QCOMPARE(testModel.index(4,1).data().value<QChar>(),QChar('e'));
-    QCOMPARE(testModel.index(5,1).data().value<QChar>(),QChar('f'));
-    QCOMPARE(twoIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(testModel.index(0,1).data().value<QChar>(),QChar(QLatin1Char('a')));
+    QCOMPARE(testModel.index(1,1).data().value<QChar>(),QChar(QLatin1Char('b')));
+    QCOMPARE(testModel.index(2,1).data().value<QChar>(),QChar(QLatin1Char('d')));
+    QCOMPARE(testModel.index(3,1).data().value<QChar>(),QChar(QLatin1Char('c')));
+    QCOMPARE(testModel.index(4,1).data().value<QChar>(),QChar(QLatin1Char('e')));
+    QCOMPARE(testModel.index(5,1).data().value<QChar>(),QChar(QLatin1Char('f')));
+    QCOMPARE(twoIndex.data().value<QChar>(),QChar(QLatin1Char('c')));
     QCOMPARE(twoIndex.row(),3);
     for(QSignalSpy* spy : spyArr){
         QCOMPARE(spy->count(),1);
@@ -1566,13 +1566,13 @@ void tst_GenericModel::moveRowsTable()
     QCOMPARE(testModel.index(3,0).data().toInt(),3);
     QCOMPARE(testModel.index(4,0).data().toInt(),4);
     QCOMPARE(testModel.index(5,0).data().toInt(),5);
-    QCOMPARE(testModel.index(0,1).data().value<QChar>(),QChar('c'));
-    QCOMPARE(testModel.index(1,1).data().value<QChar>(),QChar('a'));
-    QCOMPARE(testModel.index(2,1).data().value<QChar>(),QChar('b'));
-    QCOMPARE(testModel.index(3,1).data().value<QChar>(),QChar('d'));
-    QCOMPARE(testModel.index(4,1).data().value<QChar>(),QChar('e'));
-    QCOMPARE(testModel.index(5,1).data().value<QChar>(),QChar('f'));
-    QCOMPARE(twoIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(testModel.index(0,1).data().value<QChar>(),QChar(QLatin1Char('c')));
+    QCOMPARE(testModel.index(1,1).data().value<QChar>(),QChar(QLatin1Char('a')));
+    QCOMPARE(testModel.index(2,1).data().value<QChar>(),QChar(QLatin1Char('b')));
+    QCOMPARE(testModel.index(3,1).data().value<QChar>(),QChar(QLatin1Char('d')));
+    QCOMPARE(testModel.index(4,1).data().value<QChar>(),QChar(QLatin1Char('e')));
+    QCOMPARE(testModel.index(5,1).data().value<QChar>(),QChar(QLatin1Char('f')));
+    QCOMPARE(twoIndex.data().value<QChar>(),QChar(QLatin1Char('c')));
     QCOMPARE(twoIndex.row(),0);
     for(QSignalSpy* spy : spyArr){
         QCOMPARE(spy->count(),1);
@@ -1593,13 +1593,13 @@ void tst_GenericModel::moveRowsTable()
     QCOMPARE(testModel.index(3,0).data().toInt(),4);
     QCOMPARE(testModel.index(4,0).data().toInt(),5);
     QCOMPARE(testModel.index(5,0).data().toInt(),2);
-    QCOMPARE(testModel.index(0,1).data().value<QChar>(),QChar('a'));
-    QCOMPARE(testModel.index(1,1).data().value<QChar>(),QChar('b'));
-    QCOMPARE(testModel.index(2,1).data().value<QChar>(),QChar('d'));
-    QCOMPARE(testModel.index(3,1).data().value<QChar>(),QChar('e'));
-    QCOMPARE(testModel.index(4,1).data().value<QChar>(),QChar('f'));
-    QCOMPARE(testModel.index(5,1).data().value<QChar>(),QChar('c'));
-    QCOMPARE(twoIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(testModel.index(0,1).data().value<QChar>(),QChar(QLatin1Char('a')));
+    QCOMPARE(testModel.index(1,1).data().value<QChar>(),QChar(QLatin1Char('b')));
+    QCOMPARE(testModel.index(2,1).data().value<QChar>(),QChar(QLatin1Char('d')));
+    QCOMPARE(testModel.index(3,1).data().value<QChar>(),QChar(QLatin1Char('e')));
+    QCOMPARE(testModel.index(4,1).data().value<QChar>(),QChar(QLatin1Char('f')));
+    QCOMPARE(testModel.index(5,1).data().value<QChar>(),QChar(QLatin1Char('c')));
+    QCOMPARE(twoIndex.data().value<QChar>(),QChar(QLatin1Char('c')));
     QCOMPARE(twoIndex.row(),5);
     for(QSignalSpy* spy : spyArr){
         QCOMPARE(spy->count(),1);
@@ -1620,13 +1620,13 @@ void tst_GenericModel::moveRowsTable()
     QCOMPARE(testModel.index(3,0).data().toInt(),3);
     QCOMPARE(testModel.index(4,0).data().toInt(),4);
     QCOMPARE(testModel.index(5,0).data().toInt(),5);
-    QCOMPARE(testModel.index(0,1).data().value<QChar>(),QChar('c'));
-    QCOMPARE(testModel.index(1,1).data().value<QChar>(),QChar('a'));
-    QCOMPARE(testModel.index(2,1).data().value<QChar>(),QChar('b'));
-    QCOMPARE(testModel.index(3,1).data().value<QChar>(),QChar('d'));
-    QCOMPARE(testModel.index(4,1).data().value<QChar>(),QChar('e'));
-    QCOMPARE(testModel.index(5,1).data().value<QChar>(),QChar('f'));
-    QCOMPARE(oneIndex.data().value<QChar>(),QChar('b'));
+    QCOMPARE(testModel.index(0,1).data().value<QChar>(),QChar(QLatin1Char('c')));
+    QCOMPARE(testModel.index(1,1).data().value<QChar>(),QChar(QLatin1Char('a')));
+    QCOMPARE(testModel.index(2,1).data().value<QChar>(),QChar(QLatin1Char('b')));
+    QCOMPARE(testModel.index(3,1).data().value<QChar>(),QChar(QLatin1Char('d')));
+    QCOMPARE(testModel.index(4,1).data().value<QChar>(),QChar(QLatin1Char('e')));
+    QCOMPARE(testModel.index(5,1).data().value<QChar>(),QChar(QLatin1Char('f')));
+    QCOMPARE(oneIndex.data().value<QChar>(),QChar(QLatin1Char('b')));
     QCOMPARE(oneIndex.row(),2);
     for(QSignalSpy* spy : spyArr){
         QCOMPARE(spy->count(),1);
@@ -1689,13 +1689,13 @@ void tst_GenericModel::moveRowsTreeSameBranch()
     QCOMPARE(testModel.index(3,0,parIndex).data().toInt(),2);
     QCOMPARE(testModel.index(4,0,parIndex).data().toInt(),4);
     QCOMPARE(testModel.index(5,0,parIndex).data().toInt(),5);
-    QCOMPARE(testModel.index(0,1,parIndex).data().value<QChar>(),QChar('a'));
-    QCOMPARE(testModel.index(1,1,parIndex).data().value<QChar>(),QChar('b'));
-    QCOMPARE(testModel.index(2,1,parIndex).data().value<QChar>(),QChar('d'));
-    QCOMPARE(testModel.index(3,1,parIndex).data().value<QChar>(),QChar('c'));
-    QCOMPARE(testModel.index(4,1,parIndex).data().value<QChar>(),QChar('e'));
-    QCOMPARE(testModel.index(5,1,parIndex).data().value<QChar>(),QChar('f'));
-    QCOMPARE(twoIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(testModel.index(0,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('a')));
+    QCOMPARE(testModel.index(1,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('b')));
+    QCOMPARE(testModel.index(2,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('d')));
+    QCOMPARE(testModel.index(3,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('c')));
+    QCOMPARE(testModel.index(4,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('e')));
+    QCOMPARE(testModel.index(5,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('f')));
+    QCOMPARE(twoIndex.data().value<QChar>(),QChar(QLatin1Char('c')));
     QCOMPARE(twoIndex.row(),3);
     for(QSignalSpy* spy : spyArr){
         QCOMPARE(spy->count(),1);
@@ -1716,13 +1716,13 @@ void tst_GenericModel::moveRowsTreeSameBranch()
     QCOMPARE(testModel.index(3,0,parIndex).data().toInt(),3);
     QCOMPARE(testModel.index(4,0,parIndex).data().toInt(),4);
     QCOMPARE(testModel.index(5,0,parIndex).data().toInt(),5);
-    QCOMPARE(testModel.index(0,1,parIndex).data().value<QChar>(),QChar('c'));
-    QCOMPARE(testModel.index(1,1,parIndex).data().value<QChar>(),QChar('a'));
-    QCOMPARE(testModel.index(2,1,parIndex).data().value<QChar>(),QChar('b'));
-    QCOMPARE(testModel.index(3,1,parIndex).data().value<QChar>(),QChar('d'));
-    QCOMPARE(testModel.index(4,1,parIndex).data().value<QChar>(),QChar('e'));
-    QCOMPARE(testModel.index(5,1,parIndex).data().value<QChar>(),QChar('f'));
-    QCOMPARE(twoIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(testModel.index(0,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('c')));
+    QCOMPARE(testModel.index(1,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('a')));
+    QCOMPARE(testModel.index(2,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('b')));
+    QCOMPARE(testModel.index(3,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('d')));
+    QCOMPARE(testModel.index(4,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('e')));
+    QCOMPARE(testModel.index(5,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('f')));
+    QCOMPARE(twoIndex.data().value<QChar>(),QChar(QLatin1Char('c')));
     QCOMPARE(twoIndex.row(),0);
     for(QSignalSpy* spy : spyArr){
         QCOMPARE(spy->count(),1);
@@ -1743,13 +1743,13 @@ void tst_GenericModel::moveRowsTreeSameBranch()
     QCOMPARE(testModel.index(3,0,parIndex).data().toInt(),4);
     QCOMPARE(testModel.index(4,0,parIndex).data().toInt(),5);
     QCOMPARE(testModel.index(5,0,parIndex).data().toInt(),2);
-    QCOMPARE(testModel.index(0,1,parIndex).data().value<QChar>(),QChar('a'));
-    QCOMPARE(testModel.index(1,1,parIndex).data().value<QChar>(),QChar('b'));
-    QCOMPARE(testModel.index(2,1,parIndex).data().value<QChar>(),QChar('d'));
-    QCOMPARE(testModel.index(3,1,parIndex).data().value<QChar>(),QChar('e'));
-    QCOMPARE(testModel.index(4,1,parIndex).data().value<QChar>(),QChar('f'));
-    QCOMPARE(testModel.index(5,1,parIndex).data().value<QChar>(),QChar('c'));
-    QCOMPARE(twoIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(testModel.index(0,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('a')));
+    QCOMPARE(testModel.index(1,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('b')));
+    QCOMPARE(testModel.index(2,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('d')));
+    QCOMPARE(testModel.index(3,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('e')));
+    QCOMPARE(testModel.index(4,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('f')));
+    QCOMPARE(testModel.index(5,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('c')));
+    QCOMPARE(twoIndex.data().value<QChar>(),QChar(QLatin1Char('c')));
     QCOMPARE(twoIndex.row(),5);
     for(QSignalSpy* spy : spyArr){
         QCOMPARE(spy->count(),1);
@@ -1770,13 +1770,13 @@ void tst_GenericModel::moveRowsTreeSameBranch()
     QCOMPARE(testModel.index(3,0,parIndex).data().toInt(),3);
     QCOMPARE(testModel.index(4,0,parIndex).data().toInt(),4);
     QCOMPARE(testModel.index(5,0,parIndex).data().toInt(),5);
-    QCOMPARE(testModel.index(0,1,parIndex).data().value<QChar>(),QChar('c'));
-    QCOMPARE(testModel.index(1,1,parIndex).data().value<QChar>(),QChar('a'));
-    QCOMPARE(testModel.index(2,1,parIndex).data().value<QChar>(),QChar('b'));
-    QCOMPARE(testModel.index(3,1,parIndex).data().value<QChar>(),QChar('d'));
-    QCOMPARE(testModel.index(4,1,parIndex).data().value<QChar>(),QChar('e'));
-    QCOMPARE(testModel.index(5,1,parIndex).data().value<QChar>(),QChar('f'));
-    QCOMPARE(oneIndex.data().value<QChar>(),QChar('b'));
+    QCOMPARE(testModel.index(0,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('c')));
+    QCOMPARE(testModel.index(1,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('a')));
+    QCOMPARE(testModel.index(2,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('b')));
+    QCOMPARE(testModel.index(3,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('d')));
+    QCOMPARE(testModel.index(4,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('e')));
+    QCOMPARE(testModel.index(5,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('f')));
+    QCOMPARE(oneIndex.data().value<QChar>(),QChar(QLatin1Char('b')));
     QCOMPARE(oneIndex.row(),2);
     for(QSignalSpy* spy : spyArr){
         QCOMPARE(spy->count(),1);
@@ -1833,13 +1833,13 @@ void tst_GenericModel::moveRowsNewBranch()
     QCOMPARE(testModel.index(2,0,parIndex).data().toInt(),3);
     QCOMPARE(testModel.index(3,0,parIndex).data().toInt(),4);
     QCOMPARE(testModel.index(4,0,parIndex).data().toInt(),5);
-    QCOMPARE(testModel.index(0,1,destIndex).data().value<QChar>(),QChar('c'));
-    QCOMPARE(testModel.index(0,1,parIndex).data().value<QChar>(),QChar('a'));
-    QCOMPARE(testModel.index(1,1,parIndex).data().value<QChar>(),QChar('b'));
-    QCOMPARE(testModel.index(2,1,parIndex).data().value<QChar>(),QChar('d'));
-    QCOMPARE(testModel.index(3,1,parIndex).data().value<QChar>(),QChar('e'));
-    QCOMPARE(testModel.index(4,1,parIndex).data().value<QChar>(),QChar('f'));
-    QCOMPARE(twoIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(testModel.index(0,1,destIndex).data().value<QChar>(),QChar(QLatin1Char('c')));
+    QCOMPARE(testModel.index(0,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('a')));
+    QCOMPARE(testModel.index(1,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('b')));
+    QCOMPARE(testModel.index(2,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('d')));
+    QCOMPARE(testModel.index(3,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('e')));
+    QCOMPARE(testModel.index(4,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('f')));
+    QCOMPARE(twoIndex.data().value<QChar>(),QChar(QLatin1Char('c')));
     QCOMPARE(twoIndex.row(),0);
     QCOMPARE(twoIndex.parent(),destIndex);
     for(QSignalSpy* spy : spyArr){
@@ -1909,20 +1909,20 @@ void tst_GenericModel::moveRowsExistingBranch()
     QCOMPARE(testModel.index(5,0,destIndex).data().toInt(),13);
     QCOMPARE(testModel.index(6,0,destIndex).data().toInt(),14);
     QCOMPARE(testModel.index(7,0,destIndex).data().toInt(),15);
-    QCOMPARE(testModel.index(0,1,parIndex).data().value<QChar>(),QChar('a'));
-    QCOMPARE(testModel.index(1,1,parIndex).data().value<QChar>(),QChar('b'));
-    QCOMPARE(testModel.index(2,1,parIndex).data().value<QChar>(),QChar('e'));
-    QCOMPARE(testModel.index(3,1,parIndex).data().value<QChar>(),QChar('f'));
+    QCOMPARE(testModel.index(0,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('a')));
+    QCOMPARE(testModel.index(1,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('b')));
+    QCOMPARE(testModel.index(2,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('e')));
+    QCOMPARE(testModel.index(3,1,parIndex).data().value<QChar>(),QChar(QLatin1Char('f')));
     QCOMPARE(testModel.index(0,1,destIndex).data().value<QChar>(),QChar('a'+10));
-    QCOMPARE(testModel.index(1,1,destIndex).data().value<QChar>(),QChar('c'));
-    QCOMPARE(testModel.index(2,1,destIndex).data().value<QChar>(),QChar('d'));
+    QCOMPARE(testModel.index(1,1,destIndex).data().value<QChar>(),QChar(QLatin1Char('c')));
+    QCOMPARE(testModel.index(2,1,destIndex).data().value<QChar>(),QChar(QLatin1Char('d')));
     QCOMPARE(testModel.index(3,1,destIndex).data().value<QChar>(),QChar('b'+10));
     QCOMPARE(testModel.index(4,1,destIndex).data().value<QChar>(),QChar('c'+10));
     QCOMPARE(testModel.index(5,1,destIndex).data().value<QChar>(),QChar('d'+10));
     QCOMPARE(testModel.index(6,1,destIndex).data().value<QChar>(),QChar('e'+10));
     QCOMPARE(testModel.index(7,1,destIndex).data().value<QChar>(),QChar('f'+10));
 
-    QCOMPARE(twoIndex.data().value<QChar>(),QChar('c'));
+    QCOMPARE(twoIndex.data().value<QChar>(),QChar(QLatin1Char('c')));
     QCOMPARE(twoIndex.row(),1);
     QCOMPARE(twoIndex.parent(),destIndex);
     for(QSignalSpy* spy : spyArr){

@@ -482,6 +482,11 @@ GenericModelPrivate::~GenericModelPrivate()
     delete root;
 }
 
+QString GenericModelPrivate::mimeDataName() const
+{
+    return QStringLiteral("application/x-genericmodeldatalist");
+}
+
 GenericModelPrivate::GenericModelPrivate(GenericModel *q)
     : q_ptr(q)
     , root(new GenericModelItem(q))
@@ -907,6 +912,22 @@ QVariant GenericModel::headerData(int section, Qt::Orientation orientation, int 
     if (section >= rowCount())
         return QVariant();
     return d->vHeaderData.at(section).value(role);
+}
+
+/*!
+\reimp
+*/
+QStringList GenericModel::mimeTypes() const
+{
+    QStringList types = QAbstractItemModel::mimeTypes();
+    types
+        << QStringLiteral("text/plain")
+        << QStringLiteral("text/csv")
+        << QStringLiteral("text/xml")
+        << QStringLiteral("text/html")
+        << QStringLiteral("application/json")
+    ;
+    return types;
 }
 
 /*!

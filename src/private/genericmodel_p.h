@@ -64,6 +64,7 @@ class GenericModelPrivate
     Q_DISABLE_COPY(GenericModelPrivate)
     GenericModelPrivate(GenericModel *q);
     virtual ~GenericModelPrivate();
+    QString mimeDataName() const;
     GenericModelItem *itemForIndex(const QModelIndex &idx) const;
     QModelIndex indexForItem(GenericModelItem *item) const;
     void insertColumns(int column, int count, const QModelIndex &parent = QModelIndex());

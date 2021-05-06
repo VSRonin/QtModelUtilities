@@ -39,7 +39,7 @@ macro(BasicTest TestName)
     if(NOT NO_GUI)
         target_link_libraries(${targetName} PRIVATE Qt${QT_VERSION_MAJOR}::Gui)
     endif()
-    target_compile_definitions(${targetName} PRIVATE QT_NO_CAST_TO_ASCII)
+    target_compile_definitions(${targetName} PRIVATE QT_NO_CAST_FROM_ASCII QT_NO_CAST_TO_ASCII)
     set_target_properties(${targetName} PROPERTIES
         AUTOMOC ON
         CXX_STANDARD 11

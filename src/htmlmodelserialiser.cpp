@@ -65,7 +65,7 @@ void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter &destination,
             for (QList<int>::const_iterator roleIter = m_rolesToSave.constBegin(); roleIter != m_rolesToSave.constEnd(); ++roleIter) {
                 const QVariant headData = m_constModel->headerData(i, Qt::Horizontal, *roleIter);
                 if (!headData.isNull()) {
-                    destination.writeStartElement("div");
+                    destination.writeStartElement(QStringLiteral("div"));
                     destination.writeAttribute(QStringLiteral("data-rolecode"), QString::number(*roleIter));
                     destination.writeAttribute(QStringLiteral("data-varianttype"), QString::number(headData.userType()));
                     writeHtmlVariant(destination, headData);
@@ -85,7 +85,7 @@ void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter &destination,
             for (QList<int>::const_iterator roleIter = m_rolesToSave.constBegin(); roleIter != m_rolesToSave.constEnd(); ++roleIter) {
                 const QVariant headData = m_constModel->headerData(i, Qt::Vertical, *roleIter);
                 if (!headData.isNull()) {
-                    destination.writeStartElement("div");
+                    destination.writeStartElement(QStringLiteral("div"));
                     destination.writeAttribute(QStringLiteral("data-rolecode"), QString::number(*roleIter));
                     destination.writeAttribute(QStringLiteral("data-varianttype"), QString::number(headData.userType()));
                     writeHtmlVariant(destination, headData);
@@ -100,7 +100,7 @@ void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter &destination,
             for (QList<int>::const_iterator roleIter = m_rolesToSave.constBegin(); roleIter != m_rolesToSave.constEnd(); ++roleIter) {
                 const QVariant roleData = currIndex.data(*roleIter);
                 if (!roleData.isNull()) {
-                    destination.writeStartElement("div");
+                    destination.writeStartElement(QStringLiteral("div"));
                     destination.writeAttribute(QStringLiteral("data-rolecode"), QString::number(*roleIter));
                     destination.writeAttribute(QStringLiteral("data-varianttype"), QString::number(roleData.userType()));
                     writeHtmlVariant(destination, roleData);
@@ -217,7 +217,7 @@ bool HtmlModelSerialiserPrivate::writeHtml(QXmlStreamWriter &writer) const
         writer.writeEndElement(); // head
         writer.writeStartElement(QStringLiteral("body"));
     }
-    writer.writeStartElement("div");
+    writer.writeStartElement(QStringLiteral("div"));
     writer.writeAttribute(QStringLiteral("data-modelcode"), Magic_Model_Header);
     writeHtmlElement(writer);
     writer.writeEndElement(); // div
@@ -270,7 +270,7 @@ void HtmlModelSerialiserPrivate::writeHtmlVariant(QXmlStreamWriter &writer, cons
 {
     if (isImageType(val.userType())) {
         writer.writeEmptyElement(QStringLiteral("img"));
-        writer.writeAttribute(QStringLiteral("src"), "data:image/png;base64," + saveVariant(val));
+        writer.writeAttribute(QStringLiteral("src"), QLatin1String("data:image/png;base64,") + saveVariant(val));
         writer.writeAttribute(QStringLiteral("alt"), QStringLiteral("modelimage.png"));
         return;
     }
