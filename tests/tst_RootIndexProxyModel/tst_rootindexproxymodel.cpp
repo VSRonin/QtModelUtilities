@@ -4,6 +4,9 @@
 #include <QtTest/QTest>
 #include <QtTest/QSignalSpy>
 #include "../modeltestmanager.h"
+#ifdef QTMODELUTILITIES_GENERICMODEL
+#include <genericmodel.h>
+#endif
 
 QAbstractItemModel *createTreeModel(QObject *parent)
 {
@@ -421,12 +424,250 @@ void tst_RootIndexProxyModel::rootRemoved()
 
 void tst_RootIndexProxyModel::sourceMoveRows()
 {
-    QSKIP("No tree model implements row movement");
+#ifdef QTMODELUTILITIES_GENERICMODEL
+    const auto fillData = [](QAbstractItemModel *model, const QModelIndex& parent = QModelIndex(), int shift =0){
+        for(int i=0,maxI=model->rowCount(parent);i<maxI;++i){
+            for(int j=0,maxJ=model->columnCount(parent);j<maxJ;++j){
+                model->setData(model->index(i,j,parent),i+shift,Qt::UserRole);
+                model->setData(model->index(i,j,parent),j+shift,Qt::UserRole+1);
+            }
+        }
+    };
+    GenericModel baseModel;
+    baseModel.insertColumns(0,2);
+    baseModel.insertRows(0,5);
+    fillData(&baseModel);
+    const QPersistentModelIndex grandParent = baseModel.index(1,0);
+    baseModel.insertColumns(0,2,grandParent);
+    baseModel.insertRows(0,5,grandParent);
+    fillData(&baseModel,grandParent,50);
+    const QPersistentModelIndex parent = baseModel.index(1,0,grandParent);
+    baseModel.insertColumns(0,2,parent);
+    baseModel.insertRows(0,5,parent);
+    fillData(&baseModel,parent,100);
+    RootIndexProxyModel proxyModel;
+    new ModelTest(&proxyModel, &baseModel);
+    proxyModel.setSourceModel(&baseModel);
+    QSignalSpy rowsMovedSpy(&proxyModel,SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)));
+    QVERIFY(rowsMovedSpy.isValid());
+    QSignalSpy rowsAboutToBeMovedSpy(&proxyModel,SIGNAL(rowsAboutToBeMoved(QModelIndex,int,int,QModelIndex,int)));
+    QVERIFY(rowsAboutToBeMovedSpy.isValid());
+    QSignalSpy* moveSpyArr[] = {&rowsMovedSpy,&rowsAboutToBeMovedSpy};
+    QSignalSpy rowsInsertedSpy(&proxyModel,SIGNAL(rowsInserted(QModelIndex,int,int)));
+    QVERIFY(rowsInsertedSpy.isValid());
+    QSignalSpy rowsAboutToBeInsertedSpy(&proxyModel,SIGNAL(rowsAboutToBeInserted(QModelIndex,int,int)));
+    QVERIFY(rowsAboutToBeInsertedSpy.isValid());
+    QSignalSpy* insertSpyArr[] = {&rowsInsertedSpy,&rowsAboutToBeInsertedSpy};
+    QSignalSpy rowsRemovedSpy(&proxyModel,SIGNAL(rowsRemoved(QModelIndex,int,int)));
+    QVERIFY(rowsRemovedSpy.isValid());
+    QSignalSpy rowsAboutToBeRemovedSpy(&proxyModel,SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)));
+    QVERIFY(rowsAboutToBeRemovedSpy.isValid());
+    QSignalSpy* removeSpyArr[] = {&rowsRemovedSpy,&rowsAboutToBeRemovedSpy};
+
+    proxyModel.setRootIndex(grandParent);
+    const QPersistentModelIndex proxyParent = proxyModel.index(1,0);
+    QVERIFY(baseModel.moveRows(QModelIndex(),0,1,QModelIndex(),5));
+    QCOMPARE(proxyModel.rowCount(),5);
+    for(auto&& spy : moveSpyArr)
+        QCOMPARE(spy->count(),0);
+    QVERIFY(baseModel.moveRows(grandParent,0,1,grandParent,5));
+    QCOMPARE(proxyModel.rowCount(),5);
+    QCOMPARE(proxyModel.index(4,0).data(Qt::UserRole).toInt(),50);
+    QCOMPARE(proxyModel.index(0,0).data(Qt::UserRole).toInt(),51);
+    QCOMPARE(proxyParent.data(Qt::UserRole).toInt(),51);
+    for(auto&& spy : moveSpyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(0).value<QModelIndex>(),QModelIndex());
+        QCOMPARE(args.at(1).toInt(),0);
+        QCOMPARE(args.at(2).toInt(),0);
+        QCOMPARE(args.at(3).value<QModelIndex>(),QModelIndex());
+        QCOMPARE(args.at(4).toInt(),5);
+    }
+    QVERIFY(baseModel.moveRows(parent,0,1,parent,5));
+    QCOMPARE(proxyModel.rowCount(proxyParent),5);
+    QCOMPARE(proxyModel.index(4,0,proxyParent).data(Qt::UserRole).toInt(),100);
+    QCOMPARE(proxyModel.index(0,0,proxyParent).data(Qt::UserRole).toInt(),101);
+    for(auto&& spy : moveSpyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(0).value<QModelIndex>(),proxyParent);
+        QCOMPARE(args.at(1).toInt(),0);
+        QCOMPARE(args.at(2).toInt(),0);
+        QCOMPARE(args.at(3).value<QModelIndex>(),proxyParent);
+        QCOMPARE(args.at(4).toInt(),5);
+    }
+    QVERIFY(baseModel.moveRows(parent,0,1,grandParent,5));
+    QCOMPARE(proxyModel.rowCount(proxyParent),4);
+    QCOMPARE(proxyModel.rowCount(),6);
+    QCOMPARE(proxyModel.index(4,0).data(Qt::UserRole).toInt(),50);
+    QCOMPARE(proxyModel.index(0,0).data(Qt::UserRole).toInt(),51);
+    QCOMPARE(proxyModel.index(5,0).data(Qt::UserRole).toInt(),101);
+    for(auto&& spy : moveSpyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(0).value<QModelIndex>(),proxyParent);
+        QCOMPARE(args.at(1).toInt(),0);
+        QCOMPARE(args.at(2).toInt(),0);
+        QCOMPARE(args.at(3).value<QModelIndex>(),QModelIndex());
+        QCOMPARE(args.at(4).toInt(),5);
+    }
+    QVERIFY(baseModel.moveRows(parent,0,1,QModelIndex(),5));
+    QCOMPARE(proxyModel.rowCount(proxyParent),3);
+    QCOMPARE(proxyModel.rowCount(),6);
+    for(auto&& spy : moveSpyArr)
+        QCOMPARE(spy->count(),0);
+    for(auto&& spy : removeSpyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(0).value<QModelIndex>(),proxyParent);
+        QCOMPARE(args.at(1).toInt(),0);
+        QCOMPARE(args.at(2).toInt(),0);
+    }
+    QVERIFY(baseModel.moveRows(QModelIndex(),2,1,parent,3));
+    QCOMPARE(proxyModel.rowCount(proxyParent),4);
+    QCOMPARE(proxyModel.index(3,0,proxyParent).data(Qt::UserRole).toInt(),3);
+    QCOMPARE(proxyModel.rowCount(),6);
+    for(auto&& spy : moveSpyArr)
+        QCOMPARE(spy->count(),0);
+    for(auto&& spy : insertSpyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(0).value<QModelIndex>(),proxyParent);
+        QCOMPARE(args.at(1).toInt(),3);
+        QCOMPARE(args.at(2).toInt(),3);
+    }
+    QVERIFY(baseModel.moveRows(QModelIndex(),0,1,QModelIndex(),5));
+    QCOMPARE(proxyModel.rowCount(),6);
+    for(auto&& spy : moveSpyArr)
+        QCOMPARE(spy->count(),0);
+#else
+    QSKIP("This test requires the GenericModel module");
+#endif
 }
 
 void tst_RootIndexProxyModel::sourceMoveColumns()
 {
-    QSKIP("No tree model implements column movement");
+#ifdef QTMODELUTILITIES_GENERICMODEL
+    const auto fillData = [](QAbstractItemModel *model, const QModelIndex& parent = QModelIndex(), int shift =0){
+        for(int i=0,maxI=model->rowCount(parent);i<maxI;++i){
+            for(int j=0,maxJ=model->columnCount(parent);j<maxJ;++j){
+                model->setData(model->index(i,j,parent),i+shift,Qt::UserRole);
+                model->setData(model->index(i,j,parent),j+shift,Qt::UserRole+1);
+            }
+        }
+    };
+    GenericModel baseModel;
+    baseModel.insertColumns(0,5);
+    baseModel.insertRows(0,2);
+    fillData(&baseModel);
+    const QPersistentModelIndex grandParent = baseModel.index(1,0);
+    baseModel.insertColumns(0,5,grandParent);
+    baseModel.insertRows(0,2,grandParent);
+    fillData(&baseModel,grandParent,50);
+    const QPersistentModelIndex parent = baseModel.index(1,0,grandParent);
+    baseModel.insertColumns(0,5,parent);
+    baseModel.insertRows(0,2,parent);
+    fillData(&baseModel,parent,100);
+    RootIndexProxyModel proxyModel;
+    new ModelTest(&proxyModel, &baseModel);
+    proxyModel.setSourceModel(&baseModel);
+    QSignalSpy columnsMovedSpy(&proxyModel,SIGNAL(columnsMoved(QModelIndex,int,int,QModelIndex,int)));
+    QVERIFY(columnsMovedSpy.isValid());
+    QSignalSpy columnsAboutToBeMovedSpy(&proxyModel,SIGNAL(columnsAboutToBeMoved(QModelIndex,int,int,QModelIndex,int)));
+    QVERIFY(columnsAboutToBeMovedSpy.isValid());
+    QSignalSpy* moveSpyArr[] = {&columnsMovedSpy,&columnsAboutToBeMovedSpy};
+    QSignalSpy columnsInsertedSpy(&proxyModel,SIGNAL(columnsInserted(QModelIndex,int,int)));
+    QVERIFY(columnsInsertedSpy.isValid());
+    QSignalSpy columnsAboutToBeInsertedSpy(&proxyModel,SIGNAL(columnsAboutToBeInserted(QModelIndex,int,int)));
+    QVERIFY(columnsAboutToBeInsertedSpy.isValid());
+    QSignalSpy* insertSpyArr[] = {&columnsInsertedSpy,&columnsAboutToBeInsertedSpy};
+    QSignalSpy columnsRemovedSpy(&proxyModel,SIGNAL(columnsRemoved(QModelIndex,int,int)));
+    QVERIFY(columnsRemovedSpy.isValid());
+    QSignalSpy columnsAboutToBeRemovedSpy(&proxyModel,SIGNAL(columnsAboutToBeRemoved(QModelIndex,int,int)));
+    QVERIFY(columnsAboutToBeRemovedSpy.isValid());
+    QSignalSpy* removeSpyArr[] = {&columnsRemovedSpy,&columnsAboutToBeRemovedSpy};
+
+    proxyModel.setRootIndex(grandParent);
+    const QPersistentModelIndex proxyParent = proxyModel.index(1,0);
+    QVERIFY(baseModel.moveColumns(QModelIndex(),0,1,QModelIndex(),5));
+    QCOMPARE(proxyModel.columnCount(),5);
+    for(auto&& spy : moveSpyArr)
+        QCOMPARE(spy->count(),0);
+    QVERIFY(baseModel.moveColumns(grandParent,0,1,grandParent,5));
+    QCOMPARE(proxyModel.columnCount(),5);
+    QCOMPARE(proxyModel.index(0,4).data(Qt::UserRole+1).toInt(),50);
+    QCOMPARE(proxyModel.index(0,0).data(Qt::UserRole+1).toInt(),51);
+    QCOMPARE(proxyParent.data(Qt::UserRole+1).toInt(),50);
+    for(auto&& spy : moveSpyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(0).value<QModelIndex>(),QModelIndex());
+        QCOMPARE(args.at(1).toInt(),0);
+        QCOMPARE(args.at(2).toInt(),0);
+        QCOMPARE(args.at(3).value<QModelIndex>(),QModelIndex());
+        QCOMPARE(args.at(4).toInt(),5);
+    }
+    QVERIFY(baseModel.moveColumns(parent,0,1,parent,5));
+    QCOMPARE(proxyModel.columnCount(proxyParent),5);
+    QCOMPARE(proxyModel.index(0,4,proxyParent).data(Qt::UserRole+1).toInt(),100);
+    QCOMPARE(proxyModel.index(0,0,proxyParent).data(Qt::UserRole+1).toInt(),101);
+    for(auto&& spy : moveSpyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(0).value<QModelIndex>(),proxyParent);
+        QCOMPARE(args.at(1).toInt(),0);
+        QCOMPARE(args.at(2).toInt(),0);
+        QCOMPARE(args.at(3).value<QModelIndex>(),proxyParent);
+        QCOMPARE(args.at(4).toInt(),5);
+    }
+    QVERIFY(baseModel.moveColumns(parent,0,1,grandParent,5));
+    QCOMPARE(proxyModel.columnCount(proxyParent),4);
+    QCOMPARE(proxyModel.columnCount(),6);
+    QCOMPARE(proxyModel.index(0,4).data(Qt::UserRole+1).toInt(),50);
+    QCOMPARE(proxyModel.index(0,0).data(Qt::UserRole+1).toInt(),51);
+    QCOMPARE(proxyModel.index(0,5).data(Qt::UserRole+1).toInt(),101);
+    for(auto&& spy : moveSpyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(0).value<QModelIndex>(),proxyParent);
+        QCOMPARE(args.at(1).toInt(),0);
+        QCOMPARE(args.at(2).toInt(),0);
+        QCOMPARE(args.at(3).value<QModelIndex>(),QModelIndex());
+        QCOMPARE(args.at(4).toInt(),5);
+    }
+    QVERIFY(baseModel.moveColumns(parent,0,1,QModelIndex(),5));
+    QCOMPARE(proxyModel.columnCount(proxyParent),3);
+    QCOMPARE(proxyModel.columnCount(),6);
+    for(auto&& spy : moveSpyArr)
+        QCOMPARE(spy->count(),0);
+    for(auto&& spy : removeSpyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(0).value<QModelIndex>(),proxyParent);
+        QCOMPARE(args.at(1).toInt(),0);
+        QCOMPARE(args.at(2).toInt(),0);
+    }
+    QVERIFY(baseModel.moveColumns(QModelIndex(),2,1,parent,3));
+    QCOMPARE(proxyModel.columnCount(proxyParent),4);
+    QCOMPARE(proxyModel.index(0,3,proxyParent).data(Qt::UserRole+1).toInt(),3);
+    QCOMPARE(proxyModel.columnCount(),6);
+    for(auto&& spy : moveSpyArr)
+        QCOMPARE(spy->count(),0);
+    for(auto&& spy : insertSpyArr){
+        QCOMPARE(spy->count(),1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(0).value<QModelIndex>(),proxyParent);
+        QCOMPARE(args.at(1).toInt(),3);
+        QCOMPARE(args.at(2).toInt(),3);
+    }
+    QVERIFY(baseModel.moveColumns(QModelIndex(),0,1,QModelIndex(),5));
+    QCOMPARE(proxyModel.columnCount(),6);
+    for(auto&& spy : moveSpyArr)
+        QCOMPARE(spy->count(),0);
+#else
+    QSKIP("This test requires the GenericModel module");
+#endif
 }
 
 void tst_RootIndexProxyModel::sourceSortDescendantOfRoot()
