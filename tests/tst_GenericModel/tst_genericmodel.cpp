@@ -901,6 +901,17 @@ void tst_GenericModel::data()
             QCOMPARE(itemData.value(Qt::ToolTipRole).toString(), tooltipString);
             QCOMPARE(itemData.value(Qt::UserRole + 5).toInt(), r + c);
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+            QModelRoleData rolesData[] = {QModelRoleData(Qt::EditRole),QModelRoleData(Qt::DisplayRole),QModelRoleData(Qt::ToolTipRole),QModelRoleData(Qt::UserRole + 5),QModelRoleData(Qt::DecorationRole)};
+            QModelRoleDataSpan span(rolesData);
+            testModel.multiData(idx,span);
+            QCOMPARE(span.dataForRole(Qt::EditRole)->toString(), displayString);
+            QCOMPARE(span.dataForRole(Qt::DisplayRole)->toString(), displayString);
+            QCOMPARE(span.dataForRole(Qt::ToolTipRole)->toString(), tooltipString);
+            QCOMPARE(span.dataForRole(Qt::UserRole + 5)->toInt(), r + c);
+            QVERIFY(!span.dataForRole(Qt::DecorationRole)->isValid());
+#endif
+
             testModel.insertColumn(0, idx);
             testModel.insertRow(0, idx);
             const QModelIndex childIdx = testModel.index(0, 0, idx);
@@ -929,6 +940,15 @@ void tst_GenericModel::data()
             QCOMPARE(itemData.value(Qt::EditRole).toString(), displayString);
             QCOMPARE(itemData.value(Qt::DisplayRole).toString(), displayString);
             QCOMPARE(itemData.value(Qt::UserRole + 5).toInt(), r + c);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+            testModel.multiData(childIdx,span);
+            QCOMPARE(span.dataForRole(Qt::EditRole)->toString(), displayString);
+            QCOMPARE(span.dataForRole(Qt::DisplayRole)->toString(), displayString);
+            QVERIFY(!span.dataForRole(Qt::ToolTipRole)->isValid());
+            QCOMPARE(span.dataForRole(Qt::UserRole + 5)->toInt(), r + c);
+            QVERIFY(!span.dataForRole(Qt::DecorationRole)->isValid());
+#endif
         }
     }
     QVERIFY(testModel.itemData(QModelIndex()).isEmpty());

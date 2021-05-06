@@ -48,7 +48,7 @@ The library should be compatible with all platform supported by Qt, the CI will 
 A reduced suite of tests, to ensure compatibility, is also run on:
 
 + Ubuntu g++ 64bit Qt 5.12
-+ Ubuntu Xenial g++ 5 64bit Qt 5.9
++ Ubuntu g++ 64bit Qt 5.9
 + Ubuntu Trusty g++ 6 64bit Qt 5.1
 
 ### Examples
