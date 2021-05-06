@@ -979,7 +979,7 @@ void tst_GenericModel::headerData()
         QCOMPARE(dataChangedSpy.count(),0);
         QCOMPARE(headerDataChangedSpy.count(),1);
         auto args = headerDataChangedSpy.takeFirst();
-        QCOMPARE(args.at(0).toInt(),orientation);
+        QCOMPARE(args.at(0).toInt(),static_cast<int>(orientation));
         QCOMPARE(args.at(1).toInt(),i);
         QCOMPARE(args.at(2).toInt(),i);
         QVERIFY(testModel.setHeaderData(i,orientation,headString));
@@ -991,7 +991,7 @@ void tst_GenericModel::headerData()
         QCOMPARE(dataChangedSpy.count(),0);
         QCOMPARE(headerDataChangedSpy.count(),1);
         args = headerDataChangedSpy.takeFirst();
-        QCOMPARE(args.at(0).toInt(),orientation);
+        QCOMPARE(args.at(0).toInt(),static_cast<int>(orientation));
         QCOMPARE(args.at(1).toInt(),i);
         QCOMPARE(args.at(2).toInt(),i);
         QVERIFY(testModel.setHeaderData(i,orientation,i,Qt::UserRole));
@@ -2533,7 +2533,7 @@ void tst_GenericModel::roleNames()
     QCOMPARE(args.at(1).value<QModelIndex>(),testModel.index(2,4));
     const auto roleNs = testModel.roleNames();
     QCOMPARE(roleNs.size(),1);
-    QCOMPARE(roleNs.begin().key(),Qt::UserRole);
+    QCOMPARE(roleNs.begin().key(),static_cast<int>(Qt::UserRole));
     QCOMPARE(roleNs.begin().value(),QByteArrayLiteral("myrole"));
     testModel.setRoleNames(QHash<int,QByteArray>());
     QCOMPARE(dataChangedSpy.count(), 2);

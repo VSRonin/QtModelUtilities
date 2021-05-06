@@ -491,10 +491,10 @@ void tst_RootIndexProxyModel::sourceMoveRows()
     for(auto&& spy : moveSpyArr){
         QCOMPARE(spy->count(),1);
         const auto args = spy->takeFirst();
-        QCOMPARE(args.at(0).value<QModelIndex>(),proxyParent);
+        QCOMPARE(args.at(0).value<QModelIndex>(),QModelIndex(proxyParent));
         QCOMPARE(args.at(1).toInt(),0);
         QCOMPARE(args.at(2).toInt(),0);
-        QCOMPARE(args.at(3).value<QModelIndex>(),proxyParent);
+        QCOMPARE(args.at(3).value<QModelIndex>(),QModelIndex(proxyParent));
         QCOMPARE(args.at(4).toInt(),5);
     }
     QVERIFY(baseModel.moveRows(parent,0,1,grandParent,5));
@@ -506,7 +506,7 @@ void tst_RootIndexProxyModel::sourceMoveRows()
     for(auto&& spy : moveSpyArr){
         QCOMPARE(spy->count(),1);
         const auto args = spy->takeFirst();
-        QCOMPARE(args.at(0).value<QModelIndex>(),proxyParent);
+        QCOMPARE(args.at(0).value<QModelIndex>(),QModelIndex(proxyParent));
         QCOMPARE(args.at(1).toInt(),0);
         QCOMPARE(args.at(2).toInt(),0);
         QCOMPARE(args.at(3).value<QModelIndex>(),QModelIndex());
@@ -520,7 +520,7 @@ void tst_RootIndexProxyModel::sourceMoveRows()
     for(auto&& spy : removeSpyArr){
         QCOMPARE(spy->count(),1);
         const auto args = spy->takeFirst();
-        QCOMPARE(args.at(0).value<QModelIndex>(),proxyParent);
+        QCOMPARE(args.at(0).value<QModelIndex>(),QModelIndex(proxyParent));
         QCOMPARE(args.at(1).toInt(),0);
         QCOMPARE(args.at(2).toInt(),0);
     }
@@ -533,7 +533,7 @@ void tst_RootIndexProxyModel::sourceMoveRows()
     for(auto&& spy : insertSpyArr){
         QCOMPARE(spy->count(),1);
         const auto args = spy->takeFirst();
-        QCOMPARE(args.at(0).value<QModelIndex>(),proxyParent);
+        QCOMPARE(args.at(0).value<QModelIndex>(),QModelIndex(proxyParent));
         QCOMPARE(args.at(1).toInt(),3);
         QCOMPARE(args.at(2).toInt(),3);
     }
