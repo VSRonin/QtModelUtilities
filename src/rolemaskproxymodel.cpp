@@ -14,9 +14,16 @@
 #include "private/rolemaskproxymodel_p.h"
 #include <QVector>
 
-/*!
-\internal
-*/
+MaskedItem::MaskedItem(const RolesContainer &data, const QModelIndex &index)
+    :m_data(data)
+    ,m_index(index)
+{}
+
+MaskedItem::MaskedItem(const RolesContainer &data, const QPersistentModelIndex &index)
+    :m_data(data)
+    ,m_index(index)
+{}
+
 RoleMaskProxyModelPrivate::RoleMaskProxyModelPrivate(RoleMaskProxyModel *q)
     : q_ptr(q)
     , m_transparentIfEmpty(true)
@@ -25,9 +32,6 @@ RoleMaskProxyModelPrivate::RoleMaskProxyModelPrivate(RoleMaskProxyModel *q)
     Q_ASSERT(q_ptr);
 }
 
-/*!
-\internal
-*/
 void RoleMaskProxyModelPrivate::interceptDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
     Q_Q(RoleMaskProxyModel);
@@ -50,7 +54,11 @@ void RoleMaskProxyModelPrivate::interceptDataChanged(const QModelIndex &topLeft,
                 bool allOpaque = true;
                 for (int i = topLeft.row(); allOpaque && i <= bottomRight.row(); ++i) {
                     for (int j = topLeft.column(); allOpaque && j <= bottomRight.column(); ++j) {
-                        allOpaque = m_maskedData.value(q->sourceModel()->index(i, j, topLeft.parent())).value(singleRole).isValid();
+                        const RolesContainer *data =dataForIndex(q->sourceModel()->index(i, j, topLeft.parent()));
+                        if(data)
+                            allOpaque = data->value(singleRole).isValid();
+                        else
+                            allOpaque=false;
                     }
                 }
                 if (allOpaque)
@@ -68,58 +76,133 @@ void RoleMaskProxyModelPrivate::interceptDataChanged(const QModelIndex &topLeft,
     q->dataChanged(q->mapFromSource(topLeft), q->mapFromSource(bottomRight), filteredRoles);
 }
 
-/*!
-\internal
-*/
+const RolesContainer *RoleMaskProxyModelPrivate::dataForIndex(const QModelIndex &index) const
+{
+    if(!index.isValid())
+        return nullptr;
+    Q_ASSERT(index.model()==q_func()->sourceModel());
+    const QPair<int,int> hashKey = qMakePair(index.row(),index.column());
+    for(auto i=m_masked.constFind(hashKey), iEnd = m_masked.constEnd();i!=iEnd && i.key()==hashKey;++i){
+        if(i->m_index==index)
+            return &(i->m_data);
+    }
+    return nullptr;
+}
+
+RolesContainer *RoleMaskProxyModelPrivate::dataForIndex(const QModelIndex &index)
+{
+    if(!index.isValid())
+        return nullptr;
+    Q_ASSERT(index.model()==q_func()->sourceModel());
+    const QPair<int,int> hashKey = qMakePair(index.row(),index.column());
+    for(auto i=m_masked.find(hashKey), iEnd = m_masked.end();i!=iEnd && i.key()==hashKey;++i){
+        if(i->m_index==index)
+            return &(i->m_data);
+    }
+    return nullptr;
+}
+
+void RoleMaskProxyModelPrivate::insertData(const QModelIndex &index, const RolesContainer &data)
+{
+    Q_ASSERT(index.isValid());
+    Q_ASSERT(index.model()==q_func()->sourceModel());
+    const QPair<int,int> hashKey = qMakePair(index.row(),index.column());
+    m_masked.insert(hashKey,MaskedItem(data,index));
+}
+
+void RoleMaskProxyModelPrivate::onRowsAboutToBeInserted(const QModelIndex &parent, int start, int end)
+{
+    const int count = end-start+1;
+    Q_ASSERT(!parent.isValid() || parent.model()==q_func()->sourceModel());
+    decltype(m_masked) maskedToAdd;
+    for(auto i=m_masked.begin(), iEnd = m_masked.end();i!=iEnd;){
+        if(i->m_index.parent()==parent){
+            if(i.key().first>=start){
+                maskedToAdd.insert(qMakePair(i.key().first+count,i.key().second),i.value());
+                i = m_masked.erase(i);
+                continue;
+            }
+        }
+        ++i;
+    }
+    for(auto i=maskedToAdd.begin(), iEnd = maskedToAdd.end();i!=iEnd;++i)
+        m_masked.insert(i.key(),i.value());
+}
+
+void RoleMaskProxyModelPrivate::onColumnsAboutToBeInserted(const QModelIndex &parent, int start, int end)
+{
+    const int count = end-start+1;
+    Q_ASSERT(!parent.isValid() || parent.model()==q_func()->sourceModel());
+    decltype(m_masked) maskedToAdd;
+    for(auto i=m_masked.begin(), iEnd = m_masked.end();i!=iEnd;){
+        if(i->m_index.parent()==parent){
+            if(i.key().second>=start){
+                maskedToAdd.insert(qMakePair(i.key().first,i.key().second+count),i.value());
+                i = m_masked.erase(i);
+                continue;
+            }
+        }
+        ++i;
+    }
+    for(auto i=maskedToAdd.begin(), iEnd = maskedToAdd.end();i!=iEnd;++i)
+        m_masked.insert(i.key(),i.value());
+}
+
 void RoleMaskProxyModelPrivate::clearUnusedMaskedRoles(const QSet<int> &newRoles)
 {
     if (newRoles.isEmpty()) {
-        m_maskedData.clear();
+        m_masked.clear();
         return;
     }
-    const auto idxEnd = m_maskedData.end();
-    for (auto idxIter = m_maskedData.begin(); idxIter != idxEnd;) {
-        const auto roleEnd = idxIter->end();
-        for (auto roleIter = idxIter->begin(); roleIter != roleEnd;) {
+    const auto idxEnd = m_masked.end();
+    for (auto idxIter = m_masked.begin(); idxIter != idxEnd;) {
+        const auto roleEnd = idxIter->m_data.end();
+        for (auto roleIter = idxIter->m_data.begin(); roleIter != roleEnd;) {
             if (!newRoles.contains(roleIter.key()))
-                roleIter = idxIter->erase(roleIter);
+                roleIter = idxIter->m_data.erase(roleIter);
             else
                 ++roleIter;
         }
-        if (idxIter->isEmpty())
-            idxIter = m_maskedData.erase(idxIter);
+        if (idxIter->m_data.isEmpty())
+            idxIter = m_masked.erase(idxIter);
         else
             ++idxIter;
     }
 }
 
-/*!
-\internal
-*/
-bool RoleMaskProxyModelPrivate::removeRole(const QPersistentModelIndex &idx, int role)
+bool RoleMaskProxyModelPrivate::removeRole(const QModelIndex &idx, int role)
 {
-    const auto idxIter = m_maskedData.find(idx);
-    return removeRole(idxIter, role);
-}
-
-/*!
-\internal
-*/
-bool RoleMaskProxyModelPrivate::removeRole(const QHash<QPersistentModelIndex, RolesContainer>::iterator &idxIter, int role)
-{
-    if (idxIter == m_maskedData.end())
+    if(!idx.isValid())
         return false;
-    if (idxIter->remove(role) > 0) {
-        if (idxIter->isEmpty())
-            m_maskedData.erase(idxIter);
-        return true;
+    Q_ASSERT(idx.model()==q_func()->sourceModel());
+    const QPair<int,int> hashKey = qMakePair(idx.row(),idx.column());
+    for(auto i=m_masked.find(hashKey), iEnd = m_masked.end();i!=iEnd && i.key()==hashKey;++i){
+        if(i->m_index==idx){
+            if(i->m_data.remove(role) > 0){
+                if(i->m_data.isEmpty())
+                    m_masked.erase(i);
+                return true;
+            }
+        }
     }
     return false;
 }
 
-/*!
-\internal
-*/
+bool RoleMaskProxyModelPrivate::removeIndex(const QModelIndex &idx)
+{
+    if(!idx.isValid())
+        return false;
+    Q_ASSERT(idx.model()==q_func()->sourceModel());
+    const QPair<int,int> hashKey = qMakePair(idx.row(),idx.column());
+    for(auto i=m_masked.find(hashKey), iEnd = m_masked.end();i!=iEnd && i.key()==hashKey;++i){
+        if(i->m_index==idx){
+            m_masked.erase(i);
+            return true;
+        }
+    }
+    return false;
+}
+
 void RoleMaskProxyModelPrivate::signalAllChanged(const QVector<int> &roles, const QModelIndex &parent)
 {
     Q_Q(RoleMaskProxyModel);
@@ -282,15 +365,18 @@ void RoleMaskProxyModel::setSourceModel(QAbstractItemModel *sourceMdl)
     for (auto discIter = d->m_sourceConnections.cbegin(); discIter != d->m_sourceConnections.cend(); ++discIter)
         QObject::disconnect(*discIter);
     d->m_sourceConnections.clear();
-    d->m_maskedData.clear();
+    d->m_masked.clear();
     QIdentityProxyModel::setSourceModel(sourceMdl);
     if (sourceModel()) {
         Q_ASSUME(sourceModel()->disconnect(SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)), this));
         d->m_sourceConnections << QObject::connect(sourceModel(), &QAbstractItemModel::dataChanged,
                                                    [d](const QModelIndex &topLeft, const QModelIndex &bottomRight,
                                                        const QVector<int> &roles) -> void { d->interceptDataChanged(topLeft, bottomRight, roles); })
-                               << QObject::connect(sourceModel(), &QAbstractItemModel::modelReset, [d]() -> void { d->m_maskedData.clear(); })
-                               << QObject::connect(sourceModel(), &QAbstractItemModel::destroyed, [this]() -> void { setSourceModel(Q_NULLPTR); });
+                               << QObject::connect(sourceModel(), &QAbstractItemModel::modelReset, [d]() -> void { d->m_masked.clear(); })
+                               << QObject::connect(sourceModel(), &QAbstractItemModel::destroyed, [this]() -> void { setSourceModel(Q_NULLPTR); })
+        << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeInserted, [d](const QModelIndex &parent, int start, int end){d->onRowsAboutToBeInserted(parent,start,end);})
+           << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeInserted, [d](const QModelIndex &parent, int start, int end){d->onColumnsAboutToBeInserted(parent,start,end);})
+                ;
     }
 }
 
@@ -306,10 +392,10 @@ QVariant RoleMaskProxyModel::data(const QModelIndex &proxyIndex, int role) const
     if (!d->m_maskedRoles.contains(adjRole))
         return QIdentityProxyModel::data(proxyIndex, role);
     const QModelIndex sourceIndex = mapToSource(proxyIndex);
-    const auto idxIter = d->m_maskedData.constFind(sourceIndex);
-    if (idxIter != d->m_maskedData.constEnd()) {
-        const auto roleIter = idxIter->constFind(adjRole);
-        if (roleIter != idxIter->constEnd())
+    const RolesContainer* idxData = d->dataForIndex(sourceIndex);
+    if (idxData) {
+        const auto roleIter = idxData->constFind(adjRole);
+        if (roleIter != idxData->constEnd())
             return roleIter.value();
     }
     if (d->m_transparentIfEmpty)
@@ -333,28 +419,29 @@ bool RoleMaskProxyModel::setData(const QModelIndex &proxyIndex, const QVariant &
         return QIdentityProxyModel::setData(proxyIndex, value, role);
     const QModelIndex sourceIndex = mapToSource(proxyIndex);
     Q_ASSERT(sourceIndex.isValid());
-    auto idxIter = d->m_maskedData.find(sourceIndex);
-    if (idxIter == d->m_maskedData.end()) {
+    RolesContainer* idxData = d->dataForIndex(sourceIndex);
+    if (!idxData) {
         if (!value.isValid()) {
             return true;
         } else {
-            idxIter = d->m_maskedData.insert(sourceIndex, RolesContainer());
-            idxIter->insert(role, value);
+            RolesContainer newData;
+            newData.insert(role, value);
+            d->insertData(sourceIndex, newData);
             maskedDataChanged(proxyIndex, proxyIndex, changedRolesVector);
             dataChanged(proxyIndex, proxyIndex, changedRolesVector);
             return true;
         }
     }
     if (!value.isValid()) {
-        if (d->removeRole(idxIter, role)) {
+        if (d->removeRole(sourceIndex, role)) {
             maskedDataChanged(proxyIndex, proxyIndex, changedRolesVector);
             dataChanged(proxyIndex, proxyIndex, changedRolesVector);
         }
         return true;
     }
-    const auto roleIter = idxIter->find(role);
-    if (roleIter == idxIter->end())
-        idxIter->insert(role, value);
+    const auto roleIter = idxData->find(role);
+    if (roleIter == idxData->end())
+        idxData->insert(role, value);
     else if (roleIter.value() != value)
         roleIter.value() = value;
     else
@@ -362,6 +449,24 @@ bool RoleMaskProxyModel::setData(const QModelIndex &proxyIndex, const QVariant &
     maskedDataChanged(proxyIndex, proxyIndex, changedRolesVector);
     dataChanged(proxyIndex, proxyIndex, changedRolesVector);
     return true;
+}
+
+/*!
+Removes all the data managed by the proxy model for a certain \a index.
+*/
+void RoleMaskProxyModel::clearMaskedData(const QModelIndex &index)
+{
+    Q_D(RoleMaskProxyModel);
+    const QModelIndex sourceIndex = mapToSource(index);
+    const auto maskedIter = d->dataForIndex(sourceIndex);
+    if (!maskedIter)
+        return;
+    Q_ASSERT(!maskedIter->isEmpty());
+    const QList<int> changedRolesList = maskedIter->keys();
+    const QVector<int> changedRoles = changedRolesList.toVector();
+    Q_ASSUME(d->removeIndex(sourceIndex));
+    maskedDataChanged(index, index, changedRoles);
+    dataChanged(index, index, changedRoles);
 }
 
 /*!
@@ -393,23 +498,24 @@ bool RoleMaskProxyModel::setItemData(const QModelIndex &index, const QMap<int, Q
             rolesForSource.insert(i.key(), i.value());
             continue;
         }
-        auto idxIter = d->m_maskedData.find(sourceIndex);
-        if (idxIter == d->m_maskedData.end()) {
+        auto idxData = d->dataForIndex(sourceIndex);
+        if (!idxData) {
             if (i->isValid()) {
-                idxIter = d->m_maskedData.insert(sourceIndex, RolesContainer());
-                idxIter->insert(i.key(), i.value());
+                RolesContainer newData;
+                newData.insert(i.key(), i.value());
+                d->insertData(sourceIndex, newData);
                 changedRoles << i.key();
             }
             continue;
         }
         if (!i->isValid()) {
-            if (d->removeRole(idxIter, i.key()))
+            if (d->removeRole(sourceIndex, i.key()))
                 changedRoles << i.key();
             continue;
         }
-        const auto roleIter = idxIter->find(i.key());
-        if (roleIter == idxIter->end())
-            idxIter->insert(i.key(), i.value());
+        const auto roleIter = idxData->find(i.key());
+        if (roleIter == idxData->end())
+            idxData->insert(i.key(), i.value());
         else if (roleIter.value() != i.value())
             roleIter.value() = i.value();
         else
@@ -434,9 +540,9 @@ QMap<int, QVariant> RoleMaskProxyModel::itemData(const QModelIndex &index) const
 {
     Q_D(const RoleMaskProxyModel);
     RolesContainer result;
-    const auto maskedIter = d->m_maskedData.constFind(index);
-    if (maskedIter != d->m_maskedData.cend()) {
-        result = maskedIter.value();
+    const auto maskedData = d->dataForIndex(mapToSource(index));
+    if (maskedData) {
+        result = *maskedData;
         const auto displayIter = result.constFind(Qt::DisplayRole);
         if (d->m_mergeDisplayEdit && displayIter != result.cend())
             result.insert(Qt::EditRole, displayIter.value());
@@ -457,27 +563,10 @@ Returns all the data managed by the proxy model for a certain \a index. The key 
 QMap<int, QVariant> RoleMaskProxyModel::maskedItemData(const QModelIndex &index) const
 {
     Q_D(const RoleMaskProxyModel);
-    const auto maskedIter = d->m_maskedData.find(index);
-    if (maskedIter == d->m_maskedData.end())
+    const auto maskedData = d->dataForIndex(mapToSource(index));
+    if (!maskedData)
         return QMap<int, QVariant>();
-    return convertFromContainer<QMap<int, QVariant>>(maskedIter.value());
-}
-
-/*!
-Removes all the data managed by the proxy model for a certain \a index.
-*/
-void RoleMaskProxyModel::clearMaskedData(const QModelIndex &index)
-{
-    Q_D(RoleMaskProxyModel);
-    const auto maskedIter = d->m_maskedData.find(index);
-    if (maskedIter == d->m_maskedData.end())
-        return;
-    Q_ASSERT(!d->m_maskedData.isEmpty());
-    const QList<int> changedRolesList = maskedIter->keys();
-    const QVector<int> changedRoles = changedRolesList.toVector();
-    d->m_maskedData.erase(maskedIter);
-    maskedDataChanged(index, index, changedRoles);
-    dataChanged(index, index, changedRoles);
+    return convertFromContainer<QMap<int, QVariant>>(*maskedData);
 }
 
 /*!
@@ -525,22 +614,22 @@ void RoleMaskProxyModel::setMergeDisplayEdit(bool val)
     if (d->m_mergeDisplayEdit != val) {
         QVector<int> changedRoles({Qt::DisplayRole, Qt::EditRole});
         d->m_mergeDisplayEdit = val;
-        const auto idxEnd = d->m_maskedData.end();
-        for (auto idxIter = d->m_maskedData.begin(); idxIter != idxEnd; ++idxIter) {
+        const auto idxEnd = d->m_masked.end();
+        for (auto idxIter = d->m_masked.begin(); idxIter != idxEnd; ++idxIter) {
             if (val) {
-                if (idxIter->contains(Qt::DisplayRole)) {
-                    idxIter->remove(Qt::EditRole);
+                if (idxIter->m_data.contains(Qt::DisplayRole)) {
+                    idxIter->m_data.remove(Qt::EditRole);
                 } else {
-                    const auto roleIter = idxIter->constFind(Qt::EditRole);
-                    if (roleIter != idxIter->constEnd()) {
-                        idxIter->insert(Qt::DisplayRole, *roleIter);
-                        idxIter->remove(Qt::EditRole);
+                    const auto roleIter = idxIter->m_data.constFind(Qt::EditRole);
+                    if (roleIter != idxIter->m_data.constEnd()) {
+                        idxIter->m_data.insert(Qt::DisplayRole, *roleIter);
+                        idxIter->m_data.remove(Qt::EditRole);
                     }
                 }
             } else {
-                const auto roleIter = idxIter->constFind(Qt::DisplayRole);
-                if (roleIter != idxIter->constEnd()) {
-                    idxIter->insert(Qt::EditRole, *roleIter);
+                const auto roleIter = idxIter->m_data.constFind(Qt::DisplayRole);
+                if (roleIter != idxIter->m_data.constEnd()) {
+                    idxIter->m_data.insert(Qt::EditRole, *roleIter);
                 }
             }
         }
@@ -578,3 +667,5 @@ This signal is emitted whenever a dataChanged() signal is emitted for a role man
 \fn RoleMaskProxyModel::maskedRolesChanged()
 This signal is emitted whenever the list of roles managed by the proxy changes
 */
+
+
