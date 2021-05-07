@@ -203,7 +203,7 @@ bool HtmlModelSerialiserPrivate::writeHtml(QXmlStreamWriter &writer) const
         writer.writeStartElement(QStringLiteral("head"));
         writer.writeEmptyElement(QStringLiteral("meta"));
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-        writer.writeAttribute(QStringLiteral("charset"), writer.codec()->name());
+        writer.writeAttribute(QStringLiteral("charset"), QString::fromLatin1(writer.codec()->name()));
 #else
         writer.writeAttribute(QStringLiteral("charset"), QStringLiteral("UTF-8"));
 #endif

@@ -254,6 +254,16 @@ void tst_RoleMaskProxyModel::testMoveColumn()
 #endif
 }
 
+void tst_RoleMaskProxyModel::testRemoveRows()
+{
+    QSKIP("TODO");
+}
+
+void tst_RoleMaskProxyModel::testRemoveColumns()
+{
+    QSKIP("TODO");
+}
+
 void tst_RoleMaskProxyModel::testInsertRow()
 {
     QFETCH(QAbstractItemModel *, baseModel);
