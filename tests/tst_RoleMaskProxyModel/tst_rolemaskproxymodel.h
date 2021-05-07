@@ -35,7 +35,8 @@ private Q_SLOTS:
     void testSort_data();
     void testSort();
     void testEmptyProxy();
-
+    void testMoveRow();
+    void testMoveColumn();
 private:
     void testTransparentIfEmptyRecurse(const QAbstractItemModel *const baseModel, const RoleMaskProxyModel *const proxyModel,
                                        const QModelIndex &maskedIdx, const QVariant &maskedVal, bool nonMaskedIsNull,

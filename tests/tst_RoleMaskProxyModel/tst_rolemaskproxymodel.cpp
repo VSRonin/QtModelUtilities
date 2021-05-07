@@ -8,6 +8,9 @@
 #include <random>
 #include "tst_rolemaskproxymodel.h"
 #include <../modeltestmanager.h>
+#ifdef QTMODELUTILITIES_GENERICMODEL
+#include <genericmodel.h>
+#endif
 
 QAbstractItemModel *createNullModel(QObject *parent)
 {
@@ -107,16 +110,148 @@ void tst_RoleMaskProxyModel::testUseRoleMask_data()
     QTest::addColumn<QModelIndexList>("magicNumerIndexes");
     QTest::addColumn<bool>("userRoleEditable");
     QAbstractItemModel *baseModel = createListModel(this);
-    QTest::newRow("QStringListModel") << baseModel << QModelIndexList({baseModel->index(0, 0)}) << false;
+    QTest::newRow("List") << baseModel << QModelIndexList({baseModel->index(0, 0)}) << false;
     baseModel = createTableModel(this);
     if (baseModel)
-        QTest::newRow("QStandadItemModel Table") << baseModel << QModelIndexList({baseModel->index(1, 0), baseModel->index(0, 1)}) << true;
+        QTest::newRow("Table") << baseModel << QModelIndexList({baseModel->index(1, 0), baseModel->index(0, 1)}) << true;
     baseModel = createTreeModel(this);
     if (baseModel)
-        QTest::newRow("QStandadItemModel Tree") << baseModel
-                                                << QModelIndexList({baseModel->index(1, 0), baseModel->index(0, 1),
-                                                                    baseModel->index(0, 1, baseModel->index(0, 0))})
-                                                << true;
+        QTest::newRow("Tree") << baseModel << QModelIndexList({baseModel->index(1, 0), baseModel->index(0, 1), baseModel->index(0, 1, baseModel->index(0, 0))}) << true;
+}
+
+void tst_RoleMaskProxyModel::testMoveRow()
+{
+#ifdef QTMODELUTILITIES_GENERICMODEL
+    const auto fillData = [](QAbstractItemModel *model, const QModelIndex& parent = QModelIndex(), int shift =0){
+        for(int i=0,maxI=model->rowCount(parent);i<maxI;++i){
+            for(int j=0,maxJ=model->columnCount(parent);j<maxJ;++j){
+                model->setData(model->index(i,j,parent),i+shift,Qt::UserRole);
+                model->setData(model->index(i,j,parent),j+shift,Qt::UserRole+1);
+            }
+        }
+    };
+    GenericModel baseModel;
+    baseModel.insertColumns(0,2);
+    baseModel.insertRows(0,5);
+    fillData(&baseModel);
+    const QPersistentModelIndex parentIdx = baseModel.index(1,0);
+    baseModel.insertColumns(0,2,parentIdx);
+    baseModel.insertRows(0,5,parentIdx);
+    fillData(&baseModel,parentIdx,50);
+    RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, &baseModel);
+    proxyModel.addMaskedRole(Qt::UserRole);
+    proxyModel.setSourceModel(&baseModel);
+    const QPersistentModelIndex proxyParentIdx = proxyModel.mapFromSource(parentIdx);
+    for (int i = 0; i < proxyModel.rowCount(); ++i)
+        QVERIFY(proxyModel.setData(proxyModel.index(i, 0), 1000 + i, Qt::UserRole));
+    for (int i = 0; i < proxyModel.rowCount(proxyParentIdx); ++i)
+        QVERIFY(proxyModel.setData(proxyModel.index(i, 0,proxyParentIdx), 2000 + i, Qt::UserRole));
+    QVERIFY(proxyModel.moveRows(QModelIndex(),0,1,QModelIndex(),5));
+    QCOMPARE(proxyModel.index(0, 0).data(Qt::UserRole).toInt(),1001);
+    QCOMPARE(proxyModel.index(1, 0).data(Qt::UserRole).toInt(),1002);
+    QCOMPARE(proxyModel.index(2, 0).data(Qt::UserRole).toInt(),1003);
+    QCOMPARE(proxyModel.index(3, 0).data(Qt::UserRole).toInt(),1004);
+    QCOMPARE(proxyModel.index(4, 0).data(Qt::UserRole).toInt(),1000);
+    QCOMPARE(proxyParentIdx.data(Qt::UserRole).toInt(),1001);
+    QVERIFY(proxyModel.moveRows(proxyParentIdx,0,1,proxyParentIdx,5));
+    QCOMPARE(proxyModel.index(0, 0,proxyParentIdx).data(Qt::UserRole).toInt(),2001);
+    QCOMPARE(proxyModel.index(1, 0,proxyParentIdx).data(Qt::UserRole).toInt(),2002);
+    QCOMPARE(proxyModel.index(2, 0,proxyParentIdx).data(Qt::UserRole).toInt(),2003);
+    QCOMPARE(proxyModel.index(3, 0,proxyParentIdx).data(Qt::UserRole).toInt(),2004);
+    QCOMPARE(proxyModel.index(4, 0,proxyParentIdx).data(Qt::UserRole).toInt(),2000);
+    QVERIFY(proxyModel.moveRows(proxyParentIdx,0,1,QModelIndex(),5));
+    QCOMPARE(proxyModel.index(0, 0,proxyParentIdx).data(Qt::UserRole).toInt(),2002);
+    QCOMPARE(proxyModel.index(1, 0,proxyParentIdx).data(Qt::UserRole).toInt(),2003);
+    QCOMPARE(proxyModel.index(2, 0,proxyParentIdx).data(Qt::UserRole).toInt(),2004);
+    QCOMPARE(proxyModel.index(3, 0,proxyParentIdx).data(Qt::UserRole).toInt(),2000);
+    QCOMPARE(proxyModel.index(0, 0).data(Qt::UserRole).toInt(),1001);
+    QCOMPARE(proxyModel.index(1, 0).data(Qt::UserRole).toInt(),1002);
+    QCOMPARE(proxyModel.index(2, 0).data(Qt::UserRole).toInt(),1003);
+    QCOMPARE(proxyModel.index(3, 0).data(Qt::UserRole).toInt(),1004);
+    QCOMPARE(proxyModel.index(4, 0).data(Qt::UserRole).toInt(),1000);
+    QCOMPARE(proxyModel.index(5, 0).data(Qt::UserRole).toInt(),2001);
+    QVERIFY(proxyModel.moveRows(QModelIndex(),1,1,proxyParentIdx,4));
+    QCOMPARE(proxyModel.index(0, 0).data(Qt::UserRole).toInt(),1001);
+    QCOMPARE(proxyModel.index(1, 0).data(Qt::UserRole).toInt(),1003);
+    QCOMPARE(proxyModel.index(2, 0).data(Qt::UserRole).toInt(),1004);
+    QCOMPARE(proxyModel.index(3, 0).data(Qt::UserRole).toInt(),1000);
+    QCOMPARE(proxyModel.index(4, 0).data(Qt::UserRole).toInt(),2001);
+    QCOMPARE(proxyModel.index(0, 0,proxyParentIdx).data(Qt::UserRole).toInt(),2002);
+    QCOMPARE(proxyModel.index(1, 0,proxyParentIdx).data(Qt::UserRole).toInt(),2003);
+    QCOMPARE(proxyModel.index(2, 0,proxyParentIdx).data(Qt::UserRole).toInt(),2004);
+    QCOMPARE(proxyModel.index(3, 0,proxyParentIdx).data(Qt::UserRole).toInt(),2000);
+    QCOMPARE(proxyModel.index(4, 0,proxyParentIdx).data(Qt::UserRole).toInt(),1002);
+#else
+    QSKIP("This test requires the GenericModel module");
+#endif
+}
+
+void tst_RoleMaskProxyModel::testMoveColumn()
+{
+#ifdef QTMODELUTILITIES_GENERICMODEL
+    const auto fillData = [](QAbstractItemModel *model, const QModelIndex& parent = QModelIndex(), int shift =0){
+        for(int i=0,maxI=model->rowCount(parent);i<maxI;++i){
+            for(int j=0,maxJ=model->columnCount(parent);j<maxJ;++j){
+                model->setData(model->index(i,j,parent),i+shift,Qt::UserRole);
+                model->setData(model->index(i,j,parent),j+shift,Qt::UserRole+1);
+            }
+        }
+    };
+    GenericModel baseModel;
+    baseModel.insertColumns(0,5);
+    baseModel.insertRows(0,2);
+    fillData(&baseModel);
+    const QPersistentModelIndex parentIdx = baseModel.index(1,0);
+    baseModel.insertColumns(0,5,parentIdx);
+    baseModel.insertRows(0,2,parentIdx);
+    fillData(&baseModel,parentIdx,50);
+    RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, &baseModel);
+    proxyModel.addMaskedRole(Qt::UserRole);
+    proxyModel.setSourceModel(&baseModel);
+    const QPersistentModelIndex proxyParentIdx = proxyModel.mapFromSource(parentIdx);
+    for (int i = 0; i < proxyModel.columnCount(); ++i)
+        QVERIFY(proxyModel.setData(proxyModel.index(0, i), 1000 + i, Qt::UserRole));
+    for (int i = 0; i < proxyModel.columnCount(proxyParentIdx); ++i)
+        QVERIFY(proxyModel.setData(proxyModel.index(0, i,proxyParentIdx), 2000 + i, Qt::UserRole));
+    QVERIFY(proxyModel.moveColumns(QModelIndex(),0,1,QModelIndex(),5));
+    QCOMPARE(proxyModel.index(0, 0).data(Qt::UserRole).toInt(),1001);
+    QCOMPARE(proxyModel.index(0, 1).data(Qt::UserRole).toInt(),1002);
+    QCOMPARE(proxyModel.index(0, 2).data(Qt::UserRole).toInt(),1003);
+    QCOMPARE(proxyModel.index(0, 3).data(Qt::UserRole).toInt(),1004);
+    QCOMPARE(proxyModel.index(0, 4).data(Qt::UserRole).toInt(),1000);
+    QVERIFY(proxyModel.moveColumns(proxyParentIdx,0,1,proxyParentIdx,5));
+    QCOMPARE(proxyModel.index(0, 0,proxyParentIdx).data(Qt::UserRole).toInt(),2001);
+    QCOMPARE(proxyModel.index(0, 1,proxyParentIdx).data(Qt::UserRole).toInt(),2002);
+    QCOMPARE(proxyModel.index(0, 2,proxyParentIdx).data(Qt::UserRole).toInt(),2003);
+    QCOMPARE(proxyModel.index(0, 3,proxyParentIdx).data(Qt::UserRole).toInt(),2004);
+    QCOMPARE(proxyModel.index(0, 4,proxyParentIdx).data(Qt::UserRole).toInt(),2000);
+    QVERIFY(proxyModel.moveColumns(proxyParentIdx,0,1,QModelIndex(),5));
+    QCOMPARE(proxyModel.index(0, 0,proxyParentIdx).data(Qt::UserRole).toInt(),2002);
+    QCOMPARE(proxyModel.index(0, 1,proxyParentIdx).data(Qt::UserRole).toInt(),2003);
+    QCOMPARE(proxyModel.index(0, 2,proxyParentIdx).data(Qt::UserRole).toInt(),2004);
+    QCOMPARE(proxyModel.index(0, 3,proxyParentIdx).data(Qt::UserRole).toInt(),2000);
+    QCOMPARE(proxyModel.index(0, 0).data(Qt::UserRole).toInt(),1001);
+    QCOMPARE(proxyModel.index(0, 1).data(Qt::UserRole).toInt(),1002);
+    QCOMPARE(proxyModel.index(0, 2).data(Qt::UserRole).toInt(),1003);
+    QCOMPARE(proxyModel.index(0, 3).data(Qt::UserRole).toInt(),1004);
+    QCOMPARE(proxyModel.index(0, 4).data(Qt::UserRole).toInt(),1000);
+    QCOMPARE(proxyModel.index(0, 5).data(Qt::UserRole).toInt(),2001);
+    QVERIFY(proxyModel.moveColumns(QModelIndex(),1,1,proxyParentIdx,4));
+    QCOMPARE(proxyModel.index(0, 0).data(Qt::UserRole).toInt(),1001);
+    QCOMPARE(proxyModel.index(0, 1).data(Qt::UserRole).toInt(),1003);
+    QCOMPARE(proxyModel.index(0, 2).data(Qt::UserRole).toInt(),1004);
+    QCOMPARE(proxyModel.index(0, 3).data(Qt::UserRole).toInt(),1000);
+    QCOMPARE(proxyModel.index(0, 4).data(Qt::UserRole).toInt(),2001);
+    QCOMPARE(proxyModel.index(0, 0,proxyParentIdx).data(Qt::UserRole).toInt(),2002);
+    QCOMPARE(proxyModel.index(0, 1,proxyParentIdx).data(Qt::UserRole).toInt(),2003);
+    QCOMPARE(proxyModel.index(0, 2,proxyParentIdx).data(Qt::UserRole).toInt(),2004);
+    QCOMPARE(proxyModel.index(0, 3,proxyParentIdx).data(Qt::UserRole).toInt(),2000);
+    QCOMPARE(proxyModel.index(0, 4,proxyParentIdx).data(Qt::UserRole).toInt(),1002);
+#else
+    QSKIP("This test requires the GenericModel module");
+#endif
 }
 
 void tst_RoleMaskProxyModel::testInsertRow()
@@ -132,11 +267,11 @@ void tst_RoleMaskProxyModel::testInsertRow()
     proxyModel.setSourceModel(baseModel);
     const int magicNumber = 785874;
     const QModelIndex proxyParent = proxyModel.mapFromSource(parentIndex);
-    for (int i = 0; i < baseModel->rowCount(parentIndex); ++i) {
+    for (int i = 0; i < proxyModel.rowCount(parentIndex); ++i) {
         QVERIFY(proxyModel.setData(proxyModel.index(i, 0, proxyParent), magicNumber + i, Qt::UserRole));
     }
     QVERIFY(baseModel->insertRow(insertIndex, parentIndex));
-    for (int i = 0; i < baseModel->rowCount(parentIndex); ++i) {
+    for (int i = 0; i < proxyModel.rowCount(parentIndex); ++i) {
         if (i == insertIndex)
             QVERIFY(!proxyModel.index(i, 0, proxyParent).data(Qt::UserRole).isValid());
         else if (i > insertIndex)
@@ -766,6 +901,8 @@ void tst_RoleMaskProxyModel::testEmptyProxy()
     QCOMPARE(maskProxyModel.columnCount(), 0);
     QCOMPARE(maskProxyModel.sourceModel(), &emptyProxy);
 }
+
+
 
 void tst_RoleMaskProxyModel::testSetItemData()
 {
