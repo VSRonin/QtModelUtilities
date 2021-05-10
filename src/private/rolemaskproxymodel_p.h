@@ -50,6 +50,11 @@ class RoleMaskProxyModelPrivate
     void insertData(const QModelIndex& index, const RolesContainer& data);
     void onRowsAboutToBeInserted(const QModelIndex &parent, int start, int end);
     void onColumnsAboutToBeInserted(const QModelIndex &parent, int start, int end);
+    void onRowsAboutToBeRemoved(const QModelIndex &parent, int start, int end);
+    void onColumnsAboutToBeRemoved(const QModelIndex &parent, int start, int end);
+    void onLayoutChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint);
+    void onRowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow);
+    void onColumnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn);
 };
 
 #endif // ROLEMASKPROXYMODEL_P_H

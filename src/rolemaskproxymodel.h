@@ -44,6 +44,10 @@ public:
     void setTransparentIfEmpty(bool val);
     bool mergeDisplayEdit() const;
     void setMergeDisplayEdit(bool val);
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    void multiData(const QModelIndex &index, QModelRoleDataSpan roleDataSpan) const override;
+    bool clearItemData(const QModelIndex &index) override;
+#endif
 Q_SIGNALS:
     void mergeDisplayEditChanged(bool val);
     void transparentIfEmptyChanged(bool val);

@@ -35,10 +35,18 @@ private Q_SLOTS:
     void testSort_data();
     void testSort();
     void testEmptyProxy();
-    void testMoveRow();
-    void testMoveColumn();
+    void testMoveRowAfter();
+    void testMoveRowBefore();
+    void testMoveColumnAfter();
+    void testMoveColumnBefore();
+    void testRemoveRows_data();
     void testRemoveRows();
+    void testRemoveColumns_data();
     void testRemoveColumns();
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    void testMultiData();
+    void testClearItemData();
+#endif
 private:
     void testTransparentIfEmptyRecurse(const QAbstractItemModel *const baseModel, const RoleMaskProxyModel *const proxyModel,
                                        const QModelIndex &maskedIdx, const QVariant &maskedVal, bool nonMaskedIsNull,
