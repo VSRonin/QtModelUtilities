@@ -182,7 +182,7 @@ void tst_InsertProxyModel::testCommitSlot()
 #ifdef SKIP_QTBUG_67511
         QVERIFY(proxyDataChangedSpy.count() >= 2);
 #else
-        QCOMPARE(proxyDataChangedSpy.count(),2);
+        QCOMPARE(proxyDataChangedSpy.count(), 2);
 #endif
         proxyDataChangedSpy.clear();
         QCOMPARE(proxyExtraDataChangedSpy.count(), 1);
@@ -194,7 +194,7 @@ void tst_InsertProxyModel::testCommitSlot()
 #ifdef SKIP_QTBUG_67511
         QVERIFY(baseDataChangedSpy.count() > 0);
 #else
-        QCOMPARE(baseDataChangedSpy.count(),1);
+        QCOMPARE(baseDataChangedSpy.count(), 1);
 #endif
         baseDataChangedSpy.clear();
         QCOMPARE(proxy.rowCount(), baseModel->rowCount() + 1);
@@ -607,7 +607,7 @@ void tst_InsertProxyModel::testInsertOnEmptyModel()
     QCOMPARE(baseModel2.rowCount(), 1);
     QCOMPARE(baseModel2.index(0, 1).data().toString(), QStringLiteral("London"));
     QVERIFY(!baseModel2.index(0, 0).data().isValid());
-#ifndef SKIP_QTBUG_92220
+#    ifndef SKIP_QTBUG_92220
     ComplexModel baseModel3;
     InsertProxyModel proxyModel3;
     new ModelTest(&proxyModel3, this);
@@ -622,7 +622,7 @@ void tst_InsertProxyModel::testInsertOnEmptyModel()
     QCOMPARE(baseModel3.rowCount(), 1);
     QCOMPARE(baseModel3.index(0, 1).data().toString(), QStringLiteral("London"));
     QVERIFY(!baseModel3.index(0, 0).data().isValid());
-#endif
+#    endif
 #endif
 }
 
@@ -1004,7 +1004,7 @@ void tst_InsertProxyModel::testCommitSubclass()
 #ifdef SKIP_QTBUG_67511
         QVERIFY(proxyDataChangedSpy.count() >= 3);
 #else
-        QCOMPARE(proxyDataChangedSpy.count(),3);
+        QCOMPARE(proxyDataChangedSpy.count(), 3);
 #endif
         proxyDataChangedSpy.clear();
         QCOMPARE(proxyExtraDataChangedSpy.count(), 2);
@@ -1016,7 +1016,7 @@ void tst_InsertProxyModel::testCommitSubclass()
 #ifdef SKIP_QTBUG_67511
         QVERIFY(baseDataChangedSpy.count() >= 1);
 #else
-        QCOMPARE(baseDataChangedSpy.count(),1);
+        QCOMPARE(baseDataChangedSpy.count(), 1);
 #endif
         baseDataChangedSpy.clear();
         QCOMPARE(proxy.rowCount(), baseModel->rowCount() + 1);

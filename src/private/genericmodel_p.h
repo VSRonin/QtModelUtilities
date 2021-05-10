@@ -19,7 +19,7 @@
 class GenericModelItem
 {
 public:
-    GenericModelItem(GenericModel* model);
+    GenericModelItem(GenericModel *model);
     GenericModelItem(GenericModelItem *par);
     virtual ~GenericModelItem();
     GenericModelItem *childAt(int row, int col) const;
@@ -46,6 +46,7 @@ public:
     void moveChildColumns(int sourceCol, int count, int destinationChild);
     void setRow(int r);
     void setColumn(int c);
+
 private:
     int m_colCount;
     int m_rowCount;
@@ -53,9 +54,9 @@ private:
     int m_column;
     int m_rowSpan;
     int m_colSpan;
-    GenericModel* m_model;
+    GenericModel *m_model;
     QVector<GenericModelItem *> children;
-    void sortChildren(int column, int role, Qt::SortOrder order, bool recursive, const QModelIndexList& persistentIndexes);
+    void sortChildren(int column, int role, Qt::SortOrder order, bool recursive, const QModelIndexList &persistentIndexes);
 };
 
 class GenericModelPrivate
@@ -72,9 +73,11 @@ class GenericModelPrivate
     void removeColumns(int column, int count, const QModelIndex &parent = QModelIndex());
     void removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     void moveRowsSameParent(const QModelIndex &sourceParent, int sourceRow, int count, int destinationChild);
-    void moveRowsDifferentParent(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild);
+    void moveRowsDifferentParent(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent,
+                                 int destinationChild);
     void moveColumnsSameParent(const QModelIndex &sourceParent, int sourceCol, int count, int destinationChild);
-    void moveColumnsDifferentParent(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild);
+    void moveColumnsDifferentParent(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent,
+                                    int destinationChild);
     void setMergeDisplayEdit(bool val);
     void signalAllChanged(const QVector<int> &roles = QVector<int>(), const QModelIndex &parent = QModelIndex());
     GenericModel *q_ptr;
@@ -84,6 +87,7 @@ class GenericModelPrivate
     bool m_mergeDisplayEdit;
     int sortRole;
     QHash<int, QByteArray> m_roleNames;
+
 public:
     static void setMergeDisplayEdit(bool val, RolesContainer &container);
     static bool isVariantLessThan(const QVariant &left, const QVariant &right);

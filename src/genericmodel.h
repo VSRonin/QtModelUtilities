@@ -25,10 +25,11 @@ class MODELUTILITIES_EXPORT GenericModel : public QAbstractItemModel
     Q_DISABLE_COPY(GenericModel)
     Q_DECLARE_PRIVATE_D(m_dptr, GenericModel)
     friend class GenericModelItem;
+
 public:
     explicit GenericModel(QObject *parent = Q_NULLPTR);
     ~GenericModel();
-    void setRoleNames(const QHash<int, QByteArray>& rNames);
+    void setRoleNames(const QHash<int, QByteArray> &rNames);
     QHash<int, QByteArray> roleNames() const override;
     bool insertColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
     bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
@@ -46,14 +47,15 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     // QMimeData *mimeData(const QModelIndexList &indexes) const override;
     QStringList mimeTypes() const override;
-    bool moveColumns(const QModelIndex &sourceParent, int sourceColumn, int count, const QModelIndex &destinationParent, int destinationChild) override;
+    bool moveColumns(const QModelIndex &sourceParent, int sourceColumn, int count, const QModelIndex &destinationParent,
+                     int destinationChild) override;
     bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild) override;
     QModelIndex parent(const QModelIndex &index) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) override;
     bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles) override;
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
-    void sort(int column, const QModelIndex& parent, Qt::SortOrder order = Qt::AscendingOrder, bool recursive = true);
+    void sort(int column, const QModelIndex &parent, Qt::SortOrder order = Qt::AscendingOrder, bool recursive = true);
     QSize span(const QModelIndex &index) const override;
     bool setSpan(const QModelIndex &index, const QSize &size);
     Qt::DropActions supportedDragActions() const override;
@@ -71,6 +73,7 @@ public:
 Q_SIGNALS:
     void mergeDisplayEditChanged(bool val);
     void sortRoleChanged(int val);
+
 protected:
     GenericModel(GenericModelPrivate &dptr, QObject *parent);
     GenericModelPrivate *m_dptr;

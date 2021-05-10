@@ -54,8 +54,9 @@ private Q_SLOTS:
     void moveColumnsFromRootToBranch();
     void moveColumnsFromBranchToRoot();
     void roleNames();
+
 private:
-    void fillTable(QAbstractItemModel *model, int rows,int cols, const QModelIndex& parent = QModelIndex(), int shift =0) const;
+    void fillTable(QAbstractItemModel *model, int rows, int cols, const QModelIndex &parent = QModelIndex(), int shift = 0) const;
 };
 Q_DECLARE_METATYPE(Qt::Orientation)
 #endif // TST_GENERICMODEL_H

@@ -15,14 +15,14 @@
 #include <QVector>
 
 MaskedItem::MaskedItem(const RolesContainer &data, const QModelIndex &index)
-    :m_data(data)
-    ,m_index(index)
-{}
+    : m_data(data)
+    , m_index(index)
+{ }
 
 MaskedItem::MaskedItem(const RolesContainer &data, const QPersistentModelIndex &index)
-    :m_data(data)
-    ,m_index(index)
-{}
+    : m_data(data)
+    , m_index(index)
+{ }
 
 RoleMaskProxyModelPrivate::RoleMaskProxyModelPrivate(RoleMaskProxyModel *q)
     : q_ptr(q)
@@ -54,11 +54,11 @@ void RoleMaskProxyModelPrivate::interceptDataChanged(const QModelIndex &topLeft,
                 bool allOpaque = true;
                 for (int i = topLeft.row(); allOpaque && i <= bottomRight.row(); ++i) {
                     for (int j = topLeft.column(); allOpaque && j <= bottomRight.column(); ++j) {
-                        const RolesContainer *data =dataForIndex(q->sourceModel()->index(i, j, topLeft.parent()));
-                        if(data)
+                        const RolesContainer *data = dataForIndex(q->sourceModel()->index(i, j, topLeft.parent()));
+                        if (data)
                             allOpaque = data->value(singleRole).isValid();
                         else
-                            allOpaque=false;
+                            allOpaque = false;
                     }
                 }
                 if (allOpaque)
@@ -78,12 +78,12 @@ void RoleMaskProxyModelPrivate::interceptDataChanged(const QModelIndex &topLeft,
 
 const RolesContainer *RoleMaskProxyModelPrivate::dataForIndex(const QModelIndex &index) const
 {
-    if(!index.isValid())
+    if (!index.isValid())
         return nullptr;
-    Q_ASSERT(index.model()==q_func()->sourceModel());
-    const QPair<int,int> hashKey = qMakePair(index.row(),index.column());
-    for(auto i=m_masked.constFind(hashKey), iEnd = m_masked.constEnd();i!=iEnd && i.key()==hashKey;++i){
-        if(i->m_index==index)
+    Q_ASSERT(index.model() == q_func()->sourceModel());
+    const QPair<int, int> hashKey = qMakePair(index.row(), index.column());
+    for (auto i = m_masked.constFind(hashKey), iEnd = m_masked.constEnd(); i != iEnd && i.key() == hashKey; ++i) {
+        if (i->m_index == index)
             return &(i->m_data);
     }
     return nullptr;
@@ -91,12 +91,12 @@ const RolesContainer *RoleMaskProxyModelPrivate::dataForIndex(const QModelIndex 
 
 RolesContainer *RoleMaskProxyModelPrivate::dataForIndex(const QModelIndex &index)
 {
-    if(!index.isValid())
+    if (!index.isValid())
         return nullptr;
-    Q_ASSERT(index.model()==q_func()->sourceModel());
-    const QPair<int,int> hashKey = qMakePair(index.row(),index.column());
-    for(auto i=m_masked.find(hashKey), iEnd = m_masked.end();i!=iEnd && i.key()==hashKey;++i){
-        if(i->m_index==index)
+    Q_ASSERT(index.model() == q_func()->sourceModel());
+    const QPair<int, int> hashKey = qMakePair(index.row(), index.column());
+    for (auto i = m_masked.find(hashKey), iEnd = m_masked.end(); i != iEnd && i.key() == hashKey; ++i) {
+        if (i->m_index == index)
             return &(i->m_data);
     }
     return nullptr;
@@ -105,87 +105,87 @@ RolesContainer *RoleMaskProxyModelPrivate::dataForIndex(const QModelIndex &index
 void RoleMaskProxyModelPrivate::insertData(const QModelIndex &index, const RolesContainer &data)
 {
     Q_ASSERT(index.isValid());
-    Q_ASSERT(index.model()==q_func()->sourceModel());
-    const QPair<int,int> hashKey = qMakePair(index.row(),index.column());
-    m_masked.insert(hashKey,MaskedItem(data,index));
+    Q_ASSERT(index.model() == q_func()->sourceModel());
+    const QPair<int, int> hashKey = qMakePair(index.row(), index.column());
+    m_masked.insert(hashKey, MaskedItem(data, index));
 }
 
 void RoleMaskProxyModelPrivate::onRowsAboutToBeInserted(const QModelIndex &parent, int start, int end)
 {
-    const int count = end-start+1;
-    Q_ASSERT(!parent.isValid() || parent.model()==q_func()->sourceModel());
+    const int count = end - start + 1;
+    Q_ASSERT(!parent.isValid() || parent.model() == q_func()->sourceModel());
     decltype(m_masked) maskedToAdd;
-    for(auto i=m_masked.begin(), iEnd = m_masked.end();i!=iEnd;){
-        if(i->m_index.parent()==parent){
-            if(i.key().first>=start){
-                maskedToAdd.insert(qMakePair(i.key().first+count,i.key().second),i.value());
+    for (auto i = m_masked.begin(), iEnd = m_masked.end(); i != iEnd;) {
+        if (i->m_index.parent() == parent) {
+            if (i.key().first >= start) {
+                maskedToAdd.insert(qMakePair(i.key().first + count, i.key().second), i.value());
                 i = m_masked.erase(i);
                 continue;
             }
         }
         ++i;
     }
-    for(auto i=maskedToAdd.begin(), iEnd = maskedToAdd.end();i!=iEnd;++i)
-        m_masked.insert(i.key(),i.value());
+    for (auto i = maskedToAdd.begin(), iEnd = maskedToAdd.end(); i != iEnd; ++i)
+        m_masked.insert(i.key(), i.value());
 }
 
 void RoleMaskProxyModelPrivate::onColumnsAboutToBeInserted(const QModelIndex &parent, int start, int end)
 {
-    const int count = end-start+1;
-    Q_ASSERT(!parent.isValid() || parent.model()==q_func()->sourceModel());
+    const int count = end - start + 1;
+    Q_ASSERT(!parent.isValid() || parent.model() == q_func()->sourceModel());
     decltype(m_masked) maskedToAdd;
-    for(auto i=m_masked.begin(), iEnd = m_masked.end();i!=iEnd;){
-        if(i->m_index.parent()==parent){
-            if(i.key().second>=start){
-                maskedToAdd.insert(qMakePair(i.key().first,i.key().second+count),i.value());
+    for (auto i = m_masked.begin(), iEnd = m_masked.end(); i != iEnd;) {
+        if (i->m_index.parent() == parent) {
+            if (i.key().second >= start) {
+                maskedToAdd.insert(qMakePair(i.key().first, i.key().second + count), i.value());
                 i = m_masked.erase(i);
                 continue;
             }
         }
         ++i;
     }
-    for(auto i=maskedToAdd.begin(), iEnd = maskedToAdd.end();i!=iEnd;++i)
-        m_masked.insert(i.key(),i.value());
+    for (auto i = maskedToAdd.begin(), iEnd = maskedToAdd.end(); i != iEnd; ++i)
+        m_masked.insert(i.key(), i.value());
 }
 
 void RoleMaskProxyModelPrivate::onRowsAboutToBeRemoved(const QModelIndex &parent, int start, int end)
 {
-    const int count = end-start+1;
-    Q_ASSERT(!parent.isValid() || parent.model()==q_func()->sourceModel());
+    const int count = end - start + 1;
+    Q_ASSERT(!parent.isValid() || parent.model() == q_func()->sourceModel());
     decltype(m_masked) maskedToAdd;
-    for(auto i=m_masked.begin(), iEnd = m_masked.end();i!=iEnd;){
-        if(i->m_index.parent()==parent){
-            if(i.key().first>=start){
-                if(i.key().first>end)
-                    maskedToAdd.insert(qMakePair(i.key().first-count,i.key().second),i.value());
+    for (auto i = m_masked.begin(), iEnd = m_masked.end(); i != iEnd;) {
+        if (i->m_index.parent() == parent) {
+            if (i.key().first >= start) {
+                if (i.key().first > end)
+                    maskedToAdd.insert(qMakePair(i.key().first - count, i.key().second), i.value());
                 i = m_masked.erase(i);
                 continue;
             }
         }
         ++i;
     }
-    for(auto i=maskedToAdd.begin(), iEnd = maskedToAdd.end();i!=iEnd;++i)
-        m_masked.insert(i.key(),i.value());
+    for (auto i = maskedToAdd.begin(), iEnd = maskedToAdd.end(); i != iEnd; ++i)
+        m_masked.insert(i.key(), i.value());
 }
 
 void RoleMaskProxyModelPrivate::onColumnsAboutToBeRemoved(const QModelIndex &parent, int start, int end)
 {
-    const int count = end-start+1;
-    Q_ASSERT(!parent.isValid() || parent.model()==q_func()->sourceModel());
+    const int count = end - start + 1;
+    Q_ASSERT(!parent.isValid() || parent.model() == q_func()->sourceModel());
     decltype(m_masked) maskedToAdd;
-    for(auto i=m_masked.begin(), iEnd = m_masked.end();i!=iEnd;){
-        if(i->m_index.parent()==parent){
-            if(i.key().second>=start){
-                if(i.key().second>end)
-                    maskedToAdd.insert(qMakePair(i.key().first,i.key().second-count),i.value());
+    for (auto i = m_masked.begin(), iEnd = m_masked.end(); i != iEnd;) {
+        if (i->m_index.parent() == parent) {
+            if (i.key().second >= start) {
+                if (i.key().second > end)
+                    maskedToAdd.insert(qMakePair(i.key().first, i.key().second - count), i.value());
                 i = m_masked.erase(i);
                 continue;
             }
         }
         ++i;
     }
-    for(auto i=maskedToAdd.begin(), iEnd = maskedToAdd.end();i!=iEnd;++i)
-        m_masked.insert(i.key(),i.value());
+    for (auto i = maskedToAdd.begin(), iEnd = maskedToAdd.end(); i != iEnd; ++i)
+        m_masked.insert(i.key(), i.value());
 }
 
 void RoleMaskProxyModelPrivate::onLayoutChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
@@ -193,143 +193,135 @@ void RoleMaskProxyModelPrivate::onLayoutChanged(const QList<QPersistentModelInde
     Q_UNUSED(parents)
     Q_UNUSED(hint)
     decltype(m_masked) updatedMasked;
-    for(auto i = m_masked.constBegin(), iMax = m_masked.constEnd();i!=iMax;++i){
-        const auto newKey = qMakePair(i->m_index.row(),i->m_index.column());
-        updatedMasked.insert(newKey,i.value());
+    for (auto i = m_masked.constBegin(), iMax = m_masked.constEnd(); i != iMax; ++i) {
+        const auto newKey = qMakePair(i->m_index.row(), i->m_index.column());
+        updatedMasked.insert(newKey, i.value());
     }
     m_masked = std::move(updatedMasked);
 }
 
-void RoleMaskProxyModelPrivate::onRowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)
+void RoleMaskProxyModelPrivate::onRowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd,
+                                                     const QModelIndex &destinationParent, int destinationRow)
 {
-    Q_ASSERT(!sourceParent.isValid() || sourceParent.model()==q_func()->sourceModel());
-    Q_ASSERT(!destinationParent.isValid() || destinationParent.model()==q_func()->sourceModel());
+    Q_ASSERT(!sourceParent.isValid() || sourceParent.model() == q_func()->sourceModel());
+    Q_ASSERT(!destinationParent.isValid() || destinationParent.model() == q_func()->sourceModel());
     decltype(m_masked) maskedToAdd;
-    const int count = sourceEnd-sourceStart+1;
-    if(sourceParent!=destinationParent){
-        for(auto i=m_masked.begin(), iEnd = m_masked.end();i!=iEnd;){
-            if(i->m_index.parent()==sourceParent){
-                if(i.key().first>=sourceStart && i.key().first<=sourceEnd){
-                    maskedToAdd.insert(qMakePair(destinationRow + i.key().first-sourceStart,i.key().second),i.value());
+    const int count = sourceEnd - sourceStart + 1;
+    if (sourceParent != destinationParent) {
+        for (auto i = m_masked.begin(), iEnd = m_masked.end(); i != iEnd;) {
+            if (i->m_index.parent() == sourceParent) {
+                if (i.key().first >= sourceStart && i.key().first <= sourceEnd) {
+                    maskedToAdd.insert(qMakePair(destinationRow + i.key().first - sourceStart, i.key().second), i.value());
                     i = m_masked.erase(i);
                     continue;
                 }
-                if(i.key().first>sourceEnd){
-                    maskedToAdd.insert(qMakePair(i.key().first-count,i.key().second),i.value());
+                if (i.key().first > sourceEnd) {
+                    maskedToAdd.insert(qMakePair(i.key().first - count, i.key().second), i.value());
                     i = m_masked.erase(i);
                     continue;
                 }
-            }
-            else if(i->m_index.parent()==destinationParent){
-                if(i.key().first>=destinationRow){
-                    maskedToAdd.insert(qMakePair(i.key().first+count,i.key().second),i.value());
+            } else if (i->m_index.parent() == destinationParent) {
+                if (i.key().first >= destinationRow) {
+                    maskedToAdd.insert(qMakePair(i.key().first + count, i.key().second), i.value());
                     i = m_masked.erase(i);
                     continue;
                 }
             }
             ++i;
         }
-    }
-    else{
-    for(auto i=m_masked.begin(), iEnd = m_masked.end();i!=iEnd;){
-        if(i->m_index.parent()==sourceParent){
-            if(destinationRow<sourceStart){
-                if(i.key().first>=destinationRow && i.key().first<sourceStart){
-                    maskedToAdd.insert(qMakePair(i.key().first+count,i.key().second),i.value());
-                    i = m_masked.erase(i);
-                    continue;
-                }
-                else if(i.key().first>=sourceStart && i.key().first<=sourceEnd){
-                    maskedToAdd.insert(qMakePair(i.key().first-(sourceStart-destinationRow),i.key().second),i.value());
-                    i = m_masked.erase(i);
-                    continue;
-                }
-            }
-            else{
-                Q_ASSERT(destinationRow>sourceEnd);
-                if(i.key().first>sourceEnd && i.key().first<destinationRow){
-                    maskedToAdd.insert(qMakePair(i.key().first-count,i.key().second),i.value());
-                    i = m_masked.erase(i);
-                    continue;
-                }
-                else if(i.key().first>=sourceStart && i.key().first<=sourceEnd){
-                    maskedToAdd.insert(qMakePair(i.key().first+(destinationRow-sourceEnd-1),i.key().second),i.value());
-                    i = m_masked.erase(i);
-                    continue;
+    } else {
+        for (auto i = m_masked.begin(), iEnd = m_masked.end(); i != iEnd;) {
+            if (i->m_index.parent() == sourceParent) {
+                if (destinationRow < sourceStart) {
+                    if (i.key().first >= destinationRow && i.key().first < sourceStart) {
+                        maskedToAdd.insert(qMakePair(i.key().first + count, i.key().second), i.value());
+                        i = m_masked.erase(i);
+                        continue;
+                    } else if (i.key().first >= sourceStart && i.key().first <= sourceEnd) {
+                        maskedToAdd.insert(qMakePair(i.key().first - (sourceStart - destinationRow), i.key().second), i.value());
+                        i = m_masked.erase(i);
+                        continue;
+                    }
+                } else {
+                    Q_ASSERT(destinationRow > sourceEnd);
+                    if (i.key().first > sourceEnd && i.key().first < destinationRow) {
+                        maskedToAdd.insert(qMakePair(i.key().first - count, i.key().second), i.value());
+                        i = m_masked.erase(i);
+                        continue;
+                    } else if (i.key().first >= sourceStart && i.key().first <= sourceEnd) {
+                        maskedToAdd.insert(qMakePair(i.key().first + (destinationRow - sourceEnd - 1), i.key().second), i.value());
+                        i = m_masked.erase(i);
+                        continue;
+                    }
                 }
             }
+            ++i;
         }
-        ++i;
     }
-    }
-    for(auto i=maskedToAdd.begin(), iEnd = maskedToAdd.end();i!=iEnd;++i)
-        m_masked.insert(i.key(),i.value());
+    for (auto i = maskedToAdd.begin(), iEnd = maskedToAdd.end(); i != iEnd; ++i)
+        m_masked.insert(i.key(), i.value());
 }
 
-void RoleMaskProxyModelPrivate::onColumnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)
+void RoleMaskProxyModelPrivate::onColumnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd,
+                                                        const QModelIndex &destinationParent, int destinationColumn)
 {
-    Q_ASSERT(!sourceParent.isValid() || sourceParent.model()==q_func()->sourceModel());
-    Q_ASSERT(!destinationParent.isValid() || destinationParent.model()==q_func()->sourceModel());
+    Q_ASSERT(!sourceParent.isValid() || sourceParent.model() == q_func()->sourceModel());
+    Q_ASSERT(!destinationParent.isValid() || destinationParent.model() == q_func()->sourceModel());
     decltype(m_masked) maskedToAdd;
-    const int count = sourceEnd-sourceStart+1;
-    if(sourceParent!=destinationParent){
-        for(auto i=m_masked.begin(), iEnd = m_masked.end();i!=iEnd;){
-            if(i->m_index.parent()==sourceParent){
-                if(i.key().second>=sourceStart && i.key().second<=sourceEnd){
-                    maskedToAdd.insert(qMakePair(i.key().first,destinationColumn + i.key().second-sourceStart),i.value());
+    const int count = sourceEnd - sourceStart + 1;
+    if (sourceParent != destinationParent) {
+        for (auto i = m_masked.begin(), iEnd = m_masked.end(); i != iEnd;) {
+            if (i->m_index.parent() == sourceParent) {
+                if (i.key().second >= sourceStart && i.key().second <= sourceEnd) {
+                    maskedToAdd.insert(qMakePair(i.key().first, destinationColumn + i.key().second - sourceStart), i.value());
                     i = m_masked.erase(i);
                     continue;
                 }
-                if(i.key().second>sourceEnd){
-                    maskedToAdd.insert(qMakePair(i.key().first,i.key().second-count),i.value());
+                if (i.key().second > sourceEnd) {
+                    maskedToAdd.insert(qMakePair(i.key().first, i.key().second - count), i.value());
                     i = m_masked.erase(i);
                     continue;
                 }
-            }
-            else if(i->m_index.parent()==destinationParent){
-                if(i.key().second>=destinationColumn){
-                    maskedToAdd.insert(qMakePair(i.key().first,i.key().second+count),i.value());
+            } else if (i->m_index.parent() == destinationParent) {
+                if (i.key().second >= destinationColumn) {
+                    maskedToAdd.insert(qMakePair(i.key().first, i.key().second + count), i.value());
                     i = m_masked.erase(i);
                     continue;
                 }
             }
             ++i;
         }
-    }
-    else{
-    for(auto i=m_masked.begin(), iEnd = m_masked.end();i!=iEnd;){
-        if(i->m_index.parent()==sourceParent){
-            if(destinationColumn<sourceStart){
-                if(i.key().second>=destinationColumn && i.key().second<sourceStart){
-                    maskedToAdd.insert(qMakePair(i.key().first,i.key().second+count),i.value());
-                    i = m_masked.erase(i);
-                    continue;
-                }
-                else if(i.key().second>=sourceStart && i.key().second<=sourceEnd){
-                    maskedToAdd.insert(qMakePair(i.key().first,i.key().second-(sourceStart-destinationColumn)),i.value());
-                    i = m_masked.erase(i);
-                    continue;
-                }
-            }
-            else{
-                Q_ASSERT(destinationColumn>sourceEnd);
-                if(i.key().second>sourceEnd && i.key().second<destinationColumn){
-                    maskedToAdd.insert(qMakePair(i.key().first,i.key().second-count),i.value());
-                    i = m_masked.erase(i);
-                    continue;
-                }
-                else if(i.key().second>=sourceStart && i.key().second<=sourceEnd){
-                    maskedToAdd.insert(qMakePair(i.key().first,i.key().second+(destinationColumn-sourceEnd-1)),i.value());
-                    i = m_masked.erase(i);
-                    continue;
+    } else {
+        for (auto i = m_masked.begin(), iEnd = m_masked.end(); i != iEnd;) {
+            if (i->m_index.parent() == sourceParent) {
+                if (destinationColumn < sourceStart) {
+                    if (i.key().second >= destinationColumn && i.key().second < sourceStart) {
+                        maskedToAdd.insert(qMakePair(i.key().first, i.key().second + count), i.value());
+                        i = m_masked.erase(i);
+                        continue;
+                    } else if (i.key().second >= sourceStart && i.key().second <= sourceEnd) {
+                        maskedToAdd.insert(qMakePair(i.key().first, i.key().second - (sourceStart - destinationColumn)), i.value());
+                        i = m_masked.erase(i);
+                        continue;
+                    }
+                } else {
+                    Q_ASSERT(destinationColumn > sourceEnd);
+                    if (i.key().second > sourceEnd && i.key().second < destinationColumn) {
+                        maskedToAdd.insert(qMakePair(i.key().first, i.key().second - count), i.value());
+                        i = m_masked.erase(i);
+                        continue;
+                    } else if (i.key().second >= sourceStart && i.key().second <= sourceEnd) {
+                        maskedToAdd.insert(qMakePair(i.key().first, i.key().second + (destinationColumn - sourceEnd - 1)), i.value());
+                        i = m_masked.erase(i);
+                        continue;
+                    }
                 }
             }
+            ++i;
         }
-        ++i;
     }
-    }
-    for(auto i=maskedToAdd.begin(), iEnd = maskedToAdd.end();i!=iEnd;++i)
-        m_masked.insert(i.key(),i.value());
+    for (auto i = maskedToAdd.begin(), iEnd = maskedToAdd.end(); i != iEnd; ++i)
+        m_masked.insert(i.key(), i.value());
 }
 
 void RoleMaskProxyModelPrivate::clearUnusedMaskedRoles(const QSet<int> &newRoles)
@@ -356,14 +348,14 @@ void RoleMaskProxyModelPrivate::clearUnusedMaskedRoles(const QSet<int> &newRoles
 
 bool RoleMaskProxyModelPrivate::removeRole(const QModelIndex &idx, int role)
 {
-    if(!idx.isValid())
+    if (!idx.isValid())
         return false;
-    Q_ASSERT(idx.model()==q_func()->sourceModel());
-    const QPair<int,int> hashKey = qMakePair(idx.row(),idx.column());
-    for(auto i=m_masked.find(hashKey), iEnd = m_masked.end();i!=iEnd && i.key()==hashKey;++i){
-        if(i->m_index==idx){
-            if(i->m_data.remove(role) > 0){
-                if(i->m_data.isEmpty())
+    Q_ASSERT(idx.model() == q_func()->sourceModel());
+    const QPair<int, int> hashKey = qMakePair(idx.row(), idx.column());
+    for (auto i = m_masked.find(hashKey), iEnd = m_masked.end(); i != iEnd && i.key() == hashKey; ++i) {
+        if (i->m_index == idx) {
+            if (i->m_data.remove(role) > 0) {
+                if (i->m_data.isEmpty())
                     m_masked.erase(i);
                 return true;
             }
@@ -374,12 +366,12 @@ bool RoleMaskProxyModelPrivate::removeRole(const QModelIndex &idx, int role)
 
 bool RoleMaskProxyModelPrivate::removeIndex(const QModelIndex &idx)
 {
-    if(!idx.isValid())
+    if (!idx.isValid())
         return false;
-    Q_ASSERT(idx.model()==q_func()->sourceModel());
-    const QPair<int,int> hashKey = qMakePair(idx.row(),idx.column());
-    for(auto i=m_masked.find(hashKey), iEnd = m_masked.end();i!=iEnd && i.key()==hashKey;++i){
-        if(i->m_index==idx){
+    Q_ASSERT(idx.model() == q_func()->sourceModel());
+    const QPair<int, int> hashKey = qMakePair(idx.row(), idx.column());
+    for (auto i = m_masked.find(hashKey), iEnd = m_masked.end(); i != iEnd && i.key() == hashKey; ++i) {
+        if (i->m_index == idx) {
             m_masked.erase(i);
             return true;
         }
@@ -553,42 +545,59 @@ void RoleMaskProxyModel::setSourceModel(QAbstractItemModel *sourceMdl)
     QIdentityProxyModel::setSourceModel(sourceMdl);
     if (sourceModel()) {
         Q_ASSUME(sourceModel()->disconnect(SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)), this));
-        d->m_sourceConnections << QObject::connect(sourceModel(), &QAbstractItemModel::dataChanged,
-                                                   [d](const QModelIndex &topLeft, const QModelIndex &bottomRight,
-                                                       const QVector<int> &roles) -> void { d->interceptDataChanged(topLeft, bottomRight, roles); })
-                               << QObject::connect(sourceModel(), &QAbstractItemModel::modelReset, [d]() -> void { d->m_masked.clear(); })
-                               << QObject::connect(sourceModel(), &QAbstractItemModel::destroyed, [this]() -> void { setSourceModel(Q_NULLPTR); })
-        << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeInserted, [d](const QModelIndex &parent, int start, int end){d->onRowsAboutToBeInserted(parent,start,end);})
-           << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeInserted, [d](const QModelIndex &parent, int start, int end){d->onColumnsAboutToBeInserted(parent,start,end);})
-           << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeRemoved, [d](const QModelIndex &parent, int start, int end){d->onRowsAboutToBeRemoved(parent,start,end);})
-              << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeRemoved, [d](const QModelIndex &parent, int start, int end){d->onColumnsAboutToBeRemoved(parent,start,end);})
-           << QObject::connect(sourceModel(), &QAbstractItemModel::layoutChanged, [d](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint){d->onLayoutChanged(parents,hint);})
-           << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeMoved, [d](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow){d->onRowsAboutToBeMoved(sourceParent,sourceStart,sourceEnd,destinationParent,destinationRow);})
-              << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeMoved, [d](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow){d->onColumnsAboutToBeMoved(sourceParent,sourceStart,sourceEnd,destinationParent,destinationRow);})
-                ;
+        d->m_sourceConnections
+                << QObject::connect(sourceModel(), &QAbstractItemModel::dataChanged,
+                                    [d](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles) -> void {
+                                        d->interceptDataChanged(topLeft, bottomRight, roles);
+                                    })
+                << QObject::connect(sourceModel(), &QAbstractItemModel::modelReset, [d]() -> void { d->m_masked.clear(); })
+                << QObject::connect(sourceModel(), &QAbstractItemModel::destroyed, [this]() -> void { setSourceModel(Q_NULLPTR); })
+                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeInserted,
+                                    [d](const QModelIndex &parent, int start, int end) { d->onRowsAboutToBeInserted(parent, start, end); })
+                << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeInserted,
+                                    [d](const QModelIndex &parent, int start, int end) { d->onColumnsAboutToBeInserted(parent, start, end); })
+                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeRemoved,
+                                    [d](const QModelIndex &parent, int start, int end) { d->onRowsAboutToBeRemoved(parent, start, end); })
+                << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeRemoved,
+                                    [d](const QModelIndex &parent, int start, int end) { d->onColumnsAboutToBeRemoved(parent, start, end); })
+                << QObject::connect(sourceModel(), &QAbstractItemModel::layoutChanged,
+                                    [d](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {
+                                        d->onLayoutChanged(parents, hint);
+                                    })
+                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeMoved,
+                                    [d](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
+                                        int destinationRow) {
+                                        d->onRowsAboutToBeMoved(sourceParent, sourceStart, sourceEnd, destinationParent, destinationRow);
+                                    })
+                << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeMoved,
+                                    [d](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
+                                        int destinationRow) {
+                                        d->onColumnsAboutToBeMoved(sourceParent, sourceStart, sourceEnd, destinationParent, destinationRow);
+                                    });
     }
 }
 
 /*!
 \reimp
 */
-void RoleMaskProxyModel::multiData(const QModelIndex &index, QModelRoleDataSpan roleDataSpan) const {
+void RoleMaskProxyModel::multiData(const QModelIndex &index, QModelRoleDataSpan roleDataSpan) const
+{
     Q_ASSERT(sourceModel());
-    Q_ASSERT(index.model()==this);
+    Q_ASSERT(index.model() == this);
     Q_D(const RoleMaskProxyModel);
     const QModelIndex sourceIndex = mapToSource(index);
-    sourceModel()->multiData(sourceIndex,roleDataSpan);
-    const RolesContainer* idxData = d->dataForIndex(sourceIndex);
+    sourceModel()->multiData(sourceIndex, roleDataSpan);
+    const RolesContainer *idxData = d->dataForIndex(sourceIndex);
     for (QModelRoleData &roleData : roleDataSpan) {
-            int role = roleData.role();
-            if (d->m_mergeDisplayEdit && role == Qt::EditRole)
-                role = Qt::DisplayRole;
-            const auto roleIter = idxData->constFind(role);
-            if (roleIter != idxData->constEnd())
-                roleData.setData(roleIter.value());
-            else if(!d->m_transparentIfEmpty && d->m_maskedRoles.contains(role))
-                roleData.setData(QVariant());
-        }
+        int role = roleData.role();
+        if (d->m_mergeDisplayEdit && role == Qt::EditRole)
+            role = Qt::DisplayRole;
+        const auto roleIter = idxData->constFind(role);
+        if (roleIter != idxData->constEnd())
+            roleData.setData(roleIter.value());
+        else if (!d->m_transparentIfEmpty && d->m_maskedRoles.contains(role))
+            roleData.setData(QVariant());
+    }
 }
 
 /*!
@@ -603,7 +612,7 @@ QVariant RoleMaskProxyModel::data(const QModelIndex &proxyIndex, int role) const
     if (!d->m_maskedRoles.contains(adjRole))
         return QIdentityProxyModel::data(proxyIndex, role);
     const QModelIndex sourceIndex = mapToSource(proxyIndex);
-    const RolesContainer* idxData = d->dataForIndex(sourceIndex);
+    const RolesContainer *idxData = d->dataForIndex(sourceIndex);
     if (idxData) {
         const auto roleIter = idxData->constFind(adjRole);
         if (roleIter != idxData->constEnd())
@@ -630,7 +639,7 @@ bool RoleMaskProxyModel::setData(const QModelIndex &proxyIndex, const QVariant &
         return QIdentityProxyModel::setData(proxyIndex, value, role);
     const QModelIndex sourceIndex = mapToSource(proxyIndex);
     Q_ASSERT(sourceIndex.isValid());
-    RolesContainer* idxData = d->dataForIndex(sourceIndex);
+    RolesContainer *idxData = d->dataForIndex(sourceIndex);
     if (!idxData) {
         if (!value.isValid()) {
             return true;
@@ -667,9 +676,9 @@ Removes all the data managed by the proxy model for a certain \a index.
 */
 void RoleMaskProxyModel::clearMaskedData(const QModelIndex &index)
 {
-    if(!index.isValid())
+    if (!index.isValid())
         return;
-    Q_ASSERT(index.model()==this);
+    Q_ASSERT(index.model() == this);
     Q_D(RoleMaskProxyModel);
     const QModelIndex sourceIndex = mapToSource(index);
     const auto maskedIter = d->dataForIndex(sourceIndex);
@@ -688,10 +697,11 @@ void RoleMaskProxyModel::clearMaskedData(const QModelIndex &index)
 \details Due to limitations in the architecture, the model might emit 2 separate dataChanged signals, one for the roles that were masked and one for
 the roles that are managed by the sorce model
 */
-bool RoleMaskProxyModel::clearItemData(const QModelIndex &index){
-    if(!index.isValid())
+bool RoleMaskProxyModel::clearItemData(const QModelIndex &index)
+{
+    if (!index.isValid())
         return false;
-    Q_ASSERT(index.model()==this);
+    Q_ASSERT(index.model() == this);
     clearMaskedData(index);
     return sourceModel()->clearItemData(mapToSource(index));
 }
@@ -894,5 +904,3 @@ This signal is emitted whenever a dataChanged() signal is emitted for a role man
 \fn RoleMaskProxyModel::maskedRolesChanged()
 This signal is emitted whenever the list of roles managed by the proxy changes
 */
-
-

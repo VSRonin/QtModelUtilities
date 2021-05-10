@@ -20,14 +20,15 @@
 #include "private/modelutilities_common_p.h"
 #include "rolemaskproxymodel.h"
 
-struct MaskedItem{
+struct MaskedItem
+{
     RolesContainer m_data;
     QPersistentModelIndex m_index;
     MaskedItem() = default;
-    MaskedItem(const RolesContainer& data, const QModelIndex& index);
-    MaskedItem(const RolesContainer& data, const QPersistentModelIndex& index);
-    MaskedItem(const MaskedItem& other)=default;
-    MaskedItem& operator=(const MaskedItem& other)=default;
+    MaskedItem(const RolesContainer &data, const QModelIndex &index);
+    MaskedItem(const RolesContainer &data, const QPersistentModelIndex &index);
+    MaskedItem(const MaskedItem &other) = default;
+    MaskedItem &operator=(const MaskedItem &other) = default;
 };
 
 class RoleMaskProxyModelPrivate
@@ -36,7 +37,7 @@ class RoleMaskProxyModelPrivate
     RoleMaskProxyModel *q_ptr;
     RoleMaskProxyModelPrivate(RoleMaskProxyModel *q);
     QSet<int> m_maskedRoles;
-    QMultiHash<QPair<int,int>,MaskedItem> m_masked;
+    QMultiHash<QPair<int, int>, MaskedItem> m_masked;
     bool m_transparentIfEmpty;
     bool m_mergeDisplayEdit;
     QVector<QMetaObject::Connection> m_sourceConnections;
@@ -45,16 +46,18 @@ class RoleMaskProxyModelPrivate
     bool removeIndex(const QModelIndex &idx);
     void signalAllChanged(const QVector<int> &roles = QVector<int>(), const QModelIndex &parent = QModelIndex());
     void interceptDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
-    const RolesContainer* dataForIndex(const QModelIndex& index) const;
-    RolesContainer* dataForIndex(const QModelIndex& index);
-    void insertData(const QModelIndex& index, const RolesContainer& data);
+    const RolesContainer *dataForIndex(const QModelIndex &index) const;
+    RolesContainer *dataForIndex(const QModelIndex &index);
+    void insertData(const QModelIndex &index, const RolesContainer &data);
     void onRowsAboutToBeInserted(const QModelIndex &parent, int start, int end);
     void onColumnsAboutToBeInserted(const QModelIndex &parent, int start, int end);
     void onRowsAboutToBeRemoved(const QModelIndex &parent, int start, int end);
     void onColumnsAboutToBeRemoved(const QModelIndex &parent, int start, int end);
     void onLayoutChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint);
-    void onRowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow);
-    void onColumnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn);
+    void onRowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
+                              int destinationRow);
+    void onColumnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
+                                 int destinationColumn);
 };
 
 #endif // ROLEMASKPROXYMODEL_P_H
