@@ -16,6 +16,7 @@
 #include <modelutilities_global.h>
 #include <QAbstractItemModel>
 #include <QVariant>
+#include <QStringList>
 class GenericModelPrivate;
 class MODELUTILITIES_EXPORT GenericModel : public QAbstractItemModel
 {

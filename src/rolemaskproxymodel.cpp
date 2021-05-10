@@ -577,6 +577,7 @@ void RoleMaskProxyModel::setSourceModel(QAbstractItemModel *sourceMdl)
     }
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 /*!
 \reimp
 */
@@ -599,6 +600,7 @@ void RoleMaskProxyModel::multiData(const QModelIndex &index, QModelRoleDataSpan 
             roleData.setData(QVariant());
     }
 }
+#endif
 
 /*!
 \reimp
@@ -692,6 +694,7 @@ void RoleMaskProxyModel::clearMaskedData(const QModelIndex &index)
     dataChanged(index, index, changedRoles);
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 /*!
 \reimp
 \details Due to limitations in the architecture, the model might emit 2 separate dataChanged signals, one for the roles that were masked and one for
@@ -705,6 +708,7 @@ bool RoleMaskProxyModel::clearItemData(const QModelIndex &index)
     clearMaskedData(index);
     return sourceModel()->clearItemData(mapToSource(index));
 }
+#endif
 
 /*!
 \reimp
