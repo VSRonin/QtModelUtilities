@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.9)
 project(QtModelUtilities LANGUAGES CXX)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
-
+option(BUILD_SHARED_LIBS "Build the library as a dynamically linked library" ON)
 option(BUILD_EXAMPLES "Build the examples" OFF)
 option(NO_GUI "Disable all features requiring QtGui and QtWidgets" OFF)
 option(NO_WIDGETS "Disable all features requiring QtWidgets" OFF)
