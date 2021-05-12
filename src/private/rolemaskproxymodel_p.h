@@ -38,8 +38,11 @@ class RoleMaskProxyModelPrivate
     RoleMaskProxyModelPrivate(RoleMaskProxyModel *q);
     QSet<int> m_maskedRoles;
     QMultiHash<QPair<int, int>, MaskedItem> m_masked;
+    QVector<RolesContainer> m_hHeaderData;
+    QVector<RolesContainer> m_vHeaderData;
     bool m_transparentIfEmpty;
     bool m_mergeDisplayEdit;
+    bool m_maskHeaderData;
     QVector<QMetaObject::Connection> m_sourceConnections;
     void clearUnusedMaskedRoles(const QSet<int> &roles);
     bool removeRole(const QModelIndex &idx, int role);
@@ -58,6 +61,12 @@ class RoleMaskProxyModelPrivate
                               int destinationRow);
     void onColumnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
                                  int destinationColumn);
+    void onRowsInserted(const QModelIndex &parent, int start, int end);
+    void onColumnsInserted(const QModelIndex &parent, int start, int end);
+    void onRowsRemoved(const QModelIndex &parent, int start, int end);
+    void onColumnsRemoved(const QModelIndex &parent, int start, int end);
+    void onRowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow);
+    void onColumnsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn);
 };
 
 #endif // ROLEMASKPROXYMODEL_P_H
