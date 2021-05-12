@@ -324,9 +324,9 @@ void GenericModelItem::setSpan(const QSize &sz)
     m_colSpan = sz.width();
 }
 
-void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, bool recursive)
+void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, bool recursive, QVector<RolesContainer> *headersToSort)
 {
-    sortChildren(column, role, order, recursive, m_model->persistentIndexList());
+    sortChildren(column, role, order, recursive, m_model->persistentIndexList(),headersToSort);
 }
 
 void GenericModelItem::moveChildRows(int sourceRow, int count, int destinationChild)
@@ -393,14 +393,14 @@ void GenericModelItem::setColumn(int c)
     m_column = c;
 }
 
-void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, bool recursive, const QModelIndexList &persistentIndexes)
+void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, bool recursive, const QModelIndexList &persistentIndexes, QVector<RolesContainer> *headersToSort)
 {
     Q_ASSERT(column >= 0);
     if (children.isEmpty() || column >= m_colCount)
         return;
     if (recursive) {
         for (int i = 0, maxI = children.size(); i < maxI; ++i)
-            children.at(i)->sortChildren(column, role, order, recursive, persistentIndexes);
+            children.at(i)->sortChildren(column, role, order, recursive, persistentIndexes, nullptr);
     }
     QVector<GenericModelItem *> columnChildren;
     columnChildren.reserve(m_rowCount);
@@ -418,13 +418,17 @@ void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, b
         std::stable_sort(columnChildren.begin(), columnChildren.end(), lessComparison);
     else
         std::stable_sort(columnChildren.begin(), columnChildren.end(), greaterComparison);
-
+    QVector<RolesContainer> updatedHeadersToSort;
+    if(headersToSort)
+        updatedHeadersToSort = QVector<RolesContainer>(headersToSort->size(),RolesContainer());
     QVector<GenericModelItem *> newChildren;
     newChildren.reserve(children.size());
     QModelIndexList changedPersistentIndexesFrom, changedPersistentIndexesTo;
     for (int toRow = 0, maxRow = columnChildren.size(); toRow < maxRow; ++toRow) {
         GenericModelItem *const columnChild = columnChildren.at(toRow);
         const int fromRow = columnChild->m_row;
+        if(headersToSort)
+            updatedHeadersToSort[toRow] = headersToSort->at(fromRow);
         for (int i = m_colCount * fromRow; i < m_colCount * (fromRow + 1); ++i) {
             GenericModelItem *const iChild = children.at(i);
             if (toRow != fromRow) {
@@ -441,6 +445,8 @@ void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, b
     Q_ASSERT(newChildren.size() == children.size());
     Q_ASSERT(std::all_of(newChildren.constBegin(), newChildren.constEnd(), [](const GenericModelItem *a) -> bool { return a != nullptr; }));
     children = newChildren;
+    if(headersToSort)
+        *headersToSort = updatedHeadersToSort;
     m_model->changePersistentIndexList(changedPersistentIndexesFrom, changedPersistentIndexesTo);
 }
 
@@ -1148,7 +1154,7 @@ void GenericModel::sort(int column, const QModelIndex &parent, Qt::SortOrder ord
         parents.append(parent);
     layoutAboutToBeChanged(parents, QAbstractItemModel::VerticalSortHint);
     Q_D(GenericModel);
-    d->itemForIndex(parent)->sortChildren(column, d->sortRole, order, recursive);
+    d->itemForIndex(parent)->sortChildren(column, d->sortRole, order, recursive, &(d->vHeaderData));
     layoutChanged(parents, QAbstractItemModel::VerticalSortHint);
 }
 

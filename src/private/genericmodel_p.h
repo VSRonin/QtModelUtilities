@@ -41,7 +41,7 @@ public:
     void setMergeDisplayEdit(bool val);
     QSize span() const;
     void setSpan(const QSize &sz);
-    void sortChildren(int column, int role, Qt::SortOrder order, bool recursive);
+    void sortChildren(int column, int role, Qt::SortOrder order, bool recursive, QVector<RolesContainer>* headersToSort);
     void moveChildRows(int sourceRow, int count, int destinationChild);
     void moveChildColumns(int sourceCol, int count, int destinationChild);
     void setRow(int r);
@@ -56,7 +56,7 @@ private:
     int m_colSpan;
     GenericModel *m_model;
     QVector<GenericModelItem *> children;
-    void sortChildren(int column, int role, Qt::SortOrder order, bool recursive, const QModelIndexList &persistentIndexes);
+    void sortChildren(int column, int role, Qt::SortOrder order, bool recursive, const QModelIndexList &persistentIndexes, QVector<RolesContainer>* headersToSort);
 };
 
 class GenericModelPrivate
