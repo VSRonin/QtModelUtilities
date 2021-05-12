@@ -88,11 +88,16 @@ void tst_HtmlModelSerialiser::validateHtmlOutput()
 {
     // going to validator.w3.org is flaky on CI
     // save the files and validate them on the command line
-    if(qgetenv("CI").size()>0){
+    if (qgetenv("CI").size() > 0) {
         QFETCH(const QAbstractItemModel *, sourceModel);
         HtmlModelSerialiser serialiser(sourceModel, nullptr);
         serialiser.addRoleToSave(Qt::UserRole + 1);
-        QFile htmlDataFile(QStringLiteral("htmlToValidate.html"));
+#ifdef QT_DEBUG
+        const QString outputName = QStringLiteral("htmlToValidate_debug.html");
+#else
+        const QString outputName = QStringLiteral("htmlToValidate_release.html");
+#endif
+        QFile htmlDataFile(outputName);
         QVERIFY(htmlDataFile.open(QIODevice::WriteOnly));
         QVERIFY(serialiser.saveModel(&htmlDataFile));
         return;

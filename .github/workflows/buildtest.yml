@@ -112,9 +112,9 @@ jobs:
               cd ../release
               cmake --build . --target test
           - name: HtmlModelSerialiser output validation
-            uses: Cyb3r-Jak3/html5validator-action@master
-            with:
-                root: build/TestResults/
+            run: |
+              pip install html5validator
+              html5validator --root build/TestResults/
           - name: Prepare Test Report
             if: ${{ always() && (steps.runtests.outcome == 'failure' || steps.runlinuxdebugtests.outcome == 'failure' || steps.runlinuxreleasetests.outcome == 'failure') }}
             uses: ./ci/processtestresults
