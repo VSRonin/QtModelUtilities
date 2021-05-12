@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.9)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Gui)
-message(STATUS "Found Qt Core ${Qt5Core_VERSION}")
+message(STATUS "Found Qt Core ${Qt${QT_VERSION_MAJOR}Core_VERSION}")
 
 if(NOT "${Qt${QT_VERSION_MAJOR}Gui_FOUND}")
     set(NO_GUI ON)
