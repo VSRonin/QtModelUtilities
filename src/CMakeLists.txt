@@ -143,14 +143,13 @@ if(modelutilities_SRCS)
     if(OPTIMISE_FOR_MANY_ROLES)
         target_compile_definitions(QtModelUtilities PRIVATE OPTIMISE_FOR_MANY_ROLES)
     endif()
-    target_link_libraries(QtModelUtilities PUBLIC Qt${QT_VERSION_MAJOR}::Core)
+    target_link_libraries(QtModelUtilities PRIVATE Qt${QT_VERSION_MAJOR}::Core)
     if(NOT NO_GUI)
-        target_link_libraries(QtModelUtilities PUBLIC Qt${QT_VERSION_MAJOR}::Gui)
+        target_link_libraries(QtModelUtilities PRIVATE Qt${QT_VERSION_MAJOR}::Gui)
     endif()
     if(NOT NO_WIDGETS)
-        target_link_libraries(QtModelUtilities PUBLIC Qt${QT_VERSION_MAJOR}::Widgets)
+        target_link_libraries(QtModelUtilities PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
     endif()
-
 
     set_target_properties(QtModelUtilities PROPERTIES
         AUTOMOC ON
