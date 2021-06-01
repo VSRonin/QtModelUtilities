@@ -766,8 +766,6 @@ void InsertProxyModel::sort(int column, Qt::SortOrder order)
 {
     if (!sourceModel())
         return;
-    if (column < 0 || column >= sourceModel()->columnCount())
-        return;
     sourceModel()->sort(column, order);
 }
 
