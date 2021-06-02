@@ -32,7 +32,6 @@ private Q_SLOTS:
     void testSetItemData();
     void testSetItemDataDataChanged_data();
     void testSetItemDataDataChanged();
-    void testSort_data();
     void testSort();
     void testEmptyProxy();
     void testMoveRowAfter();

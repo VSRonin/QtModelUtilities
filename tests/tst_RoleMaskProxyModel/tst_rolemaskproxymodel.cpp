@@ -1185,16 +1185,8 @@ void tst_RoleMaskProxyModel::testSetItemDataDataChanged()
     baseModel->deleteLater();
 }
 
-void tst_RoleMaskProxyModel::testSort_data()
-{
-    QTest::addColumn<bool>("sortViaProxy");
-    QTest::newRow("Sort via Base") << false;
-    QTest::newRow("Sort via Proxy") << true;
-}
-
 void tst_RoleMaskProxyModel::testSort()
 {
-    QFETCH(bool, sortViaProxy);
     QStringList sequence;
     sequence.reserve(100);
     for (int i = 0; i < 100; ++i)
@@ -1209,10 +1201,7 @@ void tst_RoleMaskProxyModel::testSort()
     for (int i = 0; i < 100; ++i) {
         QVERIFY(proxyModel.setData(proxyModel.index(i, 0), proxyModel.index(i, 0).data().toString().toInt(), Qt::UserRole));
     }
-    if (sortViaProxy)
-        proxyModel.sort(0, Qt::AscendingOrder);
-    else
-        baseModel.sort(0, Qt::AscendingOrder);
+    baseModel.sort(0, Qt::AscendingOrder);
     for (int i = 1; i < 100; ++i) {
         QCOMPARE(proxyModel.index(i, 0).data().toString().toInt(), proxyModel.index(i - 1, 0).data().toString().toInt() + 1);
         QCOMPARE(proxyModel.index(i, 0).data(Qt::UserRole).toInt(), proxyModel.index(i - 1, 0).data(Qt::UserRole).toInt() + 1);

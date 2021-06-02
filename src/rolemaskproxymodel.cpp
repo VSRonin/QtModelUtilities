@@ -803,9 +803,7 @@ If you want to sort based on the marked data use a QSortFilterProxyModel
 on top of this proxy.
 */
 void RoleMaskProxyModel::sort(int column, Qt::SortOrder order)
-{
-    return;
-}
+{}
 
 /*!
 Removes all the data managed by the proxy model for a certain \a index.
