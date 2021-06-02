@@ -199,6 +199,39 @@ void RoleMaskProxyModelPrivate::onLayoutChanged(const QList<QPersistentModelInde
         updatedMasked.insert(newKey, i.value());
     }
     m_masked = std::move(updatedMasked);
+    if(hint!=QAbstractItemModel::HorizontalSortHint) {
+        QVector<RolesContainer> updatedvHeaderData(m_vHeaderData.size());
+        for(int i=0;i<m_sortVHeaders.size();++i){
+            updatedvHeaderData[m_sortVHeaders.at(i).row()] = m_vHeaderData.at(i);
+        }
+        m_sortVHeaders.clear();
+        m_vHeaderData = std::move(updatedvHeaderData);
+    }
+    if(hint!=QAbstractItemModel::VerticalSortHint) {
+        QVector<RolesContainer> updatedhHeaderData(m_hHeaderData.size());
+        for(int i=0;i<m_sortHHeaders.size();++i){
+            updatedhHeaderData[m_sortHHeaders.at(i).row()] = m_hHeaderData.at(i);
+        }
+        m_sortHHeaders.clear();
+        m_hHeaderData = std::move(updatedhHeaderData);
+    }
+}
+
+void RoleMaskProxyModelPrivate::onLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
+{
+    Q_Q(RoleMaskProxyModel);
+    if(hint!=QAbstractItemModel::VerticalSortHint) {
+        Q_ASSERT(m_sortHHeaders.isEmpty());
+        const int colC = q->sourceModel()->columnCount();
+        for(int i=0;i<colC;++i)
+            m_sortHHeaders.append(q->sourceModel()->index(0,i));
+    }
+    if(hint!=QAbstractItemModel::HorizontalSortHint) {
+        Q_ASSERT(m_sortVHeaders.isEmpty());
+        const int rowC = q->sourceModel()->rowCount();
+        for(int i=0;i<rowC;++i)
+            m_sortVHeaders.append(q->sourceModel()->index(i,0));
+    }
 }
 
 void RoleMaskProxyModelPrivate::onRowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd,
@@ -640,6 +673,10 @@ void RoleMaskProxyModel::setSourceModel(QAbstractItemModel *sourceMdl)
                                     [d](const QModelIndex &parent, int start, int end) { d->onRowsRemoved(parent, start, end); })
                 << QObject::connect(sourceModel(), &QAbstractItemModel::columnsRemoved,
                                     [d](const QModelIndex &parent, int start, int end) { d->onColumnsRemoved(parent, start, end); })
+                << QObject::connect(sourceModel(), &QAbstractItemModel::layoutAboutToBeChanged,
+                                    [d](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {
+                                        d->onLayoutAboutToBeChanged(parents, hint);
+                                    })
                 << QObject::connect(sourceModel(), &QAbstractItemModel::layoutChanged,
                                     [d](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {
                                         d->onLayoutChanged(parents, hint);

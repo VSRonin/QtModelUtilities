@@ -1198,13 +1198,18 @@ void tst_RoleMaskProxyModel::testSort()
     proxyModel.setSourceModel(&baseModel);
     proxyModel.addMaskedRole(Qt::UserRole);
     proxyModel.setTransparentIfEmpty(true);
+    proxyModel.setMaskHeaderData(true);
     for (int i = 0; i < 100; ++i) {
-        QVERIFY(proxyModel.setData(proxyModel.index(i, 0), proxyModel.index(i, 0).data().toString().toInt(), Qt::UserRole));
+        const int currentData = proxyModel.index(i, 0).data().toString().toInt();
+        QVERIFY(proxyModel.setHeaderData(i,Qt::Vertical, currentData, Qt::UserRole));
+        QVERIFY(proxyModel.setData(proxyModel.index(i, 0), currentData, Qt::UserRole));
     }
     baseModel.sort(0, Qt::AscendingOrder);
     for (int i = 1; i < 100; ++i) {
         QCOMPARE(proxyModel.index(i, 0).data().toString().toInt(), proxyModel.index(i - 1, 0).data().toString().toInt() + 1);
-        QCOMPARE(proxyModel.index(i, 0).data(Qt::UserRole).toInt(), proxyModel.index(i - 1, 0).data(Qt::UserRole).toInt() + 1);
+        const int currentData = proxyModel.index(i - 1, 0).data(Qt::UserRole).toInt() + 1;
+        QCOMPARE(proxyModel.index(i, 0).data(Qt::UserRole).toInt(), currentData);
+        QCOMPARE(proxyModel.headerData(i, Qt::Vertical, Qt::UserRole).toInt(), currentData);
     }
 }
 

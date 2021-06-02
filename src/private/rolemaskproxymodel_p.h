@@ -40,6 +40,8 @@ class RoleMaskProxyModelPrivate
     QMultiHash<QPair<int, int>, MaskedItem> m_masked;
     QVector<RolesContainer> m_hHeaderData;
     QVector<RolesContainer> m_vHeaderData;
+    QVector<QPersistentModelIndex> m_sortVHeaders;
+    QVector<QPersistentModelIndex> m_sortHHeaders;
     bool m_transparentIfEmpty;
     bool m_mergeDisplayEdit;
     bool m_maskHeaderData;
@@ -57,6 +59,7 @@ class RoleMaskProxyModelPrivate
     void onRowsAboutToBeRemoved(const QModelIndex &parent, int start, int end);
     void onColumnsAboutToBeRemoved(const QModelIndex &parent, int start, int end);
     void onLayoutChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint);
+    void onLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint);
     void onRowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
                               int destinationRow);
     void onColumnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
