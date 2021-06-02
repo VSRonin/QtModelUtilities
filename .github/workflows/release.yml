@@ -10,7 +10,7 @@ jobs:
         strategy:
           max-parallel: 1
           matrix:
-              qt_ver: [5.15.2,6.0.4]
+              qt_ver: [5.15.2,6.1.0]
               platforms:
                 - { os: windows-latest, generator: "NMake Makefiles", debug_postfix: d, compression: ZIP, friendly_name: MSVC }
                 - { os: windows-latest, generator: "MinGW Makefiles", debug_postfix: d, compression: ZIP, friendly_name: MinGW }
@@ -98,7 +98,7 @@ jobs:
           - name: Create Docs
             run: |
               cd build
-              cmake -G"Unix Makefiles" -DBUILD_DOCS=ON -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_ROOTINDEXPROXY=OFF -DBUILD_ROLEMASKPROXY=OFF -DBUILD_INSERTPROXY=OFF -DBUILD_MODELSERIALISATION=OFF -DCMAKE_INSTALL_PREFIX="./installed" ../
+              cmake -G"Unix Makefiles" -DBUILD_DOCS=ON -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_ROOTINDEXPROXY=OFF -DBUILD_ROLEMASKPROXY=OFF -DBUILD_INSERTPROXY=OFF -DBUILD_MODELSERIALISATION=OFF -DBUILD_GENERICMODEL=OFF -DCMAKE_INSTALL_PREFIX="./installed" ../
               cmake --build .
               cmake --build . --target install
               7z a -tzip -y QtModelUtilities-Docs.zip ./installed/docs/*
