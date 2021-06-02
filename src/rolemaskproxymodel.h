@@ -41,6 +41,7 @@ public:
     QMap<int, QVariant> itemData(const QModelIndex &index) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) override;
+    void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     void multiData(const QModelIndex &index, QModelRoleDataSpan roleDataSpan) const override;
     bool clearItemData(const QModelIndex &index) override;

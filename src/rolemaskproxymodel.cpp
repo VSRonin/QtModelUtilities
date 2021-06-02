@@ -632,6 +632,14 @@ void RoleMaskProxyModel::setSourceModel(QAbstractItemModel *sourceMdl)
                                     [d](const QModelIndex &parent, int start, int end) { d->onRowsAboutToBeRemoved(parent, start, end); })
                 << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeRemoved,
                                     [d](const QModelIndex &parent, int start, int end) { d->onColumnsAboutToBeRemoved(parent, start, end); })
+                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsInserted,
+                                    [d](const QModelIndex &parent, int start, int end) { d->onRowsInserted(parent, start, end); })
+                << QObject::connect(sourceModel(), &QAbstractItemModel::columnsInserted,
+                                    [d](const QModelIndex &parent, int start, int end) { d->onColumnsInserted(parent, start, end); })
+                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsRemoved,
+                                    [d](const QModelIndex &parent, int start, int end) { d->onRowsRemoved(parent, start, end); })
+                << QObject::connect(sourceModel(), &QAbstractItemModel::columnsRemoved,
+                                    [d](const QModelIndex &parent, int start, int end) { d->onColumnsRemoved(parent, start, end); })
                 << QObject::connect(sourceModel(), &QAbstractItemModel::layoutChanged,
                                     [d](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {
                                         d->onLayoutChanged(parents, hint);
@@ -645,9 +653,21 @@ void RoleMaskProxyModel::setSourceModel(QAbstractItemModel *sourceMdl)
                                     [d](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
                                         int destinationRow) {
                                         d->onColumnsAboutToBeMoved(sourceParent, sourceStart, sourceEnd, destinationParent, destinationRow);
-                                    });
+                                    })
+        << QObject::connect(sourceModel(), &QAbstractItemModel::rowsMoved,
+                            [d](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
+                                int destinationRow) {
+                                d->onRowsMoved(sourceParent, sourceStart, sourceEnd, destinationParent, destinationRow);
+                            })
+        << QObject::connect(sourceModel(), &QAbstractItemModel::columnsMoved,
+                            [d](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
+                                int destinationRow) {
+                                d->onColumnsMoved(sourceParent, sourceStart, sourceEnd, destinationParent, destinationRow);
+                            });
     }
 }
+
+
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 /*!
@@ -773,6 +793,18 @@ bool RoleMaskProxyModel::setHeaderData(int section, Qt::Orientation orientation,
         return true;
     }
     return QIdentityProxyModel::setHeaderData(section,orientation,value,role);
+}
+
+/*!
+\reimp
+\details This method will do nothing.
+
+If you want to sort based on the marked data use a QSortFilterProxyModel
+on top of this proxy.
+*/
+void RoleMaskProxyModel::sort(int column, Qt::SortOrder order)
+{
+    return;
 }
 
 /*!

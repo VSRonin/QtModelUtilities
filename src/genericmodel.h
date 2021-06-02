@@ -71,6 +71,7 @@ public:
 #else
     bool clearItemData(const QModelIndex &index);
 #endif
+
 Q_SIGNALS:
     void mergeDisplayEditChanged(bool val);
     void sortRoleChanged(int val);
