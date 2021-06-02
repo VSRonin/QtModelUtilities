@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.2)
 include(TestMacro)
 BasicTest(HtmlModelSerialiser)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Network)
