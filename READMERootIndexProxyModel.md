@@ -1,4 +1,4 @@
-# Root Index Proxy Model
+# Root Index Proxy Model {#RootIndexProxyModelReadme}
 
 This proxy will restrict the model to only descendants of a particular index in the source model.
 

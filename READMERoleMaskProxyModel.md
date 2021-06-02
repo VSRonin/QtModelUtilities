@@ -1,4 +1,4 @@
-# Role Mask Proxy Model
+# Role Mask Proxy Model {#RoleMaskProxyModelReadme}
 
 This proxy will act as a mask on top of the source model to intercept data.
 

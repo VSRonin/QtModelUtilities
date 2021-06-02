@@ -1,4 +1,4 @@
-# Model Serialisation
+# Model Serialisation {#ModelSerialisationReadme}
 
 Implements a general method to serialise `QAbstractItemModel` based models to various common formats.
 

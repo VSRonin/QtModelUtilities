@@ -1,7 +1,7 @@
-# Building from sources
+# Building from sources {#InstallReadme}
 The build system of this library is [CMake](https://cmake.org/), the minimum supported version is 3.9
 
-Once you installed CMake, open a terminal window with the C++ compiler and Qt environment set up. The procedure is platform dependant. 
+Once you installed CMake, you can open the CMakeLists.txt file with a recent version of QtCreator, alternatively you can open a terminal window with the C++ compiler and Qt environment set up. The procedure is platform dependant. 
 On Windows MSVC, for example, it consist in calling `vcvarsall.bat` from the compiler folder and `qtenv2.bat` from the bin folder of Qt.
 
 Now you can call CMake passing arguments to customise the build. The first choice is the generator. It is passed via the `-G "Generator"` argument

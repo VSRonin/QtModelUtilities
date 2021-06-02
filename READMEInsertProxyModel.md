@@ -1,4 +1,4 @@
-# Insert Proxy Model
+# Insert Proxy Model {#InsertProxyModelReadme}
 
 This proxy will add an extra row, column or both to allow users to insert new sections with a familiar interface.
 
