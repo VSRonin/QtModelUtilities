@@ -823,7 +823,7 @@ void InsertProxyModelPrivate::beforeLayoutChange(const QList<QPersistentModelInd
     m_layoutChangePersistentIndexes.reserve(proxyPersistentIndexes.size());
     for (const QModelIndex &proxyPersistentIndex : proxyPersistentIndexes) {
         const QPersistentModelIndex srcPersistentIndex = q->mapToSource(proxyPersistentIndex);
-        if(!srcPersistentIndex.isValid())
+        if (!srcPersistentIndex.isValid())
             continue;
         Q_ASSERT(proxyPersistentIndex.isValid());
         m_layoutChangeProxyIndexes << proxyPersistentIndex;
@@ -863,7 +863,7 @@ void InsertProxyModelPrivate::beforeSort(bool isRow)
     Q_Q(InsertProxyModel);
     if (!q->sourceModel())
         return;
-    if ((isRow ? q->sourceModel()->columnCount() : q->sourceModel()->rowCount())== 0)
+    if ((isRow ? q->sourceModel()->columnCount() : q->sourceModel()->rowCount()) == 0)
         return;
     const int maxSortedIdx = isRow ? q->sourceModel()->rowCount() : q->sourceModel()->columnCount();
     const InsertProxyModel::InsertDirections directionCheck = isRow ? InsertProxyModel::InsertColumn : InsertProxyModel::InsertRow;
