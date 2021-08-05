@@ -25,6 +25,8 @@ class InsertProxyModelPrivate
     InsertProxyModel::InsertDirections m_insertDirection;
     QVector<QPersistentModelIndex> m_layoutChangePersistentIndexes;
     QModelIndexList m_layoutChangeProxyIndexes;
+    QVector<QPersistentModelIndex> m_layoutChangeExtraPersistentIndexes;
+    QModelIndexList m_layoutChangeExtraProxyIndexes;
     QList<RolesContainer> m_extraData[2];
     RolesContainer m_extraHeaderData[2];
     RolesContainer m_dataForCorner;
@@ -35,18 +37,12 @@ class InsertProxyModelPrivate
     bool commitRow();
     bool commitToSource(const bool isRow);
     int mergeEditDisplayHash(RolesContainer &singleHash);
-    void onColumnsInserted(const QModelIndex &parent, int first, int last) { onInserted(false, parent, first, last); }
-    void onColumnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)
-    {
-        onMoved(false, parent, start, end, destination, column);
-    }
-    void onColumnsRemoved(const QModelIndex &parent, int first, int last) { onRemoved(false, parent, first, last); }
-    void onRowsInserted(const QModelIndex &parent, int first, int last) { onInserted(true, parent, first, last); }
-    void onRowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
-    {
-        onMoved(true, parent, start, end, destination, row);
-    }
-    void onRowsRemoved(const QModelIndex &parent, int first, int last) { onRemoved(true, parent, first, last); }
+    void onColumnsInserted(const QModelIndex &parent, int first, int last);
+    void onColumnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column);
+    void onColumnsRemoved(const QModelIndex &parent, int first, int last);
+    void onRowsInserted(const QModelIndex &parent, int first, int last);
+    void onRowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row);
+    void onRowsRemoved(const QModelIndex &parent, int first, int last);
     void onInserted(bool isRow, const QModelIndex &parent, int first, int last);
     void onMoved(bool isRow, const QModelIndex &parent, int start, int end, const QModelIndex &destination, int destIdx);
     void onRemoved(bool isRow, const QModelIndex &parent, int first, int last);

@@ -544,7 +544,7 @@ void tst_InsertProxyModel::testDataForCorner()
 void tst_InsertProxyModel::testSort()
 {
     QFETCH(bool, sortProxy);
-    QStringListModel baseModel(QStringList({QStringLiteral("b"), QStringLiteral("a"), QStringLiteral("d"), QStringLiteral("c")}));
+    QStringListModel baseModel(QStringList{QStringLiteral("b"), QStringLiteral("a"), QStringLiteral("d"), QStringLiteral("c")});
     InsertProxyModel proxyModel;
     new ModelTest(&proxyModel, this);
     proxyModel.setSourceModel(&baseModel);
@@ -568,6 +568,10 @@ void tst_InsertProxyModel::testSort()
     persistCode = std::make_pair(persistExtra.row(), persistExtra.column());
     QCOMPARE(persistExtra.data().toInt(), 1);
     QCOMPARE(persistInside.data().toString(), persistBase.data().toString());
+    QCOMPARE(persistInside.row(), 1);
+    QCOMPARE(persistInside.column(), 0);
+    QCOMPARE(persistExtra.row(), 1);
+    QCOMPARE(persistExtra.column(), 1);
     for (int i = 0; i < baseModel.rowCount(); ++i)
         QCOMPARE(proxyModel.index(i, 1).data().toInt(), i);
 }
@@ -1028,4 +1032,44 @@ void tst_InsertProxyModel::testCommitSubclass()
             QCOMPARE(proxy.index(originalRowCount + 1, i).data(), QVariant());
     }
     baseModel->deleteLater();
+}
+
+void tst_InsertProxyModel::createPersistentOnLayoutAboutToBeChanged()
+{
+    QStringListModel model(QStringList{QStringLiteral("1"), QStringLiteral("2"), QStringLiteral("3")});
+    InsertProxyModel proxy;
+    new ModelTest(&proxy, &proxy);
+    proxy.setSourceModel(&model);
+    proxy.setInsertDirection(InsertProxyModel::InsertRow);
+    proxy.setData(proxy.index(3, 0), QStringLiteral("4"));
+    QList<QPersistentModelIndex> idxList;
+    QSignalSpy layoutAboutToBeChangedSpy(&proxy, SIGNAL(layoutAboutToBeChanged()));
+    QVERIFY(layoutAboutToBeChangedSpy.isValid());
+    QSignalSpy layoutChangedSpy(&proxy, SIGNAL(layoutChanged()));
+    QVERIFY(layoutChangedSpy.isValid());
+    connect(&proxy, &QAbstractItemModel::layoutAboutToBeChanged, this, [&idxList, &proxy](){
+        idxList.clear();
+        for (int row = 0; row < 4; ++row)
+            idxList << QPersistentModelIndex(proxy.index(row, 0));
+    });
+    connect(&proxy, &QAbstractItemModel::layoutChanged, this, [&idxList](){
+        QCOMPARE(idxList.size(), 4);
+        QCOMPARE(idxList.at(0).row(), 1);
+        QCOMPARE(idxList.at(0).column(), 0);
+        QCOMPARE(idxList.at(0).data().toString(), QStringLiteral("1"));
+        QCOMPARE(idxList.at(1).row(), 0);
+        QCOMPARE(idxList.at(1).column(), 0);
+        QCOMPARE(idxList.at(1).data().toString(), QStringLiteral("0"));
+        QCOMPARE(idxList.at(2).row(), 2);
+        QCOMPARE(idxList.at(2).column(), 0);
+        QCOMPARE(idxList.at(2).data().toString(), QStringLiteral("3"));
+        QCOMPARE(idxList.at(3).row(), 3);
+        QCOMPARE(idxList.at(3).column(), 0);
+        QCOMPARE(idxList.at(3).data().toString(), QStringLiteral("4"));
+
+    });
+    model.setData(model.index(1, 0), QStringLiteral("0"));
+    model.sort(0);
+    QCOMPARE(layoutAboutToBeChangedSpy.size(), 1);
+    QCOMPARE(layoutChangedSpy.size(), 1);
 }

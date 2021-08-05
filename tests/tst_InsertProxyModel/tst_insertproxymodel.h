@@ -34,5 +34,6 @@ private Q_SLOTS:
     void testSort_data();
     void testInsertOnEmptyModel();
     void testResetModel();
+    void createPersistentOnLayoutAboutToBeChanged();
 };
 #endif // TST_INSERTPROXYMODEL_H
