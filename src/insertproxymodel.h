@@ -24,6 +24,7 @@ class MODELUTILITIES_EXPORT InsertProxyModel : public QAbstractProxyModel
     Q_PROPERTY(bool mergeDisplayEdit READ mergeDisplayEdit WRITE setMergeDisplayEdit NOTIFY mergeDisplayEditChanged)
     Q_DISABLE_COPY(InsertProxyModel)
     Q_DECLARE_PRIVATE_D(m_dptr, InsertProxyModel)
+    InsertProxyModelPrivate *m_dptr;
 public:
     enum InsertDirection { NoInsert = 0x0, InsertRow = 0x1, InsertColumn = 0x2 };
     Q_DECLARE_FLAGS(InsertDirections, InsertDirection)
@@ -65,23 +66,19 @@ public:
     virtual void setDataForCorner(const QVariant &value, int role = Qt::EditRole);
     bool mergeDisplayEdit() const;
     void setMergeDisplayEdit(bool val);
-public Q_SLOTS:
-    bool commitRow();
-    bool commitColumn();
-Q_SIGNALS:
-    void dataForCornerChanged(const QVector<int> &roles);
-    void extraDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
-    void mergeDisplayEditChanged(bool separate);
-    void insertDirectionChanged(InsertDirections direction);
-
 protected:
     virtual bool validRow() const;
     virtual bool validColumn() const;
     virtual Qt::ItemFlags flagForExtra(bool isRow, int section) const;
     InsertProxyModel(InsertProxyModelPrivate &dptr, QObject *parent);
-
-private:
-    InsertProxyModelPrivate *m_dptr;
+public Q_SLOTS:
+    virtual bool commitRow();
+    virtual bool commitColumn();
+Q_SIGNALS:
+    void dataForCornerChanged(const QVector<int> &roles);
+    void extraDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
+    void mergeDisplayEditChanged(bool separate);
+    void insertDirectionChanged(InsertDirections direction);
 };
 Q_DECLARE_METATYPE(InsertProxyModel::InsertDirections)
 Q_DECLARE_OPERATORS_FOR_FLAGS(InsertProxyModel::InsertDirections)
