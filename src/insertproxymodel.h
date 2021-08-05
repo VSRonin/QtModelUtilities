@@ -25,6 +25,7 @@ class MODELUTILITIES_EXPORT InsertProxyModel : public QAbstractProxyModel
     Q_DISABLE_COPY(InsertProxyModel)
     Q_DECLARE_PRIVATE_D(m_dptr, InsertProxyModel)
     InsertProxyModelPrivate *m_dptr;
+
 public:
     enum InsertDirection { NoInsert = 0x0, InsertRow = 0x1, InsertColumn = 0x2 };
     Q_DECLARE_FLAGS(InsertDirections, InsertDirection)
@@ -66,6 +67,7 @@ public:
     virtual void setDataForCorner(const QVariant &value, int role = Qt::EditRole);
     bool mergeDisplayEdit() const;
     void setMergeDisplayEdit(bool val);
+
 protected:
     virtual bool validRow() const;
     virtual bool validColumn() const;

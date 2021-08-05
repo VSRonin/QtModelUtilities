@@ -1046,11 +1046,11 @@ void tst_GenericModel::sortList()
     testModel.setData(testModel.index(2, 0), 4);
     testModel.setData(testModel.index(3, 0), 2);
     testModel.setData(testModel.index(4, 0), 5);
-    testModel.setHeaderData(0,Qt::Vertical, 3);
-    testModel.setHeaderData(1,Qt::Vertical, 1);
-    testModel.setHeaderData(2,Qt::Vertical, 4);
-    testModel.setHeaderData(3,Qt::Vertical, 2);
-    testModel.setHeaderData(4,Qt::Vertical, 5);
+    testModel.setHeaderData(0, Qt::Vertical, 3);
+    testModel.setHeaderData(1, Qt::Vertical, 1);
+    testModel.setHeaderData(2, Qt::Vertical, 4);
+    testModel.setHeaderData(3, Qt::Vertical, 2);
+    testModel.setHeaderData(4, Qt::Vertical, 5);
     QPersistentModelIndex oneIndex(testModel.index(1, 0));
     QPersistentModelIndex fiveIndex(testModel.index(4, 0));
     QCOMPARE(oneIndex.data().toInt(), 1);
@@ -1061,7 +1061,7 @@ void tst_GenericModel::sortList()
     QCOMPARE(layoutChangedSpy.count(), 1);
     for (int i = 0; i < 5; ++i) {
         QCOMPARE(testModel.data(testModel.index(i, 0)).toInt(), i + 1);
-        QCOMPARE(testModel.headerData(i,Qt::Vertical).toInt(), i + 1);
+        QCOMPARE(testModel.headerData(i, Qt::Vertical).toInt(), i + 1);
     }
     QCOMPARE(oneIndex.data().toInt(), 1);
     QCOMPARE(fiveIndex.data().toInt(), 5);
@@ -1073,7 +1073,7 @@ void tst_GenericModel::sortList()
     QCOMPARE(layoutChangedSpy.count(), 2);
     for (int i = 0; i < 5; ++i) {
         QCOMPARE(testModel.data(testModel.index(i, 0)).toInt(), i + 1);
-        QCOMPARE(testModel.headerData(i,Qt::Vertical).toInt(), i + 1);
+        QCOMPARE(testModel.headerData(i, Qt::Vertical).toInt(), i + 1);
     }
     QCOMPARE(oneIndex.data().toInt(), 1);
     QCOMPARE(fiveIndex.data().toInt(), 5);
@@ -1085,7 +1085,7 @@ void tst_GenericModel::sortList()
     QCOMPARE(layoutChangedSpy.count(), 3);
     for (int i = 0; i < 5; ++i) {
         QCOMPARE(testModel.data(testModel.index(i, 0)).toInt(), 5 - i);
-        QCOMPARE(testModel.headerData(i,Qt::Vertical).toInt(), 5-i);
+        QCOMPARE(testModel.headerData(i, Qt::Vertical).toInt(), 5 - i);
     }
     QCOMPARE(oneIndex.data().toInt(), 1);
     QCOMPARE(fiveIndex.data().toInt(), 5);

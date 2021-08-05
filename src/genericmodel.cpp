@@ -328,7 +328,7 @@ void GenericModelItem::setSpan(const QSize &sz)
 
 void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, bool recursive, QVector<RolesContainer> *headersToSort)
 {
-    sortChildren(column, role, order, recursive, m_model->persistentIndexList(),headersToSort);
+    sortChildren(column, role, order, recursive, m_model->persistentIndexList(), headersToSort);
 }
 
 void GenericModelItem::moveChildRows(int sourceRow, int count, int destinationChild)
@@ -395,7 +395,8 @@ void GenericModelItem::setColumn(int c)
     m_column = c;
 }
 
-void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, bool recursive, const QModelIndexList &persistentIndexes, QVector<RolesContainer> *headersToSort)
+void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, bool recursive, const QModelIndexList &persistentIndexes,
+                                    QVector<RolesContainer> *headersToSort)
 {
     Q_ASSERT(column >= 0);
     if (children.isEmpty() || column >= m_colCount)
@@ -421,15 +422,15 @@ void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, b
     else
         std::stable_sort(columnChildren.begin(), columnChildren.end(), greaterComparison);
     QVector<RolesContainer> updatedHeadersToSort;
-    if(headersToSort)
-        updatedHeadersToSort = QVector<RolesContainer>(headersToSort->size(),RolesContainer());
+    if (headersToSort)
+        updatedHeadersToSort = QVector<RolesContainer>(headersToSort->size(), RolesContainer());
     QVector<GenericModelItem *> newChildren;
     newChildren.reserve(children.size());
     QModelIndexList changedPersistentIndexesFrom, changedPersistentIndexesTo;
     for (int toRow = 0, maxRow = columnChildren.size(); toRow < maxRow; ++toRow) {
         GenericModelItem *const columnChild = columnChildren.at(toRow);
         const int fromRow = columnChild->m_row;
-        if(headersToSort)
+        if (headersToSort)
             updatedHeadersToSort[toRow] = headersToSort->at(fromRow);
         for (int i = m_colCount * fromRow; i < m_colCount * (fromRow + 1); ++i) {
             GenericModelItem *const iChild = children.at(i);
@@ -447,7 +448,7 @@ void GenericModelItem::sortChildren(int column, int role, Qt::SortOrder order, b
     Q_ASSERT(newChildren.size() == children.size());
     Q_ASSERT(std::all_of(newChildren.constBegin(), newChildren.constEnd(), [](const GenericModelItem *a) -> bool { return a != nullptr; }));
     children = newChildren;
-    if(headersToSort)
+    if (headersToSort)
         *headersToSort = updatedHeadersToSort;
     m_model->changePersistentIndexList(changedPersistentIndexesFrom, changedPersistentIndexesTo);
 }
@@ -931,44 +932,43 @@ QVariant GenericModel::headerData(int section, Qt::Orientation orientation, int 
 */
 QStringList GenericModel::mimeTypes() const
 {
-    return QAbstractItemModel::mimeTypes()
-            << QStringLiteral("application/x-genericmodeldatalist");
+    return QAbstractItemModel::mimeTypes() << QStringLiteral("application/x-genericmodeldatalist");
 }
 
 void GenericModelPrivate::encodeMime(QMimeData *data, const QModelIndexList &indexes) const
 {
     Q_ASSERT(data);
     Q_Q(const GenericModel);
-    QSet<GenericModelItem*> itemsToSave;
-    for(auto&& idx : indexes){
-        if(!idx.isValid())
+    QSet<GenericModelItem *> itemsToSave;
+    for (auto &&idx : indexes) {
+        if (!idx.isValid())
             continue;
-        Q_ASSERT(idx.model()==q);
+        Q_ASSERT(idx.model() == q);
         itemsToSave << itemForIndex(idx);
     }
-    for(auto i=itemsToSave.begin();i!=itemsToSave.end();){
+    for (auto i = itemsToSave.begin(); i != itemsToSave.end();) {
         bool iToErase = false;
-        auto j=i;
-        for(++j;j!=itemsToSave.end();){
-            if(GenericModelItem::isAnchestor(*i,*j)){
-                j=itemsToSave.erase(j);
+        auto j = i;
+        for (++j; j != itemsToSave.end();) {
+            if (GenericModelItem::isAnchestor(*i, *j)) {
+                j = itemsToSave.erase(j);
                 continue;
             }
-            if(GenericModelItem::isAnchestor(*j,*i)){
-               iToErase=true;
-               break;
+            if (GenericModelItem::isAnchestor(*j, *i)) {
+                iToErase = true;
+                break;
             }
             ++j;
         }
-        if(iToErase)
-            i=itemsToSave.erase(i);
+        if (iToErase)
+            i = itemsToSave.erase(i);
         else
             ++i;
     }
     QByteArray encoded;
     QDataStream stream(&encoded, QIODevice::WriteOnly);
     stream << qint32(itemsToSave.size());
-    for(auto i=itemsToSave.begin();i!=itemsToSave.end();++i)
+    for (auto i = itemsToSave.begin(); i != itemsToSave.end(); ++i)
         stream << **i;
     data->setData(QStringLiteral("application/x-genericmodeldatalist"), encoded);
 }
@@ -976,7 +976,7 @@ void GenericModelPrivate::encodeMime(QMimeData *data, const QModelIndexList &ind
 bool GenericModelPrivate::decodeMime(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
 {
     Q_ASSERT(data);
-    if(!data->hasFormat(QStringLiteral("application/x-genericmodeldatalist")))
+    if (!data->hasFormat(QStringLiteral("application/x-genericmodeldatalist")))
         return false;
 
     return true;
@@ -987,69 +987,77 @@ bool GenericModelPrivate::decodeMime(const QMimeData *data, Qt::DropAction actio
 */
 QMimeData *GenericModel::mimeData(const QModelIndexList &indexes) const
 {
-   QMimeData *data = QAbstractItemModel::mimeData(indexes);
-   if (!data)
-       return nullptr;
-   Q_D(const GenericModel);
-   d->encodeMime(data,indexes);
-   return data;
+    QMimeData *data = QAbstractItemModel::mimeData(indexes);
+    if (!data)
+        return nullptr;
+    Q_D(const GenericModel);
+    d->encodeMime(data, indexes);
+    return data;
 }
 
 bool GenericModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
 {
-    Q_ASSERT(!parent.isValid() || parent.model()==this);
+    Q_ASSERT(!parent.isValid() || parent.model() == this);
     if (!data)
         return false;
     if (!(action & supportedDropActions()))
-            return false;
+        return false;
     Q_D(GenericModel);
-    if(d->decodeMime(data,action,row,column,parent))
+    if (d->decodeMime(data, action, row, column, parent))
         return true;
-    return QAbstractItemModel::dropMimeData(data,action,row,column,parent);
+    return QAbstractItemModel::dropMimeData(data, action, row, column, parent);
 }
 
-bool GenericModelItem::isAnchestor(GenericModelItem *ancestor, GenericModelItem *descendent){
-    if(!descendent)
+bool GenericModelItem::isAnchestor(GenericModelItem *ancestor, GenericModelItem *descendent)
+{
+    if (!descendent)
         return false;
-    if(!ancestor)
+    if (!ancestor)
         return true;
-    if(ancestor==descendent)
+    if (ancestor == descendent)
         return false;
-    for(GenericModelItem* par = descendent->parent;par;par=par->parent){
-        if(par==ancestor)
+    for (GenericModelItem *par = descendent->parent; par; par = par->parent) {
+        if (par == ancestor)
             return true;
     }
     return false;
 }
 
-QDataStream &operator<<(QDataStream &stream, const GenericModelItem &item){
-    stream << qint32(item.m_colCount) << qint32(item.m_rowCount) << qint32(item.m_row) << qint32(item.m_column)
-           << qint32(item.m_rowSpan)<<qint32(item.m_colSpan)<<item.data<<item.flags << qint32(item.children.size());
-    for(GenericModelItem * child : item.children)
+QDataStream &operator<<(QDataStream &stream, const GenericModelItem &item)
+{
+    stream << qint32(item.m_colCount) << qint32(item.m_rowCount) << qint32(item.m_row) << qint32(item.m_column) << qint32(item.m_rowSpan)
+           << qint32(item.m_colSpan) << item.data << item.flags << qint32(item.children.size());
+    for (GenericModelItem *child : item.children)
         stream << *child;
     return stream;
 }
 
-QDataStream &operator>>(QDataStream &stream, GenericModelItem &item){
+QDataStream &operator>>(QDataStream &stream, GenericModelItem &item)
+{
     qint32 temp;
-    stream >> temp; item.m_colCount = temp;
-    stream >> temp; item.m_rowCount = temp;
-    stream >> temp; item.m_row = temp;
-    stream >> temp; item.m_column = temp;
-    stream >> temp; item.m_rowSpan = temp;
-    stream >> temp; item.m_colSpan = temp;
+    stream >> temp;
+    item.m_colCount = temp;
+    stream >> temp;
+    item.m_rowCount = temp;
+    stream >> temp;
+    item.m_row = temp;
+    stream >> temp;
+    item.m_column = temp;
+    stream >> temp;
+    item.m_rowSpan = temp;
+    stream >> temp;
+    item.m_colSpan = temp;
     stream >> item.data >> item.flags >> temp;
-    if(item.children.size()>temp){
-        qDeleteAll(item.children.begin()+temp,item.children.end());
-        item.children.erase(item.children.begin()+temp,item.children.end());
+    if (item.children.size() > temp) {
+        qDeleteAll(item.children.begin() + temp, item.children.end());
+        item.children.erase(item.children.begin() + temp, item.children.end());
     }
     const int oldChildSize = item.children.size();
-    for(int i=0;i<temp;++i){
-        if(i<oldChildSize){
+    for (int i = 0; i < temp; ++i) {
+        if (i < oldChildSize) {
             stream >> *item.children.at(i);
-        }
-        else{
-            GenericModelItem* newItem = new GenericModelItem(&item);
+        } else {
+            GenericModelItem *newItem = new GenericModelItem(&item);
             stream >> *newItem;
             item.children.append(newItem);
         }
@@ -1379,8 +1387,6 @@ void GenericModelPrivate::signalAllChanged(const QVector<int> &roles, const QMod
     }
     q->dataChanged(q->index(0, 0, parent), q->index(rowCnt - 1, colCnt - 1, parent), roles);
 }
-
-
 
 void GenericModelPrivate::setMergeDisplayEdit(bool val)
 {

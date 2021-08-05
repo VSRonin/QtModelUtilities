@@ -45,12 +45,13 @@ public:
     void setMergeDisplayEdit(bool val);
     QSize span() const;
     void setSpan(const QSize &sz);
-    void sortChildren(int column, int role, Qt::SortOrder order, bool recursive, QVector<RolesContainer>* headersToSort);
+    void sortChildren(int column, int role, Qt::SortOrder order, bool recursive, QVector<RolesContainer> *headersToSort);
     void moveChildRows(int sourceRow, int count, int destinationChild);
     void moveChildColumns(int sourceCol, int count, int destinationChild);
     void setRow(int r);
     void setColumn(int c);
-    static bool isAnchestor(GenericModelItem* ancestor, GenericModelItem* descendent);
+    static bool isAnchestor(GenericModelItem *ancestor, GenericModelItem *descendent);
+
 private:
     int m_colCount;
     int m_rowCount;
@@ -60,7 +61,8 @@ private:
     int m_colSpan;
     GenericModel *m_model;
     QVector<GenericModelItem *> children;
-    void sortChildren(int column, int role, Qt::SortOrder order, bool recursive, const QModelIndexList &persistentIndexes, QVector<RolesContainer>* headersToSort);
+    void sortChildren(int column, int role, Qt::SortOrder order, bool recursive, const QModelIndexList &persistentIndexes,
+                      QVector<RolesContainer> *headersToSort);
     friend QDataStream &operator<<(QDataStream &stream, const GenericModelItem &item);
     friend QDataStream &operator>>(QDataStream &stream, GenericModelItem &item);
 };

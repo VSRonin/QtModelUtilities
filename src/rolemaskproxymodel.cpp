@@ -199,17 +199,17 @@ void RoleMaskProxyModelPrivate::onLayoutChanged(const QList<QPersistentModelInde
         updatedMasked.insert(newKey, i.value());
     }
     m_masked = std::move(updatedMasked);
-    if(hint!=QAbstractItemModel::HorizontalSortHint) {
+    if (hint != QAbstractItemModel::HorizontalSortHint) {
         QVector<RolesContainer> updatedvHeaderData(m_vHeaderData.size());
-        for(int i=0;i<m_sortVHeaders.size();++i){
+        for (int i = 0; i < m_sortVHeaders.size(); ++i) {
             updatedvHeaderData[m_sortVHeaders.at(i).row()] = m_vHeaderData.at(i);
         }
         m_sortVHeaders.clear();
         m_vHeaderData = std::move(updatedvHeaderData);
     }
-    if(hint!=QAbstractItemModel::VerticalSortHint) {
+    if (hint != QAbstractItemModel::VerticalSortHint) {
         QVector<RolesContainer> updatedhHeaderData(m_hHeaderData.size());
-        for(int i=0;i<m_sortHHeaders.size();++i){
+        for (int i = 0; i < m_sortHHeaders.size(); ++i) {
             updatedhHeaderData[m_sortHHeaders.at(i).row()] = m_hHeaderData.at(i);
         }
         m_sortHHeaders.clear();
@@ -220,17 +220,17 @@ void RoleMaskProxyModelPrivate::onLayoutChanged(const QList<QPersistentModelInde
 void RoleMaskProxyModelPrivate::onLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
 {
     Q_Q(RoleMaskProxyModel);
-    if(hint!=QAbstractItemModel::VerticalSortHint) {
+    if (hint != QAbstractItemModel::VerticalSortHint) {
         Q_ASSERT(m_sortHHeaders.isEmpty());
         const int colC = q->sourceModel()->columnCount();
-        for(int i=0;i<colC;++i)
-            m_sortHHeaders.append(q->sourceModel()->index(0,i));
+        for (int i = 0; i < colC; ++i)
+            m_sortHHeaders.append(q->sourceModel()->index(0, i));
     }
-    if(hint!=QAbstractItemModel::HorizontalSortHint) {
+    if (hint != QAbstractItemModel::HorizontalSortHint) {
         Q_ASSERT(m_sortVHeaders.isEmpty());
         const int rowC = q->sourceModel()->rowCount();
-        for(int i=0;i<rowC;++i)
-            m_sortVHeaders.append(q->sourceModel()->index(i,0));
+        for (int i = 0; i < rowC; ++i)
+            m_sortVHeaders.append(q->sourceModel()->index(i, 0));
     }
 }
 
@@ -360,37 +360,38 @@ void RoleMaskProxyModelPrivate::onColumnsAboutToBeMoved(const QModelIndex &sourc
 
 void RoleMaskProxyModelPrivate::onRowsInserted(const QModelIndex &parent, int start, int end)
 {
-    if(m_maskHeaderData && !parent.isValid())
-        m_vHeaderData.insert(start,end-start+1,RolesContainer());
+    if (m_maskHeaderData && !parent.isValid())
+        m_vHeaderData.insert(start, end - start + 1, RolesContainer());
 }
 
 void RoleMaskProxyModelPrivate::onColumnsInserted(const QModelIndex &parent, int start, int end)
 {
-    if(m_maskHeaderData && !parent.isValid())
-        m_hHeaderData.insert(start,end-start+1,RolesContainer());
+    if (m_maskHeaderData && !parent.isValid())
+        m_hHeaderData.insert(start, end - start + 1, RolesContainer());
 }
 
 void RoleMaskProxyModelPrivate::onRowsRemoved(const QModelIndex &parent, int start, int end)
 {
-    if(m_maskHeaderData && !parent.isValid())
-        m_vHeaderData.remove(start,end-start+1);
+    if (m_maskHeaderData && !parent.isValid())
+        m_vHeaderData.remove(start, end - start + 1);
 }
 
 void RoleMaskProxyModelPrivate::onColumnsRemoved(const QModelIndex &parent, int start, int end)
 {
-    if(m_maskHeaderData && !parent.isValid())
-        m_hHeaderData.remove(start,end-start+1);
+    if (m_maskHeaderData && !parent.isValid())
+        m_hHeaderData.remove(start, end - start + 1);
 }
 
-void RoleMaskProxyModelPrivate::onRowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)
+void RoleMaskProxyModelPrivate::onRowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
+                                            int destinationRow)
 {
-    if(!m_maskHeaderData)
+    if (!m_maskHeaderData)
         return;
-    if(sourceParent!=destinationParent){
-        if(!sourceParent.isValid())
-            m_vHeaderData.remove(sourceStart,sourceEnd-sourceStart+1);
-        if(!destinationParent.isValid())
-            m_vHeaderData.insert(destinationRow,sourceEnd-sourceStart+1,RolesContainer());
+    if (sourceParent != destinationParent) {
+        if (!sourceParent.isValid())
+            m_vHeaderData.remove(sourceStart, sourceEnd - sourceStart + 1);
+        if (!destinationParent.isValid())
+            m_vHeaderData.insert(destinationRow, sourceEnd - sourceStart + 1, RolesContainer());
         return;
     }
     const auto sourceiBegin = m_vHeaderData.begin() + sourceStart;
@@ -402,15 +403,16 @@ void RoleMaskProxyModelPrivate::onRowsMoved(const QModelIndex &sourceParent, int
         std::rotate(sourceiBegin, sourceiEnd, destination);
 }
 
-void RoleMaskProxyModelPrivate::onColumnsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)
+void RoleMaskProxyModelPrivate::onColumnsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
+                                               int destinationColumn)
 {
-    if(!m_maskHeaderData)
+    if (!m_maskHeaderData)
         return;
-    if(sourceParent!=destinationParent){
-        if(!sourceParent.isValid())
-            m_hHeaderData.remove(sourceStart,sourceEnd-sourceStart+1);
-        if(!destinationParent.isValid())
-            m_hHeaderData.insert(destinationColumn,sourceEnd-sourceStart+1,RolesContainer());
+    if (sourceParent != destinationParent) {
+        if (!sourceParent.isValid())
+            m_hHeaderData.remove(sourceStart, sourceEnd - sourceStart + 1);
+        if (!destinationParent.isValid())
+            m_hHeaderData.insert(destinationColumn, sourceEnd - sourceStart + 1, RolesContainer());
         return;
     }
     const auto sourceiBegin = m_hHeaderData.begin() + sourceStart;
@@ -491,13 +493,13 @@ void RoleMaskProxyModelPrivate::signalAllChanged(const QVector<int> &roles, cons
                 signalAllChanged(roles, currPar);
         }
     }
-    if(rowCnt>0 && colCnt>0)
+    if (rowCnt > 0 && colCnt > 0)
         q->dataChanged(q->index(0, 0, parent), q->index(rowCnt - 1, colCnt - 1, parent), roles);
-    if(m_maskHeaderData && !parent.isValid()){
-        if(colCnt>0)
-            q->headerDataChanged(Qt::Horizontal,0,colCnt-1);
-        if(rowCnt>0)
-            q->headerDataChanged(Qt::Vertical,0,rowCnt-1);
+    if (m_maskHeaderData && !parent.isValid()) {
+        if (colCnt > 0)
+            q->headerDataChanged(Qt::Horizontal, 0, colCnt - 1);
+        if (rowCnt > 0)
+            q->headerDataChanged(Qt::Vertical, 0, rowCnt - 1);
     }
 }
 
@@ -691,20 +693,16 @@ void RoleMaskProxyModel::setSourceModel(QAbstractItemModel *sourceMdl)
                                         int destinationRow) {
                                         d->onColumnsAboutToBeMoved(sourceParent, sourceStart, sourceEnd, destinationParent, destinationRow);
                                     })
-        << QObject::connect(sourceModel(), &QAbstractItemModel::rowsMoved,
-                            [d](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
-                                int destinationRow) {
-                                d->onRowsMoved(sourceParent, sourceStart, sourceEnd, destinationParent, destinationRow);
-                            })
-        << QObject::connect(sourceModel(), &QAbstractItemModel::columnsMoved,
-                            [d](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
-                                int destinationRow) {
-                                d->onColumnsMoved(sourceParent, sourceStart, sourceEnd, destinationParent, destinationRow);
-                            });
+                << QObject::connect(
+                           sourceModel(), &QAbstractItemModel::rowsMoved,
+                           [d](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
+                               int destinationRow) { d->onRowsMoved(sourceParent, sourceStart, sourceEnd, destinationParent, destinationRow); })
+                << QObject::connect(
+                           sourceModel(), &QAbstractItemModel::columnsMoved,
+                           [d](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
+                               int destinationRow) { d->onColumnsMoved(sourceParent, sourceStart, sourceEnd, destinationParent, destinationRow); });
     }
 }
-
-
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 /*!
@@ -772,7 +770,7 @@ bool RoleMaskProxyModel::setData(const QModelIndex &proxyIndex, const QVariant &
     Q_ASSERT(sourceIndex.isValid());
     RolesContainer *idxData = d->dataForIndex(sourceIndex);
     if (!idxData) {
-        if (value.isValid()){
+        if (value.isValid()) {
             RolesContainer newData;
             newData.insert(role, value);
             d->insertData(sourceIndex, newData);
@@ -806,30 +804,29 @@ bool RoleMaskProxyModel::setData(const QModelIndex &proxyIndex, const QVariant &
 bool RoleMaskProxyModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
 {
     Q_D(RoleMaskProxyModel);
-    if(d->m_maskHeaderData && d->m_maskedRoles.contains(role)){
-        QVector<RolesContainer>& dataContainerVect = orientation==Qt::Horizontal ? d->m_hHeaderData : d->m_vHeaderData;
-        if(section<0 || section >= dataContainerVect.size())
+    if (d->m_maskHeaderData && d->m_maskedRoles.contains(role)) {
+        QVector<RolesContainer> &dataContainerVect = orientation == Qt::Horizontal ? d->m_hHeaderData : d->m_vHeaderData;
+        if (section < 0 || section >= dataContainerVect.size())
             return false;
-        RolesContainer& dataContainer=dataContainerVect[section];
+        RolesContainer &dataContainer = dataContainerVect[section];
         auto dataIter = dataContainer.find(role);
-        if(dataIter==dataContainer.end()){
-            if (value.isValid()){
-                dataContainer.insert(role,value);
-                headerDataChanged(orientation,section,section);
+        if (dataIter == dataContainer.end()) {
+            if (value.isValid()) {
+                dataContainer.insert(role, value);
+                headerDataChanged(orientation, section, section);
             }
             return true;
         }
-        if(!value.isValid()){
+        if (!value.isValid()) {
             dataContainer.erase(dataIter);
-            headerDataChanged(orientation,section,section);
-        }
-        else if(dataIter.value()!=value){
-            dataIter.value()=value;
-            headerDataChanged(orientation,section,section);
+            headerDataChanged(orientation, section, section);
+        } else if (dataIter.value() != value) {
+            dataIter.value() = value;
+            headerDataChanged(orientation, section, section);
         }
         return true;
     }
-    return QIdentityProxyModel::setHeaderData(section,orientation,value,role);
+    return QIdentityProxyModel::setHeaderData(section, orientation, value, role);
 }
 
 /*!
@@ -839,8 +836,7 @@ bool RoleMaskProxyModel::setHeaderData(int section, Qt::Orientation orientation,
 If you want to sort based on the marked data use a QSortFilterProxyModel
 on top of this proxy.
 */
-void RoleMaskProxyModel::sort(int column, Qt::SortOrder order)
-{}
+void RoleMaskProxyModel::sort(int column, Qt::SortOrder order) { }
 
 /*!
 Removes all the data managed by the proxy model for a certain \a index.
@@ -973,18 +969,18 @@ QMap<int, QVariant> RoleMaskProxyModel::itemData(const QModelIndex &index) const
 QVariant RoleMaskProxyModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     Q_D(const RoleMaskProxyModel);
-    if(d->m_maskHeaderData && d->m_maskedRoles.contains(role)){
-        const QVector<RolesContainer>& dataContainerVect = orientation==Qt::Horizontal ? d->m_hHeaderData : d->m_vHeaderData;
-        if(section<0 || section >= dataContainerVect.size())
+    if (d->m_maskHeaderData && d->m_maskedRoles.contains(role)) {
+        const QVector<RolesContainer> &dataContainerVect = orientation == Qt::Horizontal ? d->m_hHeaderData : d->m_vHeaderData;
+        if (section < 0 || section >= dataContainerVect.size())
             return QVariant();
-        const RolesContainer& dataContainer=dataContainerVect.at(section);
+        const RolesContainer &dataContainer = dataContainerVect.at(section);
         const auto roleIter = dataContainer.constFind(role);
-        if(roleIter!=dataContainer.constEnd())
+        if (roleIter != dataContainer.constEnd())
             return *roleIter;
-        if(!d->m_transparentIfEmpty)
+        if (!d->m_transparentIfEmpty)
             return QVariant();
     }
-    return QIdentityProxyModel::headerData(section,orientation,role);
+    return QIdentityProxyModel::headerData(section, orientation, role);
 }
 
 /*!
@@ -1038,25 +1034,24 @@ bool RoleMaskProxyModel::maskHeaderData() const
 void RoleMaskProxyModel::setMaskHeaderData(bool val)
 {
     Q_D(RoleMaskProxyModel);
-    if (val==d->m_maskHeaderData)
+    if (val == d->m_maskHeaderData)
         return;
     d->m_maskHeaderData = val;
     const int colCnt = columnCount();
     const int rowCnt = rowCount();
-    if(val){
-        if(colCnt>0)
-            d->m_hHeaderData = QVector<RolesContainer>(colCnt,RolesContainer());
-        if(rowCnt>0)
-            d->m_vHeaderData = QVector<RolesContainer>(rowCnt,RolesContainer());
-    }
-    else{
+    if (val) {
+        if (colCnt > 0)
+            d->m_hHeaderData = QVector<RolesContainer>(colCnt, RolesContainer());
+        if (rowCnt > 0)
+            d->m_vHeaderData = QVector<RolesContainer>(rowCnt, RolesContainer());
+    } else {
         d->m_hHeaderData.clear();
         d->m_vHeaderData.clear();
     }
     maskHeaderDataChanged(val);
-    if (colCnt>0)
+    if (colCnt > 0)
         headerDataChanged(Qt::Horizontal, 0, colCnt - 1);
-    if (rowCnt>0)
+    if (rowCnt > 0)
         headerDataChanged(Qt::Vertical, 0, rowCnt - 1);
 }
 
@@ -1078,7 +1073,7 @@ bool RoleMaskProxyModel::mergeDisplayEdit() const
 
 void RoleMaskProxyModel::setMergeDisplayEdit(bool val)
 {
-    const auto setMergeDisplayEditContainer = [val](RolesContainer& container){
+    const auto setMergeDisplayEditContainer = [val](RolesContainer &container) {
         if (val) {
             if (container.contains(Qt::DisplayRole)) {
                 container.remove(Qt::EditRole);
@@ -1106,7 +1101,7 @@ void RoleMaskProxyModel::setMergeDisplayEdit(bool val)
             d->m_maskedRoles.remove(Qt::EditRole);
         else if (d->m_maskedRoles.contains(Qt::DisplayRole))
             d->m_maskedRoles.insert(Qt::EditRole);
-        if (d->m_maskHeaderData){
+        if (d->m_maskHeaderData) {
             for (auto idxIter = d->m_hHeaderData.begin(), idxEnd = d->m_hHeaderData.end(); idxIter != idxEnd; ++idxIter)
                 setMergeDisplayEditContainer(*idxIter);
             for (auto idxIter = d->m_vHeaderData.begin(), idxEnd = d->m_vHeaderData.end(); idxIter != idxEnd; ++idxIter)
