@@ -55,11 +55,11 @@ void InsertProxyModelPrivate::checkExtraDataChanged(const QModelIndex &topLeft, 
     Q_ASSERT(topLeft.isValid());
     Q_ASSERT(bottomRight.isValid());
     Q_Q(InsertProxyModel);
-    Q_ASSERT(topLeft.model()==q);
-    Q_ASSERT(bottomRight.model()==q);
-    Q_ASSERT(topLeft.row()<=bottomRight.row());
-    Q_ASSERT(topLeft.column()<=bottomRight.column());
-    Q_ASSERT(topLeft.parent()==bottomRight.parent());
+    Q_ASSERT(topLeft.model() == q);
+    Q_ASSERT(bottomRight.model() == q);
+    Q_ASSERT(topLeft.row() <= bottomRight.row());
+    Q_ASSERT(topLeft.column() <= bottomRight.column());
+    Q_ASSERT(topLeft.parent() == bottomRight.parent());
     const QModelIndex mappedParent = q->mapToSource(topLeft.parent());
     const int sourceCols = q->sourceModel()->columnCount(mappedParent);
     const int sourceRows = q->sourceModel()->rowCount(mappedParent);
