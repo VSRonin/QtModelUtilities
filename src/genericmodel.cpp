@@ -14,6 +14,8 @@
 #include "genericmodel.h"
 #include <QDateTime>
 #include <functional>
+#include <QMimeData>
+#include <QSet>
 GenericModelItem::GenericModelItem(GenericModel *model)
     : GenericModelItem(static_cast<GenericModelItem *>(nullptr))
 {
@@ -929,10 +931,130 @@ QVariant GenericModel::headerData(int section, Qt::Orientation orientation, int 
 */
 QStringList GenericModel::mimeTypes() const
 {
-    QStringList types = QAbstractItemModel::mimeTypes();
-    types << QStringLiteral("text/plain") << QStringLiteral("text/csv") << QStringLiteral("text/xml") << QStringLiteral("text/html")
-          << QStringLiteral("application/json");
-    return types;
+    return QAbstractItemModel::mimeTypes()
+            << QStringLiteral("application/x-genericmodeldatalist");
+}
+
+void GenericModelPrivate::encodeMime(QMimeData *data, const QModelIndexList &indexes) const
+{
+    Q_ASSERT(data);
+    Q_Q(const GenericModel);
+    QSet<GenericModelItem*> itemsToSave;
+    for(auto&& idx : indexes){
+        if(!idx.isValid())
+            continue;
+        Q_ASSERT(idx.model()==q);
+        itemsToSave << itemForIndex(idx);
+    }
+    for(auto i=itemsToSave.begin();i!=itemsToSave.end();){
+        bool iToErase = false;
+        auto j=i;
+        for(++j;j!=itemsToSave.end();){
+            if(GenericModelItem::isAnchestor(*i,*j)){
+                j=itemsToSave.erase(j);
+                continue;
+            }
+            if(GenericModelItem::isAnchestor(*j,*i)){
+               iToErase=true;
+               break;
+            }
+            ++j;
+        }
+        if(iToErase)
+            i=itemsToSave.erase(i);
+        else
+            ++i;
+    }
+    QByteArray encoded;
+    QDataStream stream(&encoded, QIODevice::WriteOnly);
+    stream << qint32(itemsToSave.size());
+    for(auto i=itemsToSave.begin();i!=itemsToSave.end();++i)
+        stream << **i;
+    data->setData(QStringLiteral("application/x-genericmodeldatalist"), encoded);
+}
+
+bool GenericModelPrivate::decodeMime(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
+{
+    Q_ASSERT(data);
+    if(!data->hasFormat(QStringLiteral("application/x-genericmodeldatalist")))
+        return false;
+
+    return true;
+}
+
+/*!
+\reimp
+*/
+QMimeData *GenericModel::mimeData(const QModelIndexList &indexes) const
+{
+   QMimeData *data = QAbstractItemModel::mimeData(indexes);
+   if (!data)
+       return nullptr;
+   Q_D(const GenericModel);
+   d->encodeMime(data,indexes);
+   return data;
+}
+
+bool GenericModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
+{
+    Q_ASSERT(!parent.isValid() || parent.model()==this);
+    if (!data)
+        return false;
+    if (!(action & supportedDropActions()))
+            return false;
+    Q_D(GenericModel);
+    if(d->decodeMime(data,action,row,column,parent))
+        return true;
+    return QAbstractItemModel::dropMimeData(data,action,row,column,parent);
+}
+
+bool GenericModelItem::isAnchestor(GenericModelItem *ancestor, GenericModelItem *descendent){
+    if(!descendent)
+        return false;
+    if(!ancestor)
+        return true;
+    if(ancestor==descendent)
+        return false;
+    for(GenericModelItem* par = descendent->parent;par;par=par->parent){
+        if(par==ancestor)
+            return true;
+    }
+    return false;
+}
+
+QDataStream &operator<<(QDataStream &stream, const GenericModelItem &item){
+    stream << qint32(item.m_colCount) << qint32(item.m_rowCount) << qint32(item.m_row) << qint32(item.m_column)
+           << qint32(item.m_rowSpan)<<qint32(item.m_colSpan)<<item.data<<item.flags << qint32(item.children.size());
+    for(GenericModelItem * child : item.children)
+        stream << *child;
+    return stream;
+}
+
+QDataStream &operator>>(QDataStream &stream, GenericModelItem &item){
+    qint32 temp;
+    stream >> temp; item.m_colCount = temp;
+    stream >> temp; item.m_rowCount = temp;
+    stream >> temp; item.m_row = temp;
+    stream >> temp; item.m_column = temp;
+    stream >> temp; item.m_rowSpan = temp;
+    stream >> temp; item.m_colSpan = temp;
+    stream >> item.data >> item.flags >> temp;
+    if(item.children.size()>temp){
+        qDeleteAll(item.children.begin()+temp,item.children.end());
+        item.children.erase(item.children.begin()+temp,item.children.end());
+    }
+    const int oldChildSize = item.children.size();
+    for(int i=0;i<temp;++i){
+        if(i<oldChildSize){
+            stream >> *item.children.at(i);
+        }
+        else{
+            GenericModelItem* newItem = new GenericModelItem(&item);
+            stream >> *newItem;
+            item.children.append(newItem);
+        }
+    }
+    return stream;
 }
 
 /*!
@@ -995,16 +1117,6 @@ bool GenericModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int 
     endMoveRows();
     return true;
 }
-
-/*!
-\reimp
-*/
-/*QStringList GenericModel::mimeTypes() const
-{
-    QStringList types = QAbstractItemModel::mimeTypes();
-    types << QStringLiteral("application/x-genericmodeldatalist");
-    return types;
-}*/
 
 /*!
 \reimp
@@ -1268,6 +1380,8 @@ void GenericModelPrivate::signalAllChanged(const QVector<int> &roles, const QMod
     q->dataChanged(q->index(0, 0, parent), q->index(rowCnt - 1, colCnt - 1, parent), roles);
 }
 
+
+
 void GenericModelPrivate::setMergeDisplayEdit(bool val)
 {
     root->setMergeDisplayEdit(val);
@@ -1296,12 +1410,6 @@ void GenericModelPrivate::setMergeDisplayEdit(bool val, RolesContainer &containe
 
 /*!
 \class GenericModel
-\brief This proxy model provides an extra row and column to handle user insertions
-\details This proxy will add an extra row, column or both to allow users to insert new sections with a familiar interface.
-
-You can use setInsertDirection to determine whether to show an extra row or column. By default, this model will behave as QIdentityProxyModel
-
-You can either call commitRow/commitColumn or reimplement validRow/validColumn to decide when a row/column should be added to the main model.
-
-\warning Only flat models are supported. Branches of a tree will be hidden by the proxy
+\brief This is a full implementation for generic use of the `QAbstractItemModel` interface.
+\details The model can replace `QStandardItemModel` depending only on Qt Core and resulting faster in most use cases.
 */

@@ -16,6 +16,10 @@
 #include "private/modelutilities_common_p.h"
 #include <QVector>
 #include <QSize>
+#include <QDataStream>
+class GenericModelItem;
+QDataStream &operator<<(QDataStream &stream, const GenericModelItem &item);
+QDataStream &operator>>(QDataStream &stream, GenericModelItem &item);
 class GenericModelItem
 {
 public:
@@ -46,7 +50,7 @@ public:
     void moveChildColumns(int sourceCol, int count, int destinationChild);
     void setRow(int r);
     void setColumn(int c);
-
+    static bool isAnchestor(GenericModelItem* ancestor, GenericModelItem* descendent);
 private:
     int m_colCount;
     int m_rowCount;
@@ -57,6 +61,8 @@ private:
     GenericModel *m_model;
     QVector<GenericModelItem *> children;
     void sortChildren(int column, int role, Qt::SortOrder order, bool recursive, const QModelIndexList &persistentIndexes, QVector<RolesContainer>* headersToSort);
+    friend QDataStream &operator<<(QDataStream &stream, const GenericModelItem &item);
+    friend QDataStream &operator>>(QDataStream &stream, GenericModelItem &item);
 };
 
 class GenericModelPrivate
@@ -80,6 +86,8 @@ class GenericModelPrivate
                                     int destinationChild);
     void setMergeDisplayEdit(bool val);
     void signalAllChanged(const QVector<int> &roles = QVector<int>(), const QModelIndex &parent = QModelIndex());
+    void encodeMime(QMimeData *data, const QModelIndexList &indexes) const;
+    bool decodeMime(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
     GenericModel *q_ptr;
     GenericModelItem *root;
     QVector<RolesContainer> vHeaderData;
