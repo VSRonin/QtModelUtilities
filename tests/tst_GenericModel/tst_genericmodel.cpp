@@ -3,6 +3,7 @@
 #include <QtTest/QTest>
 #include <QtTest/QSignalSpy>
 #include "../modeltestmanager.h"
+#include <random>
 
 void tst_GenericModel::autoParent()
 {
@@ -2560,6 +2561,189 @@ void tst_GenericModel::roleNames()
     QCOMPARE(args.at(0).value<QModelIndex>(), testModel.index(0, 0));
     QCOMPARE(args.at(1).value<QModelIndex>(), testModel.index(2, 4));
     QCOMPARE(testModel.roleNames(), dafaultModel.roleNames());
+}
+
+void tst_GenericModel::bDataStaticModel_data()
+{
+    QTest::addColumn<bool>("useGenericModel");
+    QTest::addColumn<bool>("useTree");
+    QTest::newRow("QStandardItemModel Table") << false << false;
+    QTest::newRow("QStandardItemModel Tree") << false << true;
+    QTest::newRow("GenericModel Table") << true << false;
+    QTest::newRow("GenericModel Tree") << true << true;
+}
+
+void tst_GenericModel::bDataStaticModel()
+{
+    QFETCH(bool, useGenericModel);
+    QFETCH(bool, useTree);
+    QAbstractItemModel *model = nullptr;
+    if (useGenericModel)
+        model = new GenericModel;
+    else
+#ifdef QT_GUI_LIB
+        model = new QStandardItemModel;
+#else
+        QSKIP("This benchmark requires the Qt GUI module"
+#endif
+    model->insertColumns(0, 5);
+    model->insertRows(0, 100);
+    for (int ri = 0, maxR = model->rowCount(); useTree && ri < maxR; ++ri) {
+        const QModelIndex parentIdx = model->index(ri, 0);
+        model->insertColumns(0, 3, parentIdx);
+        model->insertRows(0, 10, parentIdx);
+    }
+    QBENCHMARK {
+        for (int ri = 0, maxR = model->rowCount(); ri < maxR; ++ri) {
+            for (int ci = 0, maxC = model->columnCount(); ci < maxC; ++ci)
+                model->setData(model->index(ri, ci), ri + ci);
+            if (useTree) {
+                const QModelIndex parentIdx = model->index(ri, 0);
+                for (int rri = 0, maxRR = model->rowCount(parentIdx); rri < maxRR; ++rri) {
+                    for (int ci = 0, maxC = model->columnCount(parentIdx); ci < maxC; ++ci)
+                        model->setData(model->index(rri, ci, parentIdx), ri + rri + ci);
+                }
+            }
+        }
+    }
+    delete model;
+}
+
+void tst_GenericModel::bInsertRows_data()
+{
+    QTest::addColumn<bool>("useGenericModel");
+    QTest::addColumn<bool>("useTree");
+    QTest::newRow("QStandardItemModel Table") << false << false;
+    QTest::newRow("QStandardItemModel Tree") << false << true;
+    QTest::newRow("GenericModel Table") << true << false;
+    QTest::newRow("GenericModel Tree") << true << true;
+}
+
+void tst_GenericModel::bInsertRows()
+{
+    QFETCH(bool, useGenericModel);
+    QFETCH(bool, useTree);
+    QAbstractItemModel *model = nullptr;
+    if (useGenericModel)
+        model = new GenericModel;
+    else
+#ifdef QT_GUI_LIB
+        model = new QStandardItemModel;
+#else
+        QSKIP("This benchmark requires the Qt GUI module"
+#endif
+    model->insertColumns(0, 5);
+    QBENCHMARK {
+        QVERIFY(model->insertRows(0, 100));
+        for (int ri = 0, maxR = model->rowCount(); ri < maxR; ++ri) {
+            for (int ci = 0, maxC = model->columnCount(); ci < maxC; ++ci)
+                model->setData(model->index(ri, ci), ri + ci);
+        }
+        for (int ri = 0, maxR = model->rowCount(); useTree && ri < maxR; ++ri) {
+            const QModelIndex parentIdx = model->index(ri, 0);
+            model->insertColumns(0, 3, parentIdx);
+            QVERIFY(model->insertRows(0, 10, parentIdx));
+            for (int rri = 0, maxRR = model->rowCount(parentIdx); rri < maxRR; ++rri) {
+                for (int ci = 0, maxC = model->columnCount(parentIdx); ci < maxC; ++ci)
+                    model->setData(model->index(rri, ci, parentIdx), ri + rri + ci);
+            }
+            QVERIFY(model->removeRows(3, 3, parentIdx));
+            QVERIFY(model->removeRows(model->rowCount(parentIdx) - 3, 3, parentIdx));
+            QVERIFY(model->removeRows(0, model->rowCount(parentIdx), parentIdx));
+        }
+        QVERIFY(model->removeRows(33, 33));
+        QVERIFY(model->removeRows(model->rowCount() - 33, 33));
+        QVERIFY(model->removeRows(0, model->rowCount()));
+    }
+}
+
+void tst_GenericModel::bInsertColumns_data()
+{
+    QTest::addColumn<bool>("useGenericModel");
+    QTest::addColumn<bool>("useTree");
+    QTest::newRow("QStandardItemModel Table") << false << false;
+    QTest::newRow("QStandardItemModel Tree") << false << true;
+    QTest::newRow("GenericModel Table") << true << false;
+    QTest::newRow("GenericModel Tree") << true << true;
+}
+
+void tst_GenericModel::bInsertColumns()
+{
+    QFETCH(bool, useGenericModel);
+    QFETCH(bool, useTree);
+    QAbstractItemModel *model = nullptr;
+    if (useGenericModel)
+        model = new GenericModel;
+    else
+#ifdef QT_GUI_LIB
+        model = new QStandardItemModel;
+#else
+        QSKIP("This benchmark requires the Qt GUI module"
+#endif
+    model->insertRows(0, 50);
+    QBENCHMARK {
+        QVERIFY(model->insertColumns(0, 100));
+        for (int ri = 0, maxR = model->rowCount(); ri < maxR; ++ri) {
+            for (int ci = 0, maxC = model->columnCount(); ci < maxC; ++ci)
+                model->setData(model->index(ri, ci), ri + ci);
+        }
+        for (int ri = 0, maxR = model->rowCount(); useTree && ri < maxR; ++ri) {
+            const QModelIndex parentIdx = model->index(ri, 0);
+            model->insertRows(0, 3, parentIdx);
+            QVERIFY(model->insertColumns(0, 10, parentIdx));
+            for (int rri = 0, maxRR = model->rowCount(parentIdx); rri < maxRR; ++rri) {
+                for (int ci = 0, maxC = model->columnCount(parentIdx); ci < maxC; ++ci)
+                    model->setData(model->index(rri, ci, parentIdx), ri + rri + ci);
+            }
+            QVERIFY(model->removeColumns(3, 3, parentIdx));
+            QVERIFY(model->removeColumns(model->columnCount(parentIdx) - 3, 3, parentIdx));
+            QVERIFY(model->removeColumns(0, model->columnCount(parentIdx), parentIdx));
+        }
+        QVERIFY(model->removeColumns(33, 33));
+        QVERIFY(model->removeColumns(model->columnCount() - 33, 33));
+        QVERIFY(model->removeColumns(0, model->columnCount()));
+    }
+}
+
+void tst_GenericModel::bSort_data()
+{
+    QTest::addColumn<bool>("useGenericModel");
+    QTest::addColumn<bool>("useTable");
+    QTest::newRow("QStandardItemModel List") << false << false;
+    QTest::newRow("QStandardItemModel Table") << false << true;
+    QTest::newRow("GenericModel List") << true << false;
+    QTest::newRow("GenericModel Table") << true << true;
+}
+
+void tst_GenericModel::bSort()
+{
+    QFETCH(bool, useGenericModel);
+    QFETCH(bool, useTable);
+    QAbstractItemModel *model = nullptr;
+    if (useGenericModel)
+        model = new GenericModel;
+    else
+#ifdef QT_GUI_LIB
+        model = new QStandardItemModel;
+#else
+        QSKIP("This benchmark requires the Qt GUI module"
+#endif
+    model->insertColumns(0, useTable ? 5 : 1);
+    model->insertRows(0, 50000);
+    QVector<int> numData;
+    numData.reserve(model->rowCount());
+    for (int ri = 0, maxR = model->rowCount(); ri < maxR; ++ri)
+        numData.append(ri);
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(numData.begin(), numData.end(), g);
+    for (int ri = 0, maxR = model->rowCount(); ri < maxR; ++ri) {
+        for (int ci = 0, maxC = model->columnCount(); ci < maxC; ++ci)
+            model->setData(model->index(ri, ci), numData.at(ri));
+    }
+    QBENCHMARK_ONCE {
+        model->sort(0);
+    }
 }
 
 void tst_GenericModel::fillTable(QAbstractItemModel *model, int rows, int cols, const QModelIndex &parent, int shift) const

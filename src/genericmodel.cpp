@@ -1417,5 +1417,5 @@ void GenericModelPrivate::setMergeDisplayEdit(bool val, RolesContainer &containe
 /*!
 \class GenericModel
 \brief This is a full implementation for generic use of the `QAbstractItemModel` interface.
-\details The model can replace `QStandardItemModel` depending only on Qt Core and resulting faster in most use cases.
+\details The model can replace `QStandardItemModel` depending only on Qt Core.
 */

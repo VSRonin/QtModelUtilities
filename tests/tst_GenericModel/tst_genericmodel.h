@@ -54,6 +54,15 @@ private Q_SLOTS:
     void moveColumnsFromRootToBranch();
     void moveColumnsFromBranchToRoot();
     void roleNames();
+    // Benchmarks
+    void bDataStaticModel_data();
+    void bDataStaticModel();
+    void bInsertRows_data();
+    void bInsertRows();
+    void bInsertColumns_data();
+    void bInsertColumns();
+    void bSort_data();
+    void bSort();
 
 private:
     void fillTable(QAbstractItemModel *model, int rows, int cols, const QModelIndex &parent = QModelIndex(), int shift = 0) const;
