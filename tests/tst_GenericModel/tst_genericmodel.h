@@ -54,6 +54,7 @@ private Q_SLOTS:
     void moveColumnsFromRootToBranch();
     void moveColumnsFromBranchToRoot();
     void roleNames();
+    void dragDropList();
     // Benchmarks
     void bDataStaticModel_data();
     void bDataStaticModel();

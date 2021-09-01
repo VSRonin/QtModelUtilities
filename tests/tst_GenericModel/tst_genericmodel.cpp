@@ -2,6 +2,7 @@
 #include <genericmodel.h>
 #include <QtTest/QTest>
 #include <QtTest/QSignalSpy>
+#include <QMimeData>
 #include "../modeltestmanager.h"
 #include <random>
 
@@ -2563,6 +2564,106 @@ void tst_GenericModel::roleNames()
     QCOMPARE(testModel.roleNames(), dafaultModel.roleNames());
 }
 
+void tst_GenericModel::dragDropList()
+{
+    GenericModel source;
+    GenericModel destination;
+    new ModelTest(&source, &source);
+    new ModelTest(&destination, &destination);
+    source.insertColumn(0);
+    source.insertRows(0,5);
+    for (int i=0;i<5;++i){
+        source.setData(source.index(i,0),i);
+        source.setData(source.index(i,0),i+10,Qt::UserRole);
+    }
+    QModelIndexList sourceIdxs {source.index(1,0), source.index(2,0)};
+    QMimeData *mimeData = source.mimeData(sourceIdxs);
+    QVERIFY(mimeData);
+    QVERIFY(destination.dropMimeData(mimeData,Qt::CopyAction,0,0,QModelIndex()));
+    QCOMPARE(destination.rowCount(),2);
+    QCOMPARE(destination.columnCount(),1);
+    for(int i=0;i<destination.rowCount();++i){
+        QCOMPARE(destination.rowCount(destination.index(i,0)),0);
+        QCOMPARE(destination.columnCount(destination.index(i,0)),0);
+    }
+    QCOMPARE(destination.index(0,0).data().toInt(),source.index(1,0).data().toInt());
+    QCOMPARE(destination.index(0,0).data(Qt::UserRole).toInt(),source.index(1,0).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(1,0).data().toInt(),source.index(2,0).data().toInt());
+    QCOMPARE(destination.index(1,0).data(Qt::UserRole).toInt(),source.index(2,0).data(Qt::UserRole).toInt());
+    mimeData->deleteLater();
+    mimeData = source.mimeData({source.index(3,0)});
+
+    QVERIFY(destination.dropMimeData(mimeData,Qt::CopyAction,0,0,QModelIndex()));
+    QCOMPARE(destination.rowCount(),3);
+    QCOMPARE(destination.columnCount(),1);
+    for(int i=0;i<destination.rowCount();++i){
+        QCOMPARE(destination.rowCount(destination.index(i,0)),0);
+        QCOMPARE(destination.columnCount(destination.index(i,0)),0);
+    }
+    QCOMPARE(destination.index(0,0).data().toInt(),source.index(3,0).data().toInt());
+    QCOMPARE(destination.index(0,0).data(Qt::UserRole).toInt(),source.index(3,0).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(1,0).data().toInt(),source.index(1,0).data().toInt());
+    QCOMPARE(destination.index(1,0).data(Qt::UserRole).toInt(),source.index(1,0).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(2,0).data().toInt(),source.index(2,0).data().toInt());
+    QCOMPARE(destination.index(2,0).data(Qt::UserRole).toInt(),source.index(2,0).data(Qt::UserRole).toInt());
+
+    QVERIFY(destination.dropMimeData(mimeData,Qt::CopyAction,2,0,QModelIndex()));
+    QCOMPARE(destination.rowCount(),4);
+    QCOMPARE(destination.columnCount(),1);
+    for(int i=0;i<destination.rowCount();++i){
+        QCOMPARE(destination.rowCount(destination.index(i,0)),0);
+        QCOMPARE(destination.columnCount(destination.index(i,0)),0);
+    }
+    QCOMPARE(destination.index(0,0).data().toInt(),source.index(3,0).data().toInt());
+    QCOMPARE(destination.index(0,0).data(Qt::UserRole).toInt(),source.index(3,0).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(1,0).data().toInt(),source.index(1,0).data().toInt());
+    QCOMPARE(destination.index(1,0).data(Qt::UserRole).toInt(),source.index(1,0).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(2,0).data().toInt(),source.index(3,0).data().toInt());
+    QCOMPARE(destination.index(2,0).data(Qt::UserRole).toInt(),source.index(3,0).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(3,0).data().toInt(),source.index(2,0).data().toInt());
+    QCOMPARE(destination.index(3,0).data(Qt::UserRole).toInt(),source.index(2,0).data(Qt::UserRole).toInt());
+
+    QVERIFY(destination.dropMimeData(mimeData,Qt::CopyAction,4,0,QModelIndex()));
+    QCOMPARE(destination.rowCount(),5);
+    QCOMPARE(destination.columnCount(),1);
+    for(int i=0;i<destination.rowCount();++i){
+        QCOMPARE(destination.rowCount(destination.index(i,0)),0);
+        QCOMPARE(destination.columnCount(destination.index(i,0)),0);
+    }
+    QCOMPARE(destination.index(0,0).data().toInt(),source.index(3,0).data().toInt());
+    QCOMPARE(destination.index(0,0).data(Qt::UserRole).toInt(),source.index(3,0).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(1,0).data().toInt(),source.index(1,0).data().toInt());
+    QCOMPARE(destination.index(1,0).data(Qt::UserRole).toInt(),source.index(1,0).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(2,0).data().toInt(),source.index(3,0).data().toInt());
+    QCOMPARE(destination.index(2,0).data(Qt::UserRole).toInt(),source.index(3,0).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(3,0).data().toInt(),source.index(2,0).data().toInt());
+    QCOMPARE(destination.index(3,0).data(Qt::UserRole).toInt(),source.index(2,0).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(4,0).data().toInt(),source.index(3,0).data().toInt());
+    QCOMPARE(destination.index(4,0).data(Qt::UserRole).toInt(),source.index(3,0).data(Qt::UserRole).toInt());
+
+    QVERIFY(destination.dropMimeData(mimeData,Qt::CopyAction,10,0,QModelIndex()));
+    QCOMPARE(destination.rowCount(),6);
+    QCOMPARE(destination.columnCount(),1);
+    for(int i=0;i<destination.rowCount();++i){
+        QCOMPARE(destination.rowCount(destination.index(i,0)),0);
+        QCOMPARE(destination.columnCount(destination.index(i,0)),0);
+    }
+    QCOMPARE(destination.index(0,0).data().toInt(),source.index(3,0).data().toInt());
+    QCOMPARE(destination.index(0,0).data(Qt::UserRole).toInt(),source.index(3,0).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(1,0).data().toInt(),source.index(1,0).data().toInt());
+    QCOMPARE(destination.index(1,0).data(Qt::UserRole).toInt(),source.index(1,0).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(2,0).data().toInt(),source.index(3,0).data().toInt());
+    QCOMPARE(destination.index(2,0).data(Qt::UserRole).toInt(),source.index(3,0).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(3,0).data().toInt(),source.index(2,0).data().toInt());
+    QCOMPARE(destination.index(3,0).data(Qt::UserRole).toInt(),source.index(2,0).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(4,0).data().toInt(),source.index(3,0).data().toInt());
+    QCOMPARE(destination.index(4,0).data(Qt::UserRole).toInt(),source.index(3,0).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(5,0).data().toInt(),source.index(3,0).data().toInt());
+    QCOMPARE(destination.index(5,0).data(Qt::UserRole).toInt(),source.index(3,0).data(Qt::UserRole).toInt());
+
+    mimeData->deleteLater();
+}
+
 void tst_GenericModel::bDataStaticModel_data()
 {
     QTest::addColumn<bool>("useGenericModel");
@@ -2584,7 +2685,7 @@ void tst_GenericModel::bDataStaticModel()
 #ifdef QT_GUI_LIB
         model = new QStandardItemModel;
 #else
-        QSKIP("This benchmark requires the Qt GUI module"
+        QSKIP("This benchmark requires the Qt GUI module");
 #endif
     model->insertColumns(0, 5);
     model->insertRows(0, 100);
@@ -2630,7 +2731,7 @@ void tst_GenericModel::bInsertRows()
 #ifdef QT_GUI_LIB
         model = new QStandardItemModel;
 #else
-        QSKIP("This benchmark requires the Qt GUI module"
+        QSKIP("This benchmark requires the Qt GUI module");
 #endif
     model->insertColumns(0, 5);
     QBENCHMARK {
@@ -2678,7 +2779,7 @@ void tst_GenericModel::bInsertColumns()
 #ifdef QT_GUI_LIB
         model = new QStandardItemModel;
 #else
-        QSKIP("This benchmark requires the Qt GUI module"
+        QSKIP("This benchmark requires the Qt GUI module");
 #endif
     model->insertRows(0, 50);
     QBENCHMARK {
@@ -2726,7 +2827,7 @@ void tst_GenericModel::bSort()
 #ifdef QT_GUI_LIB
         model = new QStandardItemModel;
 #else
-        QSKIP("This benchmark requires the Qt GUI module"
+        QSKIP("This benchmark requires the Qt GUI module");
 #endif
     model->insertColumns(0, useTable ? 5 : 1);
     model->insertRows(0, 50000);
