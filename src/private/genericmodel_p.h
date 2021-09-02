@@ -17,6 +17,7 @@
 #include <QVector>
 #include <QSize>
 #include <QDataStream>
+class GenericModelPrivate;
 class GenericModelItem;
 QDataStream &operator<<(QDataStream &stream, const GenericModelItem &item);
 QDataStream &operator>>(QDataStream &stream, GenericModelItem &item);
@@ -65,6 +66,7 @@ private:
                       QVector<RolesContainer> *headersToSort);
     friend QDataStream &operator<<(QDataStream &stream, const GenericModelItem &item);
     friend QDataStream &operator>>(QDataStream &stream, GenericModelItem &item);
+    friend class GenericModelPrivate;
 };
 
 class GenericModelPrivate

@@ -2564,6 +2564,27 @@ void tst_GenericModel::roleNames()
     QCOMPARE(testModel.roleNames(), dafaultModel.roleNames());
 }
 
+void tst_GenericModel::dragDropInvalid()
+{
+    GenericModel source;
+    GenericModel destination;
+    new ModelTest(&source, &source);
+    new ModelTest(&destination, &destination);
+    source.insertColumn(0);
+    source.insertRows(0,5);
+    for (int i=0;i<source.rowCount();++i){
+        source.setData(source.index(i,0),i);
+        source.setData(source.index(i,0),i+10,Qt::UserRole);
+    }
+    QVERIFY(!destination.dropMimeData(nullptr,Qt::CopyAction,0,0,QModelIndex()));
+    QMimeData *mimeData = source.mimeData({source.index(1,0), source.index(2,0)});
+    QVERIFY(mimeData);
+    QVERIFY(!destination.dropMimeData(mimeData,Qt::CopyAction,0,0,source.index(0,0)));
+    mimeData->deleteLater();
+    mimeData = source.mimeData({});
+    QVERIFY(!mimeData);
+}
+
 void tst_GenericModel::dragDropList()
 {
     GenericModel source;
@@ -2572,12 +2593,11 @@ void tst_GenericModel::dragDropList()
     new ModelTest(&destination, &destination);
     source.insertColumn(0);
     source.insertRows(0,5);
-    for (int i=0;i<5;++i){
+    for (int i=0;i<source.rowCount();++i){
         source.setData(source.index(i,0),i);
         source.setData(source.index(i,0),i+10,Qt::UserRole);
     }
-    QModelIndexList sourceIdxs {source.index(1,0), source.index(2,0)};
-    QMimeData *mimeData = source.mimeData(sourceIdxs);
+    QMimeData *mimeData = source.mimeData({source.index(1,0), source.index(2,0)});
     QVERIFY(mimeData);
     QVERIFY(destination.dropMimeData(mimeData,Qt::CopyAction,0,0,QModelIndex()));
     QCOMPARE(destination.rowCount(),2);
@@ -2662,6 +2682,131 @@ void tst_GenericModel::dragDropList()
     QCOMPARE(destination.index(5,0).data(Qt::UserRole).toInt(),source.index(3,0).data(Qt::UserRole).toInt());
 
     mimeData->deleteLater();
+
+}
+
+void tst_GenericModel::dragDropTable()
+{
+    GenericModel source;
+    GenericModel destination;
+    new ModelTest(&source, &source);
+    new ModelTest(&destination, &destination);
+    source.insertColumns(0,2);
+    source.insertRows(0,5);
+    for (int i=0;i<source.rowCount();++i){
+        for (int j=0;j<source.columnCount();++j){
+            source.setData(source.index(i,j),(10*i)+j);
+            source.setData(source.index(i,j),(10*i)+j+10,Qt::UserRole);
+        }
+    }
+    QMimeData *mimeData = source.mimeData({source.index(1,0)});
+    QVERIFY(mimeData);
+    QVERIFY(destination.dropMimeData(mimeData,Qt::CopyAction,0,0,QModelIndex()));
+    QCOMPARE(destination.rowCount(),1);
+    QCOMPARE(destination.columnCount(),1);
+    for(int i=0;i<destination.rowCount();++i){
+        for(int j=0;j<destination.columnCount();++j){
+            QCOMPARE(destination.rowCount(destination.index(i,j)),0);
+            QCOMPARE(destination.columnCount(destination.index(i,j)),0);
+        }
+    }
+    QCOMPARE(destination.index(0,0).data().toInt(),source.index(1,0).data().toInt());
+    QCOMPARE(destination.index(0,0).data(Qt::UserRole).toInt(),source.index(1,0).data(Qt::UserRole).toInt());
+    mimeData->deleteLater();
+
+    mimeData = source.mimeData({source.index(1,1)});
+    QVERIFY(mimeData);
+    QVERIFY(destination.dropMimeData(mimeData,Qt::CopyAction,0,0,QModelIndex()));
+    QCOMPARE(destination.rowCount(),2);
+    QCOMPARE(destination.columnCount(),1);
+    for(int i=0;i<destination.rowCount();++i){
+        for(int j=0;j<destination.columnCount();++j){
+            QCOMPARE(destination.rowCount(destination.index(i,j)),0);
+            QCOMPARE(destination.columnCount(destination.index(i,j)),0);
+        }
+    }
+    QCOMPARE(destination.index(0,0).data().toInt(),source.index(1,1).data().toInt());
+    QCOMPARE(destination.index(0,0).data(Qt::UserRole).toInt(),source.index(1,1).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(1,0).data().toInt(),source.index(1,0).data().toInt());
+    QCOMPARE(destination.index(1,0).data(Qt::UserRole).toInt(),source.index(1,0).data(Qt::UserRole).toInt());
+    mimeData->deleteLater();
+
+    mimeData = source.mimeData({source.index(0,0),source.index(0,1)});
+    QVERIFY(mimeData);
+    QVERIFY(destination.dropMimeData(mimeData,Qt::CopyAction,4,0,QModelIndex()));
+    QCOMPARE(destination.rowCount(),3);
+    QCOMPARE(destination.columnCount(),2);
+    for(int i=0;i<destination.rowCount();++i){
+        for(int j=0;j<destination.columnCount();++j){
+            QCOMPARE(destination.rowCount(destination.index(i,j)),0);
+            QCOMPARE(destination.columnCount(destination.index(i,j)),0);
+        }
+    }
+    QCOMPARE(destination.index(0,0).data().toInt(),source.index(1,1).data().toInt());
+    QCOMPARE(destination.index(0,0).data(Qt::UserRole).toInt(),source.index(1,1).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(1,0).data().toInt(),source.index(1,0).data().toInt());
+    QCOMPARE(destination.index(1,0).data(Qt::UserRole).toInt(),source.index(1,0).data(Qt::UserRole).toInt());
+    QVERIFY(!destination.index(0,1).data().isValid());
+    QVERIFY(!destination.index(1,1).data().isValid());
+    QCOMPARE(destination.index(2,0).data().toInt(),source.index(0,0).data().toInt());
+    QCOMPARE(destination.index(2,0).data(Qt::UserRole).toInt(),source.index(0,0).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(2,1).data().toInt(),source.index(0,1).data().toInt());
+    QCOMPARE(destination.index(2,1).data(Qt::UserRole).toInt(),source.index(0,1).data(Qt::UserRole).toInt());
+    mimeData->deleteLater();
+
+    mimeData = source.mimeData({source.index(2,0),source.index(3,1)});
+    QVERIFY(mimeData);
+    QVERIFY(destination.dropMimeData(mimeData,Qt::CopyAction,10,0,QModelIndex()));
+    QCOMPARE(destination.rowCount(),5);
+    QCOMPARE(destination.columnCount(),2);
+    for(int i=0;i<destination.rowCount();++i){
+        for(int j=0;j<destination.columnCount();++j){
+            QCOMPARE(destination.rowCount(destination.index(i,j)),0);
+            QCOMPARE(destination.columnCount(destination.index(i,j)),0);
+        }
+    }
+    QCOMPARE(destination.index(0,0).data().toInt(),source.index(1,1).data().toInt());
+    QCOMPARE(destination.index(0,0).data(Qt::UserRole).toInt(),source.index(1,1).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(1,0).data().toInt(),source.index(1,0).data().toInt());
+    QCOMPARE(destination.index(1,0).data(Qt::UserRole).toInt(),source.index(1,0).data(Qt::UserRole).toInt());
+    QVERIFY(!destination.index(0,1).data().isValid());
+    QVERIFY(!destination.index(1,1).data().isValid());
+    QCOMPARE(destination.index(2,0).data().toInt(),source.index(0,0).data().toInt());
+    QCOMPARE(destination.index(2,0).data(Qt::UserRole).toInt(),source.index(0,0).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(2,1).data().toInt(),source.index(0,1).data().toInt());
+    QCOMPARE(destination.index(2,1).data(Qt::UserRole).toInt(),source.index(0,1).data(Qt::UserRole).toInt());
+    QCOMPARE(destination.index(3,0).data().toInt(),source.index(2,0).data().toInt());
+    QCOMPARE(destination.index(3,0).data(Qt::UserRole).toInt(),source.index(2,0).data(Qt::UserRole).toInt());
+    QVERIFY(!destination.index(3,1).data().isValid());
+    QVERIFY(!destination.index(4,0).data().isValid());
+    QCOMPARE(destination.index(4,1).data().toInt(),source.index(3,1).data().toInt());
+    QCOMPARE(destination.index(4,1).data(Qt::UserRole).toInt(),source.index(3,1).data(Qt::UserRole).toInt());
+    mimeData->deleteLater();
+
+}
+
+void tst_GenericModel::dragDropTree()
+{
+    GenericModel source;
+    GenericModel destination;
+    new ModelTest(&source, &source);
+    new ModelTest(&destination, &destination);
+    source.insertColumns(0,2);
+    source.insertRows(0,5);
+    for (int i=0;i<source.rowCount();++i){
+        for (int j=0;j<source.columnCount();++j){
+            source.setData(source.index(i,j),(10*i)+j);
+            source.setData(source.index(i,j),(10*i)+j+10,Qt::UserRole);
+        }
+        const QModelIndex parIdx = source.index(i,0);
+        source.insertColumns(0,2,parIdx);
+        source.insertRows(0,2,parIdx);
+        for(int k=0;k<source.rowCount(parIdx);++k){
+            for(int j=0;j<source.columnCount(parIdx);++j)
+                source.setData(source.index(k,j,parIdx),(i*100)+(10*j)+k);
+        }
+    }
+
 }
 
 void tst_GenericModel::bDataStaticModel_data()

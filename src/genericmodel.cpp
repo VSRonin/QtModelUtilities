@@ -16,6 +16,8 @@
 #include <functional>
 #include <QMimeData>
 #include <QSet>
+#include <QMultiMap>
+#include <QIODevice>
 GenericModelItem::GenericModelItem(GenericModel *model)
     : GenericModelItem(static_cast<GenericModelItem *>(nullptr))
 {
@@ -932,7 +934,8 @@ QVariant GenericModel::headerData(int section, Qt::Orientation orientation, int 
 */
 QStringList GenericModel::mimeTypes() const
 {
-    return QAbstractItemModel::mimeTypes() << QStringLiteral("application/x-genericmodeldatalist");
+    Q_D(const GenericModel);
+    return QAbstractItemModel::mimeTypes() << d->mimeDataName();
 }
 
 void GenericModelPrivate::encodeMime(QMimeData *data, const QModelIndexList &indexes) const
@@ -970,15 +973,67 @@ void GenericModelPrivate::encodeMime(QMimeData *data, const QModelIndexList &ind
     stream << qint32(itemsToSave.size());
     for (auto i = itemsToSave.begin(); i != itemsToSave.end(); ++i)
         stream << **i;
-    data->setData(QStringLiteral("application/x-genericmodeldatalist"), encoded);
+    data->setData(mimeDataName(), encoded);
 }
 
 bool GenericModelPrivate::decodeMime(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
 {
     Q_ASSERT(data);
-    if (!data->hasFormat(QStringLiteral("application/x-genericmodeldatalist")))
+    if (!data->hasFormat(mimeDataName()))
         return false;
-
+    Q_Q(GenericModel);
+    const QByteArray encoded = data->data(mimeDataName());
+    QDataStream stream(encoded);
+    qint32 itemsCount=0;
+    stream >> itemsCount;
+    if(itemsCount==0)
+        return true;
+    QMultiMap<int, GenericModelItem *> items;
+    for(qint32 i=0;i<itemsCount;++i){
+        GenericModelItem* tempItem = new GenericModelItem(q);
+        stream >> *tempItem;
+        items.insert(tempItem->row(),tempItem);
+    }
+    int minCol = std::numeric_limits<int>::max();
+    int maxCol= 0;
+    for(auto i = items.constBegin(), iEnd = items.constEnd(); i!=iEnd;++i){
+        if((*i)->column() < minCol)
+            minCol = (*i)->column();
+        if((*i)->column() > maxCol)
+            maxCol = (*i)->column();
+    }
+    int cCount = q->columnCount(parent);
+    int rCount = q->rowCount(parent);
+    row = qMin(row,rCount);
+    column = qMin(column,cCount);
+    if(cCount<maxCol-minCol+1+column){
+        Q_ASSUME(q->insertColumns(cCount,maxCol-minCol+1+column-cCount,parent));
+        cCount = q->columnCount(parent);
+    }
+    const auto newRowIdxes = items.uniqueKeys();
+    rCount = newRowIdxes.size();
+    Q_ASSERT(rCount*cCount>0);
+    QVector<GenericModelItem *> rowsToInsert;
+    rowsToInsert.reserve(rCount*cCount);
+    for(auto i=newRowIdxes.constBegin(), iEnd = newRowIdxes.constEnd();i!=iEnd;++i){
+        const auto colItems = items.values(*i);
+        for(int j=0; j<cCount;++j){
+            if(j<column){
+                rowsToInsert.append(new GenericModelItem(q));
+                continue;
+            }
+            const auto itemIter = std::find_if(colItems.constBegin(),colItems.constEnd(),[=](GenericModelItem *item)->bool{return item->column()==minCol+j-column;});
+            if(itemIter==colItems.constEnd()){
+                rowsToInsert.append(new GenericModelItem(q));
+                continue;
+            }
+            (*itemIter)->m_column = j;
+            rowsToInsert.append(*itemIter);
+        }
+    }
+    q->beginInsertRows(parent,row,row + rCount-1);
+    itemForIndex(parent)->insertRows(row,rowsToInsert);
+    q->endInsertRows();
     return true;
 }
 
@@ -995,9 +1050,15 @@ QMimeData *GenericModel::mimeData(const QModelIndexList &indexes) const
     return data;
 }
 
+/*!
+\reimp
+*/
 bool GenericModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
 {
-    Q_ASSERT(!parent.isValid() || parent.model() == this);
+    if(row<0 || column<0)
+        return false;
+    if(parent.isValid() && parent.model() != this)
+        return false;
     if (!data)
         return false;
     if (!(action & supportedDropActions()))
