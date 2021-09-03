@@ -1018,19 +1018,24 @@ bool GenericModelPrivate::decodeMime(const QMimeData *data, Qt::DropAction actio
     for(auto i=newRowIdxes.constBegin(), iEnd = newRowIdxes.constEnd();i!=iEnd;++i){
         const auto colItems = items.values(*i);
         for(int j=0; j<cCount;++j){
+            GenericModelItem* itemToAppend = nullptr;
             if(j<column){
-                rowsToInsert.append(new GenericModelItem(q));
-                continue;
+                itemToAppend = new GenericModelItem(q);
             }
-            const auto itemIter = std::find_if(colItems.constBegin(),colItems.constEnd(),[=](GenericModelItem *item)->bool{return item->column()==minCol+j-column;});
-            if(itemIter==colItems.constEnd()){
-                rowsToInsert.append(new GenericModelItem(q));
-                continue;
+            else{
+                const auto itemIter = std::find_if(colItems.constBegin(),colItems.constEnd(),[=](GenericModelItem *item)->bool{return item->column()==minCol+j-column;});
+                if(itemIter==colItems.constEnd())
+                    itemToAppend = new GenericModelItem(q);
+                else
+                    itemToAppend = *itemIter;
             }
-            (*itemIter)->m_column = j;
-            rowsToInsert.append(*itemIter);
+            Q_ASSERT(itemToAppend);
+            rowsToInsert.append(itemToAppend);
         }
     }
+    Q_ASSERT(rowsToInsert.size()==rCount*cCount);
+    for(int i=0;i<rCount*cCount;++i)
+        rowsToInsert[i]->m_column = i%cCount;
     q->beginInsertRows(parent,row,row + rCount-1);
     itemForIndex(parent)->insertRows(row,rowsToInsert);
     q->endInsertRows();
