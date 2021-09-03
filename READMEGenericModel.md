@@ -1,4 +1,4 @@
-# Generic Model {#GenericModelReadme}
+# Generic Model
 
 This is a full implementation for generic use of the `QAbstractItemModel` interface.
 

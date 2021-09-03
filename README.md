@@ -8,11 +8,11 @@ This library is a collection of utilities for Qt's Model/View framework.
 
 ### Contents
 
-+ [Role Mask Proxy Model](@ref RoleMaskProxyModelReadme): A proxy that will act as a mask on top of the source model to intercept data.
-+ [Insert Proxy Model](@ref InsertProxyModelReadme): A proxy to add an extra row, column or both to allow users to insert new sections with a familiar interface.
-+ [Root Index Proxy Model](@ref RootIndexProxyModelReadme): A proxy to only show the portion of the model that are branches to a particular index.
-+ [Model Serialisation](@ref ModelSerialisationReadme): Implements a general method to serialise `QAbstractItemModel` based models to various common formats.
-+ [Generic Model](@ref GenericModelReadme): A convenience model for generic use implementing the full `QAbstractItemModel` interface.
++ [Role Mask Proxy Model](READMERoleMaskProxyModel.md): A proxy that will act as a mask on top of the source model to intercept data.
++ [Insert Proxy Model](READMEInsertProxyModel.md): A proxy to add an extra row, column or both to allow users to insert new sections with a familiar interface.
++ [Root Index Proxy Model](READMERootIndexProxyModel.md): A proxy to only show the portion of the model that are branches to a particular index.
++ [Model Serialisation](READMEModelSerialisation.md): Implements a general method to serialise `QAbstractItemModel` based models to various common formats.
++ [Generic Model](READMEGenericModel.md): A convenience model for generic use implementing the full `QAbstractItemModel` interface.
 + ~~Transpose Proxy Model: A proxy model to [transpose](https://en.wikipedia.org/wiki/Transpose#Examples) the original model.~~ Now part of Qt: `QTransposeProxyModel`
 
 ### Installation
@@ -22,7 +22,7 @@ If your system is compatible with one of the main platforms listed below you can
 
 #### Build from Source
 This library uses [CMake](https://cmake.org/) as build system and allows usage both using static and dynamic linking as well as customising what parts of the library you want to build. 
-See [INSTALL](@ref InstallReadme) for detailed build instructions.
+See [INSTALL](INSTALL.md) for detailed build instructions.
 
 #### Using the Library
 Once you installed/unpacked your library in a directory (e.g. `path/to/QtModelUtilities`)

@@ -1,4 +1,4 @@
-# Building from sources {#InstallReadme}
+# Building from sources
 The build system of this library is [CMake](https://cmake.org/), the minimum supported version is 3.9
 
 Once you installed CMake, you can open the CMakeLists.txt file with a recent version of QtCreator, alternatively you can open a terminal window with the C++ compiler and Qt environment set up. The procedure is platform dependant. 
