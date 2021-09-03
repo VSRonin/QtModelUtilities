@@ -2979,7 +2979,7 @@ void tst_GenericModel::dragDropTree()
         }
         const QModelIndex parIdx = source.index(i, 0);
         source.insertColumns(0, 2, parIdx);
-        source.insertRows(0, 2, parIdx);
+        source.insertRows(0, 3, parIdx);
         for (int k = 0; k < source.rowCount(parIdx); ++k) {
             for (int j = 0; j < source.columnCount(parIdx); ++j)
                 source.setData(source.index(k, j, parIdx), (i * 100) + (10 * j) + k);
@@ -2994,6 +2994,92 @@ void tst_GenericModel::dragDropTree()
     QSignalSpy columnsInsertedSpy(&destination, SIGNAL(columnsInserted(QModelIndex, int, int)));
     QSignalSpy *rowSpies[] = {&rowsAboutToBeInsertedSpy, &rowsInsertedSpy};
     QSignalSpy *columnSpies[] = {&columnsAboutToBeInsertedSpy, &columnsInsertedSpy};
+    const QModelIndex parIdx = source.index(1, 0);
+
+    QMimeData *mimeData = source.mimeData({source.index(0, 0)});
+    QVERIFY(mimeData);
+    QVERIFY(destination.dropMimeData(mimeData, Qt::CopyAction, 0, 0, QModelIndex()));
+    QCOMPARE(destination.rowCount(), 1);
+    QCOMPARE(destination.columnCount(), 1);
+    QCOMPARE(destination.rowCount(destination.index(0, 0)), source.rowCount(source.index(0, 0)));
+    QCOMPARE(destination.columnCount(destination.index(0, 0)), source.columnCount(source.index(0, 0)));
+    for (int i = 0; i < destination.rowCount(destination.index(0, 0)); ++i) {
+        for (int j = 0; j < destination.columnCount(destination.index(0, 0)); ++j) {
+            QCOMPARE(destination.index(i, j, destination.index(0, 0)).data().toInt(), source.index(i, j, source.index(0, 0)).data().toInt());
+            QCOMPARE(destination.index(i, j, destination.index(0, 0)).data(Qt::UserRole).toInt(),
+                     source.index(i, j, source.index(0, 0)).data(Qt::UserRole).toInt());
+        }
+    }
+    QCOMPARE(destination.index(0, 0).data().toInt(), source.index(0, 0).data().toInt());
+    QCOMPARE(destination.index(0, 0).data(Qt::UserRole).toInt(), source.index(0, 0).data(Qt::UserRole).toInt());
+    for (QSignalSpy *spy : rowSpies) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QVERIFY(!args.at(0).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(1).toInt(), 0);
+        QCOMPARE(args.at(2).toInt(), 0);
+    }
+    for (QSignalSpy *spy : columnSpies) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QVERIFY(!args.at(0).value<QModelIndex>().isValid());
+        QCOMPARE(args.at(1).toInt(), 0);
+        QCOMPARE(args.at(2).toInt(), 0);
+    }
+    mimeData->deleteLater();
+
+    mimeData = source.mimeData({parIdx});
+    QVERIFY(mimeData);
+    QVERIFY(destination.dropMimeData(mimeData, Qt::CopyAction, 0, 0, destination.index(0, 0)));
+    QCOMPARE(destination.rowCount(), 1);
+    QCOMPARE(destination.columnCount(), 1);
+    QCOMPARE(destination.rowCount(destination.index(0, 0)), source.rowCount(source.index(0, 0)) + 1);
+    QCOMPARE(destination.columnCount(destination.index(0, 0)), source.columnCount(source.index(0, 0)));
+    for (int i = 1; i < destination.rowCount(destination.index(0, 0)); ++i) {
+        for (int j = 0; j < destination.columnCount(destination.index(0, 0)); ++j) {
+            QCOMPARE(destination.index(i, j, destination.index(0, 0)).data().toInt(), source.index(i - 1, j, source.index(0, 0)).data().toInt());
+            QCOMPARE(destination.index(i, j, destination.index(0, 0)).data(Qt::UserRole).toInt(),
+                     source.index(i - 1, j, source.index(0, 0)).data(Qt::UserRole).toInt());
+        }
+    }
+    QCOMPARE(destination.rowCount(destination.index(0, 0, destination.index(0, 0))), source.rowCount(parIdx));
+    QCOMPARE(destination.columnCount(destination.index(0, 0, destination.index(0, 0))), source.columnCount(parIdx));
+    for (int i = 1; i < destination.rowCount(destination.index(0, 0, destination.index(0, 0))); ++i) {
+        for (int j = 0; j < destination.columnCount(destination.index(0, 0, destination.index(0, 0))); ++j) {
+            QCOMPARE(destination.index(i, j, destination.index(0, 0, destination.index(0, 0))).data().toInt(),
+                     source.index(i, j, parIdx).data().toInt());
+            QCOMPARE(destination.index(i, j, destination.index(0, 0, destination.index(0, 0))).data(Qt::UserRole).toInt(),
+                     source.index(i, j, parIdx).data(Qt::UserRole).toInt());
+        }
+    }
+    for (QSignalSpy *spy : rowSpies) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(0).value<QModelIndex>(), destination.index(0, 0));
+        QCOMPARE(args.at(1).toInt(), 0);
+        QCOMPARE(args.at(2).toInt(), 0);
+    }
+    for (QSignalSpy *spy : columnSpies)
+        QCOMPARE(spy->count(), 0);
+    mimeData->deleteLater();
+
+    mimeData = source.mimeData({source.index(1, 1, parIdx)});
+    QVERIFY(mimeData);
+    QVERIFY(destination.dropMimeData(mimeData, Qt::CopyAction, 0, 0, QModelIndex()));
+    QCOMPARE(destination.rowCount(), 2);
+    QCOMPARE(destination.columnCount(), 1);
+    QCOMPARE(destination.index(0, 0).data().toInt(), source.index(1, 1, parIdx).data().toInt());
+    QCOMPARE(destination.index(0, 0).data(Qt::UserRole).toInt(), source.index(1, 1, parIdx).data(Qt::UserRole).toInt());
+    for (QSignalSpy *spy : rowSpies) {
+        QCOMPARE(spy->count(), 1);
+        const auto args = spy->takeFirst();
+        QCOMPARE(args.at(0).value<QModelIndex>(), QModelIndex());
+        QCOMPARE(args.at(1).toInt(), 0);
+        QCOMPARE(args.at(2).toInt(), 0);
+    }
+    for (QSignalSpy *spy : columnSpies)
+        QCOMPARE(spy->count(), 0);
+    mimeData->deleteLater();
 }
 
 void tst_GenericModel::bDataStaticModel_data()
