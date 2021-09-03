@@ -1047,12 +1047,12 @@ void tst_InsertProxyModel::createPersistentOnLayoutAboutToBeChanged()
     QVERIFY(layoutAboutToBeChangedSpy.isValid());
     QSignalSpy layoutChangedSpy(&proxy, SIGNAL(layoutChanged()));
     QVERIFY(layoutChangedSpy.isValid());
-    connect(&proxy, &QAbstractItemModel::layoutAboutToBeChanged, this, [&idxList, &proxy]() {
+    connect(&proxy, &QAbstractItemModel::layoutAboutToBeChanged, [&idxList, &proxy]() {
         idxList.clear();
         for (int row = 0; row < 4; ++row)
             idxList << QPersistentModelIndex(proxy.index(row, 0));
     });
-    connect(&proxy, &QAbstractItemModel::layoutChanged, this, [&idxList]() {
+    connect(&proxy, &QAbstractItemModel::layoutChanged, [&idxList]() {
         QCOMPARE(idxList.size(), 4);
         QCOMPARE(idxList.at(0).row(), 1);
         QCOMPARE(idxList.at(0).column(), 0);
