@@ -710,24 +710,41 @@ bool GenericModel::mimeForValue(QMimeData *data, const QVariant &value) const
         data->setData(QStringLiteral("text/plain"), value.toDate().toString(Qt::ISODate).toUtf8());
         return true;
     case QMetaType::QTime:
-        data->setData(QStringLiteral("text/plain"), value.toTime().toString(Qt::ISODateWithMs).toUtf8());
+        data->setData(QStringLiteral("text/plain"),
+                      value.toTime()
+                              .toString(
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+                                      Qt::ISODateWithMs
+#else
+                                      Qt::ISODate
+#endif
+                                      )
+                              .toUtf8());
         return true;
     case QMetaType::QDateTime:
-        data->setData(QStringLiteral("text/plain"), value.toDateTime().toString(Qt::ISODateWithMs).toUtf8());
+        data->setData(QStringLiteral("text/plain"),
+                      value.toDateTime()
+                              .toString(
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+                                      Qt::ISODateWithMs
+#else
+                                      Qt::ISODate
+#endif
+                                      )
+                              .toUtf8());
         return true;
     case QMetaType::QStringList:
         data->setData(QStringLiteral("text/plain"), value.toStringList().join(QChar(QLatin1Char(','))).toUtf8());
         return true;
-    case QMetaType::QByteArrayList:
-        data->setData(QStringLiteral("text/plain"), value.value<QByteArrayList>().join(','));
-        return true;
     case QMetaType::QUrl:
         data->setData(QStringLiteral("text/plain"), value.value<QUrl>().toEncoded());
         return true;
-    case QMetaType::QJsonValue:
-        data->setData(QStringLiteral("application/json"),
-                      QJsonDocument(QJsonObject({qMakePair(QStringLiteral("value"), value.value<QJsonValue>())})).toJson());
+    case QMetaType::QJsonValue: {
+        QJsonObject jObj;
+        jObj[QLatin1String("value")] = value.value<QJsonValue>();
+        data->setData(QStringLiteral("application/json"), QJsonDocument(jObj).toJson());
         return true;
+    }
     case QMetaType::QJsonObject:
         data->setData(QStringLiteral("application/json"), QJsonDocument(value.value<QJsonObject>()).toJson());
         return true;
@@ -737,7 +754,12 @@ bool GenericModel::mimeForValue(QMimeData *data, const QVariant &value) const
     case QMetaType::QJsonDocument:
         data->setData(QStringLiteral("application/json"), value.value<QJsonDocument>().toJson());
         return true;
-#if (QT_VERSION > QT_VERSION_CHECK(5, 12, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
+    case QMetaType::QByteArrayList:
+        data->setData(QStringLiteral("text/plain"), value.value<QByteArrayList>().join(','));
+        return true;
+#endif
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
     case QMetaType::QCborValue:
         data->setData(QStringLiteral("application/cbor"), value.value<QCborValue>().toCbor());
         return true;
@@ -1229,7 +1251,7 @@ bool GenericModelItem::isAnchestor(GenericModelItem *ancestor, GenericModelItem 
 QDataStream &operator<<(QDataStream &stream, const GenericModelItem &item)
 {
     stream << qint32(item.m_colCount) << qint32(item.m_rowCount) << qint32(item.m_row) << qint32(item.m_column) << qint32(item.m_rowSpan)
-           << qint32(item.m_colSpan) << item.data << item.flags << qint32(item.children.size());
+           << qint32(item.m_colSpan) << item.data << qint32(item.flags) << qint32(item.children.size());
     for (GenericModelItem *child : item.children)
         stream << *child;
     return stream;
@@ -1250,7 +1272,9 @@ QDataStream &operator>>(QDataStream &stream, GenericModelItem &item)
     item.m_rowSpan = temp;
     stream >> temp;
     item.m_colSpan = temp;
-    stream >> item.data >> item.flags >> temp;
+    stream >> item.data >> temp;
+    item.flags = (Qt::ItemFlags)temp;
+    stream >> temp;
     if (item.children.size() > temp) {
         qDeleteAll(item.children.begin() + temp, item.children.end());
         item.children.erase(item.children.begin() + temp, item.children.end());
