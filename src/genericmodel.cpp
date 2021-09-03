@@ -1195,8 +1195,10 @@ QMimeData *GenericModel::mimeData(const QModelIndexList &indexes) const
 */
 bool GenericModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
 {
-    if (row < 0 || column < 0)
-        return false;
+    if (row < 0)
+        row = rowCount(parent);
+    if (column < 0)
+        column = 0;
     if (parent.isValid() && parent.model() != this)
         return false;
     if (!data)
