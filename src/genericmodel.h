@@ -78,6 +78,7 @@ Q_SIGNALS:
 
 protected:
     GenericModel(GenericModelPrivate &dptr, QObject *parent);
+    virtual bool mimeForValue(QMimeData *data, const QVariant &value) const;
     GenericModelPrivate *m_dptr;
 };
 #endif // GENERICMODEL_H

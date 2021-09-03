@@ -18,6 +18,24 @@
 #include <QSet>
 #include <QMultiMap>
 #include <QIODevice>
+#include <QUrl>
+#include <QJsonDocument>
+#include <QJsonValue>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QPair>
+#if (QT_VERSION > QT_VERSION_CHECK(5, 12, 0))
+#    include <QCborValue>
+#    include <QCborArray>
+#    include <QCborMap>
+#endif
+#ifdef QT_GUI_LIB
+#    include <QImage>
+#    include <QBuffer>
+#    include <QPixmap>
+#    include <QBitmap>
+#    include <QIcon>
+#endif
 GenericModelItem::GenericModelItem(GenericModel *model)
     : GenericModelItem(static_cast<GenericModelItem *>(nullptr))
 {
@@ -657,6 +675,121 @@ GenericModel::GenericModel(GenericModelPrivate &dptr, QObject *parent)
 { }
 
 /*!
+ * \brief Stores the /a value in the appropriate mime type of /a data
+ * \details Returns true if the data has been stored. Reimplement to support custom types.
+ */
+bool GenericModel::mimeForValue(QMimeData *data, const QVariant &value) const
+{
+    if (!data)
+        return false;
+    switch (value.userType()) {
+    case QMetaType::Bool:
+    case QMetaType::Int:
+    case QMetaType::UInt:
+    case QMetaType::Double:
+    case QMetaType::QChar:
+    case QMetaType::QString:
+    case QMetaType::Long:
+    case QMetaType::LongLong:
+    case QMetaType::Short:
+    case QMetaType::Char:
+    case QMetaType::ULong:
+    case QMetaType::ULongLong:
+    case QMetaType::UShort:
+    case QMetaType::SChar:
+    case QMetaType::UChar:
+    case QMetaType::Float:
+    case QMetaType::QBitArray:
+    case QMetaType::QUuid:
+        data->setData(QStringLiteral("text/plain"), value.toString().toUtf8());
+        return true;
+    case QMetaType::QByteArray:
+        data->setData(QStringLiteral("text/plain"), value.toByteArray());
+        return true;
+    case QMetaType::QDate:
+        data->setData(QStringLiteral("text/plain"), value.toDate().toString(Qt::ISODate).toUtf8());
+        return true;
+    case QMetaType::QTime:
+        data->setData(QStringLiteral("text/plain"), value.toTime().toString(Qt::ISODateWithMs).toUtf8());
+        return true;
+    case QMetaType::QDateTime:
+        data->setData(QStringLiteral("text/plain"), value.toDateTime().toString(Qt::ISODateWithMs).toUtf8());
+        return true;
+    case QMetaType::QStringList:
+        data->setData(QStringLiteral("text/plain"), value.toStringList().join(QChar(QLatin1Char(','))).toUtf8());
+        return true;
+    case QMetaType::QByteArrayList:
+        data->setData(QStringLiteral("text/plain"), value.value<QByteArrayList>().join(','));
+        return true;
+    case QMetaType::QUrl:
+        data->setData(QStringLiteral("text/plain"), value.value<QUrl>().toEncoded());
+        return true;
+    case QMetaType::QJsonValue:
+        data->setData(QStringLiteral("application/json"),
+                      QJsonDocument(QJsonObject({qMakePair(QStringLiteral("value"), value.value<QJsonValue>())})).toJson());
+        return true;
+    case QMetaType::QJsonObject:
+        data->setData(QStringLiteral("application/json"), QJsonDocument(value.value<QJsonObject>()).toJson());
+        return true;
+    case QMetaType::QJsonArray:
+        data->setData(QStringLiteral("application/json"), QJsonDocument(value.value<QJsonArray>()).toJson());
+        return true;
+    case QMetaType::QJsonDocument:
+        data->setData(QStringLiteral("application/json"), value.value<QJsonDocument>().toJson());
+        return true;
+#if (QT_VERSION > QT_VERSION_CHECK(5, 12, 0))
+    case QMetaType::QCborValue:
+        data->setData(QStringLiteral("application/cbor"), value.value<QCborValue>().toCbor());
+        return true;
+    case QMetaType::QCborArray:
+        data->setData(QStringLiteral("application/cbor"), QCborValue(value.value<QCborArray>()).toCbor());
+        return true;
+    case QMetaType::QCborMap:
+        data->setData(QStringLiteral("application/cbor"), QCborValue(value.value<QCborMap>()).toCbor());
+        return true;
+#endif
+#ifdef QT_GUI_LIB
+    case QMetaType::QImage: {
+        QByteArray imageData;
+        QBuffer imageDevice(&imageData);
+        value.value<QImage>().save(&imageDevice, "PNG");
+        data->setData(QStringLiteral("image/png"), imageData);
+        return true;
+    }
+    case QMetaType::QPixmap: {
+        QByteArray imageData;
+        QBuffer imageDevice(&imageData);
+        value.value<QPixmap>().save(&imageDevice, "PNG");
+        data->setData(QStringLiteral("image/png"), imageData);
+        return true;
+    }
+    case QMetaType::QBitmap: {
+        QByteArray imageData;
+        QBuffer imageDevice(&imageData);
+        value.value<QBitmap>().save(&imageDevice, "PNG");
+        data->setData(QStringLiteral("image/png"), imageData);
+        return true;
+    }
+    case QMetaType::QIcon: {
+        const QIcon icon = value.value<QIcon>();
+        const auto sizes = icon.availableSizes();
+        QSize maxSize =
+                sizes.isEmpty() ? QSize(20, 20) : *std::max_element(sizes.constBegin(), sizes.constEnd(), [](const QSize &a, const QSize &b) -> bool {
+                    return (a.width() * a.height()) < (b.width() * b.height());
+                });
+        QByteArray imageData;
+        QBuffer imageDevice(&imageData);
+        icon.pixmap(maxSize).save(&imageDevice, "PNG");
+        data->setData(QStringLiteral("image/png"), imageData);
+        return true;
+    }
+#endif
+    default:
+        return false;
+    }
+}
+
+/*!
 Destructor
 */
 GenericModel::~GenericModel()
@@ -1052,6 +1185,8 @@ QMimeData *GenericModel::mimeData(const QModelIndexList &indexes) const
         return nullptr;
     Q_D(const GenericModel);
     d->encodeMime(data, indexes);
+    if (indexes.size() == 1)
+        mimeForValue(data, indexes.first().data());
     return data;
 }
 
