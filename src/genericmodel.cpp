@@ -984,47 +984,47 @@ bool GenericModelPrivate::decodeMime(const QMimeData *data, Qt::DropAction actio
     Q_Q(GenericModel);
     const QByteArray encoded = data->data(mimeDataName());
     QDataStream stream(encoded);
-    qint32 itemsCount=0;
+    qint32 itemsCount = 0;
     stream >> itemsCount;
-    if(itemsCount==0)
+    if (itemsCount == 0)
         return true;
     QMultiMap<int, GenericModelItem *> items;
-    for(qint32 i=0;i<itemsCount;++i){
-        GenericModelItem* tempItem = new GenericModelItem(q);
+    for (qint32 i = 0; i < itemsCount; ++i) {
+        GenericModelItem *tempItem = new GenericModelItem(q);
         stream >> *tempItem;
-        items.insert(tempItem->row(),tempItem);
+        items.insert(tempItem->row(), tempItem);
     }
     int minCol = std::numeric_limits<int>::max();
-    int maxCol= 0;
-    for(auto i = items.constBegin(), iEnd = items.constEnd(); i!=iEnd;++i){
-        if((*i)->column() < minCol)
+    int maxCol = 0;
+    for (auto i = items.constBegin(), iEnd = items.constEnd(); i != iEnd; ++i) {
+        if ((*i)->column() < minCol)
             minCol = (*i)->column();
-        if((*i)->column() > maxCol)
+        if ((*i)->column() > maxCol)
             maxCol = (*i)->column();
     }
     int cCount = q->columnCount(parent);
     int rCount = q->rowCount(parent);
-    row = qMin(row,rCount);
-    column = qMin(column,cCount);
-    if(cCount<maxCol-minCol+1+column){
-        Q_ASSUME(q->insertColumns(cCount,maxCol-minCol+1+column-cCount,parent));
+    row = qMin(row, rCount);
+    column = qMin(column, cCount);
+    if (cCount < maxCol - minCol + 1 + column) {
+        Q_ASSUME(q->insertColumns(cCount, maxCol - minCol + 1 + column - cCount, parent));
         cCount = q->columnCount(parent);
     }
     const auto newRowIdxes = items.uniqueKeys();
     rCount = newRowIdxes.size();
-    Q_ASSERT(rCount*cCount>0);
+    Q_ASSERT(rCount * cCount > 0);
     QVector<GenericModelItem *> rowsToInsert;
-    rowsToInsert.reserve(rCount*cCount);
-    for(auto i=newRowIdxes.constBegin(), iEnd = newRowIdxes.constEnd();i!=iEnd;++i){
+    rowsToInsert.reserve(rCount * cCount);
+    for (auto i = newRowIdxes.constBegin(), iEnd = newRowIdxes.constEnd(); i != iEnd; ++i) {
         const auto colItems = items.values(*i);
-        for(int j=0; j<cCount;++j){
-            GenericModelItem* itemToAppend = nullptr;
-            if(j<column){
+        for (int j = 0; j < cCount; ++j) {
+            GenericModelItem *itemToAppend = nullptr;
+            if (j < column) {
                 itemToAppend = new GenericModelItem(q);
-            }
-            else{
-                const auto itemIter = std::find_if(colItems.constBegin(),colItems.constEnd(),[=](GenericModelItem *item)->bool{return item->column()==minCol+j-column;});
-                if(itemIter==colItems.constEnd())
+            } else {
+                const auto itemIter = std::find_if(colItems.constBegin(), colItems.constEnd(),
+                                                   [=](GenericModelItem *item) -> bool { return item->column() == minCol + j - column; });
+                if (itemIter == colItems.constEnd())
                     itemToAppend = new GenericModelItem(q);
                 else
                     itemToAppend = *itemIter;
@@ -1033,11 +1033,11 @@ bool GenericModelPrivate::decodeMime(const QMimeData *data, Qt::DropAction actio
             rowsToInsert.append(itemToAppend);
         }
     }
-    Q_ASSERT(rowsToInsert.size()==rCount*cCount);
-    for(int i=0;i<rCount*cCount;++i)
-        rowsToInsert[i]->m_column = i%cCount;
-    q->beginInsertRows(parent,row,row + rCount-1);
-    itemForIndex(parent)->insertRows(row,rowsToInsert);
+    Q_ASSERT(rowsToInsert.size() == rCount * cCount);
+    for (int i = 0; i < rCount * cCount; ++i)
+        rowsToInsert[i]->m_column = i % cCount;
+    q->beginInsertRows(parent, row, row + rCount - 1);
+    itemForIndex(parent)->insertRows(row, rowsToInsert);
     q->endInsertRows();
     return true;
 }
@@ -1060,9 +1060,9 @@ QMimeData *GenericModel::mimeData(const QModelIndexList &indexes) const
 */
 bool GenericModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
 {
-    if(row<0 || column<0)
+    if (row < 0 || column < 0)
         return false;
-    if(parent.isValid() && parent.model() != this)
+    if (parent.isValid() && parent.model() != this)
         return false;
     if (!data)
         return false;
