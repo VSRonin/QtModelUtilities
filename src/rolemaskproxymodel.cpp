@@ -427,8 +427,15 @@ void RoleMaskProxyModelPrivate::onColumnsMoved(const QModelIndex &sourceParent, 
 void RoleMaskProxyModelPrivate::clearUnusedMaskedRoles(const QSet<int> &newRoles)
 {
     if (newRoles.isEmpty()) {
+        m_defaultValues.clear();
         m_masked.clear();
         return;
+    }
+    for (auto i = m_defaultValues.begin(); i != m_defaultValues.end();) {
+        if (!newRoles.contains(i.key()))
+            i = m_defaultValues.erase(i);
+        else
+            ++i;
     }
     const auto idxEnd = m_masked.end();
     for (auto idxIter = m_masked.begin(); idxIter != idxEnd;) {
@@ -638,6 +645,28 @@ void RoleMaskProxyModel::removeMaskedRole(int role)
 }
 
 /*!
+Returns the default value for the \a role when the proxy is not transparent
+\sa transparentIfEmpty
+*/
+QVariant RoleMaskProxyModel::maskedRoleDefaultValue(int role) const
+{
+    Q_D(const RoleMaskProxyModel);
+    return d->m_defaultValues.value(role, QVariant());
+}
+
+bool RoleMaskProxyModel::setMaskedRoleDefaultValue(int role, const QVariant &value)
+{
+    Q_D(RoleMaskProxyModel);
+    if (!d->m_maskedRoles.contains(role))
+        return false;
+    if (value.isValid())
+        d->m_defaultValues[role] = value;
+    else
+        d->m_defaultValues.remove(role);
+    return true;
+}
+
+/*!
 \reimp
 */
 void RoleMaskProxyModel::setSourceModel(QAbstractItemModel *sourceMdl)
@@ -724,7 +753,7 @@ void RoleMaskProxyModel::multiData(const QModelIndex &index, QModelRoleDataSpan 
         if (roleIter != idxData->constEnd())
             roleData.setData(roleIter.value());
         else if (!d->m_transparentIfEmpty && d->m_maskedRoles.contains(role))
-            roleData.setData(QVariant());
+            roleData.setData(d->m_defaultValues.value(role, QVariant()));
     }
 }
 #endif
@@ -749,7 +778,7 @@ QVariant RoleMaskProxyModel::data(const QModelIndex &proxyIndex, int role) const
     }
     if (d->m_transparentIfEmpty)
         return QIdentityProxyModel::data(proxyIndex, role);
-    return QVariant();
+    return d->m_defaultValues.value(role, QVariant());
 }
 
 /*!
@@ -882,6 +911,8 @@ the roles that are managed by the sorce model
 */
 bool RoleMaskProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles)
 {
+    if (!index.isValid() || !sourceModel())
+        return false;
     Q_D(RoleMaskProxyModel);
     QMap<int, QVariant> adjustedRoles = roles;
     if (d->m_mergeDisplayEdit) {
@@ -935,7 +966,7 @@ bool RoleMaskProxyModel::setItemData(const QModelIndex &index, const QMap<int, Q
         dataChanged(index, index, changedRoles);
     }
     if (!rolesForSource.isEmpty())
-        return QIdentityProxyModel::setItemData(index, rolesForSource);
+        return sourceModel()->setItemData(mapToSource(index), rolesForSource);
     return true;
 }
 
@@ -944,18 +975,25 @@ bool RoleMaskProxyModel::setItemData(const QModelIndex &index, const QMap<int, Q
 */
 QMap<int, QVariant> RoleMaskProxyModel::itemData(const QModelIndex &index) const
 {
+    if (!index.isValid() || !sourceModel())
+        return QMap<int, QVariant>();
     Q_D(const RoleMaskProxyModel);
     RolesContainer result;
-    const auto maskedData = d->dataForIndex(mapToSource(index));
+    const QModelIndex sourceIdx = mapToSource(index);
+    const auto maskedData = d->dataForIndex(sourceIdx);
     if (maskedData) {
         result = *maskedData;
         const auto displayIter = result.constFind(Qt::DisplayRole);
         if (d->m_mergeDisplayEdit && displayIter != result.cend())
             result.insert(Qt::EditRole, displayIter.value());
     }
+    const QMap<int, QVariant> baseData = sourceModel()->itemData(sourceIdx);
+    for (auto i = baseData.cbegin(), baseEnd = baseData.cend(); i != baseEnd; ++i) {
+        if (!result.contains(i.key()) && (!d->m_maskedRoles.contains(i.key()) || d->m_transparentIfEmpty))
+            result.insert(i.key(), i.value());
+    }
     if (!d->m_transparentIfEmpty) {
-        const QMap<int, QVariant> baseData = QIdentityProxyModel::itemData(index);
-        for (auto i = baseData.cbegin(), baseEnd = baseData.cend(); i != baseEnd; ++i) {
+        for (auto i = d->m_defaultValues.cbegin(), iEnd = d->m_defaultValues.cend(); i != iEnd; ++i) {
             if (!result.contains(i.key()))
                 result.insert(i.key(), i.value());
         }

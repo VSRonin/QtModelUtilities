@@ -34,6 +34,8 @@ public:
     void clearMaskedRoles();
     void addMaskedRole(int role);
     void removeMaskedRole(int role);
+    QVariant maskedRoleDefaultValue(int role) const;
+    bool setMaskedRoleDefaultValue(int role, const QVariant &value);
     void setSourceModel(QAbstractItemModel *sourceModel) override;
     QVariant data(const QModelIndex &proxyIndex, int role = Qt::DisplayRole) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;

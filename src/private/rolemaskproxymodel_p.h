@@ -42,6 +42,7 @@ class RoleMaskProxyModelPrivate
     QVector<RolesContainer> m_vHeaderData;
     QVector<QPersistentModelIndex> m_sortVHeaders;
     QVector<QPersistentModelIndex> m_sortHHeaders;
+    RolesContainer m_defaultValues;
     bool m_transparentIfEmpty;
     bool m_mergeDisplayEdit;
     bool m_maskHeaderData;

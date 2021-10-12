@@ -69,6 +69,43 @@ QAbstractItemModel *createTreeModel(QObject *parent)
     return result;
 }
 
+void tst_RoleMaskProxyModel::testItemDataTransParent()
+{
+#ifdef COMPLEX_MODEL_SUPPORT
+    QAbstractItemModel *baseModel = new ComplexModel(this);
+    baseModel->insertRow(0);
+    baseModel->insertColumn(0);
+    const QModelIndex baseIdx = baseModel->index(0, 0);
+    QVERIFY(baseModel->setData(baseIdx, 1, Qt::UserRole));
+    QVERIFY(baseModel->setData(baseIdx, 2, Qt::UserRole + 1));
+    auto itemData = baseModel->itemData(baseIdx);
+    QCOMPARE(itemData.size(), 2);
+    QCOMPARE(itemData.value(Qt::UserRole).toInt(), 1);
+    QCOMPARE(itemData.value(Qt::UserRole + 1).toInt(), 2);
+    RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, baseModel);
+    proxyModel.setSourceModel(baseModel);
+    proxyModel.addMaskedRole(Qt::UserRole + 1);
+    proxyModel.addMaskedRole(Qt::UserRole + 2);
+    const QModelIndex proxyIdx = proxyModel.index(0, 0);
+    QVERIFY(proxyModel.setData(proxyIdx, 200, Qt::UserRole + 2));
+    proxyModel.setTransparentIfEmpty(true);
+    itemData = proxyModel.itemData(proxyIdx);
+    QCOMPARE(itemData.size(), 3);
+    QCOMPARE(itemData.value(Qt::UserRole).toInt(), 1);
+    QCOMPARE(itemData.value(Qt::UserRole + 2).toInt(), 200);
+    QCOMPARE(itemData.value(Qt::UserRole + 1).toInt(), 2);
+    proxyModel.setTransparentIfEmpty(false);
+    itemData = proxyModel.itemData(proxyIdx);
+    QCOMPARE(itemData.size(), 2);
+    QCOMPARE(itemData.value(Qt::UserRole).toInt(), 1);
+    QCOMPARE(itemData.value(Qt::UserRole + 2).toInt(), 200);
+    baseModel->deleteLater();
+#else
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
+#endif
+}
+
 void tst_RoleMaskProxyModel::autoParent()
 {
     QObject *parentObj = new QObject;
@@ -583,6 +620,28 @@ void tst_RoleMaskProxyModel::testMaskHorizontalHeaderData()
 #else
     QSKIP("This test requires the GenericModel module");
 #endif
+}
+
+void tst_RoleMaskProxyModel::testDefaultValueNonTransparent()
+{
+    QStringListModel baseModel(QStringList() << QStringLiteral("Alice") << QStringLiteral("Bob"));
+    RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, &baseModel);
+    proxyModel.setSourceModel(&baseModel);
+    QVERIFY(!proxyModel.setMaskedRoleDefaultValue(Qt::UserRole, 1));
+    QVERIFY(!proxyModel.maskedRoleDefaultValue(Qt::UserRole).isValid());
+    proxyModel.addMaskedRole(Qt::UserRole);
+    QVERIFY(proxyModel.setMaskedRoleDefaultValue(Qt::UserRole, 2));
+    QCOMPARE(proxyModel.maskedRoleDefaultValue(Qt::UserRole).toInt(), 2);
+    proxyModel.setTransparentIfEmpty(true);
+    QVERIFY(!proxyModel.index(0, 0).data(Qt::UserRole).isValid());
+    QVERIFY(!proxyModel.itemData(proxyModel.index(0, 0)).contains(Qt::UserRole));
+    proxyModel.setTransparentIfEmpty(false);
+    QCOMPARE(proxyModel.index(0, 0).data(Qt::UserRole).toInt(), 2);
+    QCOMPARE(proxyModel.itemData(proxyModel.index(0, 0)).value(Qt::UserRole).toInt(), 2);
+    proxyModel.setMaskedRoles(QList<int>() << Qt::DecorationRole);
+    QVERIFY(!proxyModel.maskedRoleDefaultValue(Qt::UserRole).isValid());
+    QVERIFY(!proxyModel.itemData(proxyModel.index(0, 0)).contains(Qt::UserRole));
 }
 
 void tst_RoleMaskProxyModel::testInsertRow()
