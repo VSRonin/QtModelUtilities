@@ -34,7 +34,7 @@ protected:
     QVariant loadVariant(int type, const QString &val) const;
     QString saveVariant(const QVariant &val) const;
     static int guessDecimals(double val);
-    static QString guessDecimalsString(double val, QLocale *loca = Q_NULLPTR);
+    static QString guessDecimalsString(double val, QLocale *loca = nullptr);
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     QTextCodec *m_textCodec;
 #endif

@@ -164,11 +164,6 @@ if(modelutilities_SRCS)
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin"
     )
-    include(CMakePackageConfigHelpers)
-    write_basic_package_version_file("QtModelUtilitiesConfigVersion.cmake"
-        VERSION ${VERSION_SHORT}
-        COMPATIBILITY SameMajorVersion
-    )
     install(FILES ${modelutilities_INSTALL_INCLUDE} "${CMAKE_CURRENT_BINARY_DIR}/globaldefs/modelutilities_global.h"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         COMPONENT QtModelUtilities_Development
@@ -198,6 +193,11 @@ if(modelutilities_SRCS)
                 NAMELINK_ONLY
         )
     endif()
+    include(CMakePackageConfigHelpers)
+    write_basic_package_version_file("QtModelUtilitiesConfigVersion.cmake"
+        VERSION ${VERSION_SHORT}
+        COMPATIBILITY SameMajorVersion
+    )
     install(EXPORT QtModelUtilitiesTargets
             FILE QtModelUtilitiesTargets.cmake
             NAMESPACE QtModelUtilities::
