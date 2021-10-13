@@ -1466,6 +1466,9 @@ bool GenericModel::setItemData(const QModelIndex &index, const QMap<int, QVarian
             newData.erase(editIter);
         }
     }
+    QVector<int> changedRoles = listToVector(roles.keys());
+    if (d->m_mergeDisplayEdit && newData.contains(Qt::DisplayRole))
+        changedRoles.append(Qt::EditRole);
     for (auto i = item->data.constBegin(), iEnd = item->data.constEnd(); i != iEnd; ++i) {
         if (newData.contains(i.key()))
             continue;
@@ -1474,7 +1477,7 @@ bool GenericModel::setItemData(const QModelIndex &index, const QMap<int, QVarian
     }
     if (item->data != newData) {
         item->data = std::move(newData);
-        dataChanged(index, index);
+        dataChanged(index, index, changedRoles);
     }
     return true;
 }

@@ -14,6 +14,8 @@
 #define MODELUTILITIES_COMMON_P_H
 
 #include <QVariant>
+#include <QVector>
+#include <QList>
 #ifdef OPTIMISE_FOR_MANY_ROLES
 #    include <QHash>
 using RolesContainer = QHash<int, QVariant>;
@@ -45,5 +47,16 @@ T convertFromContainer(const RolesContainer &other)
     for (auto i = other.begin(), otherEnd = other.end(); i != otherEnd; ++i)
         result.insert(i.key(), i.value());
     return result;
+}
+template<class T>
+QVector<T> listToVector(const QList<T> &list)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    return list;
+#elif QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    return QVector<T>(list.constBegin(), list.constEnd());
+#else
+    return list.toVector();
+#endif
 }
 #endif // MODELUTILITIES_COMMON_P_H
