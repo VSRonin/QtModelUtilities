@@ -1,0 +1,2 @@
+include(TestMacro)
+BasicTest(GenericModel)

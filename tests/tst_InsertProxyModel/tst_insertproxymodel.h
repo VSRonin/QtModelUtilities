@@ -1,5 +1,5 @@
-#ifndef tst_insertproxymodel_h__
-#define tst_insertproxymodel_h__
+#ifndef TST_INSERTPROXYMODEL_H
+#define TST_INSERTPROXYMODEL_H
 
 #include <QObject>
 #include <QList>
@@ -8,6 +8,7 @@ class tst_InsertProxyModel : public QObject
 {
     Q_OBJECT
 private Q_SLOTS:
+    void autoParent();
     void initTestCase();
     void testData();
     void testData_data();
@@ -33,5 +34,6 @@ private Q_SLOTS:
     void testSort_data();
     void testInsertOnEmptyModel();
     void testResetModel();
+    void createPersistentOnLayoutAboutToBeChanged();
 };
-#endif // tst_insertproxymodel_h__
+#endif // TST_INSERTPROXYMODEL_H

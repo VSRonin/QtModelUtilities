@@ -4,6 +4,17 @@
 #include <QByteArray>
 #include <QBuffer>
 #include <QDataStream>
+#include <QSignalSpy>
+
+void tst_BinaryModelSerialiser::autoParent()
+{
+    QObject *parentObj = new QObject;
+    auto testItem = new BinaryModelSerialiser(parentObj);
+    QSignalSpy testItemDestroyedSpy(testItem, SIGNAL(destroyed(QObject *)));
+    QVERIFY(testItemDestroyedSpy.isValid());
+    delete parentObj;
+    QCOMPARE(testItemDestroyedSpy.count(), 1);
+}
 
 void tst_BinaryModelSerialiser::basicSaveLoadByteArray()
 {
@@ -27,7 +38,7 @@ void tst_BinaryModelSerialiser::basicSaveLoadStream()
 {
     QFETCH(const QAbstractItemModel *, sourceModel);
     QFETCH(QAbstractItemModel *, destinationModel);
-    BinaryModelSerialiser serialiser(sourceModel);
+    BinaryModelSerialiser serialiser(sourceModel, nullptr);
     serialiser.addRoleToSave(Qt::UserRole + 1);
     QByteArray dataArray;
     QDataStream writeStream(&dataArray, QIODevice::WriteOnly);

@@ -200,6 +200,13 @@ QString AbstractStringSerialiserPrivate::saveVariant(const QVariant &val) const
 }
 
 /*!
+Construct a serialiser
+*/
+AbstractStringSerialiser::AbstractStringSerialiser(QObject *parent)
+    : AbstractModelSerialiser(*new AbstractStringSerialiserPrivate(this), parent)
+{ }
+
+/*!
 Construct a read/write serialiser
 */
 AbstractStringSerialiser::AbstractStringSerialiser(QAbstractItemModel *model, QObject *parent)

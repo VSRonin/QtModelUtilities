@@ -65,7 +65,7 @@ void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter &destination,
             for (QList<int>::const_iterator roleIter = m_rolesToSave.constBegin(); roleIter != m_rolesToSave.constEnd(); ++roleIter) {
                 const QVariant headData = m_constModel->headerData(i, Qt::Horizontal, *roleIter);
                 if (!headData.isNull()) {
-                    destination.writeStartElement("div");
+                    destination.writeStartElement(QStringLiteral("div"));
                     destination.writeAttribute(QStringLiteral("data-rolecode"), QString::number(*roleIter));
                     destination.writeAttribute(QStringLiteral("data-varianttype"), QString::number(headData.userType()));
                     writeHtmlVariant(destination, headData);
@@ -85,7 +85,7 @@ void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter &destination,
             for (QList<int>::const_iterator roleIter = m_rolesToSave.constBegin(); roleIter != m_rolesToSave.constEnd(); ++roleIter) {
                 const QVariant headData = m_constModel->headerData(i, Qt::Vertical, *roleIter);
                 if (!headData.isNull()) {
-                    destination.writeStartElement("div");
+                    destination.writeStartElement(QStringLiteral("div"));
                     destination.writeAttribute(QStringLiteral("data-rolecode"), QString::number(*roleIter));
                     destination.writeAttribute(QStringLiteral("data-varianttype"), QString::number(headData.userType()));
                     writeHtmlVariant(destination, headData);
@@ -100,7 +100,7 @@ void HtmlModelSerialiserPrivate::writeHtmlElement(QXmlStreamWriter &destination,
             for (QList<int>::const_iterator roleIter = m_rolesToSave.constBegin(); roleIter != m_rolesToSave.constEnd(); ++roleIter) {
                 const QVariant roleData = currIndex.data(*roleIter);
                 if (!roleData.isNull()) {
-                    destination.writeStartElement("div");
+                    destination.writeStartElement(QStringLiteral("div"));
                     destination.writeAttribute(QStringLiteral("data-rolecode"), QString::number(*roleIter));
                     destination.writeAttribute(QStringLiteral("data-varianttype"), QString::number(roleData.userType()));
                     writeHtmlVariant(destination, roleData);
@@ -203,7 +203,7 @@ bool HtmlModelSerialiserPrivate::writeHtml(QXmlStreamWriter &writer) const
         writer.writeStartElement(QStringLiteral("head"));
         writer.writeEmptyElement(QStringLiteral("meta"));
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-        writer.writeAttribute(QStringLiteral("charset"), writer.codec()->name());
+        writer.writeAttribute(QStringLiteral("charset"), QString::fromLatin1(writer.codec()->name()));
 #else
         writer.writeAttribute(QStringLiteral("charset"), QStringLiteral("UTF-8"));
 #endif
@@ -217,7 +217,7 @@ bool HtmlModelSerialiserPrivate::writeHtml(QXmlStreamWriter &writer) const
         writer.writeEndElement(); // head
         writer.writeStartElement(QStringLiteral("body"));
     }
-    writer.writeStartElement("div");
+    writer.writeStartElement(QStringLiteral("div"));
     writer.writeAttribute(QStringLiteral("data-modelcode"), Magic_Model_Header);
     writeHtmlElement(writer);
     writer.writeEndElement(); // div
@@ -270,7 +270,7 @@ void HtmlModelSerialiserPrivate::writeHtmlVariant(QXmlStreamWriter &writer, cons
 {
     if (isImageType(val.userType())) {
         writer.writeEmptyElement(QStringLiteral("img"));
-        writer.writeAttribute(QStringLiteral("src"), "data:image/png;base64," + saveVariant(val));
+        writer.writeAttribute(QStringLiteral("src"), QLatin1String("data:image/png;base64,") + saveVariant(val));
         writer.writeAttribute(QStringLiteral("alt"), QStringLiteral("modelimage.png"));
         return;
     }
@@ -291,6 +291,13 @@ QVariant HtmlModelSerialiserPrivate::readHtmlVariant(QXmlStreamReader &reader, i
     }
     return loadVariant(valType, reader.readElementText());
 }
+
+/*!
+Constructs a serialiser
+*/
+HtmlModelSerialiser::HtmlModelSerialiser(QObject *parent)
+    : AbstractStringSerialiser(*new HtmlModelSerialiserPrivate(this), parent)
+{ }
 
 /*!
 Constructs a serialiser operating over \a model
@@ -323,8 +330,8 @@ HtmlModelSerialiser::HtmlModelSerialiser(HtmlModelSerialiserPrivate &d, QObject 
 \property HtmlModelSerialiser::printStartDocument
 \accessors %printStartDocument(), setPrintStartDocument()
 \brief This property determines if the start of the html document should be written
-\details If this property is set to \c true (the default) the serialiser will write the \c <html> starting block.
-Set this to false to save the model as part of a larger html document or if you want to specify your custom css in the \c <head>
+\details If this property is set to \c true (the default) the serialiser will write the \c \<html\> starting block.
+Set this to false to save the model as part of a larger html document or if you want to specify your custom css in the \c \<head\>
 */
 bool HtmlModelSerialiser::printStartDocument() const
 {

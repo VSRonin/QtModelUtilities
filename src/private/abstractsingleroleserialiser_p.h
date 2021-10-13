@@ -11,8 +11,8 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef abstractsingleroleserialiser_p_h__
-#define abstractsingleroleserialiser_p_h__
+#ifndef ABSTRACTSINGLEROLESERIALISER_P_H
+#define ABSTRACTSINGLEROLESERIALISER_P_H
 #include "private/abstractstringserialiser_p.h"
 #include "abstractsingleroleserialiser.h"
 class AbstractSingleRoleSerialiserPrivate : public AbstractStringSerialiserPrivate
@@ -22,4 +22,4 @@ class AbstractSingleRoleSerialiserPrivate : public AbstractStringSerialiserPriva
 protected:
     AbstractSingleRoleSerialiserPrivate(AbstractSingleRoleSerialiser *q);
 };
-#endif // abstractsingleroleserialiser_p_h__
+#endif // ABSTRACTSINGLEROLESERIALISER_P_H

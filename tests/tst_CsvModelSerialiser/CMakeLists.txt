@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.2)
 include(TestMacro)
 BasicTest(CsvModelSerialiser)
 target_sources(tst_CsvModelSerialiser PRIVATE

@@ -1,5 +1,5 @@
-#ifndef tst_rolemaskproxymodel_h__
-#define tst_rolemaskproxymodel_h__
+#ifndef TST_ROLEMASKPROXYMODEL_H
+#define TST_ROLEMASKPROXYMODEL_H
 
 #include <QObject>
 #include <array>
@@ -10,6 +10,7 @@ class tst_RoleMaskProxyModel : public QObject
 {
     Q_OBJECT
 private Q_SLOTS:
+    void autoParent();
     void initTestCase();
     void testUseRoleMask();
     void testUseRoleMask_data();
@@ -31,10 +32,25 @@ private Q_SLOTS:
     void testSetItemData();
     void testSetItemDataDataChanged_data();
     void testSetItemDataDataChanged();
-    void testSort_data();
     void testSort();
     void testEmptyProxy();
-
+    void testMoveRowAfter();
+    void testMoveRowBefore();
+    void testMoveColumnAfter();
+    void testMoveColumnBefore();
+    void testRemoveRows_data();
+    void testRemoveRows();
+    void testRemoveColumns_data();
+    void testRemoveColumns();
+    void testMaskVerticalHeaderData();
+    void testMaskHorizontalHeaderData();
+    void testItemDataTransParent();
+    void testDefaultValueNonTransparent();
+    void testMaskFlags();
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    void testMultiData();
+    void testClearItemData();
+#endif
 private:
     void testTransparentIfEmptyRecurse(const QAbstractItemModel *const baseModel, const RoleMaskProxyModel *const proxyModel,
                                        const QModelIndex &maskedIdx, const QVariant &maskedVal, bool nonMaskedIsNull,
@@ -44,4 +60,4 @@ private:
                                 const QModelIndexList &magicNumerIndexes, const bool userRoleEditable,
                                 const QModelIndex &sourceParent = QModelIndex(), const QModelIndex &proxyParent = QModelIndex());
 };
-#endif // tst_rolemaskproxymodel_h__
+#endif // TST_ROLEMASKPROXYMODEL_H

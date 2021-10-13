@@ -40,11 +40,11 @@ jobs:
         - export PATH=$PATH:$PWD/x64/lib
         - export PATH=$PATH:$PWD/x64/bin
         - cmake --version
-        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" ../
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" ../
         - cmake --build .
         - cmake --build . --target install
         - ctest --verbose
-        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_STATIC_LIBS=OFF -DCMAKE_INSTALL_PREFIX="./installed" ../
+        - cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="./installed" ../
         - cmake --build .
         - cmake --build . --target install
         - ctest --verbose

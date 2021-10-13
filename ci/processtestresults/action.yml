@@ -26,11 +26,6 @@ runs:
         $xmlOut.AppendChild($xmlOut.CreateXmlDeclaration("1.0","UTF-8",$null));
         $rootXmlOut = $xmlOut.CreateElement("testsuites");
         $xmlOut.AppendChild($rootXmlOut);
-        $totalPass = 0;
-        $totalFail = 0;
-        $totalError = 0;
-        $totalSkip = 0;
-        $totalTime = 0;
         $crashMessage = $null;
         Get-ChildItem ".\" -Filter "*.xml" | Foreach-Object {
             $XmlDocument = $null;
@@ -39,6 +34,7 @@ runs:
             $localError = 0;
             $localSkip = 0;
             $localTime = 0;
+            $localId = 0
             $currentFilePath = $_.FullName;
             $testSuiteName = $_.BaseName;
             if([bool]((Get-Content -Path $currentFilePath) -as [xml])){
@@ -98,10 +94,11 @@ runs:
                             $testSuitetestcaseSkipXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("skipped"));
                             $testSuitetestcaseSkipXmlOut.SetAttribute("message","file: " + ($incident.file + "`nline: " + $incident.line + "`n" + $incident.Description.InnerText));
                         }
-                        ElseIf ($incident.type -eq "fail"){
+                        ElseIf ($incident.type -eq "fail" -or $incident.type -eq "xfail" -or $incident.type -eq "bfail" -or $incident.type -eq "bxfail"){
                             ++$localFail;
-                            $testSuitetestcaseSkipXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("failure"));
-                            $testSuitetestcaseSkipXmlOut.SetAttribute("message",("file: " + $incident.file + "`nline: " + $incident.line + "`n" + $incident.Description.InnerText));
+                            $testSuitetestcaseFailXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("failure"));
+                            $testSuitetestcaseFailXmlOut.SetAttribute("type",$incident.type);
+                            $testSuitetestcaseFailXmlOut.SetAttribute("message",("file: " + $incident.file + "`nline: " + $incident.line + "`n" + $incident.Description.InnerText));
                         }
                         ElseIf ($incident.type -eq "qdebug" -or $incident.type -eq "qwarn" -or $incident.type -eq "system" -or $incident.type -eq "qfatal"){
                             $testSuitetestcaseCerrXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("system-err"));
@@ -120,21 +117,14 @@ runs:
                 $testSuitetestcaseErrorXmlOut = $testSuitetestcaseXmlOut.AppendChild($xmlOut.CreateElement("error"));
                 $testSuitetestcaseErrorXmlOut.SetAttribute("message",($crashMessage));
             }
+            $testSuiteXmlOut.SetAttribute("id",$localId)
             $testSuiteXmlOut.SetAttribute("time",[math]::Round($localTime/1000,3));
             $testSuiteXmlOut.SetAttribute("skipped",$localSkip);
             $testSuiteXmlOut.SetAttribute("tests",$localSkip+$localFail+$localError+$localPass);
             $testSuiteXmlOut.SetAttribute("failures",$localFail);
             $testSuiteXmlOut.SetAttribute("errors",$localError);
-            $totalTime = $totalTime + $localTime;
-            $totalSkip = $totalSkip + $localSkip;
-            $totalError = $totalError + $localError;
-            $totalFail = $totalFail + $localFail;
-            $totalPass = $totalPass + $localPass;
+            $localId = $localId + 1
         };
-        $rootXmlOut.SetAttribute("time",[math]::Round($totalTime/1000,3));
-        $rootXmlOut.SetAttribute("failures",$totalFail);
-        $rootXmlOut.SetAttribute("errors",$totalError);
-        $rootXmlOut.SetAttribute("tests",$totalPass);
         popd
         $xmlOut.save("${{ inputs.junit-output }}");
     - shell: pwsh

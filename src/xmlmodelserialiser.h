@@ -11,10 +11,9 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef xmlmodelserialiser_h__
-#define xmlmodelserialiser_h__
+#ifndef XMLMODELSERIALISER_H
+#define XMLMODELSERIALISER_H
 
-#include "modelutilities_global.h"
 #include "abstractstringserialiser.h"
 class XmlModelSerialiserPrivate;
 class QXmlStreamWriter;
@@ -26,8 +25,9 @@ class MODELUTILITIES_EXPORT XmlModelSerialiser : public AbstractStringSerialiser
     Q_DECLARE_PRIVATE(XmlModelSerialiser)
     Q_DISABLE_COPY(XmlModelSerialiser)
 public:
-    XmlModelSerialiser(QAbstractItemModel *model = Q_NULLPTR, QObject *parent = Q_NULLPTR);
-    XmlModelSerialiser(const QAbstractItemModel *model, QObject *parent = Q_NULLPTR);
+    explicit XmlModelSerialiser(QObject *parent = Q_NULLPTR);
+    XmlModelSerialiser(QAbstractItemModel *model, QObject *parent);
+    XmlModelSerialiser(const QAbstractItemModel *model, QObject *parent);
     ~XmlModelSerialiser();
     bool printStartDocument() const;
     void setPrintStartDocument(bool val);
@@ -52,4 +52,4 @@ protected:
 QXmlStreamWriter &operator<<(QXmlStreamWriter &stream, const QAbstractItemModel &model);
 QXmlStreamReader &operator>>(QXmlStreamReader &stream, QAbstractItemModel &model);
 #endif
-#endif // xmlmodelserialiser_h__
+#endif // XMLMODELSERIALISER_H

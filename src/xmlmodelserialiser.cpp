@@ -382,6 +382,13 @@ bool XmlModelSerialiser::loadModel(QXmlStreamReader &stream)
 }
 
 /*!
+Constructs a serialiser
+*/
+XmlModelSerialiser::XmlModelSerialiser(QObject *parent)
+    : AbstractStringSerialiser(*new XmlModelSerialiserPrivate(this), parent)
+{ }
+
+/*!
 Constructs a serialiser operating over \a model
 */
 XmlModelSerialiser::XmlModelSerialiser(QAbstractItemModel *model, QObject *parent)

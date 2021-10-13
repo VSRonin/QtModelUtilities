@@ -11,10 +11,9 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef abstractsingleroleserialiser_h__
-#define abstractsingleroleserialiser_h__
+#ifndef ABSTRACTSINGLEROLESERIALISER_H
+#define ABSTRACTSINGLEROLESERIALISER_H
 
-#include "modelutilities_global.h"
 #include "abstractstringserialiser.h"
 class AbstractSingleRoleSerialiserPrivate;
 class MODELUTILITIES_EXPORT AbstractSingleRoleSerialiser : public AbstractStringSerialiser
@@ -24,8 +23,9 @@ class MODELUTILITIES_EXPORT AbstractSingleRoleSerialiser : public AbstractString
     Q_DECLARE_PRIVATE(AbstractSingleRoleSerialiser)
     Q_DISABLE_COPY(AbstractSingleRoleSerialiser)
 public:
-    AbstractSingleRoleSerialiser(QAbstractItemModel *model = Q_NULLPTR, QObject *parent = Q_NULLPTR);
-    AbstractSingleRoleSerialiser(const QAbstractItemModel *model, QObject *parent = Q_NULLPTR);
+    explicit AbstractSingleRoleSerialiser(QObject *parent = Q_NULLPTR);
+    AbstractSingleRoleSerialiser(QAbstractItemModel *model, QObject *parent);
+    AbstractSingleRoleSerialiser(const QAbstractItemModel *model, QObject *parent);
     ~AbstractSingleRoleSerialiser() = 0;
     int roleToSave() const;
     void setRoleToSave(int val);
@@ -38,4 +38,4 @@ public:
 protected:
     AbstractSingleRoleSerialiser(AbstractSingleRoleSerialiserPrivate &d, QObject *parent);
 };
-#endif // abstractsingleroleserialiser_h__
+#endif // ABSTRACTSINGLEROLESERIALISER_H

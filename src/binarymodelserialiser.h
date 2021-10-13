@@ -11,9 +11,9 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef binarymodelserialiser_h__
-#define binarymodelserialiser_h__
-#include "modelutilities_global.h"
+#ifndef BINARYMODELSERIALISER_H
+#define BINARYMODELSERIALISER_H
+
 #include "abstractmodelserialiser.h"
 class BinaryModelSerialiserPrivate;
 class MODELUTILITIES_EXPORT BinaryModelSerialiser : public AbstractModelSerialiser
@@ -23,8 +23,9 @@ class MODELUTILITIES_EXPORT BinaryModelSerialiser : public AbstractModelSerialis
     Q_DECLARE_PRIVATE(BinaryModelSerialiser)
     Q_DISABLE_COPY(BinaryModelSerialiser)
 public:
-    BinaryModelSerialiser(QAbstractItemModel *model = Q_NULLPTR, QObject *parent = Q_NULLPTR);
-    BinaryModelSerialiser(const QAbstractItemModel *model, QObject *parent = Q_NULLPTR);
+    explicit BinaryModelSerialiser(QObject *parent = Q_NULLPTR);
+    BinaryModelSerialiser(QAbstractItemModel *model, QObject *parent);
+    BinaryModelSerialiser(const QAbstractItemModel *model, QObject *parent);
     ~BinaryModelSerialiser();
     virtual bool saveModel(QDataStream &stream) const;
     Q_INVOKABLE bool saveModel(QIODevice *destination) const Q_DECL_OVERRIDE;
@@ -45,4 +46,4 @@ protected:
 QDataStream &operator<<(QDataStream &stream, const QAbstractItemModel &model);
 QDataStream &operator>>(QDataStream &stream, QAbstractItemModel &model);
 #endif
-#endif // binarymodelserialiser_h__
+#endif // BINARYMODELSERIALISER_H

@@ -13,7 +13,17 @@
 #    include <QNetworkReply>
 #    include <QNetworkRequest>
 #endif
+#include <QSignalSpy>
 
+void tst_HtmlModelSerialiser::autoParent()
+{
+    QObject *parentObj = new QObject;
+    auto testItem = new HtmlModelSerialiser(parentObj);
+    QSignalSpy testItemDestroyedSpy(testItem, SIGNAL(destroyed(QObject *)));
+    QVERIFY(testItemDestroyedSpy.isValid());
+    delete parentObj;
+    QCOMPARE(testItemDestroyedSpy.count(), 1);
+}
 void tst_HtmlModelSerialiser::initTestCase()
 {
 #ifdef QT_NETWORK_LIB
@@ -52,7 +62,7 @@ void tst_HtmlModelSerialiser::basicSaveLoadNested()
 {
     QFETCH(const QAbstractItemModel *, sourceModel);
     QFETCH(QAbstractItemModel *, destinationModel);
-    HtmlModelSerialiser serialiser(sourceModel);
+    HtmlModelSerialiser serialiser(sourceModel, nullptr);
     serialiser.addRoleToSave(Qt::UserRole + 1);
     QByteArray dataArray;
     QBuffer serialisedHtmlNested(&dataArray);
@@ -76,9 +86,25 @@ void tst_HtmlModelSerialiser::basicSaveLoadNested()
 
 void tst_HtmlModelSerialiser::validateHtmlOutput()
 {
+    // going to validator.w3.org is flaky on CI
+    // save the files and validate them on the command line
+    if (qgetenv("CI").size() > 0) {
+        QFETCH(const QAbstractItemModel *, sourceModel);
+        HtmlModelSerialiser serialiser(sourceModel, nullptr);
+        serialiser.addRoleToSave(Qt::UserRole + 1);
+#ifdef QT_DEBUG
+        const QString outputName = QStringLiteral("htmlToValidate_debug.html");
+#else
+        const QString outputName = QStringLiteral("htmlToValidate_release.html");
+#endif
+        QFile htmlDataFile(outputName);
+        QVERIFY(htmlDataFile.open(QIODevice::WriteOnly));
+        QVERIFY(serialiser.saveModel(&htmlDataFile));
+        return;
+    }
 #ifdef QT_NETWORK_LIB
     QFETCH(const QAbstractItemModel *, sourceModel);
-    HtmlModelSerialiser serialiser(sourceModel);
+    HtmlModelSerialiser serialiser(sourceModel, nullptr);
     serialiser.addRoleToSave(Qt::UserRole + 1);
     QByteArray htmlData;
     QVERIFY(serialiser.saveModel(&htmlData));
@@ -130,7 +156,7 @@ void tst_HtmlModelSerialiser::validateHtmlOutput_data()
 {
     QTest::addColumn<const QAbstractItemModel *>("sourceModel");
     QTest::newRow("List Single Role") << static_cast<const QAbstractItemModel *>(createStringModel(this));
-#ifdef QT_GUI_LIB
+#ifdef COMPLEX_MODEL_SUPPORT
     QTest::newRow("Tree Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(true, true, this));
     QTest::newRow("Table Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, this));
     QTest::newRow("Table Multi Roles") << static_cast<const QAbstractItemModel *>(createComplexModel(false, true, this));

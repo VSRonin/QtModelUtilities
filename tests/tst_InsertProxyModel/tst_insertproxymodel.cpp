@@ -1,11 +1,8 @@
 #include "tst_insertproxymodel.h"
 #include <QStringListModel>
 #include <insertproxymodel.h>
-#ifdef QT_GUI_LIB
-#    include <QStandardItemModel>
-#endif
 #include <QtTest/QTest>
-#include <QtTest/QSignalSpy>
+#include <QSignalSpy>
 #include "../modeltestmanager.h"
 #include <QSortFilterProxyModel>
 
@@ -41,8 +38,8 @@ QAbstractItemModel *createListModel(QObject *parent)
 QAbstractItemModel *createTableModel(QObject *parent)
 {
     QAbstractItemModel *result = nullptr;
-#ifdef QT_GUI_LIB
-    result = new QStandardItemModel(parent);
+#ifdef COMPLEX_MODEL_SUPPORT
+    result = new ComplexModel(parent);
     result->insertRows(0, 5);
     result->insertColumns(0, 3);
     for (int i = 0; i < result->rowCount(); ++i) {
@@ -59,8 +56,8 @@ QAbstractItemModel *createTableModel(QObject *parent)
 QAbstractItemModel *createTreeModel(QObject *parent)
 {
     QAbstractItemModel *result = nullptr;
-#ifdef QT_GUI_LIB
-    result = new QStandardItemModel(parent);
+#ifdef COMPLEX_MODEL_SUPPORT
+    result = new ComplexModel(parent);
     result->insertRows(0, 5);
     result->insertColumns(0, 3);
     for (int i = 0; i < result->rowCount(); ++i) {
@@ -83,6 +80,17 @@ QAbstractItemModel *createTreeModel(QObject *parent)
 #endif
     return result;
 }
+
+void tst_InsertProxyModel::autoParent()
+{
+    QObject *parentObj = new QObject;
+    auto testItem = new InsertProxyModel(parentObj);
+    QSignalSpy testItemDestroyedSpy(testItem, SIGNAL(destroyed(QObject *)));
+    QVERIFY(testItemDestroyedSpy.isValid());
+    delete parentObj;
+    QCOMPARE(testItemDestroyedSpy.count(), 1);
+}
+
 void tst_InsertProxyModel::testCommitSubclass_data()
 {
     QTest::addColumn<QAbstractItemModel *>("baseModel");
@@ -171,7 +179,11 @@ void tst_InsertProxyModel::testCommitSlot()
         QCOMPARE(proxyExtraDataChangedSpy.count(), 1);
         proxyExtraDataChangedSpy.clear();
         QVERIFY(proxy.commitRow());
-        QVERIFY(proxyDataChangedSpy.count() >= 2); // change to QCOMPARE(proxyDataChangedSpy.count(),2) once QTBUG-67511 is fixed
+#ifdef SKIP_QTBUG_67511
+        QVERIFY(proxyDataChangedSpy.count() >= 2);
+#else
+        QCOMPARE(proxyDataChangedSpy.count(), 2);
+#endif
         proxyDataChangedSpy.clear();
         QCOMPARE(proxyExtraDataChangedSpy.count(), 1);
         proxyExtraDataChangedSpy.clear();
@@ -179,7 +191,11 @@ void tst_InsertProxyModel::testCommitSlot()
         baseRowsInsertedSpy.clear();
         QCOMPARE(proxyRowsInsertedSpy.count(), 1);
         proxyRowsInsertedSpy.clear();
-        QVERIFY(baseDataChangedSpy.count() > 0); // change to QCOMPARE(baseDataChangedSpy.count(),1) once QTBUG-67511 is fixed
+#ifdef SKIP_QTBUG_67511
+        QVERIFY(baseDataChangedSpy.count() > 0);
+#else
+        QCOMPARE(baseDataChangedSpy.count(), 1);
+#endif
         baseDataChangedSpy.clear();
         QCOMPARE(proxy.rowCount(), baseModel->rowCount() + 1);
         QCOMPARE(baseModel->rowCount(), originalRowCount + 1);
@@ -210,7 +226,7 @@ void tst_InsertProxyModel::testCommitSlot_data()
 }
 void tst_InsertProxyModel::testSourceInsertCol()
 {
-#if defined(QT_GUI_LIB)
+#ifdef COMPLEX_MODEL_SUPPORT
     QFETCH(QAbstractItemModel *, baseModel);
     QFETCH(InsertProxyModel::InsertDirections, insertDirection);
     QFETCH(int, indexToInsert);
@@ -295,7 +311,7 @@ void tst_InsertProxyModel::testSourceInsertCol()
     }
     baseModel->deleteLater();
 #else
-    QSKIP("This test requires the Qt GUI module");
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
 }
 void tst_InsertProxyModel::testSourceInsertRow()
@@ -528,7 +544,7 @@ void tst_InsertProxyModel::testDataForCorner()
 void tst_InsertProxyModel::testSort()
 {
     QFETCH(bool, sortProxy);
-    QStringListModel baseModel(QStringList({QStringLiteral("b"), QStringLiteral("a"), QStringLiteral("d"), QStringLiteral("c")}));
+    QStringListModel baseModel(QStringList{QStringLiteral("b"), QStringLiteral("a"), QStringLiteral("d"), QStringLiteral("c")});
     InsertProxyModel proxyModel;
     new ModelTest(&proxyModel, this);
     proxyModel.setSourceModel(&baseModel);
@@ -552,6 +568,10 @@ void tst_InsertProxyModel::testSort()
     persistCode = std::make_pair(persistExtra.row(), persistExtra.column());
     QCOMPARE(persistExtra.data().toInt(), 1);
     QCOMPARE(persistInside.data().toString(), persistBase.data().toString());
+    QCOMPARE(persistInside.row(), 1);
+    QCOMPARE(persistInside.column(), 0);
+    QCOMPARE(persistExtra.row(), 1);
+    QCOMPARE(persistExtra.column(), 1);
     for (int i = 0; i < baseModel.rowCount(); ++i)
         QCOMPARE(proxyModel.index(i, 1).data().toInt(), i);
 }
@@ -576,8 +596,8 @@ void tst_InsertProxyModel::testInsertOnEmptyModel()
     proxyModel1.commitRow();
     QCOMPARE(baseModel1.rowCount(), 1);
     QCOMPARE(baseModel1.index(0, 0).data().toString(), QStringLiteral("London"));
-#if defined(QT_GUI_LIB)
-    QStandardItemModel baseModel2;
+#ifdef COMPLEX_MODEL_SUPPORT
+    ComplexModel baseModel2;
     baseModel2.insertColumns(0, 2);
     InsertProxyModel proxyModel2;
     new ModelTest(&proxyModel2, this);
@@ -591,9 +611,8 @@ void tst_InsertProxyModel::testInsertOnEmptyModel()
     QCOMPARE(baseModel2.rowCount(), 1);
     QCOMPARE(baseModel2.index(0, 1).data().toString(), QStringLiteral("London"));
     QVERIFY(!baseModel2.index(0, 0).data().isValid());
-#    if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)                                                                                                    \
-         && (QT_VERSION < QT_VERSION_CHECK(6, 0, 0) || QT_VERSION > QT_VERSION_CHECK(6, 0, 2))) // QTBUG-92220
-    QStandardItemModel baseModel3;
+#    ifndef SKIP_QTBUG_92220
+    ComplexModel baseModel3;
     InsertProxyModel proxyModel3;
     new ModelTest(&proxyModel3, this);
     proxyModel3.setSourceModel(&baseModel3);
@@ -835,8 +854,7 @@ void tst_InsertProxyModel::testSetItemDataDataChanged()
     QCOMPARE(argList.at(0).value<QModelIndex>(), proxyIdX);
     QCOMPARE(argList.at(1).value<QModelIndex>(), proxyIdX);
     auto rolesVector = argList.at(2).value<QVector<int>>();
-#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
-    // bug fixed by Qt commit 1382374deaa4a854aeb542e6c8f7e1841f2abb10
+#ifndef SKIP_QTBUG_45114
     QCOMPARE(rolesVector.size(), 4);
     QVERIFY(!rolesVector.contains(Qt::TextAlignmentRole));
 #endif
@@ -856,8 +874,7 @@ void tst_InsertProxyModel::testSetItemDataDataChanged()
     itemDataSet.clear();
     itemDataSet[Qt::UserRole] = 6;
     QVERIFY(proxyModel.setItemData(proxyIdX, itemDataSet));
-#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
-    // bug fixed by Qt commit 1382374deaa4a854aeb542e6c8f7e1841f2abb10
+#ifndef SKIP_QTBUG_45114
     QCOMPARE(proxyDataChangeSpy.size(), 0);
 #endif
     baseModel->deleteLater();
@@ -885,8 +902,7 @@ void tst_InsertProxyModel::testSetItemData()
     QCOMPARE(proxyModel.data(proxyIdX, Qt::EditRole).toString(), QStringLiteral("Test"));
     QCOMPARE(proxyModel.data(proxyIdX, Qt::UserRole).toInt(), 5);
     QCOMPARE(proxyModel.data(proxyIdX, Qt::ToolTipRole).toString(), QStringLiteral("ToolTip"));
-#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
-    // bug fixed by Qt commit 1382374deaa4a854aeb542e6c8f7e1841f2abb10
+#ifndef SKIP_QTBUG_45114
     QCOMPARE(proxyModel.data(proxyIdX, Qt::TextAlignmentRole).toInt(), Qt::AlignRight);
 #endif
     baseModel->deleteLater();
@@ -989,7 +1005,11 @@ void tst_InsertProxyModel::testCommitSubclass()
         for (int i = 0; i < originalColCount; ++i)
             QCOMPARE(proxy.index(originalRowCount, i).data(), QVariant());
         QVERIFY(proxy.setData(proxy.index(originalRowCount, 0), QStringLiteral("Test")));
-        QVERIFY(proxyDataChangedSpy.count() >= 3); // change to QCOMPARE(proxyDataChangedSpy.count(),3) once QTBUG-67511 is fixed
+#ifdef SKIP_QTBUG_67511
+        QVERIFY(proxyDataChangedSpy.count() >= 3);
+#else
+        QCOMPARE(proxyDataChangedSpy.count(), 3);
+#endif
         proxyDataChangedSpy.clear();
         QCOMPARE(proxyExtraDataChangedSpy.count(), 2);
         proxyExtraDataChangedSpy.clear();
@@ -997,7 +1017,11 @@ void tst_InsertProxyModel::testCommitSubclass()
         baseRowsInsertedSpy.clear();
         QCOMPARE(proxyRowsInsertedSpy.count(), 1);
         proxyRowsInsertedSpy.clear();
-        QVERIFY(baseDataChangedSpy.count() >= 1); // change to QCOMPARE(baseDataChangedSpy.count(),1) once QTBUG-67511 is fixed
+#ifdef SKIP_QTBUG_67511
+        QVERIFY(baseDataChangedSpy.count() >= 1);
+#else
+        QCOMPARE(baseDataChangedSpy.count(), 1);
+#endif
         baseDataChangedSpy.clear();
         QCOMPARE(proxy.rowCount(), baseModel->rowCount() + 1);
         QCOMPARE(baseModel->rowCount(), originalRowCount + 1);
@@ -1008,4 +1032,43 @@ void tst_InsertProxyModel::testCommitSubclass()
             QCOMPARE(proxy.index(originalRowCount + 1, i).data(), QVariant());
     }
     baseModel->deleteLater();
+}
+
+void tst_InsertProxyModel::createPersistentOnLayoutAboutToBeChanged()
+{
+    QStringListModel model(QStringList{QStringLiteral("1"), QStringLiteral("2"), QStringLiteral("3")});
+    InsertProxyModel proxy;
+    new ModelTest(&proxy, &proxy);
+    proxy.setSourceModel(&model);
+    proxy.setInsertDirection(InsertProxyModel::InsertRow);
+    proxy.setData(proxy.index(3, 0), QStringLiteral("4"));
+    QList<QPersistentModelIndex> idxList;
+    QSignalSpy layoutAboutToBeChangedSpy(&proxy, SIGNAL(layoutAboutToBeChanged()));
+    QVERIFY(layoutAboutToBeChangedSpy.isValid());
+    QSignalSpy layoutChangedSpy(&proxy, SIGNAL(layoutChanged()));
+    QVERIFY(layoutChangedSpy.isValid());
+    connect(&proxy, &QAbstractItemModel::layoutAboutToBeChanged, [&idxList, &proxy]() {
+        idxList.clear();
+        for (int row = 0; row < 4; ++row)
+            idxList << QPersistentModelIndex(proxy.index(row, 0));
+    });
+    connect(&proxy, &QAbstractItemModel::layoutChanged, [&idxList]() {
+        QCOMPARE(idxList.size(), 4);
+        QCOMPARE(idxList.at(0).row(), 1);
+        QCOMPARE(idxList.at(0).column(), 0);
+        QCOMPARE(idxList.at(0).data().toString(), QStringLiteral("1"));
+        QCOMPARE(idxList.at(1).row(), 0);
+        QCOMPARE(idxList.at(1).column(), 0);
+        QCOMPARE(idxList.at(1).data().toString(), QStringLiteral("0"));
+        QCOMPARE(idxList.at(2).row(), 2);
+        QCOMPARE(idxList.at(2).column(), 0);
+        QCOMPARE(idxList.at(2).data().toString(), QStringLiteral("3"));
+        QCOMPARE(idxList.at(3).row(), 3);
+        QCOMPARE(idxList.at(3).column(), 0);
+        QCOMPARE(idxList.at(3).data().toString(), QStringLiteral("4"));
+    });
+    model.setData(model.index(1, 0), QStringLiteral("0"));
+    model.sort(0);
+    QCOMPARE(layoutAboutToBeChangedSpy.size(), 1);
+    QCOMPARE(layoutChangedSpy.size(), 1);
 }

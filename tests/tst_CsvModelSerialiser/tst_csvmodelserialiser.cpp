@@ -4,6 +4,17 @@
 #include <QByteArray>
 #include <QBuffer>
 #include <QTextStream>
+#include <QSignalSpy>
+
+void tst_CsvModelSerialiser::autoParent()
+{
+    QObject *parentObj = new QObject;
+    auto testItem = new CsvModelSerialiser(parentObj);
+    QSignalSpy testItemDestroyedSpy(testItem, SIGNAL(destroyed(QObject *)));
+    QVERIFY(testItemDestroyedSpy.isValid());
+    delete parentObj;
+    QCOMPARE(testItemDestroyedSpy.count(), 1);
+}
 
 void tst_CsvModelSerialiser::basicSaveLoadByteArray()
 {
@@ -36,7 +47,7 @@ void tst_CsvModelSerialiser::basicSaveLoadStream()
 {
     QFETCH(const QAbstractItemModel *, sourceModel);
     QFETCH(QAbstractItemModel *, destinationModel);
-    CsvModelSerialiser serialiser(sourceModel);
+    CsvModelSerialiser serialiser(sourceModel, nullptr);
     QByteArray dataArray;
     QBuffer serialisedCsvStream(&dataArray);
     QVERIFY(serialisedCsvStream.open(QIODevice::WriteOnly));
@@ -88,7 +99,7 @@ void tst_CsvModelSerialiser::basicSaveLoadStreamNoHeader()
 {
     QFETCH(const QAbstractItemModel *, sourceModel);
     QFETCH(QAbstractItemModel *, destinationModel);
-    CsvModelSerialiser serialiser(sourceModel);
+    CsvModelSerialiser serialiser(sourceModel, nullptr);
     serialiser.setFirstColumnIsHeader(false);
     serialiser.setFirstRowIsHeader(false);
     QByteArray dataArray;
@@ -139,7 +150,7 @@ void tst_CsvModelSerialiser::basicSaveLoadStreamCustomSeparator()
 {
     QFETCH(const QAbstractItemModel *, sourceModel);
     QFETCH(QAbstractItemModel *, destinationModel);
-    CsvModelSerialiser serialiser(sourceModel);
+    CsvModelSerialiser serialiser(sourceModel, nullptr);
     serialiser.setCsvSeparator(QStringLiteral("\t"));
     QByteArray dataArray;
     QBuffer serialisedCsvStream(&dataArray);
@@ -163,9 +174,9 @@ void tst_CsvModelSerialiser::basicSaveLoadData(QObject *parent)
     QTest::newRow("List Single Role") << static_cast<const QAbstractItemModel *>(createStringModel(this))
                                       << static_cast<QAbstractItemModel *>(new QStringListModel(this));
     QTest::newRow("List Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createStringModel(this)) << createStringModel(this);
-#ifdef QT_GUI_LIB
+#ifdef COMPLEX_MODEL_SUPPORT
     QTest::newRow("Table Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, this))
-                                       << static_cast<QAbstractItemModel *>(new QStandardItemModel(this));
+                                       << static_cast<QAbstractItemModel *>(new ComplexModel(this));
     QTest::newRow("Table Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, this))
                                                  << createComplexModel(false, false, this);
 #endif

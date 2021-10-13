@@ -93,14 +93,14 @@ bool BinaryModelSerialiserPrivate::readBinary(QDataStream &reader)
         return false;
     m_model->removeColumns(0, m_model->columnCount());
     m_model->removeRows(0, m_model->rowCount());
-#if QT_VERSION >= 0x050700
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
     reader.startTransaction();
 #endif
     reader.setVersion(QDataStream::Qt_5_0);
     qint32 steramVersion;
     reader >> steramVersion;
     if (steramVersion > QDataStream().version()) {
-#if QT_VERSION >= 0x050700
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
         reader.rollbackTransaction();
 #endif
         return false;
@@ -109,13 +109,13 @@ bool BinaryModelSerialiserPrivate::readBinary(QDataStream &reader)
     QString header;
     reader >> header;
     if (header != Magic_Model_Header) {
-#if QT_VERSION >= 0x050700
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
         reader.rollbackTransaction();
 #endif
         return false;
     }
     if (!readBinaryElement(reader)) {
-#if QT_VERSION >= 0x050700
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
         reader.rollbackTransaction();
 #endif
         return false;
@@ -133,7 +133,7 @@ bool BinaryModelSerialiserPrivate::readBinary(QDataStream &reader)
     if (reader.status() != QDataStream::Ok) {
         m_model->removeColumns(0, m_model->columnCount());
         m_model->removeRows(0, m_model->rowCount());
-#if QT_VERSION >= 0x050700
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
         reader.rollbackTransaction();
 #endif
         return false;
@@ -150,12 +150,12 @@ bool BinaryModelSerialiserPrivate::readBinary(QDataStream &reader)
     if (reader.status() != QDataStream::Ok) {
         m_model->removeColumns(0, m_model->columnCount());
         m_model->removeRows(0, m_model->rowCount());
-#if QT_VERSION >= 0x050700
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
         reader.rollbackTransaction();
 #endif
         return false;
     }
-#if QT_VERSION >= 0x050700
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
     return reader.commitTransaction();
 #else
     return true;
@@ -285,6 +285,13 @@ bool BinaryModelSerialiser::loadModel(QDataStream &stream)
     Q_D(BinaryModelSerialiser);
     return d->readBinary(stream);
 }
+
+/*!
+Constructs a serialiser
+*/
+BinaryModelSerialiser::BinaryModelSerialiser(QObject *parent)
+    : AbstractModelSerialiser(*new BinaryModelSerialiserPrivate(this), parent)
+{ }
 
 /*!
 Constructs a serialiser operating over \a model

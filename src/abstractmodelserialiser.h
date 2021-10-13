@@ -11,10 +11,9 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef abstractmultiroleserialiser_h__
-#define abstractmultiroleserialiser_h__
-
-#include "modelutilities_global.h"
+#ifndef ABSTRACTMULTIROLESERIALISER_H
+#define ABSTRACTMULTIROLESERIALISER_H
+#include <modelutilities_global.h>
 #include <QObject>
 #include <QScopedPointer>
 #include <QAbstractItemModel>
@@ -30,8 +29,9 @@ class MODELUTILITIES_EXPORT AbstractModelSerialiser : public QObject
     Q_DECLARE_PRIVATE(AbstractModelSerialiser)
     Q_DISABLE_COPY(AbstractModelSerialiser)
 public:
-    AbstractModelSerialiser(QAbstractItemModel *model = Q_NULLPTR, QObject *parent = Q_NULLPTR);
-    AbstractModelSerialiser(const QAbstractItemModel *model, QObject *parent = Q_NULLPTR);
+    explicit AbstractModelSerialiser(QObject *parent = Q_NULLPTR);
+    AbstractModelSerialiser(QAbstractItemModel *model, QObject *parent);
+    AbstractModelSerialiser(const QAbstractItemModel *model, QObject *parent);
     virtual ~AbstractModelSerialiser() = 0;
     virtual const QList<int> &rolesToSave() const;
     virtual void setRoleToSave(const QList<int> &val);
@@ -56,4 +56,4 @@ protected:
     AbstractModelSerialiser(AbstractModelSerialiserPrivate &d, QObject *parent);
     QScopedPointer<AbstractModelSerialiserPrivate> d_ptr;
 };
-#endif // abstractmultiroleserialiser_h__
+#endif // ABSTRACTMULTIROLESERIALISER_H

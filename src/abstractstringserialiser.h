@@ -11,9 +11,9 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef abstractmodelserialiser_h__
-#define abstractmodelserialiser_h__
-#include "modelutilities_global.h"
+#ifndef ABSTRACTMODELSERIALISER_H
+#define ABSTRACTMODELSERIALISER_H
+
 #include "abstractmodelserialiser.h"
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 #    include <QTextCodec>
@@ -25,8 +25,9 @@ class MODELUTILITIES_EXPORT AbstractStringSerialiser : public AbstractModelSeria
     Q_DECLARE_PRIVATE(AbstractStringSerialiser)
     Q_DISABLE_COPY(AbstractStringSerialiser)
 public:
-    AbstractStringSerialiser(QAbstractItemModel *model = Q_NULLPTR, QObject *parent = Q_NULLPTR);
-    AbstractStringSerialiser(const QAbstractItemModel *model, QObject *parent = Q_NULLPTR);
+    explicit AbstractStringSerialiser(QObject *parent = Q_NULLPTR);
+    AbstractStringSerialiser(QAbstractItemModel *model, QObject *parent);
+    AbstractStringSerialiser(const QAbstractItemModel *model, QObject *parent);
     virtual ~AbstractStringSerialiser() = 0;
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     QTextCodec *textCodec() const;
@@ -40,4 +41,4 @@ protected:
     AbstractStringSerialiser(AbstractStringSerialiserPrivate &d, QObject *parent);
 };
 
-#endif // abstractmodelserialiser_h__
+#endif // ABSTRACTMODELSERIALISER_H

@@ -10,8 +10,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 \****************************************************************************/
-#ifndef csvmodelserialiser_p_h__
-#define csvmodelserialiser_p_h__
+#ifndef CSVMODELSERIALISER_P_H
+#define CSVMODELSERIALISER_P_H
 
 #include "private/abstractsingleroleserialiser_p.h"
 #include "csvmodelserialiser.h"
@@ -35,4 +35,4 @@ protected:
     friend QTextStream &operator>>(QTextStream &stream, QAbstractItemModel &model);
 #endif
 };
-#endif // csvmodelserialiser_p_h__
+#endif // CSVMODELSERIALISER_P_H

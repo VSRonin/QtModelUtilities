@@ -11,10 +11,9 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef csvmodelserialiser_h__
-#define csvmodelserialiser_h__
+#ifndef CSVMODELSERIALISER_H
+#define CSVMODELSERIALISER_H
 
-#include "modelutilities_global.h"
 #include "abstractsingleroleserialiser.h"
 class CsvModelSerialiserPrivate;
 class QTextStream;
@@ -27,8 +26,9 @@ class MODELUTILITIES_EXPORT CsvModelSerialiser : public AbstractSingleRoleSerial
     Q_DECLARE_PRIVATE(CsvModelSerialiser)
     Q_DISABLE_COPY(CsvModelSerialiser)
 public:
-    CsvModelSerialiser(QAbstractItemModel *model = Q_NULLPTR, QObject *parent = Q_NULLPTR);
-    CsvModelSerialiser(const QAbstractItemModel *model, QObject *parent = Q_NULLPTR);
+    explicit CsvModelSerialiser(QObject *parent = Q_NULLPTR);
+    CsvModelSerialiser(QAbstractItemModel *model, QObject *parent);
+    CsvModelSerialiser(const QAbstractItemModel *model, QObject *parent);
     const QString &csvSeparator() const;
     void setCsvSeparator(const QString &val);
     bool firstRowIsHeader();
@@ -56,4 +56,4 @@ protected:
 QTextStream &operator<<(QTextStream &stream, const QAbstractItemModel &model);
 QTextStream &operator>>(QTextStream &stream, QAbstractItemModel &model);
 #endif
-#endif // csvmodelserialiser_h__
+#endif // CSVMODELSERIALISER_H

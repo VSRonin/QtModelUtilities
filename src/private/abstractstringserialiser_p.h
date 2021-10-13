@@ -11,8 +11,8 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef abstractmodelserialiser_p_h__
-#define abstractmodelserialiser_p_h__
+#ifndef ABSTRACTMODELSERIALISER_P_H
+#define ABSTRACTMODELSERIALISER_P_H
 
 #include "abstractstringserialiser.h"
 #include "abstractmodelserialiser_p.h"
@@ -40,4 +40,4 @@ protected:
 #endif
 };
 
-#endif // abstractmodelserialiser_p_h__
+#endif // ABSTRACTMODELSERIALISER_P_H

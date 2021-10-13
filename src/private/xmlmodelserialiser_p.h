@@ -11,8 +11,8 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef xmlmodelserialiser_p_h__
-#define xmlmodelserialiser_p_h__
+#ifndef XMLMODELSERIALISER_P_H
+#define XMLMODELSERIALISER_P_H
 
 #include "private/abstractstringserialiser_p.h"
 #include "xmlmodelserialiser.h"
@@ -34,4 +34,4 @@ protected:
 #endif
 };
 
-#endif // xmlmodelserialiser_p_h__
+#endif // XMLMODELSERIALISER_P_H

@@ -1,5 +1,5 @@
-#ifndef tst_jsonmodelserialiser_h__
-#define tst_jsonmodelserialiser_h__
+#ifndef TST_JSONMODELSERIALISER_H
+#define TST_JSONMODELSERIALISER_H
 #include <QObject>
 #include <tst_serialiserscommon.h>
 class QAbstractItemModel;
@@ -7,6 +7,7 @@ class tst_JsonModelSerialiser : public QObject, public tst_SerialiserCommon
 {
     Q_OBJECT
 private Q_SLOTS:
+    void autoParent();
     void basicSaveLoadByteArray();
     void basicSaveLoadFile();
     void basicSaveLoadObject();

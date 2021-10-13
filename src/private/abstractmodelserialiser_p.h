@@ -11,8 +11,8 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef abstractmultiroleserialiser_p_h__
-#define abstractmultiroleserialiser_p_h__
+#ifndef ABSTRACTMULTIROLESERIALISER_P_H
+#define ABSTRACTMULTIROLESERIALISER_P_H
 #include "abstractmodelserialiser.h"
 #define Magic_Model_Header QStringLiteral("808FC674-78A0-4682-9C17-E05B18A0CDD3") // magic string to mark models
 class QAbstractItemModel;
@@ -28,4 +28,4 @@ protected:
     const QAbstractItemModel *m_constModel;
     AbstractModelSerialiser *q_ptr;
 };
-#endif // abstractmultiroleserialiser_p_h__
+#endif // ABSTRACTMULTIROLESERIALISER_P_H

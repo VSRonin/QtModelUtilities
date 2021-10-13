@@ -11,8 +11,8 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef jsonmodelserialiser_p_h__
-#define jsonmodelserialiser_p_h__
+#ifndef JSONMODELSERIALISER_P_H
+#define JSONMODELSERIALISER_P_H
 #include "private/abstractstringserialiser_p.h"
 #include "jsonmodelserialiser.h"
 #include <QModelIndex>
@@ -30,4 +30,4 @@ protected:
     QJsonDocument::JsonFormat m_format;
 };
 
-#endif // jsonmodelserialiser_p_h__
+#endif // JSONMODELSERIALISER_P_H

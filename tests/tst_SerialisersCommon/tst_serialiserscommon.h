@@ -1,11 +1,9 @@
-#ifndef tst_serialisers_common_h__
-#define tst_serialisers_common_h__
+#ifndef TST_SERIALISERS_COMMON_H
+#define TST_SERIALISERS_COMMON_H
 #include <QModelIndex>
 #include <QStringListModel>
 #include <random>
-#ifdef QT_GUI_LIB
-#    include <QStandardItemModel>
-#endif
+#include "../modeltestmanager.h"
 class AbstractModelSerialiser;
 class AbstractStringSerialiser;
 class tst_SerialiserCommon
@@ -21,7 +19,7 @@ protected:
     void checkModelEqual(const QAbstractItemModel *a, const QAbstractItemModel *b, const QModelIndex &aParent = QModelIndex(),
                          const QModelIndex &bParent = QModelIndex(), bool checkHeaders = true) const;
     QAbstractItemModel *createStringModel(QObject *parent = nullptr);
-#ifdef QT_GUI_LIB
+#ifdef COMPLEX_MODEL_SUPPORT
     void insertBranch(QAbstractItemModel *model, const QModelIndex &parent, bool multiRoles, int subBranches);
     QAbstractItemModel *createComplexModel(bool tree, bool multiRoles, QObject *parent = nullptr);
 #endif

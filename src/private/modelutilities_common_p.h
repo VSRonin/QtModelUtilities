@@ -10,10 +10,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 \****************************************************************************/
-#ifndef modelutilities_common_p_h__
-#define modelutilities_common_p_h__
+#ifndef MODELUTILITIES_COMMON_P_H
+#define MODELUTILITIES_COMMON_P_H
 
 #include <QVariant>
+#include <QVector>
+#include <QList>
 #ifdef OPTIMISE_FOR_MANY_ROLES
 #    include <QHash>
 using RolesContainer = QHash<int, QVariant>;
@@ -46,4 +48,15 @@ T convertFromContainer(const RolesContainer &other)
         result.insert(i.key(), i.value());
     return result;
 }
-#endif // modelutilities_common_p_h__
+template<class T>
+QVector<T> listToVector(const QList<T> &list)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    return list;
+#elif QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    return QVector<T>(list.constBegin(), list.constEnd());
+#else
+    return list.toVector();
+#endif
+}
+#endif // MODELUTILITIES_COMMON_P_H

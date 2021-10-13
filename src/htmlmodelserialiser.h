@@ -10,10 +10,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 \****************************************************************************/
-#ifndef htmlmodelserialiser_h__
-#define htmlmodelserialiser_h__
+#ifndef HTMLMODELSERIALISER_H
+#define HTMLMODELSERIALISER_H
 
-#include "modelutilities_global.h"
 #include "abstractstringserialiser.h"
 class HtmlModelSerialiserPrivate;
 class MODELUTILITIES_EXPORT HtmlModelSerialiser : public AbstractStringSerialiser
@@ -23,8 +22,9 @@ class MODELUTILITIES_EXPORT HtmlModelSerialiser : public AbstractStringSerialise
     Q_DECLARE_PRIVATE(HtmlModelSerialiser)
     Q_DISABLE_COPY(HtmlModelSerialiser)
 public:
-    HtmlModelSerialiser(QAbstractItemModel *model = Q_NULLPTR, QObject *parent = Q_NULLPTR);
-    HtmlModelSerialiser(const QAbstractItemModel *model, QObject *parent = Q_NULLPTR);
+    explicit HtmlModelSerialiser(QObject *parent = Q_NULLPTR);
+    HtmlModelSerialiser(QAbstractItemModel *model, QObject *parent);
+    HtmlModelSerialiser(const QAbstractItemModel *model, QObject *parent);
     bool printStartDocument() const;
     void setPrintStartDocument(bool val);
     bool saveModel(QIODevice *destination) const Q_DECL_OVERRIDE;
@@ -37,4 +37,4 @@ public:
 protected:
     HtmlModelSerialiser(HtmlModelSerialiserPrivate &d, QObject *parent);
 };
-#endif // htmlmodelserialiser_h__
+#endif // HTMLMODELSERIALISER_H

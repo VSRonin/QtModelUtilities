@@ -32,7 +32,7 @@ QString CsvModelSerialiserPrivate::escapedCSV(QString unexc) const
 {
     if (!unexc.contains(m_csvSeparator))
         return unexc;
-    return '\"' % unexc.replace(QLatin1Char('\"'), QStringLiteral("\"\"")) % '\"';
+    return QLatin1Char('\"') % unexc.replace(QLatin1Char('\"'), QStringLiteral("\"\"")) % QLatin1Char('\"');
 }
 
 QString CsvModelSerialiserPrivate::unescapedCSV(QString exc) const
@@ -116,7 +116,7 @@ bool CsvModelSerialiserPrivate::readCsv(QTextStream &reader)
         line = reader.readLine();
         if (line.isNull())
             break;
-        if (line.count(QChar('\"')) % 2 > 0) {
+        if (line.count(QLatin1Char('\"')) % 2 > 0) {
             m_model->removeColumns(0, m_model->columnCount());
             m_model->removeRows(0, m_model->rowCount());
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
@@ -128,7 +128,7 @@ bool CsvModelSerialiserPrivate::readCsv(QTextStream &reader)
         currentField.clear();
         bool inQuoted = false;
         for (QString::const_iterator i = line.constBegin(); i != line.constEnd(); ++i) {
-            if (*i == QChar('\"'))
+            if (*i == QLatin1Char('\"'))
                 inQuoted = !inQuoted;
             currentField.append(*i);
             if (!inQuoted) {
@@ -244,6 +244,13 @@ void CsvModelSerialiser::setFirstColumnIsHeader(bool val)
 
     d->m_firstColumnIsHeader = val;
 }
+
+/*!
+Constructs a serialiser
+*/
+CsvModelSerialiser::CsvModelSerialiser(QObject *parent)
+    : AbstractSingleRoleSerialiser(*new CsvModelSerialiserPrivate(this), parent)
+{ }
 
 /*!
 Constructs a serialiser operating over \a model

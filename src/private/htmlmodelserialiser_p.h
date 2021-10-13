@@ -11,8 +11,8 @@
    limitations under the License.
 \****************************************************************************/
 
-#ifndef htmlmodelserialiser_p_h__
-#define htmlmodelserialiser_p_h__
+#ifndef HTMLMODELSERIALISER_P_H
+#define HTMLMODELSERIALISER_P_H
 
 #include "private/abstractstringserialiser_p.h"
 #include "htmlmodelserialiser.h"
@@ -37,4 +37,4 @@ protected:
     QVariant readHtmlVariant(QXmlStreamReader &reader, int valType) const;
     bool m_printStartDocument;
 };
-#endif // htmlmodelserialiser_p_h__
+#endif // HTMLMODELSERIALISER_P_H
