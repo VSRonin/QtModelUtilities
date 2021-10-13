@@ -38,7 +38,9 @@ public:
     bool setMaskedRoleDefaultValue(int role, const QVariant &value);
     void setSourceModel(QAbstractItemModel *sourceModel) override;
     QVariant data(const QModelIndex &proxyIndex, int role = Qt::DisplayRole) const override;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    bool setMaskedFlags(const QModelIndex &index, Qt::ItemFlags flags);
     bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles) override;
     QMap<int, QVariant> itemData(const QModelIndex &index) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -49,7 +51,9 @@ public:
     bool clearItemData(const QModelIndex &index) override;
 #endif
     QMap<int, QVariant> maskedItemData(const QModelIndex &index) const;
+    const Qt::ItemFlags *maskedFlags(const QModelIndex &index) const;
     void clearMaskedData(const QModelIndex &index);
+    void clearMaskedFlags(const QModelIndex &index);
     bool transparentIfEmpty() const;
     void setTransparentIfEmpty(bool val);
     bool mergeDisplayEdit() const;

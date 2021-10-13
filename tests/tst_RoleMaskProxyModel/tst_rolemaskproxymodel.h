@@ -46,6 +46,7 @@ private Q_SLOTS:
     void testMaskHorizontalHeaderData();
     void testItemDataTransParent();
     void testDefaultValueNonTransparent();
+    void testMaskFlags();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     void testMultiData();
     void testClearItemData();

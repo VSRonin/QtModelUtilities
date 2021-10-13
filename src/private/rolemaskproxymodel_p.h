@@ -19,14 +19,25 @@
 #include <QVector>
 #include "private/modelutilities_common_p.h"
 #include "rolemaskproxymodel.h"
+#include <memory>
+
+struct FlaggedRolesContainer
+{
+    RolesContainer roles;
+    std::unique_ptr<Qt::ItemFlags> flags;
+    FlaggedRolesContainer();
+    FlaggedRolesContainer(const RolesContainer &r, const Qt::ItemFlags *f);
+    FlaggedRolesContainer(const FlaggedRolesContainer &other);
+    FlaggedRolesContainer &operator=(const FlaggedRolesContainer &other);
+};
 
 struct MaskedItem
 {
-    RolesContainer m_data;
+    FlaggedRolesContainer m_data;
     QPersistentModelIndex m_index;
     MaskedItem() = default;
-    MaskedItem(const RolesContainer &data, const QModelIndex &index);
-    MaskedItem(const RolesContainer &data, const QPersistentModelIndex &index);
+    MaskedItem(const FlaggedRolesContainer &data, const QModelIndex &index);
+    MaskedItem(const FlaggedRolesContainer &data, const QPersistentModelIndex &index);
     MaskedItem(const MaskedItem &other) = default;
     MaskedItem &operator=(const MaskedItem &other) = default;
 };
@@ -52,9 +63,9 @@ class RoleMaskProxyModelPrivate
     bool removeIndex(const QModelIndex &idx);
     void signalAllChanged(const QVector<int> &roles = QVector<int>(), const QModelIndex &parent = QModelIndex());
     void interceptDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
-    const RolesContainer *dataForIndex(const QModelIndex &index) const;
-    RolesContainer *dataForIndex(const QModelIndex &index);
-    void insertData(const QModelIndex &index, const RolesContainer &data);
+    const FlaggedRolesContainer *dataForIndex(const QModelIndex &index) const;
+    FlaggedRolesContainer *dataForIndex(const QModelIndex &index);
+    void insertData(const QModelIndex &index, const FlaggedRolesContainer &data);
     void onRowsAboutToBeInserted(const QModelIndex &parent, int start, int end);
     void onColumnsAboutToBeInserted(const QModelIndex &parent, int start, int end);
     void onRowsAboutToBeRemoved(const QModelIndex &parent, int start, int end);

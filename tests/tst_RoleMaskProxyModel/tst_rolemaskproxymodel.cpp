@@ -644,6 +644,24 @@ void tst_RoleMaskProxyModel::testDefaultValueNonTransparent()
     QVERIFY(!proxyModel.itemData(proxyModel.index(0, 0)).contains(Qt::UserRole));
 }
 
+void tst_RoleMaskProxyModel::testMaskFlags()
+{
+    QStringListModel baseModel(QStringList() << QStringLiteral("Alice") << QStringLiteral("Bob"));
+    RoleMaskProxyModel proxyModel;
+    new ModelTest(&proxyModel, &baseModel);
+    proxyModel.setSourceModel(&baseModel);
+    const QModelIndex proxyIdx = proxyModel.index(0, 0);
+    QCOMPARE(proxyModel.flags(proxyIdx), baseModel.flags(baseModel.index(0, 0)));
+    QVERIFY(!proxyModel.maskedFlags(proxyIdx));
+    proxyModel.setMaskedFlags(proxyIdx, Qt::ItemNeverHasChildren);
+    QCOMPARE(proxyModel.flags(proxyIdx), Qt::ItemNeverHasChildren);
+    QVERIFY(proxyModel.maskedFlags(proxyIdx));
+    QCOMPARE(*proxyModel.maskedFlags(proxyIdx), Qt::ItemNeverHasChildren);
+    proxyModel.clearMaskedFlags(proxyIdx);
+    QCOMPARE(proxyModel.flags(proxyIdx), baseModel.flags(baseModel.index(0, 0)));
+    QVERIFY(!proxyModel.maskedFlags(proxyIdx));
+}
+
 void tst_RoleMaskProxyModel::testInsertRow()
 {
     QFETCH(QAbstractItemModel *, baseModel);
