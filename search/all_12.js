@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['xmlmodelserialiser_86',['XmlModelSerialiser',['../class_xml_model_serialiser.html',1,'XmlModelSerialiser'],['../class_xml_model_serialiser.html#a8d3529863f1d19197039fafa645da2d3',1,'XmlModelSerialiser::XmlModelSerialiser(QAbstractItemModel *model=Q_NULLPTR, QObject *parent=Q_NULLPTR)'],['../class_xml_model_serialiser.html#a9161e8bebc0d4aeb5e3cf38516407e3a',1,'XmlModelSerialiser::XmlModelSerialiser(const QAbstractItemModel *model, QObject *parent=Q_NULLPTR)']]]
+  ['validcolumn_110',['validColumn',['../class_insert_proxy_model.html#ab8353a27cf893d87137c65a0b65c58f5',1,'InsertProxyModel']]],
+  ['validrow_111',['validRow',['../class_insert_proxy_model.html#a46e3645ca0ec719c1f8f3112e014caf2',1,'InsertProxyModel']]]
 ];

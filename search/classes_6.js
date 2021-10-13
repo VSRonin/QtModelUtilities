@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['rolemaskproxymodel_102',['RoleMaskProxyModel',['../class_role_mask_proxy_model.html',1,'']]]
+  ['jsonmodelserialiser_130',['JsonModelSerialiser',['../class_json_model_serialiser.html',1,'']]]
 ];

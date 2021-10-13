@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['transparentifempty_192',['transparentIfEmpty',['../class_role_mask_proxy_model.html#adfbb31921fd9fd2b61b260c841eebaaa',1,'RoleMaskProxyModel']]]
+  ['sortrole_248',['sortRole',['../class_generic_model.html#a3ee6388ad3e776e490e6653c8e0bee7d',1,'GenericModel']]]
 ];

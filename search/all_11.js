@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['validcolumn_84',['validColumn',['../class_insert_proxy_model.html#ab8353a27cf893d87137c65a0b65c58f5',1,'InsertProxyModel']]],
-  ['validrow_85',['validRow',['../class_insert_proxy_model.html#a46e3645ca0ec719c1f8f3112e014caf2',1,'InsertProxyModel']]]
+  ['tojsonobject_108',['toJsonObject',['../class_json_model_serialiser.html#a257e8be3da287005788ba7e65f965d54',1,'JsonModelSerialiser']]],
+  ['transparentifempty_109',['transparentIfEmpty',['../class_role_mask_proxy_model.html#a3ac3b5856f95ea7a3e2ac45075075f5f',1,'RoleMaskProxyModel']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['jsonmodelserialiser_101',['JsonModelSerialiser',['../class_json_model_serialiser.html',1,'']]]
+  ['insertproxymodel_129',['InsertProxyModel',['../class_insert_proxy_model.html',1,'']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['model_20serialisation_195',['Model Serialisation',['../md__r_e_a_d_m_e__model__serialisation.html',1,'']]]
+  ['insert_20proxy_20model_252',['Insert Proxy Model',['../md__home_runner_work__qt_model_utilities__qt_model_utilities__r_e_a_d_m_e_insert_proxy_model.html',1,'']]]
 ];

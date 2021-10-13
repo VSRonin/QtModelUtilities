@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['validcolumn_167',['validColumn',['../class_insert_proxy_model.html#ab8353a27cf893d87137c65a0b65c58f5',1,'InsertProxyModel']]],
-  ['validrow_168',['validRow',['../class_insert_proxy_model.html#a46e3645ca0ec719c1f8f3112e014caf2',1,'InsertProxyModel']]]
+  ['tojsonobject_218',['toJsonObject',['../class_json_model_serialiser.html#a257e8be3da287005788ba7e65f965d54',1,'JsonModelSerialiser']]]
 ];

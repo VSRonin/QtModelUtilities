@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['index_129',['index',['../class_insert_proxy_model.html#a568df312bfbbee45da5c6937cb6fd176',1,'InsertProxyModel']]],
-  ['insertcolumns_130',['insertColumns',['../class_insert_proxy_model.html#ac080109e4c1238a83f44fbc66546a7ea',1,'InsertProxyModel']]],
-  ['insertproxymodel_131',['InsertProxyModel',['../class_insert_proxy_model.html#abe73020e91293ea8cde8a9fa45f07650',1,'InsertProxyModel::InsertProxyModel(QObject *parent=Q_NULLPTR)'],['../class_insert_proxy_model.html#a7a9992fa73d59df5bd41227ae8af6392',1,'InsertProxyModel::InsertProxyModel(InsertProxyModelPrivate &amp;dptr, QObject *parent)']]],
-  ['insertrows_132',['insertRows',['../class_insert_proxy_model.html#a938bad6059352548c8932b28c0b57bdf',1,'InsertProxyModel']]],
-  ['itemdata_133',['itemData',['../class_role_mask_proxy_model.html#a9a4f2c933484b04a1ef724336f8c9cb1',1,'RoleMaskProxyModel']]]
+  ['haschildren_162',['hasChildren',['../class_generic_model.html#a2a9e6ea9f5c5b687f8e15ebd3d4995c5',1,'GenericModel::hasChildren()'],['../class_insert_proxy_model.html#a9574b2d597d0d34fcc9bc81acd909fb4',1,'InsertProxyModel::hasChildren()'],['../class_root_index_proxy_model.html#ad5f821ec9380cebe643970c5fa682e77',1,'RootIndexProxyModel::hasChildren()']]],
+  ['headerdata_163',['headerData',['../class_generic_model.html#aee5ec182dd56b74664e1ab2d90063b8f',1,'GenericModel::headerData()'],['../class_insert_proxy_model.html#a69a851657f38d5ba8e04edb8ba133966',1,'InsertProxyModel::headerData()'],['../class_role_mask_proxy_model.html#a866e3fb70c1beb5621262d512e9155f6',1,'RoleMaskProxyModel::headerData()']]],
+  ['htmlmodelserialiser_164',['HtmlModelSerialiser',['../class_html_model_serialiser.html#ae3c970ee060a7166e6e0f980b87a9055',1,'HtmlModelSerialiser::HtmlModelSerialiser(QObject *parent=Q_NULLPTR)'],['../class_html_model_serialiser.html#afaea51e02f6fd81ab0bbf28976a878dd',1,'HtmlModelSerialiser::HtmlModelSerialiser(QAbstractItemModel *model, QObject *parent)'],['../class_html_model_serialiser.html#ac8114ca8f82fe07771a7bc1f1efa03ac',1,'HtmlModelSerialiser::HtmlModelSerialiser(const QAbstractItemModel *model, QObject *parent)']]]
 ];

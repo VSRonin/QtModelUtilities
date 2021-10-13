@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['htmlmodelserialiser_99',['HtmlModelSerialiser',['../class_html_model_serialiser.html',1,'']]]
+  ['genericmodel_127',['GenericModel',['../class_generic_model.html',1,'']]]
 ];

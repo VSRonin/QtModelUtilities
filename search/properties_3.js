@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['maskedroles_186',['maskedRoles',['../class_role_mask_proxy_model.html#a4b5302b2a5eaaf9170298c4eb72a98de',1,'RoleMaskProxyModel']]],
-  ['mergedisplayedit_187',['mergeDisplayEdit',['../class_insert_proxy_model.html#a0c3023d1320d48d6594001547dbd6ba6',1,'InsertProxyModel::mergeDisplayEdit()'],['../class_role_mask_proxy_model.html#a8e419f07cb12b13342f5844885d60b6b',1,'RoleMaskProxyModel::mergeDisplayEdit()']]],
-  ['model_188',['model',['../class_abstract_model_serialiser.html#a674cbfa9d1dfa409a60041a48ffb56d7',1,'AbstractModelSerialiser']]]
+  ['maskedroles_240',['maskedRoles',['../class_role_mask_proxy_model.html#ac94c9810ea3b3683804d33b24bc959f5',1,'RoleMaskProxyModel']]],
+  ['maskheaderdata_241',['maskHeaderData',['../class_role_mask_proxy_model.html#a496077de0d145ccbf284929e986e4984',1,'RoleMaskProxyModel']]],
+  ['mergedisplayedit_242',['mergeDisplayEdit',['../class_generic_model.html#ab1ec10879ce269d36faaba86dc1be87e',1,'GenericModel::mergeDisplayEdit()'],['../class_insert_proxy_model.html#ad5f28f5c10c4a90404741817349a2cae',1,'InsertProxyModel::mergeDisplayEdit()'],['../class_role_mask_proxy_model.html#a9696b14ae2cf0ecc2a5b03b2f3b4ca88',1,'RoleMaskProxyModel::mergeDisplayEdit()']]],
+  ['model_243',['model',['../class_abstract_model_serialiser.html#aed65069ff5b57f8601a50f22c2a2b1f2',1,'AbstractModelSerialiser']]]
 ];
