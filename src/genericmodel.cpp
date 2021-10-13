@@ -1582,7 +1582,7 @@ void GenericModel::setMergeDisplayEdit(bool val)
 }
 
 /*!
-\property QSortFilterProxyModel::sortRole
+\property GenericModel::sortRole
 \accessors %sortRole(), setSortRole()
 \notifier sortRoleChanged()
 \brief the item role that is used to query the source model's data when sorting items

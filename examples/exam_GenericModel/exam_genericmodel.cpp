@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
     baseView->setSelectionBehavior(QAbstractItemView::SelectItems);
     baseView->setModel(baseModel);
 
+    // Create spinboxes and buttons to insert/remove rows/columns
     QSpinBox *rowNumberSpin = new QSpinBox(&mainWid);
     rowNumberSpin->setMinimum(1);
     QPushButton *insertRowButton = new QPushButton(QStringLiteral("Insert Rows"), &mainWid);
