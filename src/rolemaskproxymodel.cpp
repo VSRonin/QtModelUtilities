@@ -778,7 +778,10 @@ void RoleMaskProxyModel::multiData(const QModelIndex &index, QModelRoleDataSpan 
     Q_D(const RoleMaskProxyModel);
     const QModelIndex sourceIndex = mapToSource(index);
     sourceModel()->multiData(sourceIndex, roleDataSpan);
+    const FlaggedRolesContainer emptyData;
     const FlaggedRolesContainer *idxData = d->dataForIndex(sourceIndex);
+    if (!idxData)
+        idxData = &emptyData;
     for (QModelRoleData &roleData : roleDataSpan) {
         int role = roleData.role();
         if (d->m_mergeDisplayEdit && role == Qt::EditRole)
