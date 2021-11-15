@@ -1,3 +1,48 @@
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Test REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Test REQUIRED)
+if(NOT NO_GUI)
+    find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Gui)
+    if(NOT "${Qt${QT_VERSION_MAJOR}Gui_FOUND}")
+        set(NO_GUI ON)
+    else()
+        message(STATUS "Found Qt Gui ${Qt${QT_VERSION_MAJOR}Gui_VERSION}")
+    endif()
+endif()
+message(STATUS "Found Qt Test ${Qt${QT_VERSION_MAJOR}Test_VERSION}")
+add_library(tstLib STATIC modeltestmanager.h modeltestmanager.cpp)
+add_library(tstLib::tstLib ALIAS tstLib)
+target_compile_definitions(tstLib PUBLIC QT_NO_CAST_FROM_ASCII QT_NO_CAST_TO_ASCII)
+target_include_directories(tstLib PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+target_link_libraries(tstLib PUBLIC
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Test
+    QtModelUtilities::QtModelUtilities
+)
+if(NOT NO_GUI)
+    target_link_libraries(tstLib PUBLIC Qt${QT_VERSION_MAJOR}::Gui)
+endif()
+if("${Qt${QT_VERSION_MAJOR}Test_VERSION}" VERSION_LESS "5.11.0")
+    file(DOWNLOAD "https://code.qt.io/cgit/qt-creator/qt-creator.git/plain/src/shared/modeltest/modeltest.cpp" "${CMAKE_CURRENT_BINARY_DIR}/modeltest.cpp" STATUS ModelTestDownloadStatus)
+    list(GET ModelTestDownloadStatus 0 ModelTestDownloadStatusCode)
+    if(ModelTestDownloadStatusCode EQUAL 0)
+        file(DOWNLOAD "https://code.qt.io/cgit/qt-creator/qt-creator.git/plain/src/shared/modeltest/modeltest.h" "${CMAKE_CURRENT_BINARY_DIR}/modeltest.h" STATUS ModelTestDownloadStatus)
+        list(GET ModelTestDownloadStatus 0 ModelTestDownloadStatusCode)
+        if(ModelTestDownloadStatusCode EQUAL 0)
+            target_sources(tstLib PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/modeltest.h" "${CMAKE_CURRENT_BINARY_DIR}/modeltest.cpp")
+            target_include_directories(tstLib PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
+        else()
+            target_compile_definitions(tstLib PUBLIC MOC_MODEL_TEST)
+        endif()
+    else()
+        target_compile_definitions(tstLib PUBLIC MOC_MODEL_TEST)
+    endif()
+endif()
+set_target_properties(tstLib PROPERTIES
+    AUTOMOC ON
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED ON
+)
+
 if(BUILD_ROLEMASKPROXY)
     add_subdirectory(tst_RoleMaskProxyModel)
 endif()

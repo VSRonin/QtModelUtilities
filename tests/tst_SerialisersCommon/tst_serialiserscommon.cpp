@@ -93,7 +93,7 @@ QAbstractItemModel *tst_SerialiserCommon::createStringModel(QObject *parent)
     QStringList itmesList;
     for (int i = rowsDist(generator); i > 0; --i)
         itmesList.append(QStringLiteral("Item ") + QString::number(itemsDist(generator)));
-    return new QStringListModel(itmesList, parent);
+    return new SimpleModel(itmesList, parent);
 }
 #ifdef COMPLEX_MODEL_SUPPORT
 void tst_SerialiserCommon::insertBranch(QAbstractItemModel *model, const QModelIndex &parent, bool multiRoles, int subBranches)
@@ -145,7 +145,7 @@ void tst_SerialiserCommon::basicSaveLoadData(QObject *parent)
     QTest::addColumn<const QAbstractItemModel *>("sourceModel");
     QTest::addColumn<QAbstractItemModel *>("destinationModel");
     QTest::newRow("List Single Role") << static_cast<const QAbstractItemModel *>(createStringModel(parent))
-                                      << static_cast<QAbstractItemModel *>(new QStringListModel(parent));
+                                      << static_cast<QAbstractItemModel *>(new SimpleModel(parent));
     QTest::newRow("List Single Role Overwrite") << static_cast<const QAbstractItemModel *>(createStringModel(parent)) << createStringModel(parent);
 #ifdef COMPLEX_MODEL_SUPPORT
     QTest::newRow("Table Single Role") << static_cast<const QAbstractItemModel *>(createComplexModel(false, false, parent))

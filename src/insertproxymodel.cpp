@@ -402,7 +402,7 @@ int InsertProxyModel::rowCount(const QModelIndex &parent) const
     if (!sourceModel())
         return 0;
     Q_D(const InsertProxyModel);
-    const int originalCount = sourceModel()->rowCount(parent);
+    const int originalCount = sourceModel()->rowCount(mapToSource(parent));
     if (d->m_insertDirection & InsertRow)
         return originalCount + 1;
     return originalCount;
@@ -418,7 +418,7 @@ int InsertProxyModel::columnCount(const QModelIndex &parent) const
     if (!sourceModel())
         return 0;
     Q_D(const InsertProxyModel);
-    const int originalCount = sourceModel()->columnCount(parent);
+    const int originalCount = sourceModel()->columnCount(mapToSource(parent));
     if (d->m_insertDirection & InsertColumn)
         return originalCount + 1;
     return originalCount;

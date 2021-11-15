@@ -1,5 +1,6 @@
 include(TestMacro)
 BasicTest(HtmlModelSerialiser)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Network REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Network)
 if("${Qt${QT_VERSION_MAJOR}Network_FOUND}")
     message(STATUS "Found Qt Network ${Qt${QT_VERSION_MAJOR}Network_VERSION}")

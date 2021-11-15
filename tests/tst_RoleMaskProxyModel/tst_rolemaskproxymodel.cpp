@@ -1,5 +1,4 @@
 #include <QtTest/QTest>
-#include <QStringListModel>
 #include <rolemaskproxymodel.h>
 #include <QSortFilterProxyModel>
 #include <QSignalSpy>
@@ -7,7 +6,7 @@
 #include <QVariant>
 #include <random>
 #include "tst_rolemaskproxymodel.h"
-#include <../modeltestmanager.h>
+#include <modeltestmanager.h>
 #ifdef QTMODELUTILITIES_GENERICMODEL
 #    include <genericmodel.h>
 #endif
@@ -19,7 +18,7 @@ QAbstractItemModel *createNullModel(QObject *parent)
 }
 QAbstractItemModel *createListModel(QObject *parent)
 {
-    return new QStringListModel(
+    return new SimpleModel(
             QStringList() << QStringLiteral("1") << QStringLiteral("2") << QStringLiteral("3") << QStringLiteral("4") << QStringLiteral("5"), parent);
 }
 
@@ -624,7 +623,7 @@ void tst_RoleMaskProxyModel::testMaskHorizontalHeaderData()
 
 void tst_RoleMaskProxyModel::testDefaultValueNonTransparent()
 {
-    QStringListModel baseModel(QStringList() << QStringLiteral("Alice") << QStringLiteral("Bob"));
+    SimpleModel baseModel(QStringList() << QStringLiteral("Alice") << QStringLiteral("Bob"));
     RoleMaskProxyModel proxyModel;
     new ModelTest(&proxyModel, &baseModel);
     proxyModel.setSourceModel(&baseModel);
@@ -646,7 +645,7 @@ void tst_RoleMaskProxyModel::testDefaultValueNonTransparent()
 
 void tst_RoleMaskProxyModel::testMaskFlags()
 {
-    QStringListModel baseModel(QStringList() << QStringLiteral("Alice") << QStringLiteral("Bob"));
+    SimpleModel baseModel(QStringList() << QStringLiteral("Alice") << QStringLiteral("Bob"));
     RoleMaskProxyModel proxyModel;
     new ModelTest(&proxyModel, &baseModel);
     proxyModel.setSourceModel(&baseModel);
@@ -805,7 +804,7 @@ void tst_RoleMaskProxyModel::testNullModel()
     proxyModel.setSourceModel(nullptr);
     QVERIFY(!proxyModel.setData(proxyModel.index(0, 0), 1, Qt::UserRole));
     QVERIFY(!proxyModel.index(0, 0).data(Qt::UserRole).isValid());
-    QStringListModel validModel(QStringList() << QStringLiteral("1"));
+    SimpleModel validModel(QStringList() << QStringLiteral("1"));
     proxyModel.setSourceModel(&validModel);
     QVERIFY(proxyModel.setData(proxyModel.index(0, 0), 1, Qt::UserRole));
     QCOMPARE(proxyModel.index(0, 0).data(Qt::UserRole).toInt(), 1);
@@ -1122,8 +1121,8 @@ void tst_RoleMaskProxyModel::testManageMaskedRoles()
 
 void tst_RoleMaskProxyModel::testDisconnectedModel()
 {
-    QStringListModel baseModel1(QStringList({QStringLiteral("London"), QStringLiteral("Berlin"), QStringLiteral("Paris")}));
-    QStringListModel baseModel2(QStringList({QStringLiteral("Rome"), QStringLiteral("Madrid"), QStringLiteral("Prague")}));
+    SimpleModel baseModel1(QStringList({QStringLiteral("London"), QStringLiteral("Berlin"), QStringLiteral("Paris")}));
+    SimpleModel baseModel2(QStringList({QStringLiteral("Rome"), QStringLiteral("Madrid"), QStringLiteral("Prague")}));
     RoleMaskProxyModel proxyModel;
     new ModelTest(&proxyModel, this);
     proxyModel.setMergeDisplayEdit(true);
@@ -1269,7 +1268,7 @@ void tst_RoleMaskProxyModel::testSort()
     for (int i = 0; i < 100; ++i)
         sequence.append(QStringLiteral("%1").arg(i, 3, 10, QLatin1Char('0')));
     std::shuffle(sequence.begin(), sequence.end(), std::mt19937(88));
-    QStringListModel baseModel(sequence);
+    SimpleModel baseModel(sequence);
     RoleMaskProxyModel proxyModel;
     new ModelTest(&proxyModel, this);
     proxyModel.setSourceModel(&baseModel);
@@ -1335,7 +1334,7 @@ void tst_RoleMaskProxyModel::testSetItemData()
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 void tst_RoleMaskProxyModel::testClearItemData()
 {
-    QStringListModel baseModel(QStringList() << QStringLiteral("Test") << QStringLiteral("Test1"));
+    SimpleModel baseModel(QStringList() << QStringLiteral("Test") << QStringLiteral("Test1"));
     RoleMaskProxyModel proxyModel;
     new ModelTest(&proxyModel, &baseModel);
     proxyModel.setSourceModel(&baseModel);
@@ -1350,7 +1349,7 @@ void tst_RoleMaskProxyModel::testClearItemData()
 }
 void tst_RoleMaskProxyModel::testMultiData()
 {
-    QStringListModel baseModel(QStringList() << QStringLiteral("Test") << QStringLiteral("Test1"));
+    SimpleModel baseModel(QStringList() << QStringLiteral("Test") << QStringLiteral("Test1"));
     RoleMaskProxyModel proxyModel;
     new ModelTest(&proxyModel, &baseModel);
     proxyModel.setSourceModel(&baseModel);

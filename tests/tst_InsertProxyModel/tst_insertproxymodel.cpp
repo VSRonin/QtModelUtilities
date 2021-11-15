@@ -1,5 +1,5 @@
 #include "tst_insertproxymodel.h"
-#include <QStringListModel>
+
 #include <insertproxymodel.h>
 #include <QtTest/QTest>
 #include <QSignalSpy>
@@ -12,26 +12,9 @@ QAbstractItemModel *createNullModel(QObject *parent)
     return nullptr;
 }
 
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-using StringListModel = QStringListModel;
-#else
-class StringListModel : public QStringListModel
-{
-public:
-    using QStringListModel::QStringListModel;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override
-    {
-        const QVariant baseData = QStringListModel::data(index, role);
-        if (baseData.toString().isEmpty())
-            return QVariant();
-        return baseData;
-    }
-};
-#endif
-
 QAbstractItemModel *createListModel(QObject *parent)
 {
-    return new StringListModel(
+    return new SimpleModel(
             QStringList() << QStringLiteral("1") << QStringLiteral("2") << QStringLiteral("3") << QStringLiteral("4") << QStringLiteral("5"), parent);
 }
 
@@ -479,7 +462,7 @@ void tst_InsertProxyModel::testNullModel()
     QVERIFY(!proxyModel.setData(proxyModel.index(0, 0), QStringLiteral("1")));
     QVERIFY(!proxyModel.index(0, 0).data().isValid());
     QVERIFY(!proxyModel.commitRow());
-    QStringListModel validModel(QStringList() << QStringLiteral("1"));
+    SimpleModel validModel(QStringList() << QStringLiteral("1"));
     proxyModel.setSourceModel(&validModel);
     QVERIFY(proxyModel.setData(proxyModel.index(1, 0), QStringLiteral("2")));
     QCOMPARE(proxyModel.index(1, 0).data().toString(), QStringLiteral("2"));
@@ -544,7 +527,7 @@ void tst_InsertProxyModel::testDataForCorner()
 void tst_InsertProxyModel::testSort()
 {
     QFETCH(bool, sortProxy);
-    QStringListModel baseModel(QStringList{QStringLiteral("b"), QStringLiteral("a"), QStringLiteral("d"), QStringLiteral("c")});
+    SimpleModel baseModel(QStringList{QStringLiteral("b"), QStringLiteral("a"), QStringLiteral("d"), QStringLiteral("c")});
     InsertProxyModel proxyModel;
     new ModelTest(&proxyModel, this);
     proxyModel.setSourceModel(&baseModel);
@@ -585,7 +568,7 @@ void tst_InsertProxyModel::testSort_data()
 
 void tst_InsertProxyModel::testInsertOnEmptyModel()
 {
-    QStringListModel baseModel1;
+    SimpleModel baseModel1;
     InsertProxyModel proxyModel1;
     new ModelTest(&proxyModel1, this);
     proxyModel1.setSourceModel(&baseModel1);
@@ -632,8 +615,8 @@ void tst_InsertProxyModel::testInsertOnEmptyModel()
 
 void tst_InsertProxyModel::testResetModel()
 {
-    QStringListModel baseModel1(QStringList({QStringLiteral("London"), QStringLiteral("Berlin"), QStringLiteral("Paris")}));
-    QStringListModel baseModel2(QStringList({QStringLiteral("Rome"), QStringLiteral("Madrid")}));
+    SimpleModel baseModel1(QStringList({QStringLiteral("London"), QStringLiteral("Berlin"), QStringLiteral("Paris")}));
+    SimpleModel baseModel2(QStringList({QStringLiteral("Rome"), QStringLiteral("Madrid")}));
     QSortFilterProxyModel middleProxy;
     middleProxy.setSourceModel(&baseModel1);
     InsertProxyModel insertProxy;
@@ -656,8 +639,8 @@ void tst_InsertProxyModel::testResetModel()
 
 void tst_InsertProxyModel::testDisconnectedModel()
 {
-    QStringListModel baseModel1(QStringList({QStringLiteral("London"), QStringLiteral("Berlin"), QStringLiteral("Paris")}));
-    QStringListModel baseModel2(QStringList({QStringLiteral("Rome"), QStringLiteral("Madrid"), QStringLiteral("Prague")}));
+    SimpleModel baseModel1(QStringList({QStringLiteral("London"), QStringLiteral("Berlin"), QStringLiteral("Paris")}));
+    SimpleModel baseModel2(QStringList({QStringLiteral("Rome"), QStringLiteral("Madrid"), QStringLiteral("Prague")}));
     InsertProxyModel proxyModel;
     new ModelTest(&proxyModel, this);
     proxyModel.setSourceModel(&baseModel1);
@@ -1036,7 +1019,7 @@ void tst_InsertProxyModel::testCommitSubclass()
 
 void tst_InsertProxyModel::createPersistentOnLayoutAboutToBeChanged()
 {
-    QStringListModel model(QStringList{QStringLiteral("1"), QStringLiteral("2"), QStringLiteral("3")});
+    SimpleModel model(QStringList{QStringLiteral("1"), QStringLiteral("2"), QStringLiteral("3")});
     InsertProxyModel proxy;
     new ModelTest(&proxy, &proxy);
     proxy.setSourceModel(&model);

@@ -1,5 +1,4 @@
 #include "tst_rootindexproxymodel.h"
-#include <QStringListModel>
 #include <rootindexproxymodel.h>
 #include <QtTest/QTest>
 #include <QtTest/QSignalSpy>
