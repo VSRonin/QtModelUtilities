@@ -388,7 +388,8 @@ void RootIndexProxyModel::setSourceModel(QAbstractItemModel *newSourceModel)
                 << connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeRemoved,
                            std::bind(&RootIndexProxyModelPrivate::onColumnsAboutToBeRemoved, d, _1, _2, _3))
                 << connect(sourceModel(), &QAbstractItemModel::rowsRemoved, std::bind(&RootIndexProxyModelPrivate::onRowsRemoved, d, _1, _2, _3))
-                << connect(sourceModel(), &QAbstractItemModel::columnsRemoved, std::bind(&RootIndexProxyModelPrivate::onColumnsRemoved, d, _1, _2, _3))
+                << connect(sourceModel(), &QAbstractItemModel::columnsRemoved,
+                           std::bind(&RootIndexProxyModelPrivate::onColumnsRemoved, d, _1, _2, _3))
                 << connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeInserted,
                            std::bind(&RootIndexProxyModelPrivate::onRowsAboutToBeInserted, d, _1, _2, _3))
                 << connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeInserted,
@@ -412,10 +413,9 @@ void RootIndexProxyModel::setSourceModel(QAbstractItemModel *newSourceModel)
                            std::bind(&RootIndexProxyModelPrivate::checkRootRowRemoved, d, _1, _2, _3))
                 << connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeRemoved,
                            std::bind(&RootIndexProxyModelPrivate::checkRootColumnsRemoved, d, _1, _2, _3))
-                << connect(sourceModel(), &QAbstractItemModel::headerDataChanged,this,&RootIndexProxyModel::headerDataChanged)
-                << connect(sourceModel(), &QAbstractItemModel::modelAboutToBeReset,this,&RootIndexProxyModel::beginResetModel)
-                << connect(sourceModel(), &QAbstractItemModel::modelReset,this,&RootIndexProxyModel::endResetModel)
-                ;
+                << connect(sourceModel(), &QAbstractItemModel::headerDataChanged, this, &RootIndexProxyModel::headerDataChanged)
+                << connect(sourceModel(), &QAbstractItemModel::modelAboutToBeReset, this, &RootIndexProxyModel::beginResetModel)
+                << connect(sourceModel(), &QAbstractItemModel::modelReset, this, &RootIndexProxyModel::endResetModel);
     }
     endResetModel();
 }
