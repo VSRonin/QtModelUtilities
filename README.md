@@ -24,6 +24,18 @@ If your system is compatible with one of the main platforms listed below you can
 This library uses [CMake](https://cmake.org/) as build system and allows usage both using static and dynamic linking as well as customising what parts of the library you want to build. 
 See [INSTALL](INSTALL.md) for detailed build instructions.
 
+#### Use sources directly
+You can include the library in your CMake (3.11 or newer) project simply by using `FetchContent`:
+```
+include(FetchContent)
+FetchContent_Declare(QtModelUtilitiesFC
+    GIT_REPOSITORY https://github.com/VSRonin/QtModelUtilities.git
+    GIT_TAG master
+)
+FetchContent_MakeAvailable(QtModelUtilitiesFC)
+```
+You are then able to use they library by just adding `target_link_libraries(MyApp PUBLIC QtModelUtilities::QtModelUtilities)`
+
 #### Using the Library
 Once you installed/unpacked your library in a directory (e.g. `path/to/QtModelUtilities`)
 + **CMake**: add `path/to/QtModelUtilities` to `CMAKE_PREFIX_PATH`, then you can use `find_package(QtModelUtilities)`/`target_link_libraries(MyApp PRIVATE QtModelUtilities::QtModelUtilities)` in your CMakeLists.
