@@ -1144,7 +1144,8 @@ const Qt::ItemFlags *RoleMaskProxyModel::maskedFlags(const QModelIndex &index) c
 \accessors %transparentIfEmpty(), setTransparentIfEmpty()
 \notifier transparentIfEmptyChanged()
 \brief This property determines if a mapped role containing no data should be transparent
-\details If this property is set to true, roles managed by the proxy will show the source model data unless it gets ovewritten in the proxy
+\details If this property is set to true (the default), roles managed by the proxy will show the source model data unless it gets ovewritten in the
+proxy
 */
 bool RoleMaskProxyModel::transparentIfEmpty() const
 {
