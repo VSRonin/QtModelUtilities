@@ -255,17 +255,14 @@ void InsertProxyModel::setSourceModel(QAbstractItemModel *newSourceModel)
         return;
     Q_D(InsertProxyModel);
     beginResetModel();
-    if (sourceModel()) {
-        for (auto discIter = d->m_sourceConnections.cbegin(); discIter != d->m_sourceConnections.cend(); ++discIter)
-            QObject::disconnect(*discIter);
-    }
+    for (auto discIter = d->m_sourceConnections.cbegin(); discIter != d->m_sourceConnections.cend(); ++discIter)
+        QObject::disconnect(*discIter);
     QAbstractProxyModel::setSourceModel(newSourceModel);
     d->m_sourceConnections.clear();
     for (auto &extraData : d->m_extraData)
         extraData.clear();
     if (sourceModel()) {
         d->m_sourceConnections
-                << QObject::connect(sourceModel(), &QAbstractItemModel::destroyed, [this]() -> void { setSourceModel(Q_NULLPTR); })
                 << QObject::connect(sourceModel(), &QAbstractItemModel::dataChanged,
                                     [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles) {
                                         Q_EMIT dataChanged(mapFromSource(topLeft), mapFromSource(bottomRight), roles);
