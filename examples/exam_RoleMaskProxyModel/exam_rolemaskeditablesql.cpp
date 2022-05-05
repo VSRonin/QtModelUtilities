@@ -9,6 +9,9 @@
 #include <QGridLayout>
 #include <QDir>
 #include <QHeaderView>
+#include <QTemporaryFile>
+#include <QFileInfo>
+#include <memory>
 
 // We subclass RoleMaskProxyModel and reimplement the flags() method to allow editing
 class EditableFlagMask : public RoleMaskProxyModel
@@ -25,14 +28,13 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     // we copy the dummy sqlite db from the program resources to a temporary file
-    const QString dbPath = QDir::tempPath() + "/exampledb.sqlite3";
-    QFile::copy(QStringLiteral(":/db/exampledb.sqlite3"), dbPath);
+    QFile dbResourceFile(QStringLiteral(":/db/exampledb.sqlite3"));
+    std::unique_ptr<QTemporaryFile> dbFile(QTemporaryFile::createNativeFile(dbResourceFile));
     // open the sqlite db
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(dbPath);
+    db.setDatabaseName(QFileInfo(*dbFile).absoluteFilePath());
     if (!db.open()) {
         qDebug("Unable to open Db");
-        QFile::remove(dbPath);
         return 1;
     }
 
@@ -66,7 +68,5 @@ int main(int argc, char *argv[])
     mainLay->addWidget(new QLabel(QStringLiteral("Editable Model")), 0, 1);
     mainLay->addWidget(proxyView, 1, 1);
     mainWid.show();
-    const int appRes = app.exec();
-    QFile::remove(dbPath);
-    return appRes;
+    return app.exec();
 }

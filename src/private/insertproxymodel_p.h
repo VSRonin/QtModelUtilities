@@ -22,6 +22,7 @@ class InsertProxyModelPrivate
     Q_DECLARE_PUBLIC(InsertProxyModel)
     Q_DISABLE_COPY(InsertProxyModelPrivate)
     InsertProxyModelPrivate(InsertProxyModel *q);
+    InsertProxyModel *q_ptr;
     InsertProxyModel::InsertDirections m_insertDirection;
     QVector<QPersistentModelIndex> m_layoutChangePersistentIndexes;
     QModelIndexList m_layoutChangeProxyIndexes;
@@ -36,6 +37,7 @@ class InsertProxyModelPrivate
     bool commitColumn();
     bool commitRow();
     bool commitToSource(const bool isRow);
+    void afterCommit(const bool isRow);
     int mergeEditDisplayHash(RolesContainer &singleHash);
     void onColumnsInserted(const QModelIndex &parent, int first, int last);
     void onColumnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column);
@@ -56,7 +58,6 @@ class InsertProxyModelPrivate
     void afetrLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint);
     void afterReset();
     QVector<int> setDataInContainer(RolesContainer &baseHash, int role, const QVariant &value);
-    InsertProxyModel *q_ptr;
 };
 
 #endif // INSERTPROXY_P_H

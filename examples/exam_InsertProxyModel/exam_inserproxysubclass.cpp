@@ -25,7 +25,9 @@ protected:
             return false;
         const int sourceCols = sourceModel()->columnCount();
         const int sourceRows = sourceModel()->rowCount();
+        // iterate through all the columns
         for (int i = 0; i < sourceCols; ++i) {
+            // if one column is missing data do not commit
             if (index(sourceRows, i).data().toString().isEmpty())
                 return false;
         }
@@ -37,7 +39,9 @@ protected:
             return false;
         const int sourceCols = sourceModel()->columnCount();
         const int sourceRows = sourceModel()->rowCount();
+        // iterate through all the rows
         for (int i = 0; i < sourceRows; ++i) {
+            // if one row is missing data do not commit
             if (index(i, sourceCols).data().toString().isEmpty())
                 return false;
         }

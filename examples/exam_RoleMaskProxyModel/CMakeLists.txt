@@ -49,7 +49,6 @@ if("${Qt${QT_VERSION_MAJOR}Sql_FOUND}")
         CXX_STANDARD 11
         CXX_STANDARD_REQUIRED ON
         VERSION "1.0"
-        SOVERSION 1
         EXPORT_NAME "examRoleMaskProxyModelEditableSQL"
         ARCHIVE_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/examples"
         LIBRARY_OUTPUT_DIRECTORY "../../${modelutilities_PlatformDir}/lib/examples"

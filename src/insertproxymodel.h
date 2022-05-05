@@ -72,6 +72,8 @@ protected:
     virtual bool validRow() const;
     virtual bool validColumn() const;
     virtual Qt::ItemFlags flagForExtra(bool isRow, int section) const;
+    void endCommitRow();
+    void endCommitColumn();
     InsertProxyModel(InsertProxyModelPrivate &dptr, QObject *parent);
 public Q_SLOTS:
     virtual bool commitRow();

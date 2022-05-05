@@ -67,10 +67,10 @@ void InsertProxyModelPrivate::checkExtraDataChanged(const QModelIndex &topLeft, 
         return; // the corner changed
     if (bottomRight.column() >= sourceCols) {
         if (q->validColumn())
-            commitColumn();
+            q->commitColumn();
     } else if (bottomRight.row() >= sourceRows) {
         if (q->validRow())
-            commitRow();
+            q->commitRow();
     }
 }
 
@@ -94,7 +94,7 @@ bool InsertProxyModelPrivate::commitToSource(const bool isRow)
         return false;
     const int loopEnd = isRow ? sourceCols : sourceRows;
     for (int i = 0; i < loopEnd; ++i) {
-        RolesContainer &allRoles = m_extraData[isRow][i];
+        const RolesContainer &allRoles = m_extraData[isRow][i];
         if (allRoles.isEmpty())
             continue;
         const QModelIndex currentIdx = isRow ? q->sourceModel()->index(sourceRows, i) : q->sourceModel()->index(i, sourceCols);
@@ -102,15 +102,31 @@ bool InsertProxyModelPrivate::commitToSource(const bool isRow)
         Q_ASSERT(m_separateEditDisplay || (allRoles.value(Qt::DisplayRole) == allRoles.value(Qt::EditRole)));
         if (!q->sourceModel()->setItemData(currentIdx, convertFromContainer<QMap<int, QVariant>>(allRoles)))
             return false;
+    }
+    afterCommit(isRow);
+    return true;
+}
+
+void InsertProxyModelPrivate::afterCommit(const bool isRow)
+{
+    Q_Q(InsertProxyModel);
+    if (!q->sourceModel())
+        return;
+    const int sourceCols = q->sourceModel()->columnCount();
+    const int sourceRows = q->sourceModel()->rowCount();
+    const int loopEnd = isRow ? sourceCols : sourceRows;
+    for (int i = 0; i < loopEnd; ++i) {
+        RolesContainer &allRoles = m_extraData[isRow][i];
+        if (allRoles.isEmpty())
+            continue;
         QVector<int> aggregateRoles;
         aggregateRoles.reserve(allRoles.size());
         for (auto j = allRoles.begin(); !allRoles.isEmpty(); j = allRoles.erase(j))
             aggregateRoles << j.key();
-        const QModelIndex proxyIdx = isRow ? q->index(sourceRows + 1, i) : q->index(i, sourceCols + 1);
+        const QModelIndex proxyIdx = isRow ? q->index(sourceRows, i) : q->index(i, sourceCols);
         Q_EMIT q->dataChanged(proxyIdx, proxyIdx, aggregateRoles);
         Q_EMIT q->extraDataChanged(proxyIdx, proxyIdx, aggregateRoles);
     }
-    return true;
 }
 
 int InsertProxyModelPrivate::mergeEditDisplayHash(RolesContainer &singleHash)
@@ -990,6 +1006,10 @@ void InsertProxyModel::setDataForCorner(const QVariant &value, int role)
 
 /*!
 Adds the extra row to the source model
+
+Reimplement this method to provide custom behavior to inserting rows.
+When subclassing, call endCommitRow after the row is
+inserted succesfully in the source model.
 */
 bool InsertProxyModel::commitRow()
 {
@@ -999,11 +1019,39 @@ bool InsertProxyModel::commitRow()
 
 /*!
 Adds the extra column to the source model
+
+Reimplement this method to provide custom behavior to inserting columns
+When subclassing, call endCommitRow after the column is
+inserted succesfully in the source model.
 */
 bool InsertProxyModel::commitColumn()
 {
     Q_D(InsertProxyModel);
     return d->commitColumn();
+}
+
+/*!
+When reimplementing commitRow, call this method after the row is
+inserted succesfully in the source model.
+
+\sa commitRow
+*/
+void InsertProxyModel::endCommitRow()
+{
+    Q_D(InsertProxyModel);
+    return d->afterCommit(true);
+}
+
+/*!
+When reimplementing commitRow, call this method after the column is
+inserted succesfully in the source model.
+
+\sa commitColumn
+*/
+void InsertProxyModel::endCommitColumn()
+{
+    Q_D(InsertProxyModel);
+    return d->afterCommit(false);
 }
 
 /*!
