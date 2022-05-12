@@ -6,7 +6,6 @@
 #include <QStandardPaths>
 #include <QTreeView>
 #include <QApplication>
-#include <QDebug>
 
 // we create a small subclass of RoleMaskProxyModel
 class CheckableProxy : public RoleMaskProxyModel

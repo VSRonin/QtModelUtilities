@@ -9,6 +9,7 @@
 #include <QFileInfo>
 #include <QSqlError>
 #include <memory>
+#include <QDebug>
 
 // subclass InsertProxyModel and reimplement commitRow to insert
 // the record in the source QSqlTableModel
