@@ -12,6 +12,7 @@ option(BUILD_MODELSERIALISATION "Enables or disables the build of Model Serialis
 option(BUILD_INSERTPROXY "Enables or disables the build of Insert Proxy Model" ON)
 option(BUILD_ROOTINDEXPROXY "Enables or disables the build of Root Index Proxy Model" ON)
 option(BUILD_GENERICMODEL "Enables or disables the build of Generic Model" ON)
+option(BUILD_HIERARCHYLEVELPROXY "Enables or disables the build of Hierarchy Level Proxy Model" ON)
 option(OPTIMISE_FOR_MANY_ROLES "Set this property to ON if you plan to store more than 20 different roles in the models to optimise performance" OFF)
 option(MODEL_UTILITIES_INSTALL "Generate installation target" ON)
 
