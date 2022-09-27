@@ -17,44 +17,95 @@ int HierarchyLevelProxyModelPrivate::rootOf(QModelIndex sourceIndex) const
 {
     Q_ASSERT(sourceIndex.isValid());
     Q_ASSERT(sourceIndex.model() == q_func()->sourceModel());
-    while(sourceIndex.isValid()){
+    do{
+        sourceIndex=sourceIndex.parent();
         for(int i=0;i<m_roots.size();++i){
             if(m_roots.at(i).root==sourceIndex)
                 return i;
         }
-        sourceIndex=sourceIndex.parent();
-    }
+    }while(sourceIndex.isValid());
     return -1;
+}
+
+void HierarchyLevelProxyModelPrivate::rebuildMapping()
+{
+    m_roots.clear();
+    m_maxCol=0;
+    Q_Q(HierarchyLevelProxyModel);
+    if(!q->sourceModel())
+        return;
+    if(m_targetLevel==0){
+        m_roots.append(HierarchyRootData(QModelIndex(),0));
+        m_maxCol = q->sourceModel()->columnCount();
+        return;
+    }
+    int rootsRowCount=0;
+    rebuildMappingBranch(QModelIndex(),0,rootsRowCount);
+}
+void HierarchyLevelProxyModelPrivate::rebuildMappingBranch(const QModelIndex& parent, int levl, int& rootsRowCount)
+{
+    Q_Q(HierarchyLevelProxyModel);
+    for(int i=0, iMax = q->sourceModel()->rowCount(parent);i<iMax;++i){
+        for(int j=0, jMax = q->sourceModel()->columnCount(parent);j<jMax;++j){
+            const QModelIndex currIdx = q->sourceModel()->index(i,j,parent);
+            if(q->sourceModel()->hasChildren(currIdx)){
+                if(levl==m_targetLevel-1){
+                    m_roots.append(HierarchyRootData(currIdx,rootsRowCount));
+                    rootsRowCount+=q->sourceModel()->rowCount(currIdx);
+                    m_maxCol = qMax(m_maxCol,q->sourceModel()->columnCount(currIdx));
+                }
+                else{
+                    rebuildMappingBranch(currIdx,levl+1,rootsRowCount);
+                }
+            }
+        }
+    }
+
+}
+
+void HierarchyLevelProxyModelPrivate::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+{
+
 }
 
 void HierarchyLevelProxyModelPrivate::onColumnsInserted(const QModelIndex &parent, int first, int last)
 {
-    onInserted(false, parent, first, last);
+
 }
 
 void HierarchyLevelProxyModelPrivate::onColumnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)
 {
-    onMoved(false, parent, start, end, destination, column);
+
 }
 
 void HierarchyLevelProxyModelPrivate::onColumnsRemoved(const QModelIndex &parent, int first, int last)
 {
-    onRemoved(false, parent, first, last);
+
 }
 
 void HierarchyLevelProxyModelPrivate::onRowsInserted(const QModelIndex &parent, int first, int last)
 {
-    onInserted(true, parent, first, last);
+
 }
 
 void HierarchyLevelProxyModelPrivate::onRowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
 {
-    onMoved(true, parent, start, end, destination, row);
+
 }
 
 void HierarchyLevelProxyModelPrivate::onRowsRemoved(const QModelIndex &parent, int first, int last)
 {
-    onRemoved(true, parent, first, last);
+
+}
+
+void HierarchyLevelProxyModelPrivate::beforeLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
+{
+
+}
+
+void HierarchyLevelProxyModelPrivate::afetrLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
+{
+
 }
 
 HierarchyLevelProxyModelPrivate::HierarchyLevelProxyModelPrivate(HierarchyLevelProxyModel *q)
@@ -104,7 +155,7 @@ void HierarchyLevelProxyModel::setSourceModel(QAbstractItemModel *newSourceModel
         QObject::disconnect(*discIter);
      d->m_sourceConnections.clear();
     QAbstractProxyModel::setSourceModel(newSourceModel);
-
+    d->rebuildMapping();
     if (sourceModel()) {
         using namespace std::placeholders;
         d->m_sourceConnections
@@ -180,32 +231,16 @@ void HierarchyLevelProxyModel::setSourceModel(QAbstractItemModel *newSourceModel
                                     })
                 << QObject::connect(sourceModel(), &QAbstractItemModel::modelAboutToBeReset, [this]() -> void { beginResetModel(); })
                 << QObject::connect(sourceModel(), &QAbstractItemModel::modelReset, [d]() -> void { d->afterReset(); });
-        const int sourceCols = sourceModel()->columnCount();
-        const int sourceRows = sourceModel()->rowCount();
-        for (int i = 0; i < sourceRows; ++i)
-            d->m_extraData[0].append(RolesContainer());
-        for (int i = 0; i < sourceCols; ++i)
-            d->m_extraData[1].append(RolesContainer());
     }
-
     endResetModel();
 }
 
 /*!
 \internal
 */
-void InsertProxyModelPrivate::afterReset()
+void HierarchyLevelProxyModelPrivate::afterReset()
 {
-    Q_Q(InsertProxyModel);
-    for (auto &extraData : m_extraData)
-        extraData.clear();
-    const int sourceCols = q->sourceModel()->columnCount();
-    const int sourceRows = q->sourceModel()->rowCount();
-    for (int i = 0; i < sourceRows; ++i)
-        m_extraData[0].append(RolesContainer());
-    for (int i = 0; i < sourceCols; ++i)
-        m_extraData[1].append(RolesContainer());
-    q->endResetModel();
+    rebuildMapping();
 }
 
 /*!
@@ -247,7 +282,16 @@ QVariant HierarchyLevelProxyModel::headerData(int section, Qt::Orientation orien
         return QVariant();
     if(orientation == Qt::Horizontal)
         return sourceModel()->headerData(section, orientation,  role);
-    return QAbstractProxyModel::headerData(section, orientation,  role);
+    //#TODO
+    return 0;
+    Q_D(const HierarchyLevelProxyModel);
+    for(auto i=d->m_roots.constBegin(), iEnd=d->m_roots.constEnd();i!=iEnd;++i){
+        if(i->cachedCumRowCount>section){
+            --i;
+
+        }
+    }
+    return 0;
 }
 
 
@@ -316,7 +360,7 @@ QModelIndex HierarchyLevelProxyModel::mapToSource(const QModelIndex &proxyIndex)
     if (!proxyIndex.isValid())
         return QModelIndex();
     Q_D(const HierarchyLevelProxyModel);
-    if(proxyIndex.parent().isValid() || d->m_roots.size()==1)
+    if(proxyIndex.internalPointer())
         return createSourceIndex(proxyIndex.row(), proxyIndex.column(), proxyIndex.internalPointer());
     if(proxyIndex.row()==0) // optimisation
         return sourceModel()->index(0, proxyIndex.column(),d->m_roots.first().root);
@@ -324,10 +368,13 @@ QModelIndex HierarchyLevelProxyModel::mapToSource(const QModelIndex &proxyIndex)
     for(int i=1;i<d->m_roots.size();++i)
         Q_ASSERT(d->m_roots.at(i).cachedCumRowCount>d->m_roots.at(i-1).cachedCumRowCount);
 #endif
-   for(const auto& rootData : d->m_roots){
+   for(int i=d->m_roots.size()-1;i>=0;--i){
+       const auto& rootData = d->m_roots.at(i);
        if(proxyIndex.row()>=rootData.cachedCumRowCount)
            return sourceModel()->index(proxyIndex.row()-rootData.cachedCumRowCount, proxyIndex.column(),rootData.root);
    }
+   Q_UNREACHABLE();
+   return QModelIndex();
 }
 
 /*!
@@ -356,238 +403,36 @@ QModelIndex HierarchyLevelProxyModel::parent(const QModelIndex &index) const
 QModelIndex HierarchyLevelProxyModel::index(int row, int column, const QModelIndex &parent) const
 {
     Q_ASSERT(parent.isValid() ? parent.model() == this : true);
-    return mapFromSource(sourceModel()->index(row,column,mapToSource(parent)));
-}
-/*!
-\reimp
-*/
-bool InsertProxyModel::insertRows(int row, int count, const QModelIndex &parent)
-{
-    if (parent.isValid())
-        return false;
-    if (!sourceModel())
-        return false;
-    if (row < 0 || row > sourceModel()->rowCount())
-        return false;
-    return sourceModel()->insertRows(row, count);
-}
-/*!
-\reimp
-*/
-bool InsertProxyModel::removeRows(int row, int count, const QModelIndex &parent)
-{
-    if (parent.isValid())
-        return false;
-    if (!sourceModel())
-        return false;
-    if (row < 0 || row > sourceModel()->rowCount())
-        return false;
-    return sourceModel()->removeRows(row, count);
+    if(parent.isValid())
+        return mapFromSource(sourceModel()->index(row,column,mapToSource(parent)));
+    return createIndex(row,column);
 }
 
-/*!
-\reimp
-*/
-bool InsertProxyModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild)
+int HierarchyLevelProxyModel::hierarchyLevel() const
 {
-    if (sourceParent.isValid() || destinationParent.isValid())
-        return false;
-    if (!sourceModel())
-        return false;
-    if (sourceRow + count > sourceModel()->rowCount())
-        return false;
-    if (destinationChild > sourceModel()->rowCount())
-        return false;
-    return sourceModel()->moveRows(QModelIndex(), sourceRow, count, QModelIndex(), destinationChild);
+    Q_D(const HierarchyLevelProxyModel);
+    return d->m_targetLevel;
 }
 
-/*!
-\reimp
-*/
-bool InsertProxyModel::insertColumns(int column, int count, const QModelIndex &parent)
+void HierarchyLevelProxyModel::setHierarchyLevel(int hierarchyLvl)
 {
-    if (parent.isValid())
-        return false;
-    if (!sourceModel())
-        return false;
-    if (column < 0 || column > sourceModel()->columnCount())
-        return false;
-    return sourceModel()->insertColumns(column, count);
-}
-
-/*!
-\reimp
-*/
-bool InsertProxyModel::removeColumns(int column, int count, const QModelIndex &parent)
-{
-    if (parent.isValid())
-        return false;
-    if (!sourceModel())
-        return false;
-    if (column < 0 || column > sourceModel()->columnCount())
-        return false;
-    return sourceModel()->removeColumns(column, count);
-}
-
-/*!
-\reimp
-*/
-bool InsertProxyModel::moveColumns(const QModelIndex &sourceParent, int sourceColumn, int count, const QModelIndex &destinationParent,
-                                   int destinationChild)
-{
-    if (sourceParent.isValid() || destinationParent.isValid())
-        return false;
-    if (!sourceModel())
-        return false;
-    if (sourceColumn + count > sourceModel()->columnCount())
-        return false;
-    if (destinationChild > sourceModel()->columnCount())
-        return false;
-    return sourceModel()->moveColumns(QModelIndex(), sourceColumn, count, QModelIndex(), destinationChild);
-}
-
-/*!
-\reimp
-*/
-void InsertProxyModel::sort(int column, Qt::SortOrder order)
-{
-    if (!sourceModel())
+    Q_D(HierarchyLevelProxyModel);
+    if(hierarchyLvl<0)
+        hierarchyLvl=0;
+    if(hierarchyLvl == d->m_targetLevel)
         return;
-    sourceModel()->sort(column, order);
-}
-
-void InsertProxyModelPrivate::beforeLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
-{
-    if (!parents.isEmpty() && std::all_of(parents.cbegin(), parents.cend(), [](const QPersistentModelIndex &idx) { return idx.isValid(); }))
-        return;
-    Q_Q(InsertProxyModel);
-    Q_ASSERT(q->sourceModel());
-    Q_EMIT q->layoutAboutToBeChanged(QList<QPersistentModelIndex>({QPersistentModelIndex()}), hint);
-    if (hint == QAbstractItemModel::VerticalSortHint)
-        beforeSortRows();
-    else if (hint == QAbstractItemModel::HorizontalSortHint)
-        beforeSortCols();
-    // Not much we can do otherwise
-    const QModelIndexList proxyPersistentIndexes = q->persistentIndexList();
-    m_layoutChangeProxyIndexes.clear();
-    m_layoutChangePersistentIndexes.clear();
-    m_layoutChangeProxyIndexes.reserve(proxyPersistentIndexes.size());
-    m_layoutChangePersistentIndexes.reserve(proxyPersistentIndexes.size());
-    for (const QModelIndex &proxyPersistentIndex : proxyPersistentIndexes) {
-        const QPersistentModelIndex srcPersistentIndex = q->mapToSource(proxyPersistentIndex);
-        if (!srcPersistentIndex.isValid())
-            continue;
-        Q_ASSERT(proxyPersistentIndex.isValid());
-        m_layoutChangeProxyIndexes << proxyPersistentIndex;
-        m_layoutChangePersistentIndexes << srcPersistentIndex;
+    if(sourceModel())
+        beginResetModel();
+    d->m_targetLevel=hierarchyLvl;
+    if(sourceModel()){
+        d->rebuildMapping();
+        endResetModel();
     }
 }
 
-void InsertProxyModelPrivate::afetrLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
-{
-
-    if (!parents.isEmpty() && std::all_of(parents.cbegin(), parents.cend(), [](const QPersistentModelIndex &idx) { return idx.isValid(); }))
-        return;
-    if (hint == QAbstractItemModel::VerticalSortHint)
-        afterSortRows();
-    else if (hint == QAbstractItemModel::HorizontalSortHint)
-        afterSortCols();
-    // Not much we can do otherwise
-    Q_Q(InsertProxyModel);
-    Q_ASSERT(q->sourceModel());
-    QModelIndexList toList;
-    toList.reserve(m_layoutChangePersistentIndexes.size());
-    for (auto i = m_layoutChangePersistentIndexes.cbegin(), listEnd = m_layoutChangePersistentIndexes.cend(); i != listEnd; ++i)
-        toList << q->mapFromSource(*i);
-    q->changePersistentIndexList(m_layoutChangeProxyIndexes, toList);
-    m_layoutChangeProxyIndexes.clear();
-    m_layoutChangePersistentIndexes.clear();
-    Q_EMIT q->layoutChanged(QList<QPersistentModelIndex>({QPersistentModelIndex()}), hint);
-}
-
-void InsertProxyModelPrivate::beforeSortRows()
-{
-    return beforeSort(true);
-}
-
-void InsertProxyModelPrivate::beforeSort(bool isRow)
-{
-    Q_Q(InsertProxyModel);
-    if (!q->sourceModel())
-        return;
-    if ((isRow ? q->sourceModel()->columnCount() : q->sourceModel()->rowCount()) == 0)
-        return;
-    const int maxSortedIdx = isRow ? q->sourceModel()->rowCount() : q->sourceModel()->columnCount();
-    const InsertProxyModel::InsertDirections directionCheck = isRow ? InsertProxyModel::InsertColumn : InsertProxyModel::InsertRow;
-    if (m_insertDirection & directionCheck) {
-        m_layoutChangeExtraProxyIndexes.clear();
-        m_layoutChangeExtraPersistentIndexes.clear();
-        m_layoutChangeExtraProxyIndexes.reserve(maxSortedIdx);
-        m_layoutChangeExtraPersistentIndexes.reserve(maxSortedIdx);
-        const int maxSecondaryIdx = isRow ? q->sourceModel()->columnCount() : q->sourceModel()->rowCount();
-        for (int i = 0; i < maxSortedIdx; ++i) {
-            m_layoutChangeExtraPersistentIndexes.append(isRow ? q->sourceModel()->index(i, 0) : q->sourceModel()->index(0, i));
-            m_layoutChangeExtraProxyIndexes.append(isRow ? q->index(i, maxSecondaryIdx) : q->index(maxSecondaryIdx, i));
-        }
-    }
-}
-
-void InsertProxyModelPrivate::afterSort(bool isRow)
-{
-    Q_Q(InsertProxyModel);
-    const int maxSortedIdx = isRow ? q->sourceModel()->rowCount() : q->sourceModel()->columnCount();
-    const InsertProxyModel::InsertDirections directionCheck = isRow ? InsertProxyModel::InsertColumn : InsertProxyModel::InsertRow;
-    if (m_insertDirection & directionCheck) {
-        const auto oldlayout = m_extraData[!isRow];
-        const int maxSecondaryIdx = isRow ? q->sourceModel()->columnCount() : q->sourceModel()->rowCount();
-        QModelIndexList toList;
-        toList.reserve(maxSortedIdx);
-        Q_ASSERT(m_layoutChangeExtraPersistentIndexes.size() == maxSortedIdx);
-        for (int i = 0; i < maxSortedIdx; ++i) {
-            const int newSortedIdx = isRow ? m_layoutChangeExtraPersistentIndexes.at(i).row() : m_layoutChangeExtraPersistentIndexes.at(i).column();
-            m_extraData[!isRow][newSortedIdx] = oldlayout.at(i);
-            toList << (isRow ? q->index(newSortedIdx, maxSecondaryIdx) : q->index(maxSecondaryIdx, newSortedIdx));
-        }
-        q->changePersistentIndexList(m_layoutChangeExtraProxyIndexes, toList);
-    }
-    m_layoutChangeExtraProxyIndexes.clear();
-    m_layoutChangeExtraPersistentIndexes.clear();
-}
-
-void InsertProxyModelPrivate::afterSortRows()
-{
-    return afterSort(true);
-}
-
-void InsertProxyModelPrivate::beforeSortCols()
-{
-    return beforeSort(false);
-}
-
-void InsertProxyModelPrivate::afterSortCols()
-{
-    return afterSort(false);
-}
 
 
 
-/*!
-\class InsertProxyModel
-\brief This proxy model provides an extra row and column to handle user insertions
-\details This proxy will add an extra row, column or both to allow users to insert new sections with a familiar interface.
-
-You can use setInsertDirection to determine whether to show an extra row or column. By default, this model will behave as QIdentityProxyModel
-
-You can either call commitRow/commitColumn or reimplement validRow/validColumn to decide when a row/column should be added to the main model.
-
-\warning Only flat models are supported. Branches of a tree will be hidden by the proxy
-*/
-
-/*!
-\fn void InsertProxyModel::dataForCornerChanged(int role)
-
-This signal is emitted whenever the data for the corner at the intersection of the extra row and column is changed
-*/
 
 
 
