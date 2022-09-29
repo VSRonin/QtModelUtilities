@@ -45,9 +45,15 @@ class HierarchyLevelProxyModelPrivate
 
     void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
     void onHeaderDataChanged(Qt::Orientation orientation,int first, int last);
+    void onColumnsAboutToBeInserted(const QModelIndex &parent, int first, int last);
+    void onColumnsAboutToBeMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column);
+    void onColumnsAboutToBeRemoved(const QModelIndex &parent, int first, int last);
     void onColumnsInserted(const QModelIndex &parent, int first, int last);
     void onColumnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column);
     void onColumnsRemoved(const QModelIndex &parent, int first, int last);
+    void onRowsAboutToBeInserted(const QModelIndex &parent, int first, int last);
+    void onRowsAboutToBeMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row);
+    void onRowsAboutToBeRemoved(const QModelIndex &parent, int first, int last);
     void onRowsInserted(const QModelIndex &parent, int first, int last);
     void onRowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row);
     void onRowsRemoved(const QModelIndex &parent, int first, int last);

@@ -42,21 +42,20 @@ void HierarchyLevelProxyModelPrivate::rebuildMapping()
     int rootsRowCount=0;
     rebuildMappingBranch(QModelIndex(),0,rootsRowCount);
 }
+
 void HierarchyLevelProxyModelPrivate::rebuildMappingBranch(const QModelIndex& parent, int levl, int& rootsRowCount)
 {
     Q_Q(HierarchyLevelProxyModel);
     for(int i=0, iMax = q->sourceModel()->rowCount(parent);i<iMax;++i){
         for(int j=0, jMax = q->sourceModel()->columnCount(parent);j<jMax;++j){
             const QModelIndex currIdx = q->sourceModel()->index(i,j,parent);
-            if(q->sourceModel()->hasChildren(currIdx)){
-                if(levl==m_targetLevel-1){
-                    m_roots.append(HierarchyRootData(currIdx,rootsRowCount));
-                    rootsRowCount+=q->sourceModel()->rowCount(currIdx);
-                    m_maxCol = qMax(m_maxCol,q->sourceModel()->columnCount(currIdx));
-                }
-                else{
-                    rebuildMappingBranch(currIdx,levl+1,rootsRowCount);
-                }
+            if(levl==m_targetLevel-1){
+                m_roots.append(HierarchyRootData(currIdx,rootsRowCount));
+                rootsRowCount+=q->sourceModel()->rowCount(currIdx);
+                m_maxCol = qMax(m_maxCol,q->sourceModel()->columnCount(currIdx));
+            }
+            else{
+                rebuildMappingBranch(currIdx,levl+1,rootsRowCount);
             }
         }
     }
@@ -65,27 +64,86 @@ void HierarchyLevelProxyModelPrivate::rebuildMappingBranch(const QModelIndex& pa
 
 void HierarchyLevelProxyModelPrivate::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
+    Q_Q(HierarchyLevelProxyModel);
+    Q_ASSERT(topLeft.isValid() && bottomRight.isValid() && topLeft.model()==q->sourceModel() &&  topLeft.model()==bottomRight.model() && bottomRight.parent()==topLeft.parent());
+    const QModelIndex mappedTopLeft = q->mapFromSource(topLeft);
+    if(mappedTopLeft.isValid())
+        emit q->dataChanged(mappedTopLeft,q->mapFromSource(bottomRight),roles);
+}
 
+void HierarchyLevelProxyModelPrivate::onHeaderDataChanged(Qt::Orientation orientation, int first, int last)
+{
+    //#TODO
+}
+
+void HierarchyLevelProxyModelPrivate::onColumnsAboutToBeInserted(const QModelIndex &parent, int first, int last)
+{
+    //#TODO
+}
+
+void HierarchyLevelProxyModelPrivate::onColumnsAboutToBeMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)
+{
+    //#TODO
+}
+
+void HierarchyLevelProxyModelPrivate::onColumnsAboutToBeRemoved(const QModelIndex &parent, int first, int last)
+{
+    //#TODO
 }
 
 void HierarchyLevelProxyModelPrivate::onColumnsInserted(const QModelIndex &parent, int first, int last)
 {
-
+    //#TODO
 }
 
 void HierarchyLevelProxyModelPrivate::onColumnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)
 {
-
+    //#TODO
 }
 
 void HierarchyLevelProxyModelPrivate::onColumnsRemoved(const QModelIndex &parent, int first, int last)
 {
+    //#TODO
+}
 
+void HierarchyLevelProxyModelPrivate::onRowsAboutToBeInserted(const QModelIndex &parent, int first, int last)
+{
+    Q_Q(HierarchyLevelProxyModel);
+    for(auto i=m_roots.begin(), iEnd=m_roots.end();i!=iEnd;++i){
+        if(i->root==parent){
+            q->beginInsertRows(QModelIndex(),i->cachedCumRowCount+first,i->cachedCumRowCount+last);
+            return;
+        }
+    }
+    const QModelIndex mappedParent = q->mapFromSource(parent);
+    if(mappedParent.isValid()){
+        q->beginInsertRows(mappedParent,first,last);
+    }
+    //#TODO row added to parent that didn't have one
+}
+
+void HierarchyLevelProxyModelPrivate::onRowsAboutToBeMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
+{
+    //#TODO
+}
+
+void HierarchyLevelProxyModelPrivate::onRowsAboutToBeRemoved(const QModelIndex &parent, int first, int last)
+{
+    //#TODO
 }
 
 void HierarchyLevelProxyModelPrivate::onRowsInserted(const QModelIndex &parent, int first, int last)
 {
+    Q_Q(HierarchyLevelProxyModel);
+    for(auto i=m_roots.begin(), iEnd=m_roots.end();i!=iEnd;++i){
+        if(i->root==parent){
 
+            for(++i;i!=iEnd;++i)
+                i->cachedCumRowCount+=last-first+1;
+            q->endInsertRows();
+            return;
+        }
+    }
 }
 
 void HierarchyLevelProxyModelPrivate::onRowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
@@ -106,6 +164,13 @@ void HierarchyLevelProxyModelPrivate::beforeLayoutChange(const QList<QPersistent
 void HierarchyLevelProxyModelPrivate::afetrLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
 {
 
+}
+
+void HierarchyLevelProxyModelPrivate::afterReset()
+{
+    rebuildMapping();
+    Q_Q(HierarchyLevelProxyModel);
+    q->endResetModel();
 }
 
 HierarchyLevelProxyModelPrivate::HierarchyLevelProxyModelPrivate(HierarchyLevelProxyModel *q)
@@ -136,9 +201,6 @@ Destructor
 */
 HierarchyLevelProxyModel::~HierarchyLevelProxyModel()
 {
-    Q_D(HierarchyLevelProxyModel);
-    for (auto discIter = d->m_sourceConnections.cbegin(); discIter != d->m_sourceConnections.cend(); ++discIter)
-        QObject::disconnect(*discIter);
     delete m_dptr;
 }
 
@@ -160,88 +222,28 @@ void HierarchyLevelProxyModel::setSourceModel(QAbstractItemModel *newSourceModel
         using namespace std::placeholders;
         d->m_sourceConnections
                 << QObject::connect(sourceModel(), &QAbstractItemModel::dataChanged, this, std::bind(&HierarchyLevelProxyModelPrivate::onDataChanged,d,_1,_2,_3))
-                << QObject::connect(sourceModel(), &QAbstractItemModel::headerDataChanged, this, &QAbstractItemModel::headerDataChanged)
-                << QObject::connect(sourceModel(), &QAbstractItemModel::layoutAboutToBeChanged,
-                                    [d](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {
-                                        d->beforeLayoutChange(parents, hint);
-                                    })
-                << QObject::connect(sourceModel(), &QAbstractItemModel::layoutChanged,
-                                    [d](const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint) {
-                                        d->afetrLayoutChange(parents, hint);
-                                    })
-                << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeInserted,
-                                    [this](const QModelIndex &parent, int first, int last) {
-                                        if (!parent.isValid()) {
-                                            beginInsertColumns(QModelIndex(), first, last);
-                                        }
-                                    })
-                << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeMoved,
-                                    [this](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
-                                           int destinationColumn) {
-                                        if (sourceParent.isValid())
-                                            return;
-                                        if (destinationParent.isValid())
-                                            beginRemoveColumns(QModelIndex(), sourceStart, sourceEnd);
-                                        else
-                                            beginMoveColumns(QModelIndex(), sourceStart, sourceEnd, QModelIndex(), destinationColumn);
-                                    })
-                << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeRemoved,
-                                    [this](const QModelIndex &parent, int first, int last) {
-                                        if (!parent.isValid()) {
-                                            beginRemoveColumns(QModelIndex(), first, last);
-                                        }
-                                    })
-                << QObject::connect(sourceModel(), &QAbstractItemModel::columnsInserted,
-                                    [d](const QModelIndex &parent, int first, int last) -> void { d->onColumnsInserted(parent, first, last); })
-                << QObject::connect(sourceModel(), &QAbstractItemModel::columnsRemoved,
-                                    [d](const QModelIndex &parent, int first, int last) -> void { d->onColumnsRemoved(parent, first, last); })
-                << QObject::connect(sourceModel(), &QAbstractItemModel::columnsMoved,
-                                    [d](const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column) -> void {
-                                        d->onColumnsMoved(parent, start, end, destination, column);
-                                    })
-                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeInserted,
-                                    [this](const QModelIndex &parent, int first, int last) {
-                                        if (!parent.isValid()) {
-                                            beginInsertRows(QModelIndex(), first, last);
-                                        }
-                                    })
-                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeMoved,
-                                    [this](const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent,
-                                           int destinationRow) {
-                                        if (sourceParent.isValid())
-                                            return;
-                                        if (destinationParent.isValid())
-                                            beginRemoveRows(QModelIndex(), sourceStart, sourceEnd);
-                                        else
-                                            beginMoveRows(QModelIndex(), sourceStart, sourceEnd, QModelIndex(), destinationRow);
-                                    })
-                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeRemoved,
-                                    [this](const QModelIndex &parent, int first, int last) {
-                                        if (!parent.isValid()) {
-                                            beginRemoveRows(QModelIndex(), first, last);
-                                        }
-                                    })
-                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsInserted,
-                                    [d](const QModelIndex &parent, int first, int last) -> void { d->onRowsInserted(parent, first, last); })
-                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsRemoved,
-                                    [d](const QModelIndex &parent, int first, int last) -> void { d->onRowsRemoved(parent, first, last); })
-                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsMoved,
-                                    [d](const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row) -> void {
-                                        d->onRowsMoved(parent, start, end, destination, row);
-                                    })
-                << QObject::connect(sourceModel(), &QAbstractItemModel::modelAboutToBeReset, [this]() -> void { beginResetModel(); })
-                << QObject::connect(sourceModel(), &QAbstractItemModel::modelReset, [d]() -> void { d->afterReset(); });
+                << QObject::connect(sourceModel(), &QAbstractItemModel::headerDataChanged,this, std::bind(&HierarchyLevelProxyModelPrivate::onHeaderDataChanged,d,_1,_2,_3))
+                << QObject::connect(sourceModel(), &QAbstractItemModel::layoutAboutToBeChanged,this, std::bind(&HierarchyLevelProxyModelPrivate::beforeLayoutChange,d,_1,_2))
+                << QObject::connect(sourceModel(), &QAbstractItemModel::layoutChanged,this, std::bind(&HierarchyLevelProxyModelPrivate::afetrLayoutChange,d,_1,_2))
+                << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeInserted, this, std::bind(&HierarchyLevelProxyModelPrivate::onColumnsAboutToBeInserted,d,_1,_2,_3))
+                << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeMoved, this, std::bind(&HierarchyLevelProxyModelPrivate::onColumnsAboutToBeMoved,d,_1,_2,_3,_4,_5))
+                << QObject::connect(sourceModel(), &QAbstractItemModel::columnsAboutToBeRemoved, this, std::bind(&HierarchyLevelProxyModelPrivate::onColumnsAboutToBeRemoved,d,_1,_2,_3))
+                << QObject::connect(sourceModel(), &QAbstractItemModel::columnsInserted, this, std::bind(&HierarchyLevelProxyModelPrivate::onColumnsInserted,d,_1,_2,_3))
+                << QObject::connect(sourceModel(), &QAbstractItemModel::columnsRemoved,this, std::bind(&HierarchyLevelProxyModelPrivate::onColumnsRemoved,d,_1,_2,_3))
+                << QObject::connect(sourceModel(), &QAbstractItemModel::columnsMoved,this, std::bind(&HierarchyLevelProxyModelPrivate::onColumnsMoved,d,_1,_2,_3,_4,_5))
+                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeInserted,this, std::bind(&HierarchyLevelProxyModelPrivate::onRowsAboutToBeInserted,d,_1,_2,_3))
+                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeMoved,this,std::bind(&HierarchyLevelProxyModelPrivate::onRowsAboutToBeMoved,d,_1,_2,_3,_4,_5))
+                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsAboutToBeRemoved, this, std::bind(&HierarchyLevelProxyModelPrivate::onRowsAboutToBeRemoved,d,_1,_2,_3))
+                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsInserted,this, std::bind(&HierarchyLevelProxyModelPrivate::onRowsInserted,d,_1,_2,_3))
+                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsRemoved,this, std::bind(&HierarchyLevelProxyModelPrivate::onRowsRemoved,d,_1,_2,_3))
+                << QObject::connect(sourceModel(), &QAbstractItemModel::rowsMoved,this,std::bind(&HierarchyLevelProxyModelPrivate::onRowsMoved,d,_1,_2,_3,_4,_5))
+                << QObject::connect(sourceModel(), &QAbstractItemModel::modelAboutToBeReset,this,&HierarchyLevelProxyModel::beginResetModel)
+                << QObject::connect(sourceModel(), &QAbstractItemModel::modelReset, this,std::bind(&HierarchyLevelProxyModelPrivate::afterReset,d));
     }
     endResetModel();
 }
 
-/*!
-\internal
-*/
-void HierarchyLevelProxyModelPrivate::afterReset()
-{
-    rebuildMapping();
-}
+
 
 /*!
 \reimp
@@ -352,6 +354,19 @@ QModelIndex HierarchyLevelProxyModel::mapFromSource(const QModelIndex &sourceInd
 /*!
 \reimp
 */
+bool HierarchyLevelProxyModel::hasChildren(const QModelIndex &parent) const
+{
+    if(!sourceModel())
+        return false;
+    Q_D(const HierarchyLevelProxyModel);
+    if(!parent.isValid() && d->m_targetLevel>0)
+        return columnCount()>0 && rowCount()>0;
+    return sourceModel()->hasChildren(mapToSource(parent));
+}
+
+/*!
+\reimp
+*/
 QModelIndex HierarchyLevelProxyModel::mapToSource(const QModelIndex &proxyIndex) const
 {
     Q_ASSERT(proxyIndex.isValid() ? proxyIndex.model() == this : true);
@@ -366,7 +381,7 @@ QModelIndex HierarchyLevelProxyModel::mapToSource(const QModelIndex &proxyIndex)
         return sourceModel()->index(0, proxyIndex.column(),d->m_roots.first().root);
 #ifdef QT_DEBUG
     for(int i=1;i<d->m_roots.size();++i)
-        Q_ASSERT(d->m_roots.at(i).cachedCumRowCount>d->m_roots.at(i-1).cachedCumRowCount);
+        Q_ASSERT(d->m_roots.at(i).cachedCumRowCount>=d->m_roots.at(i-1).cachedCumRowCount);
 #endif
    for(int i=d->m_roots.size()-1;i>=0;--i){
        const auto& rootData = d->m_roots.at(i);
