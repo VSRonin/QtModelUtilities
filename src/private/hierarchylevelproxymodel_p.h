@@ -18,13 +18,8 @@
 struct HierarchyRootData{
     QPersistentModelIndex root;
     int cachedCumRowCount=0;
-    HierarchyRootData(const QPersistentModelIndex& rt, int rc)
-        :root(rt)
-        ,cachedCumRowCount(rc)
-    {}
-    HierarchyRootData()
-        :HierarchyRootData(QPersistentModelIndex(),0)
-    {}
+    HierarchyRootData(const QPersistentModelIndex& rt, int rc);
+    HierarchyRootData();
 };
 
 class HierarchyLevelProxyModelPrivate
@@ -40,6 +35,7 @@ class HierarchyLevelProxyModelPrivate
     QModelIndexList m_layoutChangeProxyIndexes;
     QVector<QMetaObject::Connection> m_sourceConnections;
     int rootOf(QModelIndex sourceIndex) const;
+    static int levelOf(QModelIndex idx);
     void rebuildMapping();
     void rebuildMappingBranch(const QModelIndex& parent, int levl, int &rootsRowCount);
 
@@ -64,6 +60,7 @@ class HierarchyLevelProxyModelPrivate
     void beforeLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint);
     void afetrLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint);
     void afterReset();
+
 };
 
 #endif // HIERARCHYLEVELPROXY_P_H

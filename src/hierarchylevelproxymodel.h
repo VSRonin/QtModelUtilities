@@ -43,8 +43,8 @@ public:
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const override;
     QModelIndex parent(const QModelIndex &index) const override;
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
-    /*
     bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+    /*
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent,
                   int destinationChild) override;
