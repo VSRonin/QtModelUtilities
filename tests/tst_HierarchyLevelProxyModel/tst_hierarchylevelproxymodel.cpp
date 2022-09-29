@@ -144,6 +144,7 @@ void tst_HierarchyLevelProxyModel::testDisconnectedModel()
     new ModelTest(&proxyModel, this);
     proxyModel.setSourceModel(&baseModel1);
     QSignalSpy proxyDataChangeSpy(&proxyModel, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)));
+    QVERIFY(proxyDataChangeSpy.isValid());
     baseModel1.setData(baseModel1.index(0, 0), QStringLiteral("New York"));
     QCOMPARE(proxyDataChangeSpy.count(), 1);
     proxyDataChangeSpy.clear();
@@ -208,60 +209,67 @@ void tst_HierarchyLevelProxyModel::testData_data()
 
 void tst_HierarchyLevelProxyModel::testSetData()
 {
-    /*
     QFETCH(QAbstractItemModel *, baseModel);
-    QFETCH(int, idxRow);
-    QFETCH(int, idxCol);
     if (!baseModel)
         return;
     HierarchyLevelProxyModel proxyModel;
     new ModelTest(&proxyModel, baseModel);
     proxyModel.setSourceModel(baseModel);
-    const QModelIndex proxyIdX = proxyModel.index(idxRow, idxCol);
-    const QString idxData = QStringLiteral("Test");
-    QVERIFY(proxyModel.setData(proxyIdX, idxData, Qt::DisplayRole));
-    QCOMPARE(proxyModel.data(proxyIdX, Qt::DisplayRole).toString(), idxData);
-    QCOMPARE(proxyModel.data(proxyIdX, Qt::EditRole).toString(), idxData);
+    QSignalSpy proxyDataChangeSpy(&proxyModel, &QAbstractItemModel::dataChanged);
+    QSignalSpy sourceDataChangeSpy(baseModel, &QAbstractItemModel::dataChanged);
+    const QModelIndex proxyIdX = proxyModel.index(0, 0);
+    QString idxData = QStringLiteral("Test");
+    QVERIFY(proxyModel.setData(proxyIdX, idxData));
+    QCOMPARE(proxyModel.data(proxyIdX).toString(), idxData);
+    QCOMPARE(baseModel->index(0,0).data().toString(), idxData);
+    QCOMPARE(proxyDataChangeSpy.count(), 1);
+    QCOMPARE(sourceDataChangeSpy.count(), 1);
+    auto spyArgs = proxyDataChangeSpy.takeFirst();
+    QCOMPARE(spyArgs.at(0).value<QModelIndex>(), proxyIdX);
+    QCOMPARE(spyArgs.at(1).value<QModelIndex>(), proxyIdX);
+    spyArgs = sourceDataChangeSpy.takeFirst();
+    QCOMPARE(spyArgs.at(0).value<QModelIndex>(), baseModel->index(0,0));
+    QCOMPARE(spyArgs.at(1).value<QModelIndex>(), baseModel->index(0,0));
     baseModel->deleteLater();
-    */
-    //#TODO
+    if(baseModel->hasChildren(baseModel->index(0,0))){
+        const QModelIndex proxyChildIdX = proxyModel.index(0, 0, proxyIdX);
+        QVERIFY(proxyModel.setData(proxyChildIdX, idxData));
+        QCOMPARE(proxyModel.data(proxyChildIdX).toString(), idxData);
+        QCOMPARE(baseModel->index(0,0,baseModel->index(0,0)).data().toString(), idxData);
+        QCOMPARE(proxyDataChangeSpy.count(), 1);
+        QCOMPARE(sourceDataChangeSpy.count(), 1);
+        auto spyArgs = proxyDataChangeSpy.takeFirst();
+        QCOMPARE(spyArgs.at(0).value<QModelIndex>(), proxyChildIdX);
+        QCOMPARE(spyArgs.at(1).value<QModelIndex>(), proxyChildIdX);
+        spyArgs = sourceDataChangeSpy.takeFirst();
+        QCOMPARE(spyArgs.at(0).value<QModelIndex>(), baseModel->index(0,0,baseModel->index(0,0)));
+        QCOMPARE(spyArgs.at(1).value<QModelIndex>(), baseModel->index(0,0,baseModel->index(0,0)));
+    }
+    proxyModel.setHierarchyLevel(1);
+    idxData+=QStringLiteral("Test2");
+    if(baseModel->hasChildren(baseModel->index(0,0))){
+        QVERIFY(proxyModel.setData(proxyModel.index(0, 0), idxData));
+        QCOMPARE(proxyModel.data(proxyModel.index(0, 0)).toString(), idxData);
+        QCOMPARE(baseModel->index(0,0,baseModel->index(0,0)).data().toString(), idxData);
+        QCOMPARE(proxyDataChangeSpy.count(), 1);
+        QCOMPARE(sourceDataChangeSpy.count(), 1);
+        auto spyArgs = proxyDataChangeSpy.takeFirst();
+        QCOMPARE(spyArgs.at(0).value<QModelIndex>(), proxyModel.index(0, 0));
+        QCOMPARE(spyArgs.at(1).value<QModelIndex>(), proxyModel.index(0, 0));
+        spyArgs = sourceDataChangeSpy.takeFirst();
+        QCOMPARE(spyArgs.at(0).value<QModelIndex>(), baseModel->index(0,0,baseModel->index(0,0)));
+        QCOMPARE(spyArgs.at(1).value<QModelIndex>(), baseModel->index(0,0,baseModel->index(0,0)));
+    }
+    else{
+        QVERIFY(!proxyModel.setData(proxyModel.index(0,0), idxData));
+    }
 }
 
 void tst_HierarchyLevelProxyModel::testSetData_data()
 {
-    /*
     QTest::addColumn<QAbstractItemModel *>("baseModel");
-    QTest::addColumn<int>("idxRow");
-    QTest::addColumn<int>("idxCol");
-    QTest::newRow("List Inside Base Model") << createListModel(this) << 0 << 0;
-    QAbstractItemModel *baseModel = createListModel(this);
-    QTest::newRow("List Extra Row") << baseModel << baseModel->rowCount() << 0;
-    baseModel = createListModel(this);
-    QTest::newRow("List Extra Col") << baseModel << 0 << baseModel->columnCount();
-    baseModel = createListModel(this);
-    QTest::newRow("List Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
-    QTest::newRow("Table Inside Base Model") << createTableModel(this) << 0 << 0;
-    baseModel = createTableModel(this);
-    if (baseModel)
-        QTest::newRow("Table Extra Row") << baseModel << baseModel->rowCount() << 0;
-    baseModel = createTableModel(this);
-    if (baseModel)
-        QTest::newRow("Table Extra Col") << baseModel << 0 << baseModel->columnCount();
-    baseModel = createTableModel(this);
-    if (baseModel)
-        QTest::newRow("Table Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
-    QTest::newRow("Tree Inside Base Model") << createTreeModel(this) << 0 << 0;
-    baseModel = createTreeModel(this);
-    if (baseModel)
-        QTest::newRow("Tree Extra Row") << baseModel << baseModel->rowCount() << 0;
-    baseModel = createTreeModel(this);
-    if (baseModel)
-        QTest::newRow("Tree Extra Col") << baseModel << 0 << baseModel->columnCount();
-    baseModel = createTreeModel(this);
-    if (baseModel)
-        QTest::newRow("Tree Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
-    */
-    //#TODO
+    QTest::newRow("List") << createListModel(this);
+    QTest::newRow("Tree") << createTreeModel(this);
 }
 
 void tst_HierarchyLevelProxyModel::testSetItemData_data()
