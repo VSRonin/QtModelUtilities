@@ -17,10 +17,9 @@ class GuardedModel : public T
     }
 
 public:
-    /*GuardedModel(QObject *parent = nullptr)
+    GuardedModel(QObject *parent = nullptr)
         : T(parent)
-    { }*/
-    using T::T;
+    { }
     QModelIndex buddy(const QModelIndex &index) const override
     {
         Q_ASSERT(verifyIndex(index));

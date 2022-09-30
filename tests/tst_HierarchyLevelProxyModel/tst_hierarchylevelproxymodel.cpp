@@ -14,7 +14,7 @@ QAbstractItemModel *createNullModel(QObject *parent)
 
 QAbstractItemModel *createListModel(QObject *parent)
 {
-    return new GuardedModel<SimpleModel>(
+    return new SimpleModel(
             QStringList() << QStringLiteral("1") << QStringLiteral("2") << QStringLiteral("3") << QStringLiteral("4") << QStringLiteral("5"), parent);
 }
 
@@ -22,7 +22,7 @@ QAbstractItemModel *createTreeModel(QObject *parent, int rows=5, int cols=3)
 {
     QAbstractItemModel *result = nullptr;
 #ifdef COMPLEX_MODEL_SUPPORT
-    result = new GuardedModel<ComplexModel>(parent);
+    result = new ComplexModel(parent);
     result->insertRows(0, rows);
     result->insertColumns(0, cols);
     for (int i = 0; i < result->rowCount(); ++i) {

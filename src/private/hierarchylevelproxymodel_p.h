@@ -31,11 +31,13 @@ class HierarchyLevelProxyModelPrivate
     QVector<HierarchyRootData> m_roots;
     int m_maxCol;
     int m_targetLevel;
+    const char m_inexistentSourceIndexFlag;
     QVector<QPersistentModelIndex> m_layoutChangePersistentIndexes;
     QModelIndexList m_layoutChangeProxyIndexes;
     QVector<QMetaObject::Connection> m_sourceConnections;
     int rootOf(QModelIndex sourceIndex) const;
     static int levelOf(QModelIndex idx);
+    bool inexistentAtSource(const QModelIndex& idx) const;
     void rebuildMapping();
     void rebuildMappingBranch(const QModelIndex& parent, int levl, int &rootsRowCount);
 

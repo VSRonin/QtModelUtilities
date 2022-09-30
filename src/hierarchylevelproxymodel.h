@@ -35,10 +35,8 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) override;
-#if (QT_VERSION < QT_VERSION_CHECK(6, 3, 0))
     QMap<int, QVariant> itemData(const QModelIndex &index) const override;
     bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles) override;
-#endif
     QModelIndex mapFromSource(const QModelIndex &sourceIndex) const override;
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const override;
     QModelIndex parent(const QModelIndex &index) const override;

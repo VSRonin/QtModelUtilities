@@ -35,6 +35,11 @@ int HierarchyLevelProxyModelPrivate::levelOf(QModelIndex idx)
     return result;
 }
 
+bool HierarchyLevelProxyModelPrivate::inexistentAtSource(const QModelIndex &idx) const
+{
+    return idx.internalPointer()==&m_inexistentSourceIndexFlag;
+}
+
 void HierarchyLevelProxyModelPrivate::rebuildMapping()
 {
     m_roots.clear();
@@ -151,9 +156,7 @@ void HierarchyLevelProxyModelPrivate::onRowsInserted(const QModelIndex &parent, 
             return;
         }
     }
-    if(levelOf(parent)==m_targetLevel-1){
-        if(q->sourceModel()->columnCount(parent)==0)
-            return;
+    if(levelOf(parent)==m_targetLevel-1 && q->sourceModel()->columnCount(parent)>0){
         int newCachedCumRowCount=0;
         if(first<m_roots.size())
             newCachedCumRowCount = m_roots.at(first).cachedCumRowCount;
@@ -195,6 +198,7 @@ HierarchyLevelProxyModelPrivate::HierarchyLevelProxyModelPrivate(HierarchyLevelP
     : q_ptr(q)
     , m_maxCol(0)
     , m_targetLevel(0)
+    , m_inexistentSourceIndexFlag(0)
 {
     Q_ASSERT(q_ptr);
 }
@@ -271,6 +275,8 @@ int HierarchyLevelProxyModel::rowCount(const QModelIndex &parent) const
     if (!sourceModel())
         return 0;
     Q_D(const HierarchyLevelProxyModel);
+    if(d->inexistentAtSource(parent))
+        return 0;
     if (!parent.isValid()){
         if(d->m_roots.isEmpty())
             return 0;
@@ -288,6 +294,8 @@ int HierarchyLevelProxyModel::columnCount(const QModelIndex &parent) const
     if (!sourceModel())
         return 0;
     Q_D(const HierarchyLevelProxyModel);
+    if(d->inexistentAtSource(parent))
+        return 0;
     if (!parent.isValid())
         return d->m_maxCol;
     return sourceModel()->columnCount(mapToSource(parent));
@@ -328,7 +336,6 @@ bool HierarchyLevelProxyModel::setHeaderData(int section, Qt::Orientation orient
     return QAbstractProxyModel::setHeaderData(section, orientation, value, role);
 }
 
-#if (QT_VERSION < QT_VERSION_CHECK(6, 3, 0))
 /*!
 \reimp
 */
@@ -336,6 +343,9 @@ bool HierarchyLevelProxyModel::setItemData(const QModelIndex &index, const QMap<
     if(!sourceModel())
         return false;
     Q_ASSERT(index.isValid() ? index.model() == this : true);
+    Q_D(const HierarchyLevelProxyModel);
+    if(d->inexistentAtSource(index))
+        return false;
     return sourceModel()->setItemData(mapToSource(index), roles);
 }
 /*!
@@ -345,9 +355,11 @@ QMap<int, QVariant> HierarchyLevelProxyModel::itemData(const QModelIndex &index)
     if(!sourceModel())
         return QMap<int, QVariant>();
     Q_ASSERT(index.isValid() ? index.model() == this : true);
+    Q_D(const HierarchyLevelProxyModel);
+    if(d->inexistentAtSource(index))
+        return QMap<int, QVariant>();
     return sourceModel()->itemData(mapToSource(index));
 }
-#endif
 
 /*!
 \reimp
@@ -377,6 +389,8 @@ bool HierarchyLevelProxyModel::hasChildren(const QModelIndex &parent) const
     if(!sourceModel())
         return false;
     Q_D(const HierarchyLevelProxyModel);
+    if(d->inexistentAtSource(parent))
+        return false;
     if(!parent.isValid() && d->m_targetLevel>0)
         return columnCount()>0 && rowCount()>0;
     return sourceModel()->hasChildren(mapToSource(parent));
@@ -393,6 +407,8 @@ QModelIndex HierarchyLevelProxyModel::mapToSource(const QModelIndex &proxyIndex)
     if (!proxyIndex.isValid())
         return QModelIndex();
     Q_D(const HierarchyLevelProxyModel);
+    if(d->inexistentAtSource(proxyIndex))
+        return QModelIndex();
     if(proxyIndex.internalPointer())
         return createSourceIndex(proxyIndex.row(), proxyIndex.column(), proxyIndex.internalPointer());
     if(proxyIndex.row()==0) // optimisation
@@ -416,7 +432,8 @@ QModelIndex HierarchyLevelProxyModel::mapToSource(const QModelIndex &proxyIndex)
 Qt::ItemFlags HierarchyLevelProxyModel::flags(const QModelIndex &index) const
 {
     Q_ASSERT(index.isValid() ? index.model() == this : true);
-    if (!sourceModel())
+    Q_D(const HierarchyLevelProxyModel);
+    if (!sourceModel() || d->inexistentAtSource(index))
         return Qt::NoItemFlags;
     return sourceModel()->flags(mapToSource(index));
 }
@@ -427,6 +444,9 @@ Qt::ItemFlags HierarchyLevelProxyModel::flags(const QModelIndex &index) const
 QModelIndex HierarchyLevelProxyModel::parent(const QModelIndex &index) const
 {
     Q_ASSERT(index.isValid() ? index.model() == this : true);
+    Q_D(const HierarchyLevelProxyModel);
+    if (!sourceModel() || d->inexistentAtSource(index))
+        return QModelIndex();
     return mapFromSource(mapToSource(index).parent());
 }
 
@@ -436,8 +456,20 @@ QModelIndex HierarchyLevelProxyModel::parent(const QModelIndex &index) const
 QModelIndex HierarchyLevelProxyModel::index(int row, int column, const QModelIndex &parent) const
 {
     Q_ASSERT(parent.isValid() ? parent.model() == this : true);
-    if(parent.isValid())
-        return mapFromSource(sourceModel()->index(row,column,mapToSource(parent)));
+    Q_D(const HierarchyLevelProxyModel);
+    if(parent.isValid()){
+        const QModelIndex mappedParent = mapToSource(parent);
+        if(sourceModel()->hasIndex(row,column,mappedParent))
+            return mapFromSource(sourceModel()->index(row,column,mappedParent));
+        return createIndex(row,column,&(d->m_inexistentSourceIndexFlag));
+    }
+    for(auto i=std::rbegin(d->m_roots), iEnd=std::rend(d->m_roots);i!=iEnd;++i){
+        if(row>=i->cachedCumRowCount){
+            if(sourceModel()->hasIndex(row-i->cachedCumRowCount,column,i->root))
+                break;
+            return createIndex(row,column,&(d->m_inexistentSourceIndexFlag));
+        }
+    }
     return createIndex(row,column);
 }
 
@@ -447,6 +479,8 @@ QModelIndex HierarchyLevelProxyModel::index(int row, int column, const QModelInd
 bool HierarchyLevelProxyModel::insertRows(int row, int count, const QModelIndex &parent)
 {
     Q_D(const HierarchyLevelProxyModel);
+    if (!sourceModel() || d->inexistentAtSource(parent))
+        return false;
     if(!parent.isValid() && d->m_targetLevel>0){
         for(auto i=std::rbegin(d->m_roots), iEnd=std::rend(d->m_roots);i!=iEnd;++i){
             if(row>=i->cachedCumRowCount){

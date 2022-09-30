@@ -22,11 +22,6 @@ int main(int argc, char *argv[])
     hierarchyLevelProxy->setHierarchyLevel(1);
     hierarchyLevelProxy->setSourceModel(baseModel);
 
-    baseModel->insertRow(1);
-    baseModel->insertColumn(0,baseModel->index(1,0));
-    baseModel->insertRow(0,baseModel->index(1,0));
-    baseModel->setData(baseModel->index(0,0,baseModel->index(1,0)),QStringLiteral("Test"));
-
     // Create a view for the base model and a view for the proxy
     QTreeView *baseView = new QTreeView(&mainWid);
     baseView->header()->setSectionResizeMode(QHeaderView::Stretch);
