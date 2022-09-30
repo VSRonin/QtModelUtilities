@@ -12,6 +12,7 @@
 \****************************************************************************/
 #include "private/hierarchylevelproxymodel_p.h"
 #include "hierarchylevelproxymodel.h"
+#include <QSize>
 
 int HierarchyLevelProxyModelPrivate::rootOf(QModelIndex sourceIndex) const
 {
@@ -127,18 +128,11 @@ void HierarchyLevelProxyModelPrivate::onRowsAboutToBeInserted(const QModelIndex 
         }
     }
     const QModelIndex mappedParent = q->mapFromSource(parent);
-    if(mappedParent.isValid()){
+    if(mappedParent.isValid())
         q->beginInsertRows(mappedParent,first,last);
-    }
-
 }
 
 void HierarchyLevelProxyModelPrivate::onRowsAboutToBeMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
-{
-    //#TODO
-}
-
-void HierarchyLevelProxyModelPrivate::onRowsAboutToBeRemoved(const QModelIndex &parent, int first, int last)
 {
     //#TODO
 }
@@ -167,22 +161,51 @@ void HierarchyLevelProxyModelPrivate::onRowsInserted(const QModelIndex &parent, 
 
 void HierarchyLevelProxyModelPrivate::onRowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
 {
+    //#TODO
+}
 
+void HierarchyLevelProxyModelPrivate::onRowsAboutToBeRemoved(const QModelIndex &parent, int first, int last)
+{
+    const auto isAncestor = [&parent](QModelIndex idx)->bool{
+        for(;idx.parent().isValid();idx=idx.parent()){
+            if(idx.parent()==parent)
+                return true;
+        }
+        return false;
+    };
+    Q_Q(HierarchyLevelProxyModel);
+    std::pair<int,int> rootsAboutToBeRemoved(-1,-1);
+    for(auto i=m_roots.begin(), iEnd=m_roots.end();i!=iEnd;++i){
+        if(i->root==parent){
+            q->beginRemoveRows(QModelIndex(),i->cachedCumRowCount+first,i->cachedCumRowCount+last);
+            return;
+        }
+        if(isAncestor(i->root)){
+            if(rootsAboutToBeRemoved.first<0)
+                rootsAboutToBeRemoved.first = i->cachedCumRowCount;
+            rootsAboutToBeRemoved.second = i->cachedCumRowCount + q->sourceModel()->rowCount(i->root)-1;
+        }
+    }
+    const QModelIndex mappedParent = q->mapFromSource(parent);
+    if(mappedParent.isValid())
+        return q->beginRemoveRows(mappedParent,first,last);
+    if(rootsAboutToBeRemoved.first>=0)
+        return q->beginRemoveRows(QModelIndex(),rootsAboutToBeRemoved.first,rootsAboutToBeRemoved.second);
 }
 
 void HierarchyLevelProxyModelPrivate::onRowsRemoved(const QModelIndex &parent, int first, int last)
 {
-
+    //#TODO
 }
 
 void HierarchyLevelProxyModelPrivate::beforeLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
 {
-
+    //#TODO
 }
 
 void HierarchyLevelProxyModelPrivate::afetrLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
 {
-
+    //#TODO
 }
 
 void HierarchyLevelProxyModelPrivate::afterReset()
@@ -336,24 +359,69 @@ bool HierarchyLevelProxyModel::setHeaderData(int section, Qt::Orientation orient
 /*!
 \reimp
 */
-bool HierarchyLevelProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles){
-    if(!sourceModel())
-        return false;
+QVariant HierarchyLevelProxyModel::data(const QModelIndex &index, int role) const
+{
     Q_ASSERT(index.isValid() ? index.model() == this : true);
     Q_D(const HierarchyLevelProxyModel);
-    if(d->inexistentAtSource(index))
+    if(!sourceModel() || !index.isValid() || d->inexistentAtSource(index))
+        return QVariant();
+    return sourceModel()->data(mapToSource(index),role);
+}
+
+/*!
+\reimp
+*/
+bool HierarchyLevelProxyModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    Q_ASSERT(index.isValid() ? index.model() == this : true);
+    Q_D(const HierarchyLevelProxyModel);
+    if(!sourceModel() || !index.isValid() || d->inexistentAtSource(index))
+        return false;
+    return sourceModel()->setData(mapToSource(index),value,role);
+}
+
+/*!
+\reimp
+*/
+void HierarchyLevelProxyModel::multiData(const QModelIndex &index, QModelRoleDataSpan roleDataSpan) const
+{
+    Q_ASSERT(index.isValid() ? index.model() == this : true);
+    Q_D(const HierarchyLevelProxyModel);
+    if(!sourceModel() || !index.isValid() || d->inexistentAtSource(index))
+        return;
+    return sourceModel()->multiData(mapToSource(index),roleDataSpan);
+}
+
+/*!
+\reimp
+*/
+bool HierarchyLevelProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles){
+    Q_ASSERT(index.isValid() ? index.model() == this : true);
+    Q_D(const HierarchyLevelProxyModel);
+    if(!sourceModel() || !index.isValid() || d->inexistentAtSource(index))
         return false;
     return sourceModel()->setItemData(mapToSource(index), roles);
 }
+
+/*!
+\reimp
+*/
+bool HierarchyLevelProxyModel::clearItemData(const QModelIndex &index)
+{
+    Q_ASSERT(index.isValid() ? index.model() == this : true);
+    Q_D(const HierarchyLevelProxyModel);
+    if(!sourceModel() || !index.isValid() || d->inexistentAtSource(index))
+        return false;
+    return sourceModel()->clearItemData(mapToSource(index));
+}
+
 /*!
 \reimp
 */
 QMap<int, QVariant> HierarchyLevelProxyModel::itemData(const QModelIndex &index) const{
-    if(!sourceModel())
-        return QMap<int, QVariant>();
     Q_ASSERT(index.isValid() ? index.model() == this : true);
     Q_D(const HierarchyLevelProxyModel);
-    if(d->inexistentAtSource(index))
+    if(!sourceModel() || !index.isValid() || d->inexistentAtSource(index))
         return QMap<int, QVariant>();
     return sourceModel()->itemData(mapToSource(index));
 }
@@ -383,10 +451,8 @@ QModelIndex HierarchyLevelProxyModel::mapFromSource(const QModelIndex &sourceInd
 */
 bool HierarchyLevelProxyModel::hasChildren(const QModelIndex &parent) const
 {
-    if(!sourceModel())
-        return false;
     Q_D(const HierarchyLevelProxyModel);
-    if(d->inexistentAtSource(parent))
+    if(!sourceModel() || d->inexistentAtSource(parent))
         return false;
     if(!parent.isValid() && d->m_targetLevel>0)
         return columnCount()>0 && rowCount()>0;
@@ -496,6 +562,132 @@ bool HierarchyLevelProxyModel::insertRows(int row, int count, const QModelIndex 
         }
     }
     return sourceModel()->insertRows(row,count,mapToSource(parent));
+}
+
+/*!
+\reimp
+*/
+bool HierarchyLevelProxyModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+    if(row<0 || row+count-1>=rowCount(parent))
+        return false;
+    if(parent.isValid())
+        return sourceModel()->removeRows(row,count,mapToSource(parent));
+    Q_D(const HierarchyLevelProxyModel);
+    QList<std::tuple<QModelIndex,int,int>> rowsToRemove;
+    for(auto i=std::rbegin(d->m_roots), iEnd=std::rend(d->m_roots);i!=iEnd;++i){
+        if(row+count-1>=i->cachedCumRowCount){
+            if(row>=i->cachedCumRowCount){
+                rowsToRemove.append(std::make_tuple(i->root,row-i->cachedCumRowCount,count));
+                break;
+            }
+            rowsToRemove.append(std::make_tuple(i->root,0,count+row-i->cachedCumRowCount));
+            count-=count+row-i->cachedCumRowCount;
+        }
+    }
+    Q_ASSERT(!rowsToRemove.isEmpty());
+    bool result = true;
+    for(auto&& rowToRemove : qAsConst(rowsToRemove))
+        result = result && sourceModel()->removeRows(std::get<1>(rowToRemove),std::get<2>(rowToRemove),std::get<0>(rowToRemove));
+    return result;
+}
+
+/*!
+\reimp
+*/
+QModelIndex HierarchyLevelProxyModel::buddy(const QModelIndex &index) const
+{
+    Q_ASSERT(index.isValid() ? index.model() == this : true);
+    Q_D(const HierarchyLevelProxyModel);
+    if(!sourceModel() || !index.isValid() || d->inexistentAtSource(index))
+        return QModelIndex();
+    return sourceModel()->buddy(mapToSource(index));
+}
+
+/*!
+\reimp
+*/
+bool HierarchyLevelProxyModel::canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) const{
+    Q_ASSERT(parent.isValid() ? parent.model() == this : true);
+    Q_D(const HierarchyLevelProxyModel);
+    if(!sourceModel() || d->inexistentAtSource(parent))
+        return false;
+    return sourceModel()->canDropMimeData(data,action,row,column,mapToSource(parent));
+}
+
+/*!
+\reimp
+*/
+bool HierarchyLevelProxyModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent){
+    Q_ASSERT(parent.isValid() ? parent.model() == this : true);
+    Q_D(const HierarchyLevelProxyModel);
+    if(!sourceModel() || d->inexistentAtSource(parent))
+        return false;
+    return sourceModel()->dropMimeData(data,action,row,column,mapToSource(parent));
+}
+
+/*!
+\reimp
+*/
+bool HierarchyLevelProxyModel::canFetchMore(const QModelIndex &parent) const
+{
+    Q_ASSERT(parent.isValid() ? parent.model() == this : true);
+    Q_D(const HierarchyLevelProxyModel);
+    if(!sourceModel() || d->inexistentAtSource(parent))
+        return false;
+    return sourceModel()->canFetchMore(mapToSource(parent));
+}
+
+/*!
+\reimp
+*/
+void HierarchyLevelProxyModel::fetchMore(const QModelIndex &parent){
+    Q_ASSERT(parent.isValid() ? parent.model() == this : true);
+    Q_D(const HierarchyLevelProxyModel);
+    if(!sourceModel() || d->inexistentAtSource(parent))
+        return;
+    return sourceModel()->fetchMore(mapToSource(parent));
+}
+
+/*!
+\reimp
+*/
+QModelIndexList HierarchyLevelProxyModel::match(const QModelIndex &start, int role, const QVariant &value, int hits, Qt::MatchFlags flags) const
+{
+    Q_ASSERT(start.isValid() ? start.model() == this : true);
+    Q_D(const HierarchyLevelProxyModel);
+    if(!sourceModel() || !start.isValid() || d->inexistentAtSource(start))
+        return QModelIndexList();
+    return sourceModel()->match(mapToSource(start),role,value,hits,flags);
+}
+
+/*!
+\reimp
+*/
+QMimeData *HierarchyLevelProxyModel::mimeData(const QModelIndexList &indexes) const{
+    if(!sourceModel())
+        return nullptr;
+    Q_D(const HierarchyLevelProxyModel);
+    QModelIndexList adjList;
+    for(auto i : indexes){
+        if(!d->inexistentAtSource(i))
+            adjList.append(mapToSource(i));
+    }
+    return sourceModel()->mimeData(adjList);
+}
+
+/*!
+\reimp
+*/
+QSize HierarchyLevelProxyModel::span(const QModelIndex &index) const
+{
+    Q_ASSERT(index.isValid() ? index.model() == this : true);
+    Q_D(const HierarchyLevelProxyModel);
+    if(!sourceModel() || !index.isValid())
+        return QSize(0,0);
+    if(d->inexistentAtSource(index))
+        return QSize(1,1);
+    return sourceModel()->span(mapToSource(index));
 }
 
 int HierarchyLevelProxyModel::hierarchyLevel() const

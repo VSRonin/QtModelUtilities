@@ -22,6 +22,8 @@ int main(int argc, char *argv[])
     hierarchyLevelProxy->setHierarchyLevel(1);
     hierarchyLevelProxy->setSourceModel(baseModel);
 
+    hierarchyLevelProxy->removeRows(2,6);
+
     // Create a view for the base model and a view for the proxy
     QTreeView *baseView = new QTreeView(&mainWid);
     baseView->header()->setSectionResizeMode(QHeaderView::Stretch);

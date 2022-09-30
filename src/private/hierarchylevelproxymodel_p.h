@@ -20,6 +20,8 @@ struct HierarchyRootData{
     int cachedCumRowCount=0;
     HierarchyRootData(const QPersistentModelIndex& rt, int rc);
     HierarchyRootData();
+    HierarchyRootData(const HierarchyRootData& other) =default;
+    HierarchyRootData& operator=(const HierarchyRootData& other)=default;
 };
 
 class HierarchyLevelProxyModelPrivate

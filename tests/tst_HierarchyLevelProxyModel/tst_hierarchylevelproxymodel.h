@@ -15,8 +15,12 @@ private Q_SLOTS:
     void testSetData_data();
     void testInsertRowSource_data();
     void testInsertRowSource();
+    void testInsertRowsSource_data();
+    void testInsertRowsSource();
     void testInsertRowProxy_data();
     void testInsertRowProxy();
+    void testInsertRowsProxy_data();
+    void testInsertRowsProxy();
 
     void testInsertBehaviour();
 

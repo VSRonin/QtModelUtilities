@@ -335,6 +335,66 @@ void tst_HierarchyLevelProxyModel::testInsertRowSource()
     }
 }
 
+void tst_HierarchyLevelProxyModel::testInsertRowsSource_data()
+{
+    QTest::addColumn<QAbstractItemModel *>("baseModel");
+    QTest::newRow("List") << createListModel(this);
+    QTest::newRow("Tree") << createTreeModel(this);
+}
+
+void tst_HierarchyLevelProxyModel::testInsertRowsSource()
+{
+    QFETCH(QAbstractItemModel *, baseModel);
+    if (!baseModel)
+        return;
+    HierarchyLevelProxyModel proxyModel;
+    new ModelTest(&proxyModel, baseModel);
+    proxyModel.setSourceModel(baseModel);
+    QSignalSpy proxyRowAboutToInsertSpy(&proxyModel, &QAbstractItemModel::rowsAboutToBeInserted);
+    QSignalSpy proxyRowInsertSpy(&proxyModel, &QAbstractItemModel::rowsInserted);
+
+    int beforeInsertRowCount= baseModel->rowCount();
+    QVERIFY(baseModel->insertRows(2,2));
+    QCOMPARE(proxyModel.rowCount(),beforeInsertRowCount+2);
+    for(QSignalSpy* spy : {&proxyRowAboutToInsertSpy,&proxyRowInsertSpy}){
+        QCOMPARE(spy->count(),1);
+        const auto spyArgs = spy->takeFirst();
+        QVERIFY(!spyArgs.at(0).value<QModelIndex>().isValid());
+        QCOMPARE(spyArgs.at(2).toInt(),3);
+        QCOMPARE(spyArgs.at(1).toInt(),2);
+    }
+    if(baseModel->hasChildren(baseModel->index(0,0))){
+        beforeInsertRowCount= 0;
+        for(int i=0, iEnd=baseModel->rowCount();i<iEnd;++i)
+            beforeInsertRowCount+=baseModel->rowCount(baseModel->index(i,0));
+        proxyModel.setHierarchyLevel(1);
+        QVERIFY(baseModel->insertRows(2,2));
+        QCOMPARE(proxyModel.rowCount(),beforeInsertRowCount);
+        for(QSignalSpy* spy : {&proxyRowAboutToInsertSpy,&proxyRowInsertSpy})
+            QCOMPARE(spy->count(),0);
+        QVERIFY(baseModel->insertRows(1,2,baseModel->index(1,0)));
+        QCOMPARE(proxyModel.rowCount(),beforeInsertRowCount+2);
+        for(QSignalSpy* spy : {&proxyRowAboutToInsertSpy,&proxyRowInsertSpy}){
+            QCOMPARE(spy->count(),1);
+            const auto spyArgs = spy->takeFirst();
+            QVERIFY(!spyArgs.at(0).value<QModelIndex>().isValid());
+            QCOMPARE(spyArgs.at(2).toInt(),baseModel->rowCount(baseModel->index(0,0))+2);
+            QCOMPARE(spyArgs.at(1).toInt(),baseModel->rowCount(baseModel->index(0,0))+1);
+        }
+        QCOMPARE(baseModel->rowCount(baseModel->index(2,0)),0);
+        QVERIFY(baseModel->insertColumn(0,baseModel->index(2,0)));
+        QVERIFY(baseModel->insertRows(0,2,baseModel->index(2,0)));
+        QCOMPARE(proxyModel.rowCount(),beforeInsertRowCount+4);
+        for(QSignalSpy* spy : {&proxyRowAboutToInsertSpy,&proxyRowInsertSpy}){
+            QCOMPARE(spy->count(),1);
+            const auto spyArgs = spy->takeFirst();
+            QVERIFY(!spyArgs.at(0).value<QModelIndex>().isValid());
+            QCOMPARE(spyArgs.at(2).toInt(),baseModel->rowCount(baseModel->index(0,0))+baseModel->rowCount(baseModel->index(1,0))+1);
+            QCOMPARE(spyArgs.at(1).toInt(),baseModel->rowCount(baseModel->index(0,0))+baseModel->rowCount(baseModel->index(1,0)));
+        }
+    }
+}
+
 void tst_HierarchyLevelProxyModel::testInsertRowProxy_data()
 {
     QTest::addColumn<QAbstractItemModel *>("baseModel");
@@ -391,6 +451,66 @@ void tst_HierarchyLevelProxyModel::testInsertRowProxy()
             QCOMPARE(spyArgs.at(0).value<QModelIndex>(),baseModel->index(1,0));
             QCOMPARE(spyArgs.at(2).toInt(),1);
             QCOMPARE(spyArgs.at(1).toInt(),1);
+        }
+    }
+}
+
+void tst_HierarchyLevelProxyModel::testInsertRowsProxy_data()
+{
+    QTest::addColumn<QAbstractItemModel *>("baseModel");
+    QTest::newRow("List") << createListModel(this);
+    QTest::newRow("Tree") << createTreeModel(this);
+}
+
+void tst_HierarchyLevelProxyModel::testInsertRowsProxy()
+{
+    QFETCH(QAbstractItemModel *, baseModel);
+    if (!baseModel)
+        return;
+    HierarchyLevelProxyModel proxyModel;
+    new ModelTest(&proxyModel, baseModel);
+    proxyModel.setSourceModel(baseModel);
+    QSignalSpy proxyRowAboutToInsertSpy(&proxyModel, &QAbstractItemModel::rowsAboutToBeInserted);
+    QSignalSpy proxyRowInsertSpy(&proxyModel, &QAbstractItemModel::rowsInserted);
+    QSignalSpy sourceRowAboutToInsertSpy(baseModel, &QAbstractItemModel::rowsAboutToBeInserted);
+    QSignalSpy sourceRowInsertSpy(baseModel, &QAbstractItemModel::rowsInserted);
+    QVERIFY(!proxyModel.insertRows(proxyModel.rowCount()+1,2));
+    for(QSignalSpy* spy : {&proxyRowAboutToInsertSpy,&proxyRowInsertSpy,&sourceRowAboutToInsertSpy,&sourceRowInsertSpy})
+        QVERIFY(spy->isEmpty());
+    QVERIFY(!proxyModel.insertRows(-1,2));
+    for(QSignalSpy* spy : {&proxyRowAboutToInsertSpy,&proxyRowInsertSpy,&sourceRowAboutToInsertSpy,&sourceRowInsertSpy})
+        QVERIFY(spy->isEmpty());
+    int beforeInsertRowCount= baseModel->rowCount();
+    QVERIFY(proxyModel.insertRows(2,2));
+    QCOMPARE(proxyModel.rowCount(),beforeInsertRowCount+2);
+    QCOMPARE(baseModel->rowCount(),beforeInsertRowCount+2);
+    for(QSignalSpy* spy : {&proxyRowAboutToInsertSpy,&proxyRowInsertSpy,&sourceRowAboutToInsertSpy,&sourceRowInsertSpy}){
+        QCOMPARE(spy->count(),1);
+        const auto spyArgs = spy->takeFirst();
+        QVERIFY(!spyArgs.at(0).value<QModelIndex>().isValid());
+        QCOMPARE(spyArgs.at(1).toInt(),2);
+        QCOMPARE(spyArgs.at(2).toInt(),3);
+    }
+    if(baseModel->hasChildren(baseModel->index(0,0))){
+        beforeInsertRowCount= 0;
+        for(int i=0, iEnd=baseModel->rowCount();i<iEnd;++i)
+            beforeInsertRowCount+=baseModel->rowCount(baseModel->index(i,0));
+        proxyModel.setHierarchyLevel(1);
+        QVERIFY(proxyModel.insertRows(baseModel->rowCount(baseModel->index(0,0))+1,2)); // equivalent to baseModel->insertRow(1,baseModel->index(1,0))
+        QCOMPARE(proxyModel.rowCount(),beforeInsertRowCount+2);
+        for(QSignalSpy* spy : {&proxyRowAboutToInsertSpy,&proxyRowInsertSpy}){
+            QCOMPARE(spy->count(),1);
+            const auto spyArgs = spy->takeFirst();
+            QVERIFY(!spyArgs.at(0).value<QModelIndex>().isValid());
+            QCOMPARE(spyArgs.at(1).toInt(),baseModel->rowCount(baseModel->index(0,0))+1);
+            QCOMPARE(spyArgs.at(2).toInt(),baseModel->rowCount(baseModel->index(0,0))+2);
+        }
+        for(QSignalSpy* spy : {&sourceRowAboutToInsertSpy,&sourceRowInsertSpy}){
+            QCOMPARE(spy->count(),1);
+            const auto spyArgs = spy->takeFirst();
+            QCOMPARE(spyArgs.at(0).value<QModelIndex>(),baseModel->index(1,0));
+            QCOMPARE(spyArgs.at(1).toInt(),1);
+            QCOMPARE(spyArgs.at(2).toInt(),2);
         }
     }
 }
