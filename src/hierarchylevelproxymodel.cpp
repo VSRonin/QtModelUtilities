@@ -475,6 +475,8 @@ bool HierarchyLevelProxyModel::insertRows(int row, int count, const QModelIndex 
     Q_D(const HierarchyLevelProxyModel);
     if (!sourceModel() || d->inexistentAtSource(parent))
         return false;
+    if(d->m_roots.isEmpty())
+        return false;
     if(!parent.isValid() && d->m_targetLevel>0){
         Q_ASSERT(d->m_roots.first().cachedCumRowCount==0);
         for(auto i=std::rbegin(d->m_roots), iEnd=std::rend(d->m_roots);i!=iEnd;++i){
@@ -484,9 +486,8 @@ bool HierarchyLevelProxyModel::insertRows(int row, int count, const QModelIndex 
                 return sourceModel()->insertRows(row-i->cachedCumRowCount,count,i->root);
             }
             if(row==i->cachedCumRowCount){
-                if(d->m_insertBehaviour==InsertToNext || row==0)
+                if(d->m_insertBehaviour==InsertToNext)
                     return sourceModel()->insertRows(0,count,i->root);
-                Q_ASSERT(i+1!=iEnd);
                 for(++i;d->m_insertBehaviour==InsertToPreviousNonEmpty && row==i->cachedCumRowCount && i!=iEnd;++i){}
                 if(i==iEnd)
                     --i;

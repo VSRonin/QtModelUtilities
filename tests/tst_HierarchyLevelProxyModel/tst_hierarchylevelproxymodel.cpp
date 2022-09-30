@@ -483,6 +483,44 @@ void tst_HierarchyLevelProxyModel::testInsertBehaviour()
         QCOMPARE(spyArgs.at(1).toInt(),3);
     }
     QCOMPARE(baseModel.rowCount(baseModel.index(1,0)),0);
+
+    sourceIdx = baseModel.index(0,0);
+    QVERIFY(baseModel.removeRows(0,baseModel.rowCount(sourceIdx),sourceIdx));
+    /// #TODO
+    ///  remove later
+    QCOMPARE(proxyModel.rowCount(),8);
+    proxyModel.setHierarchyLevel(0);
+    proxyModel.setHierarchyLevel(1);
+    ///
+    QCOMPARE(proxyModel.rowCount(),4);
+#ifdef QT_DEBUG
+    for(int i=0;i<4;++i)
+        qDebug() << baseModel.rowCount(baseModel.index(i,0));
+#endif
+    QVERIFY(proxyModel.insertRow(0));
+    QCOMPARE(proxyModel.rowCount(),5);
+#ifdef QT_DEBUG
+    for(int i=0;i<4;++i)
+        qDebug() << baseModel.rowCount(baseModel.index(i,0));
+#endif
+    QCOMPARE(baseModel.rowCount(sourceIdx),1);
+    QCOMPARE(baseModel.rowCount(baseModel.index(1,0)),0);
+    QCOMPARE(baseModel.rowCount(baseModel.index(2,0)),1);
+    QCOMPARE(baseModel.rowCount(baseModel.index(3,0)),3);
+    for(QSignalSpy* spy : {&proxyRowAboutToInsertSpy,&proxyRowInsertSpy}){
+        QCOMPARE(spy->count(),1);
+        const auto spyArgs = spy->takeFirst();
+        QVERIFY(!spyArgs.at(0).value<QModelIndex>().isValid());
+        QCOMPARE(spyArgs.at(2).toInt(),0);
+        QCOMPARE(spyArgs.at(1).toInt(),0);
+    }
+    for(QSignalSpy* spy : {&sourceRowAboutToInsertSpy,&sourceRowInsertSpy}){
+        QCOMPARE(spy->count(),1);
+        const auto spyArgs = spy->takeFirst();
+        QCOMPARE(spyArgs.at(0).value<QModelIndex>(),sourceIdx);
+        QCOMPARE(spyArgs.at(2).toInt(),0);
+        QCOMPARE(spyArgs.at(1).toInt(),0);
+    }
 #else
     QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
