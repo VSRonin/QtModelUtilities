@@ -31,6 +31,7 @@ class HierarchyLevelProxyModelPrivate
     QVector<HierarchyRootData> m_roots;
     int m_maxCol;
     int m_targetLevel;
+    HierarchyLevelProxyModel::InsertBehaviour m_insertBehaviour;
     const char m_inexistentSourceIndexFlag;
     QVector<QPersistentModelIndex> m_layoutChangePersistentIndexes;
     QModelIndexList m_layoutChangeProxyIndexes;

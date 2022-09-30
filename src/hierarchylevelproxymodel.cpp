@@ -60,17 +60,15 @@ void HierarchyLevelProxyModelPrivate::rebuildMappingBranch(const QModelIndex& pa
 {
     Q_Q(HierarchyLevelProxyModel);
     for(int i=0, iMax = q->sourceModel()->rowCount(parent);i<iMax;++i){
-        //for(int j=0, jMax = q->sourceModel()->columnCount(parent);j<jMax;++j){
-            const QModelIndex currIdx = q->sourceModel()->index(i,0/*j*/,parent);
-            if(levl==m_targetLevel-1){
-                m_roots.append(HierarchyRootData(currIdx,rootsRowCount));
-                rootsRowCount+=q->sourceModel()->rowCount(currIdx);
-                m_maxCol = qMax(m_maxCol,q->sourceModel()->columnCount(currIdx));
-            }
-            else{
-                rebuildMappingBranch(currIdx,levl+1,rootsRowCount);
-            }
-        //}
+        const QModelIndex currIdx = q->sourceModel()->index(i,0,parent);
+        if(levl==m_targetLevel-1){
+            m_roots.append(HierarchyRootData(currIdx,rootsRowCount));
+            rootsRowCount+=q->sourceModel()->rowCount(currIdx);
+            m_maxCol = qMax(m_maxCol,q->sourceModel()->columnCount(currIdx));
+        }
+        else{
+            rebuildMappingBranch(currIdx,levl+1,rootsRowCount);
+        }
     }
 
 }
@@ -81,7 +79,7 @@ void HierarchyLevelProxyModelPrivate::onDataChanged(const QModelIndex &topLeft, 
     Q_ASSERT(topLeft.isValid() && bottomRight.isValid() && topLeft.model()==q->sourceModel() &&  topLeft.model()==bottomRight.model() && bottomRight.parent()==topLeft.parent());
     const QModelIndex mappedTopLeft = q->mapFromSource(topLeft);
     if(mappedTopLeft.isValid())
-        emit q->dataChanged(mappedTopLeft,q->mapFromSource(bottomRight),roles);
+        Q_EMIT q->dataChanged(mappedTopLeft,q->mapFromSource(bottomRight),roles);
 }
 
 void HierarchyLevelProxyModelPrivate::onHeaderDataChanged(Qt::Orientation orientation, int first, int last)
@@ -198,6 +196,7 @@ HierarchyLevelProxyModelPrivate::HierarchyLevelProxyModelPrivate(HierarchyLevelP
     : q_ptr(q)
     , m_maxCol(0)
     , m_targetLevel(0)
+    , m_insertBehaviour(HierarchyLevelProxyModel::InsertToNext)
     , m_inexistentSourceIndexFlag(0)
 {
     Q_ASSERT(q_ptr);
@@ -322,8 +321,6 @@ QVariant HierarchyLevelProxyModel::headerData(int section, Qt::Orientation orien
     return 0;
 }
 
-
-
 /*!
 \reimp
 */
@@ -411,16 +408,13 @@ QModelIndex HierarchyLevelProxyModel::mapToSource(const QModelIndex &proxyIndex)
         return QModelIndex();
     if(proxyIndex.internalPointer())
         return createSourceIndex(proxyIndex.row(), proxyIndex.column(), proxyIndex.internalPointer());
-    if(proxyIndex.row()==0) // optimisation
-        return sourceModel()->index(0, proxyIndex.column(),d->m_roots.first().root);
 #ifdef QT_DEBUG
     for(int i=1;i<d->m_roots.size();++i)
         Q_ASSERT(d->m_roots.at(i).cachedCumRowCount>=d->m_roots.at(i-1).cachedCumRowCount);
 #endif
-   for(int i=d->m_roots.size()-1;i>=0;--i){
-       const auto& rootData = d->m_roots.at(i);
-       if(proxyIndex.row()>=rootData.cachedCumRowCount)
-           return sourceModel()->index(proxyIndex.row()-rootData.cachedCumRowCount, proxyIndex.column(),rootData.root);
+   for(auto i=std::rbegin(d->m_roots), iEnd=std::rend(d->m_roots);i!=iEnd;++i){
+       if(proxyIndex.row()>=i->cachedCumRowCount)
+           return sourceModel()->index(proxyIndex.row()-i->cachedCumRowCount, proxyIndex.column(),i->root);
    }
    Q_UNREACHABLE();
    return QModelIndex();
@@ -482,11 +476,21 @@ bool HierarchyLevelProxyModel::insertRows(int row, int count, const QModelIndex 
     if (!sourceModel() || d->inexistentAtSource(parent))
         return false;
     if(!parent.isValid() && d->m_targetLevel>0){
+        Q_ASSERT(d->m_roots.first().cachedCumRowCount==0);
         for(auto i=std::rbegin(d->m_roots), iEnd=std::rend(d->m_roots);i!=iEnd;++i){
-            if(row>=i->cachedCumRowCount){
-                if(row+count-1>i->cachedCumRowCount+sourceModel()->rowCount(i->root))
+            if(row>i->cachedCumRowCount){
+                if(row>i->cachedCumRowCount+sourceModel()->rowCount(i->root))
                     return false;
                 return sourceModel()->insertRows(row-i->cachedCumRowCount,count,i->root);
+            }
+            if(row==i->cachedCumRowCount){
+                if(d->m_insertBehaviour==InsertToNext || row==0)
+                    return sourceModel()->insertRows(0,count,i->root);
+                Q_ASSERT(i+1!=iEnd);
+                for(++i;d->m_insertBehaviour==InsertToPreviousNonEmpty && row==i->cachedCumRowCount && i!=iEnd;++i){}
+                if(i==iEnd)
+                    --i;
+                return sourceModel()->insertRows(sourceModel()->rowCount(i->root),count,i->root);
             }
         }
     }
@@ -513,6 +517,21 @@ void HierarchyLevelProxyModel::setHierarchyLevel(int hierarchyLvl)
         d->rebuildMapping();
         endResetModel();
     }
+}
+
+HierarchyLevelProxyModel::InsertBehaviour HierarchyLevelProxyModel::insertBehaviour() const
+{
+    Q_D(const HierarchyLevelProxyModel);
+    return d->m_insertBehaviour;
+}
+
+void HierarchyLevelProxyModel::setInsertBehaviour(InsertBehaviour behave)
+{
+    Q_D(HierarchyLevelProxyModel);
+    if(d->m_insertBehaviour==behave)
+        return;
+    d->m_insertBehaviour=behave;
+    Q_EMIT insertBehaviourChanged(behave);
 }
 
 

@@ -21,11 +21,18 @@ class MODELUTILITIES_EXPORT HierarchyLevelProxyModel : public QAbstractProxyMode
 {
     Q_OBJECT
     Q_PROPERTY(int hierarchyLevel READ hierarchyLevel WRITE setHierarchyLevel NOTIFY hierarchyLevelChanged)
+    Q_PROPERTY(InsertBehaviour insertBehaviour READ insertBehaviour WRITE setInsertBehaviour NOTIFY insertBehaviourChanged)
     Q_DISABLE_COPY_MOVE(HierarchyLevelProxyModel)
     Q_DECLARE_PRIVATE_D(m_dptr, HierarchyLevelProxyModel)
     HierarchyLevelProxyModelPrivate *m_dptr;
 
 public:
+    enum InsertBehaviour {
+        InsertToPrevious
+        , InsertToPreviousNonEmpty
+        , InsertToNext
+    };
+    Q_ENUM(InsertBehaviour)
     explicit HierarchyLevelProxyModel(QObject *parent = nullptr);
     ~HierarchyLevelProxyModel();
     void setSourceModel(QAbstractItemModel *newSourceModel) override;
@@ -54,9 +61,12 @@ public:
     */
     int hierarchyLevel() const;
     void setHierarchyLevel(int hierarchyLvl);
+    InsertBehaviour insertBehaviour() const;
+    void setInsertBehaviour(InsertBehaviour behave);
 protected:
     HierarchyLevelProxyModel(HierarchyLevelProxyModelPrivate &dptr, QObject *parent);
 Q_SIGNALS:
     void hierarchyLevelChanged(int hierarchyLvl);
+    void insertBehaviourChanged(InsertBehaviour behave);
 };
 #endif // HIERARCHYLEVELPROXY_H
