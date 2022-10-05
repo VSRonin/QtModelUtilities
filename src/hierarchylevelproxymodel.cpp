@@ -36,6 +36,14 @@ int HierarchyLevelProxyModelPrivate::levelOf(QModelIndex idx)
     return result;
 }
 
+bool HierarchyLevelProxyModelPrivate::isAncestor(const QModelIndex& targetparent, QModelIndex root){
+    for(;root.parent().isValid();root=root.parent()){
+        if(root.parent()==targetparent)
+            return true;
+    }
+    return false;
+}
+
 bool HierarchyLevelProxyModelPrivate::inexistentAtSource(const QModelIndex &idx) const
 {
     return idx.internalPointer()==&m_inexistentSourceIndexFlag;
@@ -157,6 +165,8 @@ void HierarchyLevelProxyModelPrivate::onRowsInserted(const QModelIndex &parent, 
         for(int i=first;i<=last;++i)
             m_roots.insert(i,HierarchyRootData(q->sourceModel()->index(i,0),newCachedCumRowCount));
     }
+    else if (q->mapFromSource(parent).isValid())
+        q->endInsertRows();
 }
 
 void HierarchyLevelProxyModelPrivate::onRowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
@@ -166,13 +176,6 @@ void HierarchyLevelProxyModelPrivate::onRowsMoved(const QModelIndex &parent, int
 
 void HierarchyLevelProxyModelPrivate::onRowsAboutToBeRemoved(const QModelIndex &parent, int first, int last)
 {
-    const auto isAncestor = [&parent](QModelIndex idx)->bool{
-        for(;idx.parent().isValid();idx=idx.parent()){
-            if(idx.parent()==parent)
-                return true;
-        }
-        return false;
-    };
     Q_Q(HierarchyLevelProxyModel);
     std::pair<int,int> rootsAboutToBeRemoved(-1,-1);
     for(auto i=m_roots.begin(), iEnd=m_roots.end();i!=iEnd;++i){
@@ -180,7 +183,7 @@ void HierarchyLevelProxyModelPrivate::onRowsAboutToBeRemoved(const QModelIndex &
             q->beginRemoveRows(QModelIndex(),i->cachedCumRowCount+first,i->cachedCumRowCount+last);
             return;
         }
-        if(isAncestor(i->root)){
+        if(isAncestor(parent,i->root)){
             if(rootsAboutToBeRemoved.first<0)
                 rootsAboutToBeRemoved.first = i->cachedCumRowCount;
             rootsAboutToBeRemoved.second = i->cachedCumRowCount + q->sourceModel()->rowCount(i->root)-1;
@@ -195,7 +198,21 @@ void HierarchyLevelProxyModelPrivate::onRowsAboutToBeRemoved(const QModelIndex &
 
 void HierarchyLevelProxyModelPrivate::onRowsRemoved(const QModelIndex &parent, int first, int last)
 {
-    //#TODO
+    Q_Q(HierarchyLevelProxyModel);
+    for(auto i=m_roots.begin(), iEnd=m_roots.end();i!=iEnd;++i){
+        if(i->root==parent){
+            for(++i;i!=iEnd;++i)
+                i->cachedCumRowCount-=last-first+1;
+            q->endRemoveRows();
+            return;
+        }
+        if(isAncestor(parent,i->root)){
+            q->endRemoveRows();
+            return;
+        }
+    }
+    if (q->mapFromSource(parent).isValid())
+        q->endRemoveRows();
 }
 
 void HierarchyLevelProxyModelPrivate::beforeLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)

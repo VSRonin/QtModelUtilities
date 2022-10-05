@@ -165,6 +165,10 @@ public:
 #endif
 };
 
+#ifdef QT_DEBUG
+QString printModel(const QAbstractItemModel* model, const QModelIndex& root = QModelIndex(), const QString& prefix=QString());
+#endif
+
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 class StringListModel : public QStringListModel
 {

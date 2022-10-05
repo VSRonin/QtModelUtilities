@@ -40,6 +40,7 @@ class HierarchyLevelProxyModelPrivate
     QVector<QMetaObject::Connection> m_sourceConnections;
     int rootOf(QModelIndex sourceIndex) const;
     static int levelOf(QModelIndex idx);
+    static bool isAncestor(const QModelIndex& targetparent, QModelIndex root);
     bool inexistentAtSource(const QModelIndex& idx) const;
     void rebuildMapping();
     void rebuildMappingBranch(const QModelIndex& parent, int levl, int &rootsRowCount);
