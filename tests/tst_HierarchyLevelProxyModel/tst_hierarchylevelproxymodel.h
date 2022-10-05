@@ -8,7 +8,8 @@ class tst_HierarchyLevelProxyModel : public QObject
     Q_OBJECT
 private Q_SLOTS:
     void autoParent();
-
+    void testProperties();
+    void testDisconnectedModel();
     void testData();
     void testData_data();
     void testSetData();
@@ -21,19 +22,17 @@ private Q_SLOTS:
     void testInsertRowProxy();
     void testInsertRowsProxy_data();
     void testInsertRowsProxy();
-
     void testInsertBehaviour();
+    void testRemoveRowSource_data();
+    void testRemoveRowSource();
 
     void testSetItemData_data();
     void testSetItemData();
     void testSetItemDataDataChanged_data();
     void testSetItemDataDataChanged();
-    void testSourceInsertRow();
-    void testSourceInsertRow_data();
     void testSourceInsertCol();
     void testSourceInsertCol_data();
-    void testDisconnectedModel();
-    void testProperties();
+
     void testSort();
     void testSort_data();
     void testResetModel();

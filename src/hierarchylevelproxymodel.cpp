@@ -199,17 +199,23 @@ void HierarchyLevelProxyModelPrivate::onRowsAboutToBeRemoved(const QModelIndex &
 void HierarchyLevelProxyModelPrivate::onRowsRemoved(const QModelIndex &parent, int first, int last)
 {
     Q_Q(HierarchyLevelProxyModel);
-    for(auto i=m_roots.begin(), iEnd=m_roots.end();i!=iEnd;++i){
+    bool ancestorRemoved = false;
+    for(auto i=m_roots.begin();i!=m_roots.end();){
         if(i->root==parent){
-            for(++i;i!=iEnd;++i)
+            for(i=m_roots.erase(i);i!=m_roots.end();++i)
                 i->cachedCumRowCount-=last-first+1;
             q->endRemoveRows();
             return;
         }
         if(isAncestor(parent,i->root)){
-            q->endRemoveRows();
-            return;
+            // TODO fixme
+            ancestorRemoved=true;
+            q->sourceModel()->rowCount(i->root);
+            i=m_roots.erase(i);
+
         }
+        else
+            ++i;
     }
     if (q->mapFromSource(parent).isValid())
         q->endRemoveRows();

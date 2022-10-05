@@ -75,25 +75,13 @@ void tst_HierarchyLevelProxyModel::testSourceInsertCol()
     QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
 }
-void tst_HierarchyLevelProxyModel::testSourceInsertRow()
+
+void tst_HierarchyLevelProxyModel::testSourceInsertCol_data()
 {
 #ifdef COMPLEX_MODEL_SUPPORT
 
 #else
     QSKIP("This test requires the Qt GUI or GenericModel modules");
-#endif
-}
-
-void tst_HierarchyLevelProxyModel::testSourceInsertRow_data()
-{
-#ifdef COMPLEX_MODEL_SUPPORT
-#endif
-}
-
-void tst_HierarchyLevelProxyModel::testSourceInsertCol_data()
-{
-
-#ifdef COMPLEX_MODEL_SUPPORT
 #endif
 }
 
@@ -133,7 +121,32 @@ void tst_HierarchyLevelProxyModel::testSort_data()
 void tst_HierarchyLevelProxyModel::testResetModel()
 {
 #ifdef COMPLEX_MODEL_SUPPORT
-
+    class ResettableModel : public ComplexModel{
+    public:
+        using ComplexModel::ComplexModel;
+        void triggerReset(){
+            beginResetModel();
+            endResetModel();
+        }
+    };
+    ResettableModel baseModel;
+    baseModel.insertColumn(0);
+    baseModel.insertRows(0,3);
+    baseModel.insertColumn(0,baseModel.index(0,0));
+    baseModel.insertRows(0,4,baseModel.index(0,0));
+    baseModel.insertColumn(0,baseModel.index(1,0));
+    baseModel.insertRows(0,5,baseModel.index(1,0));
+    HierarchyLevelProxyModel proxyModel;
+    new ModelTest(&proxyModel, this);
+    proxyModel.setSourceModel(&baseModel);
+    proxyModel.setHierarchyLevel(1);
+    QSignalSpy proxyModelAboutToBeResetSpy(&proxyModel, &HierarchyLevelProxyModel::modelAboutToBeReset);
+    QSignalSpy proxyModelResetSpy(&proxyModel, &HierarchyLevelProxyModel::modelReset);
+    QCOMPARE(proxyModel.rowCount(),9);
+    baseModel.triggerReset();
+    QCOMPARE(proxyModelAboutToBeResetSpy.count(),1);
+    QCOMPARE(proxyModelResetSpy.count(),1);
+    QCOMPARE(proxyModel.rowCount(),9);
 #else
     QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
@@ -154,7 +167,6 @@ void tst_HierarchyLevelProxyModel::testDisconnectedModel()
     proxyModel.setSourceModel(&baseModel2);
     baseModel1.setData(baseModel1.index(1, 0), QStringLiteral("Tokyo"));
     QCOMPARE(proxyDataChangeSpy.count(), 0);
-    proxyDataChangeSpy.clear();
     baseModel2.setData(baseModel2.index(0, 0), QStringLiteral("Lima"));
     QCOMPARE(proxyDataChangeSpy.count(), 1);
 }
@@ -705,6 +717,81 @@ void tst_HierarchyLevelProxyModel::testInsertBehaviour()
 #else
     QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
+}
+
+void tst_HierarchyLevelProxyModel::testRemoveRowSource_data(){
+    QTest::addColumn<QAbstractItemModel *>("baseModel");
+    QTest::newRow("List") << createListModel(this);
+    QTest::newRow("Tree") << createTreeModel(this);
+}
+
+void tst_HierarchyLevelProxyModel::testRemoveRowSource()
+{
+    QFETCH(QAbstractItemModel *, baseModel);
+    if (!baseModel)
+        return;
+    HierarchyLevelProxyModel proxyModel;
+    new ModelTest(&proxyModel, baseModel);
+    proxyModel.setSourceModel(baseModel);
+    QSignalSpy proxyRowAboutToRemovedSpy(&proxyModel, &QAbstractItemModel::rowsAboutToBeRemoved);
+    QSignalSpy proxyRowRemovedSpy(&proxyModel, &QAbstractItemModel::rowsRemoved);
+
+    int beforeRemovedRowCount= baseModel->rowCount();
+    QVERIFY(baseModel->removeRow(2));
+    QCOMPARE(proxyModel.rowCount(),beforeRemovedRowCount-1);
+    for(QSignalSpy* spy : {&proxyRowAboutToRemovedSpy,&proxyRowRemovedSpy}){
+        QCOMPARE(spy->count(),1);
+        const auto spyArgs = spy->takeFirst();
+        QVERIFY(!spyArgs.at(0).value<QModelIndex>().isValid());
+        QCOMPARE(spyArgs.at(2).toInt(),2);
+        QCOMPARE(spyArgs.at(1).toInt(),2);
+    }
+    if(baseModel->hasChildren(baseModel->index(0,0))){
+        beforeRemovedRowCount= 0;
+        for(int i=0, iEnd=baseModel->rowCount();i<iEnd;++i)
+            beforeRemovedRowCount+=baseModel->rowCount(baseModel->index(i,0));
+        proxyModel.setHierarchyLevel(1);
+        // remove at level 2
+        QVERIFY(baseModel->removeRow(1,baseModel->index(1,0,baseModel->index(1,0))));
+        QCOMPARE(proxyModel.rowCount(),beforeRemovedRowCount);
+        for(QSignalSpy* spy : {&proxyRowAboutToRemovedSpy,&proxyRowRemovedSpy}){
+            QCOMPARE(spy->count(),1);
+            const auto spyArgs = spy->takeFirst();
+            QCOMPARE(spyArgs.at(0).value<QModelIndex>(),proxyModel.index(baseModel->rowCount(baseModel->index(0,0))+1,0));
+            QCOMPARE(spyArgs.at(2).toInt(),1);
+            QCOMPARE(spyArgs.at(1).toInt(),1);
+        }
+        // remove at level 1
+        QVERIFY(baseModel->removeRow(1,baseModel->index(1,0)));
+        QCOMPARE(proxyModel.rowCount(),beforeRemovedRowCount-1);
+        for(QSignalSpy* spy : {&proxyRowAboutToRemovedSpy,&proxyRowRemovedSpy}){
+            QCOMPARE(spy->count(),1);
+            const auto spyArgs = spy->takeFirst();
+            QVERIFY(!spyArgs.at(0).value<QModelIndex>().isValid());
+            QCOMPARE(spyArgs.at(2).toInt(),baseModel->rowCount(baseModel->index(0,0))+1);
+            QCOMPARE(spyArgs.at(1).toInt(),baseModel->rowCount(baseModel->index(0,0))+1);
+        }
+        // remove at level 0
+        beforeRemovedRowCount = proxyModel.rowCount();
+        const int childRowsRemoved = baseModel->rowCount(baseModel->index(1,0));
+        Q_ASSERT(childRowsRemoved>0);
+        QVERIFY(baseModel->removeRow(1));
+        QCOMPARE(proxyModel.rowCount(),beforeRemovedRowCount-childRowsRemoved);
+        for(QSignalSpy* spy : {&proxyRowAboutToRemovedSpy,&proxyRowRemovedSpy}){
+            QCOMPARE(spy->count(),1);
+            const auto spyArgs = spy->takeFirst();
+            QVERIFY(!spyArgs.at(0).value<QModelIndex>().isValid());
+            QCOMPARE(spyArgs.at(2).toInt(),baseModel->rowCount(baseModel->index(0,0))+childRowsRemoved-1);
+            QCOMPARE(spyArgs.at(1).toInt(),baseModel->rowCount(baseModel->index(0,0)));
+        }
+        // remove at level 0 on empty root
+        beforeRemovedRowCount = proxyModel.rowCount();
+        QVERIFY(baseModel->insertRow(1));
+        QVERIFY(baseModel->removeRow(1));
+        QCOMPARE(proxyModel.rowCount(),beforeRemovedRowCount);
+        for(QSignalSpy* spy : {&proxyRowAboutToRemovedSpy,&proxyRowRemovedSpy})
+            QCOMPARE(spy->count(),0);
+    }
 }
 
 void tst_HierarchyLevelProxyModel::testSetItemData_data()
