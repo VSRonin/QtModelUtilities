@@ -37,6 +37,8 @@ int HierarchyLevelProxyModelPrivate::levelOf(QModelIndex idx)
 }
 
 bool HierarchyLevelProxyModelPrivate::isAncestor(const QModelIndex& targetparent, QModelIndex root){
+    if(!targetparent.isValid())
+        return true;
     for(;root.parent().isValid();root=root.parent()){
         if(root.parent()==targetparent)
             return true;
@@ -177,16 +179,27 @@ void HierarchyLevelProxyModelPrivate::onRowsMoved(const QModelIndex &parent, int
 void HierarchyLevelProxyModelPrivate::onRowsAboutToBeRemoved(const QModelIndex &parent, int first, int last)
 {
     Q_Q(HierarchyLevelProxyModel);
+    Q_ASSERT(m_rootsIndexesToRemove.isEmpty());
     std::pair<int,int> rootsAboutToBeRemoved(-1,-1);
-    for(auto i=m_roots.begin(), iEnd=m_roots.end();i!=iEnd;++i){
-        if(i->root==parent){
-            q->beginRemoveRows(QModelIndex(),i->cachedCumRowCount+first,i->cachedCumRowCount+last);
+    for(int i=0, iEnd=m_roots.count();i<iEnd;++i){
+        if(m_roots.at(i).root==parent){
+            q->beginRemoveRows(QModelIndex(),m_roots.at(i).cachedCumRowCount+first,m_roots.at(i).cachedCumRowCount+last);
             return;
         }
-        if(isAncestor(parent,i->root)){
-            if(rootsAboutToBeRemoved.first<0)
-                rootsAboutToBeRemoved.first = i->cachedCumRowCount;
-            rootsAboutToBeRemoved.second = i->cachedCumRowCount + q->sourceModel()->rowCount(i->root)-1;
+        if(isAncestor(parent,m_roots.at(i).root)){
+            int targetRow = m_roots.at(i).root.row();
+            for(QModelIndex parentIter = m_roots.at(i).root.parent();parentIter!=parent;parentIter=parentIter.parent())
+                targetRow = parentIter.row();
+            if(targetRow>=first && targetRow<=last){
+                const int countRowsRemoved = q->sourceModel()->rowCount(m_roots.at(i).root);
+                m_rootsIndexesToRemove.append(std::make_pair(i,countRowsRemoved>0));
+                if(countRowsRemoved>0){
+                    if(rootsAboutToBeRemoved.first<0)
+                        rootsAboutToBeRemoved.first = m_roots.at(i).cachedCumRowCount;
+                    Q_ASSERT(rootsAboutToBeRemoved.second <= m_roots.at(i).cachedCumRowCount + countRowsRemoved-1);
+                    rootsAboutToBeRemoved.second = m_roots.at(i).cachedCumRowCount + countRowsRemoved-1;
+                }
+            }
         }
     }
     const QModelIndex mappedParent = q->mapFromSource(parent);
@@ -199,23 +212,30 @@ void HierarchyLevelProxyModelPrivate::onRowsAboutToBeRemoved(const QModelIndex &
 void HierarchyLevelProxyModelPrivate::onRowsRemoved(const QModelIndex &parent, int first, int last)
 {
     Q_Q(HierarchyLevelProxyModel);
-    bool ancestorRemoved = false;
-    for(auto i=m_roots.begin();i!=m_roots.end();){
+    if(!m_rootsIndexesToRemove.isEmpty()){
+        Q_ASSERT(std::is_sorted(m_rootsIndexesToRemove.cbegin(),m_rootsIndexesToRemove.cend()));
+        bool needEndRemoveRows = false;
+        for(auto i=m_rootsIndexesToRemove.crbegin(), iEnd=m_rootsIndexesToRemove.crend();i!=iEnd;++i){
+            needEndRemoveRows= needEndRemoveRows || i->second;
+            if(i->first<m_roots.count()-1){
+                const int cachedCumRowAdjustment = m_roots[(i->first)+1].cachedCumRowCount-m_roots.at(i->first).cachedCumRowCount;
+                for(int j=(i->first)+1;j<m_roots.count();++j)
+                    m_roots[j].cachedCumRowCount-=cachedCumRowAdjustment;
+            }
+            m_roots.removeAt(i->first);
+        }
+        m_rootsIndexesToRemove.clear();
+        if(needEndRemoveRows)
+            q->endRemoveRows();
+        return;
+    }
+    for(auto i=m_roots.begin();i!=m_roots.end();++i){
         if(i->root==parent){
-            for(i=m_roots.erase(i);i!=m_roots.end();++i)
+            for(++i;i!=m_roots.end();++i)
                 i->cachedCumRowCount-=last-first+1;
             q->endRemoveRows();
             return;
-        }
-        if(isAncestor(parent,i->root)){
-            // TODO fixme
-            ancestorRemoved=true;
-            q->sourceModel()->rowCount(i->root);
-            i=m_roots.erase(i);
-
-        }
-        else
-            ++i;
+        }            
     }
     if (q->mapFromSource(parent).isValid())
         q->endRemoveRows();

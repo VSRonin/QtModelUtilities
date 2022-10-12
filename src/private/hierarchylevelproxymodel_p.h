@@ -35,6 +35,7 @@ class HierarchyLevelProxyModelPrivate
     int m_targetLevel;
     HierarchyLevelProxyModel::InsertBehaviour m_insertBehaviour;
     const char m_inexistentSourceIndexFlag;
+    QVector<std::pair<int,bool> > m_rootsIndexesToRemove;
     QVector<QPersistentModelIndex> m_layoutChangePersistentIndexes;
     QModelIndexList m_layoutChangeProxyIndexes;
     QVector<QMetaObject::Connection> m_sourceConnections;

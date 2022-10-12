@@ -686,16 +686,8 @@ void tst_HierarchyLevelProxyModel::testInsertBehaviour()
     sourceIdx = baseModel.index(0,0);
     QVERIFY(baseModel.removeRows(0,baseModel.rowCount(sourceIdx),sourceIdx));
     QCOMPARE(proxyModel.rowCount(),4);
-#ifdef QT_DEBUG
-    for(int i=0;i<4;++i)
-        qDebug() << baseModel.rowCount(baseModel.index(i,0));
-#endif
     QVERIFY(proxyModel.insertRow(0));
     QCOMPARE(proxyModel.rowCount(),5);
-#ifdef QT_DEBUG
-    for(int i=0;i<4;++i)
-        qDebug() << baseModel.rowCount(baseModel.index(i,0));
-#endif
     QCOMPARE(baseModel.rowCount(sourceIdx),1);
     QCOMPARE(baseModel.rowCount(baseModel.index(1,0)),0);
     QCOMPARE(baseModel.rowCount(baseModel.index(2,0)),1);
@@ -775,7 +767,15 @@ void tst_HierarchyLevelProxyModel::testRemoveRowSource()
         beforeRemovedRowCount = proxyModel.rowCount();
         const int childRowsRemoved = baseModel->rowCount(baseModel->index(1,0));
         Q_ASSERT(childRowsRemoved>0);
+#ifdef QT_DEBUG
+        qDebug().noquote() << printModel(baseModel);
+        qDebug().noquote() << printModel(&proxyModel);
+#endif
         QVERIFY(baseModel->removeRow(1));
+#ifdef QT_DEBUG
+        qDebug().noquote() << printModel(baseModel);
+        qDebug().noquote() << printModel(&proxyModel);
+#endif
         QCOMPARE(proxyModel.rowCount(),beforeRemovedRowCount-childRowsRemoved);
         for(QSignalSpy* spy : {&proxyRowAboutToRemovedSpy,&proxyRowRemovedSpy}){
             QCOMPARE(spy->count(),1);
