@@ -100,7 +100,19 @@ void HierarchyLevelProxyModelPrivate::onHeaderDataChanged(Qt::Orientation orient
 
 void HierarchyLevelProxyModelPrivate::onColumnsAboutToBeInserted(const QModelIndex &parent, int first, int last)
 {
-    //#TODO
+    Q_Q(HierarchyLevelProxyModel);
+    for(auto& root : qAsConst(m_roots)){
+        if(root.root!=parent)
+            continue;
+        if(m_maxCol==q->sourceModel()->columnCount(parent)){
+            q->beginInsertColumns(QModelIndex(),first,last);
+            return;
+        }
+    }
+    const QModelIndex mappedParent = q->mapFromSource(parent);
+    if(mappedParent.isValid())
+        q->beginInsertColumns(mappedParent,first,last);
+    //#TODO inserting first column
 }
 
 void HierarchyLevelProxyModelPrivate::onColumnsAboutToBeMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)
@@ -115,7 +127,18 @@ void HierarchyLevelProxyModelPrivate::onColumnsAboutToBeRemoved(const QModelInde
 
 void HierarchyLevelProxyModelPrivate::onColumnsInserted(const QModelIndex &parent, int first, int last)
 {
-    //#TODO
+    Q_Q(HierarchyLevelProxyModel);
+    for(auto& root : qAsConst(m_roots)){
+        if(root.root!=parent)
+            continue;
+        if(m_maxCol<q->sourceModel()->columnCount(parent)){
+            m_maxCol=q->sourceModel()->columnCount(parent);
+            q->endInsertColumns();
+            return;
+        }
+    }
+    if(q->mapFromSource(parent).isValid())
+        q->endInsertColumns();
 }
 
 void HierarchyLevelProxyModelPrivate::onColumnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)
@@ -430,8 +453,11 @@ void HierarchyLevelProxyModel::multiData(const QModelIndex &index, QModelRoleDat
 {
     Q_ASSERT(index.isValid() ? index.model() == this : true);
     Q_D(const HierarchyLevelProxyModel);
-    if(!sourceModel() || !index.isValid() || d->inexistentAtSource(index))
+    if(!sourceModel() || !index.isValid() || d->inexistentAtSource(index)){
+        for (QModelRoleData &roleData : roleDataSpan)
+            roleData.setData(QVariant());
         return;
+    }
     return sourceModel()->multiData(mapToSource(index),roleDataSpan);
 }
 
