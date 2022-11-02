@@ -794,6 +794,42 @@ void tst_HierarchyLevelProxyModel::testRemoveRowSource()
     }
 }
 
+void tst_HierarchyLevelProxyModel::testInsertColumnSource_data(){
+    QTest::addColumn<QAbstractItemModel *>("baseModel");
+    QTest::newRow("List") << createListModel(this);
+    QTest::newRow("Tree") << createTreeModel(this);
+}
+
+void tst_HierarchyLevelProxyModel::testInsertColumnSource()
+{
+    QFETCH(QAbstractItemModel *, baseModel);
+    if (!baseModel)
+        return;
+    HierarchyLevelProxyModel proxyModel;
+    new ModelTest(&proxyModel, baseModel);
+    proxyModel.setSourceModel(baseModel);
+    QSignalSpy proxyColumnAboutToBeInsertedSpy(&proxyModel, &QAbstractItemModel::columnsAboutToBeInserted);
+    QSignalSpy proxyColumnInsertedSpy(&proxyModel, &QAbstractItemModel::columnsInserted);
+
+    if(!baseModel->hasChildren(baseModel->index(0,0)))
+        return;
+    proxyModel.setHierarchyLevel(1);
+
+    //insert at level 2
+    QModelIndex sourceParent = baseModel->index(0,0,baseModel->index(0,0));
+    int oldSourceColCount = baseModel->columnCount(sourceParent);
+    QCOMPARE(proxyModel.columnCount(proxyModel.index(0,0)),oldSourceColCount);
+    QVERIFY(baseModel->insertColumn(1,sourceParent));
+    QCOMPARE(proxyModel.columnCount(proxyModel.index(0,0)),oldSourceColCount+1);
+    for(QSignalSpy* spy : {&proxyColumnAboutToBeInsertedSpy,&proxyColumnInsertedSpy}){
+        QCOMPARE(spy->count(),1);
+        const auto spyArgs = spy->takeFirst();
+        QCOMPARE(spyArgs.at(0).value<QModelIndex>(), proxyModel.index(0,0));
+        QCOMPARE(spyArgs.at(1).toInt(),1);
+        QCOMPARE(spyArgs.at(2).toInt(),1);
+    }
+}
+
 void tst_HierarchyLevelProxyModel::testSetItemData_data()
 {
     /*

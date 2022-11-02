@@ -44,7 +44,7 @@ public:
     bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
-    void multiData(const QModelIndex &index, QModelRoleDataSpan roleDataSpan) const;
+    void multiData(const QModelIndex &index, QModelRoleDataSpan roleDataSpan) const override;
     QMap<int, QVariant> itemData(const QModelIndex &index) const override;
     bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles) override;
     bool clearItemData(const QModelIndex &index) override;
@@ -54,9 +54,9 @@ public:
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
     bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+    bool insertColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
     /*bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent,
                   int destinationChild) override;
-    bool insertColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
     bool removeColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
     bool moveColumns(const QModelIndex &sourceParent, int sourceColumn, int count, const QModelIndex &destinationParent,
                      int destinationChild) override;
