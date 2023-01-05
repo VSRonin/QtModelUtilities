@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     hierarchyLevelProxy->setHierarchyLevel(1);
     hierarchyLevelProxy->setSourceModel(baseModel);
 
-    QTimer::singleShot(5000,baseModel,[baseModel,hierarchyLevelProxy]{baseModel->removeRows(1,1,baseModel->index(0,0));});
+    QTimer::singleShot(5000, baseModel, [baseModel, hierarchyLevelProxy] { baseModel->removeRows(1, 1, baseModel->index(0, 0)); });
 
     // Create a view for the base model and a view for the proxy
     QTreeView *baseView = new QTreeView(&mainWid);
@@ -40,7 +40,6 @@ int main(int argc, char *argv[])
     QSpinBox *levelSpin = new QSpinBox(&mainWid);
     levelSpin->setValue(1);
     QObject::connect(levelSpin, &QSpinBox::valueChanged, hierarchyLevelProxy, &HierarchyLevelProxyModel::setHierarchyLevel);
-
 
     // Lay out the widget
     QGridLayout *mainLay = new QGridLayout(&mainWid);

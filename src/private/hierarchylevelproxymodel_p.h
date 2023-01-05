@@ -15,13 +15,14 @@
 #include "hierarchylevelproxymodel.h"
 #include "private/modelutilities_common_p.h"
 #include <QVector>
-struct HierarchyRootData{
+struct HierarchyRootData
+{
     QPersistentModelIndex root;
-    int cachedCumRowCount=0;
-    HierarchyRootData(const QPersistentModelIndex& rt, int rc);
+    int cachedCumRowCount = 0;
+    HierarchyRootData(const QPersistentModelIndex &rt, int rc);
     HierarchyRootData();
-    HierarchyRootData(const HierarchyRootData& other) =default;
-    HierarchyRootData& operator=(const HierarchyRootData& other)=default;
+    HierarchyRootData(const HierarchyRootData &other) = default;
+    HierarchyRootData &operator=(const HierarchyRootData &other) = default;
 };
 
 class HierarchyLevelProxyModelPrivate
@@ -35,19 +36,19 @@ class HierarchyLevelProxyModelPrivate
     int m_targetLevel;
     HierarchyLevelProxyModel::InsertBehaviour m_insertBehaviour;
     const char m_inexistentSourceIndexFlag;
-    QVector<std::pair<int,bool> > m_rootsIndexesToRemove;
+    QVector<std::pair<int, bool>> m_rootsIndexesToRemove;
     QVector<QPersistentModelIndex> m_layoutChangePersistentIndexes;
     QModelIndexList m_layoutChangeProxyIndexes;
     QVector<QMetaObject::Connection> m_sourceConnections;
     int rootOf(QModelIndex sourceIndex) const;
     static int levelOf(QModelIndex idx);
-    static bool isAncestor(const QModelIndex& targetparent, QModelIndex root);
-    bool inexistentAtSource(const QModelIndex& idx) const;
+    static bool isAncestor(const QModelIndex &targetparent, QModelIndex root);
+    bool inexistentAtSource(const QModelIndex &idx) const;
     void rebuildMapping();
-    void rebuildMappingBranch(const QModelIndex& parent, int levl, int &rootsRowCount);
+    void rebuildMappingBranch(const QModelIndex &parent, int levl, int &rootsRowCount);
 
     void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
-    void onHeaderDataChanged(Qt::Orientation orientation,int first, int last);
+    void onHeaderDataChanged(Qt::Orientation orientation, int first, int last);
     void onColumnsAboutToBeInserted(const QModelIndex &parent, int first, int last);
     void onColumnsAboutToBeMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column);
     void onColumnsAboutToBeRemoved(const QModelIndex &parent, int first, int last);
@@ -67,7 +68,6 @@ class HierarchyLevelProxyModelPrivate
     void beforeLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint);
     void afetrLayoutChange(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint);
     void afterReset();
-
 };
 
 #endif // HIERARCHYLEVELPROXY_P_H

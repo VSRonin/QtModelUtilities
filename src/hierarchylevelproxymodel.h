@@ -27,11 +27,7 @@ class MODELUTILITIES_EXPORT HierarchyLevelProxyModel : public QAbstractProxyMode
     HierarchyLevelProxyModelPrivate *m_dptr;
 
 public:
-    enum InsertBehaviour {
-        InsertToPrevious
-        , InsertToPreviousNonEmpty
-        , InsertToNext
-    };
+    enum InsertBehaviour { InsertToPrevious, InsertToPreviousNonEmpty, InsertToNext };
     Q_ENUM(InsertBehaviour)
     explicit HierarchyLevelProxyModel(QObject *parent = nullptr);
     ~HierarchyLevelProxyModel();
@@ -67,13 +63,15 @@ public:
     bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) override;
     bool canFetchMore(const QModelIndex &parent) const override;
     void fetchMore(const QModelIndex &parent) override;
-    QModelIndexList match(const QModelIndex &start, int role, const QVariant &value, int hits = 1, Qt::MatchFlags flags = Qt::MatchFlags(Qt::MatchStartsWith|Qt::MatchWrap)) const override;
+    QModelIndexList match(const QModelIndex &start, int role, const QVariant &value, int hits = 1,
+                          Qt::MatchFlags flags = Qt::MatchFlags(Qt::MatchStartsWith | Qt::MatchWrap)) const override;
     QMimeData *mimeData(const QModelIndexList &indexes) const override;
     QSize span(const QModelIndex &index) const override;
     int hierarchyLevel() const;
     void setHierarchyLevel(int hierarchyLvl);
     InsertBehaviour insertBehaviour() const;
     void setInsertBehaviour(InsertBehaviour behave);
+
 protected:
     HierarchyLevelProxyModel(HierarchyLevelProxyModelPrivate &dptr, QObject *parent);
 Q_SIGNALS:

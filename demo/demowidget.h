@@ -4,7 +4,9 @@
 #include <QWidget>
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class DemoWidget; }
+namespace Ui {
+class DemoWidget;
+}
 QT_END_NAMESPACE
 
 class DemoWidget : public QWidget

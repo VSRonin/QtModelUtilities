@@ -16,11 +16,11 @@ public:
     ~DemoHierarchylevelProxyModel();
 
 private:
-    void buildBranch(QAbstractItemModel* model, const QModelIndex& parent = QModelIndex(), const QString& prefix = QString(), int depth =0);
+    void buildBranch(QAbstractItemModel *model, const QModelIndex &parent = QModelIndex(), const QString &prefix = QString(), int depth = 0);
     void onChangeHierarchylevel(int value);
     Ui::DemoHierarchylevelProxyModel *ui;
-    QStandardItemModel* sourceModel;
-    HierarchyLevelProxyModel* proxyModel;
+    QStandardItemModel *sourceModel;
+    HierarchyLevelProxyModel *proxyModel;
 };
 
 #endif // DEMOHIERARCHYLEVELPROXYMODEL_H

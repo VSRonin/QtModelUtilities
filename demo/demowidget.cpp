@@ -12,4 +12,3 @@ DemoWidget::~DemoWidget()
 {
     delete ui;
 }
-
