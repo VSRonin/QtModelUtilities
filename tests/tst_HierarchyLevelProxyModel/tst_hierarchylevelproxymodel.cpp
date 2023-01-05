@@ -18,13 +18,14 @@ QAbstractItemModel *createListModel(QObject *parent)
             QStringList() << QStringLiteral("1") << QStringLiteral("2") << QStringLiteral("3") << QStringLiteral("4") << QStringLiteral("5"), parent);
 }
 
-QAbstractItemModel *createTreeModel(QObject *parent, int rows=5, int cols=3)
+void fillTreeModel(QAbstractItemModel *result, int rows=5, int cols=3, bool rowFirst=true)
 {
-    QAbstractItemModel *result = nullptr;
 #ifdef COMPLEX_MODEL_SUPPORT
-    result = new ComplexModel(parent);
-    result->insertRows(0, rows);
+    if(rowFirst)
+        result->insertRows(0, rows);
     result->insertColumns(0, cols);
+    if(!rowFirst)
+        result->insertRows(0, rows);
     for (int i = 0; i < result->rowCount(); ++i) {
         for (int j = 0; j < result->columnCount(); ++j) {
             result->setData(result->index(i, j), QStringLiteral("%1,%2").arg(i).arg(j), Qt::EditRole);
@@ -32,8 +33,11 @@ QAbstractItemModel *createTreeModel(QObject *parent, int rows=5, int cols=3)
             result->setData(result->index(i, j), j, Qt::UserRole + 1);
         }
         const QModelIndex parIdx = result->index(i, 0);
-        result->insertRows(0, rows, parIdx);
+        if(rowFirst)
+            result->insertRows(0, rows, parIdx);
         result->insertColumns(0, cols, parIdx);
+        if(!rowFirst)
+            result->insertRows(0, rows, parIdx);
         for (int k = 0; k < result->rowCount(parIdx); ++k) {
             for (int h = 0; h < result->columnCount(parIdx); ++h) {
                 result->setData(result->index(k, h, parIdx), QStringLiteral("%1,%2,%3").arg(i).arg(k).arg(h), Qt::EditRole);
@@ -42,8 +46,11 @@ QAbstractItemModel *createTreeModel(QObject *parent, int rows=5, int cols=3)
 
             }
             const QModelIndex childIdx = result->index(k, 0, parIdx);
-            result->insertRows(0, rows, childIdx);
+            if(rowFirst)
+                result->insertRows(0, rows, childIdx);
             result->insertColumns(0, cols, childIdx);
+            if(!rowFirst)
+                result->insertRows(0, rows, childIdx);
              for (int j = 0; j < result->rowCount(childIdx); ++j) {
                  for (int h = 0; h < result->columnCount(childIdx); ++h) {
                      result->setData(result->index(j, h, childIdx), QStringLiteral("%1,%2,%3,%4").arg(i).arg(k).arg(j).arg(h), Qt::EditRole);
@@ -54,6 +61,15 @@ QAbstractItemModel *createTreeModel(QObject *parent, int rows=5, int cols=3)
         }
     }
 #endif
+}
+
+QAbstractItemModel *createTreeModel(QObject *parent, int rows=5, int cols=3)
+{
+    QAbstractItemModel *result = nullptr;
+#ifdef COMPLEX_MODEL_SUPPORT
+    result = new ComplexModel(parent);
+#endif
+    fillTreeModel(result,rows,cols);
     return result;
 }
 
@@ -767,15 +783,7 @@ void tst_HierarchyLevelProxyModel::testRemoveRowSource()
         beforeRemovedRowCount = proxyModel.rowCount();
         const int childRowsRemoved = baseModel->rowCount(baseModel->index(1,0));
         Q_ASSERT(childRowsRemoved>0);
-#ifdef QT_DEBUG
-        qDebug().noquote() << printModel(baseModel);
-        qDebug().noquote() << printModel(&proxyModel);
-#endif
         QVERIFY(baseModel->removeRow(1));
-#ifdef QT_DEBUG
-        qDebug().noquote() << printModel(baseModel);
-        qDebug().noquote() << printModel(&proxyModel);
-#endif
         QCOMPARE(proxyModel.rowCount(),beforeRemovedRowCount-childRowsRemoved);
         for(QSignalSpy* spy : {&proxyRowAboutToRemovedSpy,&proxyRowRemovedSpy}){
             QCOMPARE(spy->count(),1);
@@ -810,7 +818,6 @@ void tst_HierarchyLevelProxyModel::testInsertColumnSource()
     proxyModel.setSourceModel(baseModel);
     QSignalSpy proxyColumnAboutToBeInsertedSpy(&proxyModel, &QAbstractItemModel::columnsAboutToBeInserted);
     QSignalSpy proxyColumnInsertedSpy(&proxyModel, &QAbstractItemModel::columnsInserted);
-
     if(!baseModel->hasChildren(baseModel->index(0,0)))
         return;
     proxyModel.setHierarchyLevel(1);
@@ -828,6 +835,71 @@ void tst_HierarchyLevelProxyModel::testInsertColumnSource()
         QCOMPARE(spyArgs.at(1).toInt(),1);
         QCOMPARE(spyArgs.at(2).toInt(),1);
     }
+
+    //insert at level 0
+    oldSourceColCount = baseModel->columnCount(baseModel->index(0,0));
+    QVERIFY(baseModel->insertColumn(1));
+    QCOMPARE(proxyModel.columnCount(),oldSourceColCount);
+    for(QSignalSpy* spy : {&proxyColumnAboutToBeInsertedSpy,&proxyColumnInsertedSpy})
+        QCOMPARE(spy->count(),0);
+
+    //insert at level 1
+    QSignalSpy proxyDataChangedSpy(&proxyModel, &QAbstractItemModel::dataChanged);
+    QVERIFY(baseModel->insertColumn(1, baseModel->index(0,0)));
+    QCOMPARE(proxyModel.columnCount(),oldSourceColCount+1);
+    for(QSignalSpy* spy : {&proxyColumnAboutToBeInsertedSpy,&proxyColumnInsertedSpy}){
+        QCOMPARE(spy->count(),1);
+        const auto spyArgs = spy->takeFirst();
+        QVERIFY(!spyArgs.at(0).value<QModelIndex>().isValid());
+        QCOMPARE(spyArgs.at(1).toInt(),oldSourceColCount);
+        QCOMPARE(spyArgs.at(2).toInt(),oldSourceColCount);
+    }
+    {
+        QCOMPARE(proxyDataChangedSpy.count(),1);
+        const auto spyArgs = proxyDataChangedSpy.takeFirst();
+        QCOMPARE(spyArgs.at(0).value<QModelIndex>(),proxyModel.index(0,1));
+        QCOMPARE(spyArgs.at(1).value<QModelIndex>(),proxyModel.index(baseModel->rowCount(baseModel->index(0,0))-1,oldSourceColCount));
+        QVERIFY(spyArgs.at(2).value<QVector<int> >().isEmpty());
+    }
+    //insert at level 1 of dominant branch
+    QVERIFY(baseModel->insertRows(0,1000, baseModel->index(1,0)));
+    QVERIFY(baseModel->insertColumns(1,2, baseModel->index(1,0)));
+    QCOMPARE(proxyModel.columnCount(),oldSourceColCount+2);
+    for(QSignalSpy* spy : {&proxyColumnAboutToBeInsertedSpy,&proxyColumnInsertedSpy}){
+        QCOMPARE(spy->count(),1);
+        const auto spyArgs = spy->takeFirst();
+        QVERIFY(!spyArgs.at(0).value<QModelIndex>().isValid());
+        QCOMPARE(spyArgs.at(1).toInt(),1);
+        QCOMPARE(spyArgs.at(2).toInt(),2);
+    }
+    {
+        QCOMPARE(proxyDataChangedSpy.count(),2);
+        auto spyArgs = proxyDataChangedSpy.takeFirst();
+        QCOMPARE(spyArgs.at(0).value<QModelIndex>(),proxyModel.index(0,1));
+        QCOMPARE(spyArgs.at(1).value<QModelIndex>(),proxyModel.index(baseModel->rowCount(baseModel->index(0,0))-1,oldSourceColCount+1));
+        QVERIFY(spyArgs.at(2).value<QVector<int> >().isEmpty());
+        spyArgs = proxyDataChangedSpy.takeFirst();
+        QCOMPARE(spyArgs.at(0).value<QModelIndex>(),proxyModel.index(baseModel->rowCount(baseModel->index(0,0))+baseModel->rowCount(baseModel->index(1,0)),1));
+        QCOMPARE(spyArgs.at(1).value<QModelIndex>(),proxyModel.index(proxyModel.rowCount()-1,oldSourceColCount+1));
+        QVERIFY(spyArgs.at(2).value<QVector<int> >().isEmpty());
+    }
+    //insert at level 1 no new column
+    QVERIFY(baseModel->insertColumn(1, baseModel->index(0,0)));
+    QCOMPARE(proxyModel.columnCount(),oldSourceColCount+2);
+    for(QSignalSpy* spy : {&proxyColumnAboutToBeInsertedSpy,&proxyColumnInsertedSpy})
+        QCOMPARE(spy->count(),0);
+
+
+    //insert first column at level 0
+    QSignalSpy proxyModelResetSpy(&proxyModel, &QAbstractItemModel::modelReset);
+    QSignalSpy proxyModelAboutToBeResetSpy(&proxyModel, &QAbstractItemModel::modelAboutToBeReset);
+    QVERIFY(baseModel->insertColumn(0));
+    QCOMPARE(proxyModel.columnCount(),0);
+    QCOMPARE(proxyModel.rowCount(),0);
+    for(QSignalSpy* spy : {&proxyColumnAboutToBeInsertedSpy,&proxyColumnInsertedSpy})
+        QCOMPARE(spy->count(),0);
+    for(QSignalSpy* spy : {&proxyModelAboutToBeResetSpy,&proxyModelResetSpy})
+        QCOMPARE(spy->count(),1);
 }
 
 void tst_HierarchyLevelProxyModel::testSetItemData_data()
@@ -1023,4 +1095,28 @@ void tst_HierarchyLevelProxyModel::createPersistentOnLayoutAboutToBeChanged()
     QCOMPARE(layoutAboutToBeChangedSpy.size(), 1);
     QCOMPARE(layoutChangedSpy.size(), 1);
     */
+}
+void tst_HierarchyLevelProxyModel::testBuildFromScratch_data(){
+    QTest::addColumn<bool>("insertBy");
+    QTest::newRow("Row First") << true;
+    QTest::newRow("Column First") << false;
+}
+
+void tst_HierarchyLevelProxyModel::testBuildFromScratch()
+{
+    QFETCH(bool, insertBy);
+#ifdef COMPLEX_MODEL_SUPPORT
+    ComplexModel model;
+    HierarchyLevelProxyModel proxy;
+    new ModelTest(&proxy, &proxy);
+    proxy.setSourceModel(&model);
+    proxy.setHierarchyLevel(1);
+    fillTreeModel(&model,3,2,insertBy);
+    QCOMPARE(proxy.rowCount(),9);
+    QCOMPARE(proxy.columnCount(),2);
+    QCOMPARE(proxy.rowCount(proxy.index(0,0)),3);
+    QCOMPARE(proxy.columnCount(proxy.index(0,0)),2);
+#else
+QSKIP("This test requires the Qt GUI or GenericModel modules");
+#endif
 }

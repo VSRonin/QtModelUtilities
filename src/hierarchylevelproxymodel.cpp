@@ -110,14 +110,14 @@ void HierarchyLevelProxyModelPrivate::onColumnsAboutToBeInserted(const QModelInd
     const int proxyRowCount = q->rowCount();
     for(auto& root : qAsConst(m_roots)){
         if(root.root==parent){
-            if(m_maxCol<currColumnCount+first-last+1){
-                // calculate if it's more efficient to add the column in place or at the end
-                const int currRowCount = q->sourceModel()->rowCount(parent);
-                if(currColumnCount == first || currRowCount==0 || static_cast<double>(currRowCount)/static_cast<double>(proxyRowCount)<0.5)
-                    // append at the end
-                    return q->beginInsertColumns(QModelIndex(),m_maxCol,m_maxCol+first-last);
-                return q->beginInsertColumns(QModelIndex(),first,last);
-            }
+            if(m_maxCol>=currColumnCount+last-first+1)
+                return;
+            // calculate if it's more efficient to add the column in place or at the end
+            const int currRowCount = q->sourceModel()->rowCount(parent);
+            if(currColumnCount == first || currRowCount==0 || static_cast<double>(currRowCount)/std::max(0.01,static_cast<double>(proxyRowCount))<0.5)
+                // append at the end
+                return q->beginInsertColumns(QModelIndex(),m_maxCol,m_maxCol+last-first);
+            return q->beginInsertColumns(QModelIndex(),first,last);
         }
         if(first==0 && isAncestor(parent, root.root))
             return q->beginResetModel();
@@ -151,19 +151,19 @@ void HierarchyLevelProxyModelPrivate::onColumnsInserted(const QModelIndex &paren
                 q->endInsertColumns();
                 if(oldMaxCol == first)
                     return;
-                if(currRowCount==0 || static_cast<double>(currRowCount)/static_cast<double>(proxyRowCount)<0.5){
+                if(currRowCount==0 || static_cast<double>(currRowCount)/std::max(0.01,static_cast<double>(proxyRowCount))<0.5){
                     if(currRowCount>0)
                         Q_EMIT q->dataChanged(q->index(m_roots.at(i).cachedCumRowCount,first),q->index(m_roots.at(i).cachedCumRowCount+currRowCount-1,m_maxCol-1));
                 }
                 else{
                     if(m_roots.at(i).cachedCumRowCount>0)
-                        Q_EMIT q->dataChanged(q->index(0,first),q->index(m_roots.at(i).cachedCumRowCount-1,last));
+                        Q_EMIT q->dataChanged(q->index(0,first),q->index(m_roots.at(i).cachedCumRowCount-1,m_maxCol-1));
                     if(proxyRowCount>m_roots.at(i).cachedCumRowCount+currRowCount)
-                        Q_EMIT q->dataChanged(q->index(m_roots.at(i).cachedCumRowCount+currRowCount,first),q->index(proxyRowCount-1,last));
+                        Q_EMIT q->dataChanged(q->index(m_roots.at(i).cachedCumRowCount+currRowCount,first),q->index(proxyRowCount-1,m_maxCol-1));
                 }
 
             }
-            else{
+            else if(currRowCount>0){
                 Q_EMIT q->dataChanged(q->index(m_roots.at(i).cachedCumRowCount,first),q->index(m_roots.at(i).cachedCumRowCount+currRowCount-1,last));
             }
             return;
@@ -172,6 +172,20 @@ void HierarchyLevelProxyModelPrivate::onColumnsInserted(const QModelIndex &paren
             rebuildMapping();
             return q->endResetModel();
         }
+    }
+    if(levelOf(parent)==m_targetLevel-1 && currRowCount>0){
+        auto rootI = m_roots.begin();
+        int newCachedCumRowCount=0;
+        for(;rootI!=m_roots.end();++rootI){
+            if(rootI->root.row()>parent.row())
+                break;
+            newCachedCumRowCount=rootI->cachedCumRowCount;
+        }
+        // #TODO
+        //rootI=m_roots.insert(rootI,HierarchyRootData(q->sourceModel()->index(i,0,parent),newCachedCumRowCount));
+        //++rootI;
+
+
     }
 
 }
@@ -220,10 +234,10 @@ void HierarchyLevelProxyModelPrivate::onRowsInserted(const QModelIndex &parent, 
         int newCachedCumRowCount=0;
         if(first<m_roots.size())
             newCachedCumRowCount = m_roots.at(first).cachedCumRowCount;
-        else
+        else if(!m_roots.isEmpty())
             newCachedCumRowCount = m_roots.last().cachedCumRowCount+q->sourceModel()->rowCount(m_roots.last().root);
         for(int i=first;i<=last;++i)
-            m_roots.insert(i,HierarchyRootData(q->sourceModel()->index(i,0),newCachedCumRowCount));
+            m_roots.insert(i,HierarchyRootData(q->sourceModel()->index(i,0,parent),newCachedCumRowCount)); //#TODO test. probably wrong
     }
     else if (q->mapFromSource(parent).isValid())
         q->endInsertRows();
@@ -360,7 +374,7 @@ void HierarchyLevelProxyModel::setSourceModel(QAbstractItemModel *newSourceModel
     beginResetModel();
     for (auto discIter = d->m_sourceConnections.cbegin(); discIter != d->m_sourceConnections.cend(); ++discIter)
         QObject::disconnect(*discIter);
-     d->m_sourceConnections.clear();
+    d->m_sourceConnections.clear();
     QAbstractProxyModel::setSourceModel(newSourceModel);
     d->rebuildMapping();
     if (sourceModel()) {
@@ -582,6 +596,9 @@ QModelIndex HierarchyLevelProxyModel::mapToSource(const QModelIndex &proxyIndex)
 */
 Qt::ItemFlags HierarchyLevelProxyModel::flags(const QModelIndex &index) const
 {
+    if(index.isValid() ? index.model() != this : false){
+        qDebug() << "index.model(): " << index.model() << "\n" <<"this: "<<this<< "\n"<<"sourceModel: " <<sourceModel();
+    }
     Q_ASSERT(index.isValid() ? index.model() == this : true);
     Q_D(const HierarchyLevelProxyModel);
     if (!sourceModel() || d->inexistentAtSource(index))
@@ -713,7 +730,7 @@ QModelIndex HierarchyLevelProxyModel::buddy(const QModelIndex &index) const
     Q_D(const HierarchyLevelProxyModel);
     if(!sourceModel() || !index.isValid() || d->inexistentAtSource(index))
         return QModelIndex();
-    return sourceModel()->buddy(mapToSource(index));
+    return mapFromSource(sourceModel()->buddy(mapToSource(index)));
 }
 
 /*!
