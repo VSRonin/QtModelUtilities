@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DemoWidget</class>
+ <widget class="QWidget" name="DemoWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>DemoWidget</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>5</number>
+     </property>
+     <property name="documentMode">
+      <bool>false</bool>
+     </property>
+     <widget class="QWidget" name="GenericModel">
+      <attribute name="title">
+       <string notr="true">GenericModel</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="InsertProxyModel">
+      <attribute name="title">
+       <string notr="true">InsertProxyModel</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="ModelSerialisation">
+      <attribute name="title">
+       <string notr="true">ModelSerialisation</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="RoleMaskProxyModel">
+      <attribute name="title">
+       <string notr="true">RoleMaskProxyModel</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="RootIndexProxyModel">
+      <attribute name="title">
+       <string notr="true">RootIndexProxyModel</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="HierarchylevelProxyModel">
+      <attribute name="title">
+       <string notr="true">HierarchylevelProxyModel</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="DemoHierarchylevelProxyModel" name="widget" native="true"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DemoHierarchylevelProxyModel</class>
+   <extends>QWidget</extends>
+   <header>demohierarchylevelproxymodel.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
