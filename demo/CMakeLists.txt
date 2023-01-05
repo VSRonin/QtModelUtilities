@@ -11,6 +11,7 @@ qt_add_executable(QtModelUtilitiesDemo
     demohierarchylevelproxymodel.h
     demohierarchylevelproxymodel.cpp
     demohierarchylevelproxymodel.ui
+    templatedemoview.h
 )
 
 target_link_libraries(QtModelUtilitiesDemo PRIVATE

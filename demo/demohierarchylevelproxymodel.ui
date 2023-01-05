@@ -29,7 +29,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QTreeView" name="sourceView">
+        <widget class="DemoTreeView" name="sourceView">
          <property name="contextMenuPolicy">
           <enum>Qt::CustomContextMenu</enum>
          </property>
@@ -37,7 +37,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QLabel" name="label_2">
@@ -68,7 +68,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QTreeView" name="proxyView">
+        <widget class="DemoTreeView" name="proxyView">
          <property name="contextMenuPolicy">
           <enum>Qt::CustomContextMenu</enum>
          </property>
@@ -80,6 +80,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DemoTreeView</class>
+   <extends>QTreeView</extends>
+   <header>templatedemoview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
