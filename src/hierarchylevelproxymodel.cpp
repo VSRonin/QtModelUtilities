@@ -164,10 +164,9 @@ void HierarchyLevelProxyModelPrivate::onColumnsInserted(const QModelIndex &paren
                         Q_EMIT q->dataChanged(q->index(m_roots.at(i).cachedCumRowCount + currRowCount, first),
                                               q->index(proxyRowCount - 1, m_maxCol - 1));
                 }
-
             } else if (currRowCount > 0) {
                 Q_EMIT q->dataChanged(q->index(m_roots.at(i).cachedCumRowCount, first),
-                                      q->index(m_roots.at(i).cachedCumRowCount + currRowCount - 1, last));
+                                      q->index(m_roots.at(i).cachedCumRowCount + currRowCount - 1, m_maxCol - 1));
             }
             return;
         } else if (first == 0 && isAncestor(parent, m_roots.at(i).root)) {
