@@ -242,7 +242,7 @@ void HierarchyLevelProxyModelPrivate::onRowsInserted(const QModelIndex &parent, 
         else if (!m_roots.isEmpty())
             newCachedCumRowCount = m_roots.last().cachedCumRowCount + q->sourceModel()->rowCount(m_roots.last().root);
         for (int i = first; i <= last; ++i)
-            m_roots.insert(i, HierarchyRootData(q->sourceModel()->index(i, 0, parent), newCachedCumRowCount)); //#TODO test. probably wrong
+            m_roots.insert(i, HierarchyRootData(q->sourceModel()->index(i, 0, parent), newCachedCumRowCount));
     } else if (q->mapFromSource(parent).isValid())
         q->endInsertRows();
 }

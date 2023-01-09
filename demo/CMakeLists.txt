@@ -24,7 +24,7 @@ target_link_libraries(QtModelUtilitiesDemo PRIVATE
 set_target_properties(QtModelUtilitiesDemo PROPERTIES
     AUTOMOC ON
     AUTOUIC ON
-    CXX_STANDARD 11
+    CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
     VERSION ${VERSION_SHORT}
     MACOSX_BUNDLE_GUI_IDENTIFIER demo.qtmodelutilities.com

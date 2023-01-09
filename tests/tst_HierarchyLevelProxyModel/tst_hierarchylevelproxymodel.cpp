@@ -585,8 +585,8 @@ void tst_HierarchyLevelProxyModel::testInsertRowsProxy()
         for (int i = 0, iEnd = baseModel->rowCount(); i < iEnd; ++i)
             beforeInsertRowCount += baseModel->rowCount(baseModel->index(i, 0));
 
-        QVERIFY(proxyModel.insertRows(baseModel->rowCount(baseModel->index(0, 0)) + 1,
-                                      2)); // equivalent to baseModel->insertRow(1,baseModel->index(1,0))
+        // equivalent to baseModel->insertRow(1,baseModel->index(1,0))
+        QVERIFY(proxyModel.insertRows(baseModel->rowCount(baseModel->index(0, 0)) + 1, 2));
         QCOMPARE(proxyModel.rowCount(), beforeInsertRowCount + 2);
         for (QSignalSpy *spy : {&proxyRowAboutToInsertSpy, &proxyRowInsertSpy}) {
             QCOMPARE(spy->count(), 1);
