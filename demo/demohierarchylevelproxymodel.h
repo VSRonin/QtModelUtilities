@@ -16,7 +16,7 @@ public:
     ~DemoHierarchylevelProxyModel();
 
 private:
-    void buildBranch(QAbstractItemModel *model, const QModelIndex &parent = QModelIndex(), const QString &prefix = QString(), int depth = 0);
+    void fillModel(QAbstractItemModel *model);
     void onChangeHierarchylevel(int value);
     Ui::DemoHierarchylevelProxyModel *ui;
     QStandardItemModel *sourceModel;
