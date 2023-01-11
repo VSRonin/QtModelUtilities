@@ -733,8 +733,30 @@ bool HierarchyLevelProxyModel::insertColumns(int column, int count, const QModel
     if (parent.isValid())
         return sourceModel()->insertColumns(column, count, mapToSource(parent));
     bool result = true;
-    for (auto &&root : d->m_roots)
+    for (auto &&root : qAsConst(d->m_roots))
         result = result && sourceModel()->insertColumns(std::min(column, sourceModel()->columnCount(root.root)), count, root.root);
+    return result;
+}
+
+/*!
+\reimp
+*/
+bool HierarchyLevelProxyModel::removeColumns(int column, int count, const QModelIndex &parent)
+{
+    Q_ASSERT(parent.isValid() ? parent.model() == this : true);
+    Q_D(const HierarchyLevelProxyModel);
+    if (!sourceModel() || d->inexistentAtSource(parent))
+        return false;
+    if (column < 0 || column + count  > columnCount(parent))
+        return false;
+    if (parent.isValid())
+        return sourceModel()->removeRows(column, count, mapToSource(parent));
+    bool result = true;
+    for (auto &&root : qAsConst(d->m_roots)){
+        const int branchCount =sourceModel()->columnCount(root.root);
+        if(column<branchCount)
+            result = result && sourceModel()->removeColumns(column, std::min(count,branchCount-column), root.root);
+    }
     return result;
 }
 
