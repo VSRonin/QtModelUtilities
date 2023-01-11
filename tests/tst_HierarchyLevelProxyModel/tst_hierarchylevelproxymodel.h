@@ -25,7 +25,8 @@ private Q_SLOTS:
     void testInsertBehaviour();
     void testRemoveRowSource_data();
     void testRemoveRowSource();
-    // #TODO remove row proxy
+    void testRemoveRowProxy_data();
+    void testRemoveRowProxy();
     void testInsertColumnSource();
     void testInsertColumnProxy();
 

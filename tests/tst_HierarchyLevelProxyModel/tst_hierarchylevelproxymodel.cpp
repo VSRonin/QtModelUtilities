@@ -797,6 +797,79 @@ void tst_HierarchyLevelProxyModel::testRemoveRowSource()
             QCOMPARE(spy->count(), 0);
     }
 }
+void tst_HierarchyLevelProxyModel::testRemoveRowProxy_data()
+{
+    QTest::addColumn<QAbstractItemModel *>("baseModel");
+    QTest::newRow("List") << createListModel(this);
+    QTest::newRow("Tree") << createTreeModel(this);
+}
+
+void tst_HierarchyLevelProxyModel::testRemoveRowProxy()
+{
+    QFETCH(QAbstractItemModel *, baseModel);
+    if (!baseModel)
+        return;
+    HierarchyLevelProxyModel proxyModel;
+    new ModelTest(&proxyModel, baseModel);
+    proxyModel.setSourceModel(baseModel);
+    QSignalSpy proxyRowAboutToRemovedSpy(&proxyModel, &QAbstractItemModel::rowsAboutToBeRemoved);
+    QSignalSpy proxyRowRemovedSpy(&proxyModel, &QAbstractItemModel::rowsRemoved);
+    QSignalSpy sourceRowAboutToRemovedSpy(baseModel, &QAbstractItemModel::rowsAboutToBeRemoved);
+    QSignalSpy sourceRowRemovedSpy(baseModel, &QAbstractItemModel::rowsRemoved);
+
+    int beforeRemovedRowCount = baseModel->rowCount();
+    QVERIFY(proxyModel.removeRow(2));
+    QCOMPARE(proxyModel.rowCount(), beforeRemovedRowCount - 1);
+    QCOMPARE(baseModel->rowCount(), beforeRemovedRowCount - 1);
+    for (QSignalSpy *spy : {&proxyRowAboutToRemovedSpy, &proxyRowRemovedSpy, &sourceRowAboutToRemovedSpy,&sourceRowRemovedSpy}) {
+        QCOMPARE(spy->count(), 1);
+        const auto spyArgs = spy->takeFirst();
+        QVERIFY(!spyArgs.at(0).value<QModelIndex>().isValid());
+        QCOMPARE(spyArgs.at(2).toInt(), 2);
+        QCOMPARE(spyArgs.at(1).toInt(), 2);
+    }
+    if (baseModel->hasChildren(baseModel->index(0, 0))) {
+        beforeRemovedRowCount = 0;
+        for (int i = 0, iEnd = baseModel->rowCount(); i < iEnd; ++i)
+            beforeRemovedRowCount += baseModel->rowCount(baseModel->index(i, 0));
+        proxyModel.setHierarchyLevel(1);
+        // remove at level 2
+        QVERIFY(proxyModel.removeRow(1, proxyModel.index(1, 0)));
+        QCOMPARE(proxyModel.rowCount(), beforeRemovedRowCount);
+        for (QSignalSpy *spy : {&proxyRowAboutToRemovedSpy, &proxyRowRemovedSpy}) {
+            QCOMPARE(spy->count(), 1);
+            const auto spyArgs = spy->takeFirst();
+            QCOMPARE(spyArgs.at(0).value<QModelIndex>(), proxyModel.index(1, 0));
+            QCOMPARE(spyArgs.at(2).toInt(), 1);
+            QCOMPARE(spyArgs.at(1).toInt(), 1);
+        }
+        for (QSignalSpy *spy : {&sourceRowAboutToRemovedSpy, &sourceRowRemovedSpy}) {
+            QCOMPARE(spy->count(), 1);
+            const auto spyArgs = spy->takeFirst();
+            QCOMPARE(spyArgs.at(0).value<QModelIndex>(), baseModel->index(1,0,baseModel->index(0, 0)));
+            QCOMPARE(spyArgs.at(2).toInt(), 1);
+            QCOMPARE(spyArgs.at(1).toInt(), 1);
+        }
+
+        // remove at level 1
+        QVERIFY(proxyModel.removeRow(1));
+        QCOMPARE(proxyModel.rowCount(), beforeRemovedRowCount - 1);
+        for (QSignalSpy *spy : {&proxyRowAboutToRemovedSpy, &proxyRowRemovedSpy}) {
+            QCOMPARE(spy->count(), 1);
+            const auto spyArgs = spy->takeFirst();
+            QVERIFY(!spyArgs.at(0).value<QModelIndex>().isValid());
+            QCOMPARE(spyArgs.at(2).toInt(), 1);
+            QCOMPARE(spyArgs.at(1).toInt(), 1);
+        }
+        for (QSignalSpy *spy : {&sourceRowAboutToRemovedSpy, &sourceRowRemovedSpy}) {
+            QCOMPARE(spy->count(), 1);
+            const auto spyArgs = spy->takeFirst();
+            QCOMPARE(spyArgs.at(0).value<QModelIndex>(), baseModel->index(0, 0));
+            QCOMPARE(spyArgs.at(2).toInt(), 1);
+            QCOMPARE(spyArgs.at(1).toInt(), 1);
+        }
+    }
+}
 
 void tst_HierarchyLevelProxyModel::testInsertColumnSource()
 {
@@ -876,7 +949,13 @@ void tst_HierarchyLevelProxyModel::testInsertColumnSource()
     QCOMPARE(proxyModel.columnCount(), oldSourceColCount + 2);
     for (QSignalSpy *spy : {&proxyColumnAboutToBeInsertedSpy, &proxyColumnInsertedSpy})
         QCOMPARE(spy->count(), 0);
-    // #TODO test the dataChanged emitted
+    {
+        QCOMPARE(proxyDataChangedSpy.count(), 1);
+        auto spyArgs = proxyDataChangedSpy.takeFirst();
+        QCOMPARE(spyArgs.at(0).value<QModelIndex>(), proxyModel.index(0, 1));
+        QCOMPARE(spyArgs.at(1).value<QModelIndex>(), proxyModel.index(baseModel->rowCount(baseModel->index(0, 0)) - 1, baseModel->columnCount(baseModel->index(0, 0))-1));
+        QVERIFY(spyArgs.at(2).value<QVector<int>>().isEmpty());
+    }
 
     // insert first column at level 0
     QSignalSpy proxyModelResetSpy(&proxyModel, &QAbstractItemModel::modelReset);
