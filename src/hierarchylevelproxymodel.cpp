@@ -133,7 +133,34 @@ void HierarchyLevelProxyModelPrivate::onColumnsAboutToBeMoved(const QModelIndex 
 
 void HierarchyLevelProxyModelPrivate::onColumnsAboutToBeRemoved(const QModelIndex &parent, int first, int last)
 {
-    //#TODO
+    Q_Q(HierarchyLevelProxyModel);
+    Q_ASSERT(first >= 0 && first <= m_maxCol && last >= first);
+    const QModelIndex mappedParent = q->mapFromSource(parent);
+    if (mappedParent.isValid())
+        return q->beginRemoveColumns(mappedParent, first, last);
+    const int currColumnCount = q->sourceModel()->columnCount(parent);
+    const int proxyRowCount = q->rowCount();
+    for (auto &root : qAsConst(m_roots)) {
+        if (root.root == parent) {
+            Q_ASSERT(first < currColumnCount);
+            if(currColumnCount==m_maxCol){
+                for (auto i=m_roots.cbegin(), iEnd=m_roots.cend();i!=iEnd;++i){
+                    if(root.root != i->root && q->sourceModel()->columnCount(i->root)==m_maxCol)
+                        return; //just needs dataChanged
+                }
+                // calculate if it's more efficient to remove the column in place or at the end
+                const int currRowCount = q->sourceModel()->rowCount(parent);
+                if (currColumnCount == first || currRowCount == 0
+                    || static_cast<double>(currRowCount) / std::max(0.01, static_cast<double>(proxyRowCount)) < 0.5)
+                    // remove at the end
+                    return q->beginRemoveColumns(QModelIndex(),m_maxCol-last+first-1, m_maxCol-1);
+                return q->beginRemoveColumns(QModelIndex(), first, last);
+            }
+            return; //just needs dataChanged
+        }
+        if (first == 0 && isAncestor(parent, root.root))
+            return q->beginResetModel();
+    }
 }
 
 void HierarchyLevelProxyModelPrivate::onColumnsInserted(const QModelIndex &parent, int first, int last)
@@ -201,7 +228,51 @@ void HierarchyLevelProxyModelPrivate::onColumnsMoved(const QModelIndex &parent, 
 
 void HierarchyLevelProxyModelPrivate::onColumnsRemoved(const QModelIndex &parent, int first, int last)
 {
-    //#TODO
+    Q_Q(HierarchyLevelProxyModel);
+    Q_ASSERT(first >= 0 && first <= m_maxCol && last >= first);
+    if (q->mapFromSource(parent).isValid())
+        return q->endRemoveColumns();
+    const int currColumnCount = q->sourceModel()->columnCount(parent);
+    const int currRowCount = q->sourceModel()->rowCount(parent);
+    const int oldColumnCount = currColumnCount -last+first-1;
+    const int proxyRowCount = q->rowCount();
+    for (auto root = m_roots.cbegin(), rootEnd = m_roots.cend();root!=rootEnd;++root) {
+        if (root->root == parent) {
+            if(oldColumnCount==m_maxCol){
+                int newMaxCol = 0;
+                for (auto i=m_roots.cbegin(), iEnd=m_roots.cend();i!=iEnd;++i){
+                    const int iColCount = q->sourceModel()->columnCount(i->root);
+                    if(root->root != i->root && iColCount==m_maxCol){
+                        Q_EMIT q->dataChanged(q->index(root->cachedCumRowCount, first), q->index(root->cachedCumRowCount+currRowCount-1, m_maxCol-1));
+                        return;
+                    }
+                    if(iColCount>newMaxCol)
+                    newMaxCol = iColCount;
+                }
+                m_maxCol=newMaxCol;
+                q->endRemoveColumns();
+                // calculate if it's more efficient to remove the column in place or at the end
+                if (oldColumnCount == first || currRowCount == 0
+                    || static_cast<double>(currRowCount) / std::max(0.01, static_cast<double>(proxyRowCount)) < 0.5){
+                    // remove at the end
+                    Q_EMIT q->dataChanged(q->index(root->cachedCumRowCount, first), q->index(root->cachedCumRowCount+currRowCount-1, m_maxCol-1));
+                }
+                else{
+                    if(root->cachedCumRowCount>0)
+                        Q_EMIT q->dataChanged(q->index(0, first), q->index(root->cachedCumRowCount-1, m_maxCol-1));
+                    if(std::distance(root,rootEnd)>1)
+                        Q_EMIT q->dataChanged(q->index(root->cachedCumRowCount+currRowCount, first), q->index(proxyRowCount, m_maxCol-1));
+                }
+            }
+            Q_EMIT q->dataChanged(q->index(root->cachedCumRowCount, first), q->index(root->cachedCumRowCount+currRowCount-1, m_maxCol-1));
+            return;
+        }
+        if (first == 0 && isAncestor(parent, root->root)){
+            rebuildMapping();
+            return q->endResetModel();
+        }
+    }
+
 }
 
 void HierarchyLevelProxyModelPrivate::onRowsAboutToBeInserted(const QModelIndex &parent, int first, int last)

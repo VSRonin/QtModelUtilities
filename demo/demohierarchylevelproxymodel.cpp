@@ -28,18 +28,30 @@ void DemoHierarchylevelProxyModel::fillModel(QAbstractItemModel *model)
     for (int i = 0; i < model->rowCount(); ++i){
         int whQuantity=0;
         double whWeight=0.0;
-        QModelIndex currParent = model->index(i, 0);
+        const QModelIndex currParent = model->index(i, 0);
         model->setData(currParent, tr("Warehouse %1").arg(i+1));
         model->insertRows(0, 5, currParent);
         model->insertColumns(0,3, currParent);
         for (int j = 0; j < model->rowCount(currParent); ++j){
-            model->setData(model->index(j,0,currParent), tr("Product %1").arg(j+1));
-            const int quantity = quantityDistrib(generator);
-            model->setData(model->index(j,1,currParent), quantity);
-            whQuantity+=quantity;
-            const double weight = weightDistrib(generator);
-            model->setData(model->index(j,2,currParent), weight);
-            whWeight+=weight;
+            int prQuantity=0;
+            double prWeight=0.0;
+            const QModelIndex currChild = model->index(j,0,currParent);
+            model->setData(currChild, tr("Product %1").arg(j+1));
+            model->insertRows(0, 5, currChild);
+            model->insertColumns(0,3, currChild);
+            for (int h=0;h< model->rowCount(currChild); ++h){
+                const int quantity = quantityDistrib(generator);
+                const double weight = weightDistrib(generator);
+                model->setData(model->index(h,0,currChild), tr("Component %1").arg(h+1));
+                model->setData(model->index(h,1,currChild), quantity);
+                model->setData(model->index(h,2,currChild), weight);
+                prQuantity+=quantity;
+                prWeight+=weight;
+            }
+            model->setData(model->index(j,1,currParent), prQuantity);
+            model->setData(model->index(j,2,currParent), prWeight);
+            whQuantity+=prQuantity;
+            whWeight+=prWeight;
         }
         model->setData(model->index(i,1), whQuantity);
         model->setData(model->index(i,2), whWeight);

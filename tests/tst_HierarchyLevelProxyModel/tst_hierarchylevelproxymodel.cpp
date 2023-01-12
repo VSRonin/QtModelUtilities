@@ -1079,6 +1079,21 @@ void tst_HierarchyLevelProxyModel::testInsertColumnProxy()
 #endif
 }
 
+void tst_HierarchyLevelProxyModel::testRemoveColumnSource()
+{
+#ifdef COMPLEX_MODEL_SUPPORT
+    QAbstractItemModel *baseModel = createTreeModel(this);
+    HierarchyLevelProxyModel proxyModel;
+    new ModelTest(&proxyModel, baseModel);
+    proxyModel.setSourceModel(baseModel);
+    QSignalSpy proxyColumnAboutToBeRemovedSpy(&proxyModel, &QAbstractItemModel::columnsAboutToBeRemoved);
+    QSignalSpy proxyColumnRemovedSpy(&proxyModel, &QAbstractItemModel::columnsRemoved);
+    // #TODO
+#else
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
+#endif
+}
+
 void tst_HierarchyLevelProxyModel::testSetItemData_data()
 {
     /*
