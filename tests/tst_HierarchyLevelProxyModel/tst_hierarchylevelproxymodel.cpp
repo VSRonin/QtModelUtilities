@@ -82,24 +82,6 @@ void tst_HierarchyLevelProxyModel::autoParent()
     QCOMPARE(testItemDestroyedSpy.count(), 1);
 }
 
-void tst_HierarchyLevelProxyModel::testSourceInsertCol()
-{
-#ifdef COMPLEX_MODEL_SUPPORT
-
-#else
-    QSKIP("This test requires the Qt GUI or GenericModel modules");
-#endif
-}
-
-void tst_HierarchyLevelProxyModel::testSourceInsertCol_data()
-{
-#ifdef COMPLEX_MODEL_SUPPORT
-
-#else
-    QSKIP("This test requires the Qt GUI or GenericModel modules");
-#endif
-}
-
 void tst_HierarchyLevelProxyModel::testProperties()
 {
     HierarchyLevelProxyModel proxyModel;
@@ -256,7 +238,6 @@ void tst_HierarchyLevelProxyModel::testSetData()
     spyArgs = sourceDataChangeSpy.takeFirst();
     QCOMPARE(spyArgs.at(0).value<QModelIndex>(), baseModel->index(0, 0));
     QCOMPARE(spyArgs.at(1).value<QModelIndex>(), baseModel->index(0, 0));
-    baseModel->deleteLater();
     if (baseModel->hasChildren(baseModel->index(0, 0))) {
         const QModelIndex proxyChildIdX = proxyModel.index(0, 0, proxyIdX);
         QVERIFY(proxyModel.setData(proxyChildIdX, idxData));
@@ -288,6 +269,7 @@ void tst_HierarchyLevelProxyModel::testSetData()
     } else {
         QVERIFY(!proxyModel.setData(proxyModel.index(0, 0), idxData));
     }
+    baseModel->deleteLater();
 }
 
 void tst_HierarchyLevelProxyModel::testSetData_data()
@@ -368,6 +350,7 @@ void tst_HierarchyLevelProxyModel::testInsertRowSource()
             QCOMPARE(spyArgs.at(1).toInt(), baseModel->rowCount(baseModel->index(0, 0)) + baseModel->rowCount(baseModel->index(1, 0)));
         }
     }
+    baseModel->deleteLater();
 }
 
 void tst_HierarchyLevelProxyModel::testInsertRowsSource_data()
@@ -442,6 +425,7 @@ void tst_HierarchyLevelProxyModel::testInsertRowsSource()
             QCOMPARE(spyArgs.at(1).toInt(), baseModel->rowCount(baseModel->index(0, 0)) + baseModel->rowCount(baseModel->index(1, 0)));
         }
     }
+    baseModel->deleteLater();
 }
 
 void tst_HierarchyLevelProxyModel::testInsertRowProxy_data()
@@ -523,6 +507,7 @@ void tst_HierarchyLevelProxyModel::testInsertRowProxy()
             QCOMPARE(spyArgs.at(1).toInt(), 1);
         }
     }
+    baseModel->deleteLater();
 }
 
 void tst_HierarchyLevelProxyModel::testInsertRowsProxy_data()
@@ -603,6 +588,7 @@ void tst_HierarchyLevelProxyModel::testInsertRowsProxy()
             QCOMPARE(spyArgs.at(2).toInt(), 2);
         }
     }
+    baseModel->deleteLater();
 }
 
 void tst_HierarchyLevelProxyModel::testInsertBehaviour()
@@ -796,6 +782,7 @@ void tst_HierarchyLevelProxyModel::testRemoveRowSource()
         for (QSignalSpy *spy : {&proxyRowAboutToRemovedSpy, &proxyRowRemovedSpy})
             QCOMPARE(spy->count(), 0);
     }
+    baseModel->deleteLater();
 }
 void tst_HierarchyLevelProxyModel::testRemoveRowProxy_data()
 {
@@ -869,6 +856,7 @@ void tst_HierarchyLevelProxyModel::testRemoveRowProxy()
             QCOMPARE(spyArgs.at(1).toInt(), 1);
         }
     }
+    baseModel->deleteLater();
 }
 
 void tst_HierarchyLevelProxyModel::testInsertColumnSource()
@@ -967,6 +955,7 @@ void tst_HierarchyLevelProxyModel::testInsertColumnSource()
         QCOMPARE(spy->count(), 0);
     for (QSignalSpy *spy : {&proxyModelAboutToBeResetSpy, &proxyModelResetSpy})
         QCOMPARE(spy->count(), 1);
+    baseModel->deleteLater();
 #else
     QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
@@ -1074,6 +1063,7 @@ void tst_HierarchyLevelProxyModel::testInsertColumnProxy()
             QCOMPARE(spyArgs.at(2).toInt(), 1);
         }
     }
+    baseModel->deleteLater();
 #else
     QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
@@ -1088,102 +1078,31 @@ void tst_HierarchyLevelProxyModel::testRemoveColumnSource()
     proxyModel.setSourceModel(baseModel);
     QSignalSpy proxyColumnAboutToBeRemovedSpy(&proxyModel, &QAbstractItemModel::columnsAboutToBeRemoved);
     QSignalSpy proxyColumnRemovedSpy(&proxyModel, &QAbstractItemModel::columnsRemoved);
+
     // #TODO
+    baseModel->deleteLater();
 #else
     QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif
 }
 
-void tst_HierarchyLevelProxyModel::testSetItemData_data()
-{
-    /*
-    QTest::addColumn<QAbstractItemModel *>("baseModel");
-    QTest::addColumn<int>("idxRow");
-    QTest::addColumn<int>("idxCol");
-    QAbstractItemModel *baseModel = createListModel(this);
-    QTest::newRow("List Extra Row") << baseModel << baseModel->rowCount() << 0;
-    baseModel = createListModel(this);
-    QTest::newRow("List Extra Col") << baseModel << 0 << baseModel->columnCount();
-    baseModel = createListModel(this);
-    QTest::newRow("List Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
-    QTest::newRow("Table Inside Base Model") << createTableModel(this) << 0 << 0;
-    baseModel = createTableModel(this);
-    if (baseModel)
-        QTest::newRow("Table Extra Row") << baseModel << baseModel->rowCount() << 0;
-    baseModel = createTableModel(this);
-    if (baseModel)
-        QTest::newRow("Table Extra Col") << baseModel << 0 << baseModel->columnCount();
-    baseModel = createTableModel(this);
-    if (baseModel)
-        QTest::newRow("Table Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
-    QTest::newRow("Tree Inside Base Model") << createTreeModel(this) << 0 << 0;
-    baseModel = createTreeModel(this);
-    if (baseModel)
-        QTest::newRow("Tree Extra Row") << baseModel << baseModel->rowCount() << 0;
-    baseModel = createTreeModel(this);
-    if (baseModel)
-        QTest::newRow("Tree Extra Col") << baseModel << 0 << baseModel->columnCount();
-    baseModel = createTreeModel(this);
-    if (baseModel)
-        QTest::newRow("Tree Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
-    */
-    //#TODO
-}
-
-void tst_HierarchyLevelProxyModel::testSetItemDataDataChanged_data()
-{
-    /*
-    QTest::addColumn<QAbstractItemModel *>("baseModel");
-    QTest::addColumn<int>("idxRow");
-    QTest::addColumn<int>("idxCol");
-    QAbstractItemModel *baseModel = createListModel(this);
-    QTest::newRow("List Extra Row") << baseModel << baseModel->rowCount() << 0;
-    baseModel = createListModel(this);
-    QTest::newRow("List Extra Col") << baseModel << 0 << baseModel->columnCount();
-    baseModel = createListModel(this);
-    QTest::newRow("List Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
-    baseModel = createTableModel(this);
-    if (baseModel)
-        QTest::newRow("Table Extra Row") << baseModel << baseModel->rowCount() << 0;
-    baseModel = createTableModel(this);
-    if (baseModel)
-        QTest::newRow("Table Extra Col") << baseModel << 0 << baseModel->columnCount();
-    baseModel = createTableModel(this);
-    if (baseModel)
-        QTest::newRow("Table Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
-    baseModel = createTreeModel(this);
-    if (baseModel)
-        QTest::newRow("Tree Extra Row") << baseModel << baseModel->rowCount() << 0;
-    baseModel = createTreeModel(this);
-    if (baseModel)
-        QTest::newRow("Tree Extra Col") << baseModel << 0 << baseModel->columnCount();
-    baseModel = createTreeModel(this);
-    if (baseModel)
-        QTest::newRow("Tree Corner") << baseModel << baseModel->rowCount() << baseModel->columnCount();
-    */
-    //#TODO
-}
-
 void tst_HierarchyLevelProxyModel::testSetItemDataDataChanged()
 {
-    /*
-    QFETCH(QAbstractItemModel *, baseModel);
-    if (!baseModel)
-        return;
-    QFETCH(int, idxRow);
-    QFETCH(int, idxCol);
-    QMap<int, QVariant> itemDataSet{{// TextAlignmentRole
-                                     std::make_pair<int, QVariant>(Qt::UserRole, 5),
-                                     std::make_pair<int, QVariant>(Qt::DisplayRole, QStringLiteral("Test")),
-                                     std::make_pair<int, QVariant>(Qt::ToolTipRole, QStringLiteral("ToolTip"))}};
-    InsertProxyModel proxyModel;
+#ifdef COMPLEX_MODEL_SUPPORT
+    QAbstractItemModel *baseModel = createTreeModel(this);
+    HierarchyLevelProxyModel proxyModel;
     new ModelTest(&proxyModel, baseModel);
-    proxyModel.setMergeDisplayEdit(true);
-    proxyModel.setInsertDirection(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
     proxyModel.setSourceModel(baseModel);
-    const QModelIndex proxyIdX = proxyModel.index(idxRow, idxCol);
+    QMap<int, QVariant> itemDataSet{{std::make_pair<int, QVariant>(Qt::UserRole, 5),
+                                           std::make_pair<int, QVariant>(Qt::DisplayRole, QStringLiteral("Test")),
+                                           std::make_pair<int, QVariant>(Qt::ToolTipRole, QStringLiteral("ToolTip"))}};
+    proxyModel.setHierarchyLevel(1);
+    const QModelIndex proxyIdX = proxyModel.index(1, 1);
+    const QModelIndex baseIdX = baseModel->index(1, 1,baseModel->index(0,0));
     QVERIFY(proxyModel.setData(proxyIdX, Qt::AlignRight, Qt::TextAlignmentRole));
-    QSignalSpy proxyDataChangeSpy(&proxyModel, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)));
+    QSignalSpy proxyDataChangeSpy(&proxyModel, &QAbstractItemModel::dataChanged);
+    QSignalSpy baseDataChangeSpy(baseModel, &QAbstractItemModel::dataChanged);
+
     QVERIFY(proxyModel.setItemData(proxyIdX, itemDataSet));
     QCOMPARE(proxyDataChangeSpy.size(), 1);
     auto argList = proxyDataChangeSpy.takeFirst();
@@ -1198,55 +1117,71 @@ void tst_HierarchyLevelProxyModel::testSetItemDataDataChanged()
     QVERIFY(rolesVector.contains(Qt::EditRole));
     QVERIFY(rolesVector.contains(Qt::DisplayRole));
     QVERIFY(rolesVector.contains(Qt::UserRole));
-    itemDataSet[Qt::UserRole] = 6;
-    QVERIFY(proxyModel.setItemData(proxyIdX, itemDataSet));
-    QCOMPARE(proxyDataChangeSpy.size(), 1);
-    argList = proxyDataChangeSpy.takeFirst();
-    QCOMPARE(argList.at(0).value<QModelIndex>(), proxyIdX);
-    QCOMPARE(argList.at(1).value<QModelIndex>(), proxyIdX);
+    QCOMPARE(baseDataChangeSpy.size(), 1);
+    argList = baseDataChangeSpy.takeFirst();
+    QCOMPARE(argList.at(0).value<QModelIndex>(), baseIdX);
+    QCOMPARE(argList.at(1).value<QModelIndex>(), baseIdX);
     rolesVector = argList.at(2).value<QVector<int>>();
-    QCOMPARE(rolesVector.size(), 1);
-    QVERIFY(rolesVector.contains(Qt::UserRole));
-    itemDataSet.clear();
-    itemDataSet[Qt::UserRole] = 6;
-    QVERIFY(proxyModel.setItemData(proxyIdX, itemDataSet));
 #ifndef SKIP_QTBUG_45114
-    QCOMPARE(proxyDataChangeSpy.size(), 0);
+    QCOMPARE(rolesVector.size(), 4);
+    QVERIFY(!rolesVector.contains(Qt::TextAlignmentRole));
 #endif
+    QVERIFY(rolesVector.contains(Qt::ToolTipRole));
+    QVERIFY(rolesVector.contains(Qt::EditRole));
+    QVERIFY(rolesVector.contains(Qt::DisplayRole));
+    QVERIFY(rolesVector.contains(Qt::UserRole));
     baseModel->deleteLater();
-    */
-    //#TODO
+#else
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
+#endif
 }
+
+
 
 void tst_HierarchyLevelProxyModel::testSetItemData()
 {
-    /*
-    QFETCH(QAbstractItemModel *, baseModel);
-    if (!baseModel)
-        return;
-    QFETCH(int, idxRow);
-    QFETCH(int, idxCol);
+#ifdef COMPLEX_MODEL_SUPPORT
+    QAbstractItemModel *baseModel = createTreeModel(this);
+    HierarchyLevelProxyModel proxyModel;
+    new ModelTest(&proxyModel, baseModel);
+    proxyModel.setSourceModel(baseModel);
     const QMap<int, QVariant> itemDataSet{{std::make_pair<int, QVariant>(Qt::UserRole, 5),
                                            std::make_pair<int, QVariant>(Qt::DisplayRole, QStringLiteral("Test")),
                                            std::make_pair<int, QVariant>(Qt::ToolTipRole, QStringLiteral("ToolTip"))}};
-    InsertProxyModel proxyModel;
-    new ModelTest(&proxyModel, baseModel);
-    proxyModel.setMergeDisplayEdit(true);
-    proxyModel.setInsertDirection(InsertProxyModel::InsertColumn | InsertProxyModel::InsertRow);
-    proxyModel.setSourceModel(baseModel);
-    const QModelIndex proxyIdX = proxyModel.index(idxRow, idxCol);
+
+    QModelIndex proxyIdX = proxyModel.index(1,1);
+    QModelIndex baseIndex = baseModel->index(1,1);
     QVERIFY(proxyModel.setData(proxyIdX, Qt::AlignRight, Qt::TextAlignmentRole));
     QVERIFY(proxyModel.setItemData(proxyIdX, itemDataSet));
     QCOMPARE(proxyModel.data(proxyIdX, Qt::DisplayRole).toString(), QStringLiteral("Test"));
-    QCOMPARE(proxyModel.data(proxyIdX, Qt::EditRole).toString(), QStringLiteral("Test"));
     QCOMPARE(proxyModel.data(proxyIdX, Qt::UserRole).toInt(), 5);
     QCOMPARE(proxyModel.data(proxyIdX, Qt::ToolTipRole).toString(), QStringLiteral("ToolTip"));
+    QCOMPARE(baseIndex.data(Qt::DisplayRole).toString(), QStringLiteral("Test"));
+    QCOMPARE(baseIndex.data(Qt::UserRole).toInt(), 5);
+    QCOMPARE(baseIndex.data(Qt::ToolTipRole).toString(), QStringLiteral("ToolTip"));
 #ifndef SKIP_QTBUG_45114
     QCOMPARE(proxyModel.data(proxyIdX, Qt::TextAlignmentRole).toInt(), Qt::AlignRight);
+    QCOMPARE(baseIndex.data(Qt::TextAlignmentRole).toInt(), Qt::AlignRight);
+#endif
+    proxyModel.setHierarchyLevel(1);
+    proxyIdX = proxyModel.index(1,1);
+    baseIndex = baseModel->index(1,1,baseModel->index(0,0));
+    QVERIFY(proxyModel.setData(proxyIdX, Qt::AlignRight, Qt::TextAlignmentRole));
+    QVERIFY(proxyModel.setItemData(proxyIdX, itemDataSet));
+    QCOMPARE(proxyModel.data(proxyIdX, Qt::DisplayRole).toString(), QStringLiteral("Test"));
+    QCOMPARE(proxyModel.data(proxyIdX, Qt::UserRole).toInt(), 5);
+    QCOMPARE(proxyModel.data(proxyIdX, Qt::ToolTipRole).toString(), QStringLiteral("ToolTip"));
+    QCOMPARE(baseIndex.data(Qt::DisplayRole).toString(), QStringLiteral("Test"));
+    QCOMPARE(baseIndex.data(Qt::UserRole).toInt(), 5);
+    QCOMPARE(baseIndex.data(Qt::ToolTipRole).toString(), QStringLiteral("ToolTip"));
+#ifndef SKIP_QTBUG_45114
+    QCOMPARE(proxyModel.data(proxyIdX, Qt::TextAlignmentRole).toInt(), Qt::AlignRight);
+    QCOMPARE(baseIndex.data(Qt::TextAlignmentRole).toInt(), Qt::AlignRight);
 #endif
     baseModel->deleteLater();
-    */
-    //#TODO
+#else
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
+#endif
 }
 
 void tst_HierarchyLevelProxyModel::createPersistentOnLayoutAboutToBeChanged()

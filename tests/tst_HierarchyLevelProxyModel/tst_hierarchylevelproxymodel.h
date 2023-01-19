@@ -30,13 +30,8 @@ private Q_SLOTS:
     void testInsertColumnSource();
     void testInsertColumnProxy();
     void testRemoveColumnSource();
-
-    void testSetItemData_data();
     void testSetItemData();
-    void testSetItemDataDataChanged_data();
     void testSetItemDataDataChanged();
-    void testSourceInsertCol();
-    void testSourceInsertCol_data();
 
     void testSort();
     void testSort_data();
