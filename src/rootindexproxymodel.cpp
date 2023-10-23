@@ -37,6 +37,20 @@ bool RootIndexProxyModelPrivate::isDescendant(QModelIndex childIdx, const QModel
     return false;
 }
 
+bool RootIndexProxyModelPrivate::isRelevant(const QModelIndex &idx) const
+{
+    if (m_rootIndex == idx)
+        return true;
+
+    if (!idx.isValid())
+        return false;
+
+    if (isDescendant(m_rootIndex, idx))
+        return false;
+
+    return isDescendant(idx, m_rootIndex);
+}
+
 void RootIndexProxyModelPrivate::resetRootOnModelChange()
 {
     m_rootIndex = QModelIndex();
@@ -75,7 +89,7 @@ void RootIndexProxyModelPrivate::onRowsAboutToBeInserted(const QModelIndex &pare
     Q_Q(RootIndexProxyModel);
     Q_ASSERT(!parent.isValid() || parent.model() == q->sourceModel());
     if (m_rootIndex.isValid()) {
-        if (isDescendant(m_rootIndex, parent))
+        if (!isRelevant(parent))
             return;
     }
     q->beginInsertRows(q->mapFromSource(parent), first, last);
@@ -88,7 +102,7 @@ void RootIndexProxyModelPrivate::onRowsInserted(const QModelIndex &parent, int f
     Q_Q(RootIndexProxyModel);
     Q_ASSERT(!parent.isValid() || parent.model() == q->sourceModel());
     if (m_rootIndex.isValid()) {
-        if (isDescendant(m_rootIndex, parent))
+        if (!isRelevant(parent))
             return;
     }
     q->endInsertRows();
@@ -99,7 +113,7 @@ void RootIndexProxyModelPrivate::onRowsAboutToBeRemoved(const QModelIndex &paren
     Q_Q(RootIndexProxyModel);
     Q_ASSERT(!parent.isValid() || parent.model() == q->sourceModel());
     if (m_rootIndex.isValid()) {
-        if (isDescendant(m_rootIndex, parent))
+        if (!isRelevant(parent))
             return;
     }
     q->beginRemoveRows(q->mapFromSource(parent), first, last);
@@ -112,7 +126,7 @@ void RootIndexProxyModelPrivate::onRowsRemoved(const QModelIndex &parent, int fi
     Q_Q(RootIndexProxyModel);
     Q_ASSERT(!parent.isValid() || parent.model() == q->sourceModel());
     if (m_rootIndex.isValid()) {
-        if (isDescendant(m_rootIndex, parent))
+        if (!isRelevant(parent))
             return;
     }
     if (m_rootRowDeleted)
@@ -127,13 +141,18 @@ void RootIndexProxyModelPrivate::onRowsAboutToBeMoved(const QModelIndex &sourceP
     Q_Q(RootIndexProxyModel);
     Q_ASSERT(!sourceParent.isValid() || sourceParent.model() == q->sourceModel());
     Q_ASSERT(!destParent.isValid() || destParent.model() == q->sourceModel());
-    if (isDescendant(m_rootIndex, destParent) == isDescendant(m_rootIndex, sourceParent)) {
-        if (isDescendant(m_rootIndex, destParent))
-            return;
+
+    bool sourceIsRelevant = isRelevant(sourceParent);
+    bool destIsRelevant = isRelevant(destParent);
+
+    if (!sourceIsRelevant && ! destIsRelevant)
+        return;
+
+    if (sourceIsRelevant && destIsRelevant)
         q->beginMoveRows(q->mapFromSource(sourceParent), sourceStart, sourceEnd, q->mapFromSource(destParent), dest);
-    } else if (isDescendant(m_rootIndex, destParent))
+    else if (sourceIsRelevant)
         q->beginRemoveRows(q->mapFromSource(sourceParent), sourceStart, sourceEnd);
-    else
+    else if (destIsRelevant)
         q->beginInsertRows(q->mapFromSource(destParent), dest, dest + sourceEnd - sourceStart);
 }
 
@@ -145,13 +164,18 @@ void RootIndexProxyModelPrivate::onRowsMoved(const QModelIndex &sourceParent, in
     Q_Q(RootIndexProxyModel);
     Q_ASSERT(!sourceParent.isValid() || sourceParent.model() == q->sourceModel());
     Q_ASSERT(!destParent.isValid() || destParent.model() == q->sourceModel());
-    if (isDescendant(m_rootIndex, destParent) == isDescendant(m_rootIndex, sourceParent)) {
-        if (isDescendant(m_rootIndex, destParent))
-            return;
+
+    bool sourceIsRelevant = isRelevant(sourceParent);
+    bool destIsRelevant = isRelevant(destParent);
+
+    if (!sourceIsRelevant && ! destIsRelevant)
+        return;
+
+    if (sourceIsRelevant && destIsRelevant)
         q->endMoveRows();
-    } else if (isDescendant(m_rootIndex, destParent))
+    else if (sourceIsRelevant)
         q->endRemoveRows();
-    else
+    else if (destIsRelevant)
         q->endInsertRows();
 }
 
@@ -164,13 +188,15 @@ void RootIndexProxyModelPrivate::onColumnsMoved(const QModelIndex &sourceParent,
     Q_Q(RootIndexProxyModel);
     Q_ASSERT(!sourceParent.isValid() || sourceParent.model() == q->sourceModel());
     Q_ASSERT(!destParent.isValid() || destParent.model() == q->sourceModel());
-    if (isDescendant(m_rootIndex, destParent) == isDescendant(m_rootIndex, sourceParent)) {
-        if (isDescendant(m_rootIndex, destParent))
-            return;
+
+    bool sourceIsRelevant = isRelevant(sourceParent);
+    bool destIsRelevant = isRelevant(destParent);
+
+    if (sourceIsRelevant && destIsRelevant)
         q->endMoveColumns();
-    } else if (isDescendant(m_rootIndex, destParent))
+    else if (sourceIsRelevant)
         q->endRemoveColumns();
-    else
+    else if (destIsRelevant)
         q->endInsertColumns();
 }
 
@@ -180,13 +206,18 @@ void RootIndexProxyModelPrivate::onColumnsAboutToBeMoved(const QModelIndex &sour
     Q_Q(RootIndexProxyModel);
     Q_ASSERT(!sourceParent.isValid() || sourceParent.model() == q->sourceModel());
     Q_ASSERT(!destParent.isValid() || destParent.model() == q->sourceModel());
-    if (isDescendant(m_rootIndex, destParent) == isDescendant(m_rootIndex, sourceParent)) {
-        if (isDescendant(m_rootIndex, destParent))
-            return;
+
+    bool sourceIsRelevant = isRelevant(sourceParent);
+    bool destIsRelevant = isRelevant(destParent);
+
+    if (!sourceIsRelevant && ! destIsRelevant)
+        return;
+
+    if (sourceIsRelevant && destIsRelevant)
         q->beginMoveColumns(q->mapFromSource(sourceParent), sourceStart, sourceEnd, q->mapFromSource(destParent), dest);
-    } else if (isDescendant(m_rootIndex, destParent))
+    else if (sourceIsRelevant)
         q->beginRemoveColumns(q->mapFromSource(sourceParent), sourceStart, sourceEnd);
-    else
+    else if (destIsRelevant)
         q->beginInsertColumns(q->mapFromSource(destParent), dest, dest + sourceEnd - sourceStart);
 }
 
@@ -195,7 +226,7 @@ void RootIndexProxyModelPrivate::onColumnsAboutToBeInserted(const QModelIndex &p
     Q_Q(RootIndexProxyModel);
     Q_ASSERT(!parent.isValid() || parent.model() == q->sourceModel());
     if (m_rootIndex.isValid()) {
-        if (isDescendant(m_rootIndex, parent))
+        if (!isRelevant(parent))
             return;
     }
     q->beginInsertColumns(q->mapFromSource(parent), first, last);
@@ -208,7 +239,7 @@ void RootIndexProxyModelPrivate::onColumnsInserted(const QModelIndex &parent, in
     Q_Q(RootIndexProxyModel);
     Q_ASSERT(!parent.isValid() || parent.model() == q->sourceModel());
     if (m_rootIndex.isValid()) {
-        if (isDescendant(m_rootIndex, parent))
+        if (!isRelevant(parent))
             return;
     }
     q->endInsertColumns();
@@ -219,7 +250,7 @@ void RootIndexProxyModelPrivate::onColumnsAboutToBeRemoved(const QModelIndex &pa
     Q_Q(RootIndexProxyModel);
     Q_ASSERT(!parent.isValid() || parent.model() == q->sourceModel());
     if (m_rootIndex.isValid()) {
-        if (isDescendant(m_rootIndex, parent))
+        if (!isRelevant(parent))
             return;
     }
     q->beginRemoveColumns(q->mapFromSource(parent), first, last);
@@ -232,7 +263,7 @@ void RootIndexProxyModelPrivate::onColumnsRemoved(const QModelIndex &parent, int
     Q_Q(RootIndexProxyModel);
     Q_ASSERT(!parent.isValid() || parent.model() == q->sourceModel());
     if (m_rootIndex.isValid()) {
-        if (isDescendant(m_rootIndex, parent))
+        if (!isRelevant(parent))
             return;
     }
     if (m_rootColumnDeleted)
@@ -250,7 +281,7 @@ void RootIndexProxyModelPrivate::onDataChanged(const QModelIndex &topLeft, const
     Q_ASSERT(bottomRight.model() == q->sourceModel());
     Q_ASSERT(bottomRight.parent() == topLeft.parent());
     if (m_rootIndex.isValid()) {
-        if (isDescendant(m_rootIndex, topLeft.parent()))
+        if (!isRelevant(topLeft.parent()))
             return;
     }
     q->dataChanged(q->mapFromSource(topLeft), q->mapFromSource(bottomRight), roles);
@@ -271,6 +302,8 @@ void RootIndexProxyModelPrivate::onLayoutAboutToBeChanged(const QList<QPersisten
             }
             continue;
         }
+        if (parent != m_rootIndex && !isDescendant(parent, m_rootIndex))
+            continue;
         const QModelIndex mappedParent = q->mapFromSource(parent);
         Q_ASSERT(mappedParent.isValid());
         parents << mappedParent;
@@ -304,6 +337,8 @@ void RootIndexProxyModelPrivate::onLayoutChanged(const QList<QPersistentModelInd
             }
             continue;
         }
+        if (parent != m_rootIndex && !isDescendant(parent, m_rootIndex))
+            continue;
         const QModelIndex mappedParent = q->mapFromSource(parent);
         Q_ASSERT(mappedParent.isValid());
         parents << mappedParent;

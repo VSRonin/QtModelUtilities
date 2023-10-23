@@ -156,7 +156,18 @@ void tst_RootIndexProxyModel::insertRow()
     RootIndexProxyModel proxyModel;
     new ModelTest(&proxyModel, baseModel);
     proxyModel.setSourceModel(baseModel);
-    proxyModel.setRootIndex(baseModel->index(1, 0));
+    auto proxyRootIdx = baseModel->index(1, 0);
+    proxyModel.setRootIndex(proxyRootIdx);
+
+    baseModel->insertRows(3, 1); // sibling with no rows
+#if 1 // If set to 0, test runs fine. Just the presence of a second model leads to a crash.
+    RootIndexProxyModel proxyModel2;
+    proxyModel2.setSourceModel(baseModel);
+    auto siblingIdx = baseModel->index(3, 0);
+    proxyModel2.setRootIndex(siblingIdx); // set root index to sibling with no rows
+#endif
+    baseModel->insertRows(1, 1, proxyRootIdx); // second proxy emits beginInsertRows(!siblingIdx!, 1, 1), but sibling has no rows
+
     QSignalSpy proxyRowsAboutToBeInsertedSpy(&proxyModel, SIGNAL(rowsAboutToBeInserted(QModelIndex, int, int)));
     QVERIFY(proxyRowsAboutToBeInsertedSpy.isValid());
     QSignalSpy proxyRowsInsertedSpy(&proxyModel, SIGNAL(rowsInserted(QModelIndex, int, int)));
