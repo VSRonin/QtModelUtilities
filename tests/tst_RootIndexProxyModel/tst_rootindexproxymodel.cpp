@@ -337,6 +337,424 @@ void tst_RootIndexProxyModel::removeColumn()
 #endif
 }
 
+void tst_RootIndexProxyModel::bug53Rows()
+{
+#ifdef COMPLEX_MODEL_SUPPORT
+    ComplexModel baseModel;
+    QVERIFY(baseModel.insertColumn(0));
+    QVERIFY(baseModel.insertRows(0, 2));
+    QVERIFY(baseModel.insertColumn(0, baseModel.index(0, 0)));
+    QVERIFY(baseModel.insertRows(0, 2, baseModel.index(0, 0)));
+    QVERIFY(baseModel.insertColumn(0, baseModel.index(1, 0)));
+    QVERIFY(baseModel.insertRows(0, 1, baseModel.index(1, 0)));
+    QVERIFY(baseModel.setData(baseModel.index(0, 0), QChar(QLatin1Char('A'))));
+    QVERIFY(baseModel.setData(baseModel.index(0, 0, baseModel.index(0, 0)), QChar(QLatin1Char('C'))));
+    QVERIFY(baseModel.setData(baseModel.index(1, 0, baseModel.index(0, 0)), QChar(QLatin1Char('D'))));
+    QVERIFY(baseModel.setData(baseModel.index(1, 0), QChar(QLatin1Char('B'))));
+    QVERIFY(baseModel.setData(baseModel.index(0, 0, baseModel.index(1, 0)), QChar(QLatin1Char('E'))));
+    RootIndexProxyModel proxyModel1;
+    new ModelTest(&proxyModel1, &baseModel);
+    proxyModel1.setSourceModel(&baseModel);
+    proxyModel1.setRootIndex(baseModel.index(0, 0));
+    RootIndexProxyModel proxyModel2;
+    new ModelTest(&proxyModel2, &baseModel);
+    proxyModel2.setSourceModel(&baseModel);
+    proxyModel2.setRootIndex(baseModel.index(1, 0));
+    QSignalSpy proxy1RowsAboutToBeInsertedSpy(&proxyModel1, SIGNAL(rowsAboutToBeInserted(QModelIndex, int, int)));
+    QVERIFY(proxy1RowsAboutToBeInsertedSpy.isValid());
+    QSignalSpy proxy1RowsInsertedSpy(&proxyModel1, SIGNAL(rowsInserted(QModelIndex, int, int)));
+    QVERIFY(proxy1RowsInsertedSpy.isValid());
+    QSignalSpy proxy2RowsAboutToBeInsertedSpy(&proxyModel2, SIGNAL(rowsAboutToBeInserted(QModelIndex, int, int)));
+    QVERIFY(proxy2RowsAboutToBeInsertedSpy.isValid());
+    QSignalSpy proxy2RowsInsertedSpy(&proxyModel2, SIGNAL(rowsInserted(QModelIndex, int, int)));
+    QVERIFY(proxy2RowsInsertedSpy.isValid());
+    QSignalSpy proxy1RowsAboutToBeRemovedSpy(&proxyModel1, SIGNAL(rowsAboutToBeRemoved(QModelIndex, int, int)));
+    QVERIFY(proxy1RowsAboutToBeRemovedSpy.isValid());
+    QSignalSpy proxy1RowsRemovedSpy(&proxyModel1, SIGNAL(rowsRemoved(QModelIndex, int, int)));
+    QVERIFY(proxy1RowsRemovedSpy.isValid());
+    QSignalSpy proxy2RowsAboutToBeRemovedSpy(&proxyModel2, SIGNAL(rowsAboutToBeRemoved(QModelIndex, int, int)));
+    QVERIFY(proxy2RowsAboutToBeRemovedSpy.isValid());
+    QSignalSpy proxy2RowsRemovedSpy(&proxyModel2, SIGNAL(rowsRemoved(QModelIndex, int, int)));
+    QVERIFY(proxy2RowsRemovedSpy.isValid());
+    QSignalSpy proxy1rowsMovedSpy(&proxyModel1, SIGNAL(rowsMoved(QModelIndex, int, int, QModelIndex, int)));
+    QVERIFY(proxy1rowsMovedSpy.isValid());
+    QSignalSpy proxy1rowsAboutToBeMovedSpy(&proxyModel1, SIGNAL(rowsAboutToBeMoved(QModelIndex, int, int, QModelIndex, int)));
+    QVERIFY(proxy1rowsAboutToBeMovedSpy.isValid());
+    QSignalSpy proxy2rowsMovedSpy(&proxyModel2, SIGNAL(rowsMoved(QModelIndex, int, int, QModelIndex, int)));
+    QVERIFY(proxy2rowsMovedSpy.isValid());
+    QSignalSpy proxy2rowsAboutToBeMovedSpy(&proxyModel2, SIGNAL(rowsAboutToBeMoved(QModelIndex, int, int, QModelIndex, int)));
+    QVERIFY(proxy2rowsAboutToBeMovedSpy.isValid());
+    QVERIFY(baseModel.insertRow(2, baseModel.index(0, 0)));
+    QCOMPARE(proxyModel1.rowCount(), 3);
+    QCOMPARE(proxyModel2.rowCount(), 1);
+    QVERIFY(proxy2RowsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy2RowsInsertedSpy.isEmpty());
+    QVERIFY(proxy1RowsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy1RowsRemovedSpy.isEmpty());
+    QVERIFY(proxy2RowsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy2RowsRemovedSpy.isEmpty());
+    QVERIFY(proxy1rowsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy1rowsMovedSpy.isEmpty());
+    QVERIFY(proxy2rowsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy2rowsMovedSpy.isEmpty());
+    QCOMPARE(proxy1RowsAboutToBeInsertedSpy.count(), 1);
+    QCOMPARE(proxy1RowsInsertedSpy.count(), 1);
+    proxy1RowsAboutToBeInsertedSpy.clear();
+    proxy1RowsInsertedSpy.clear();
+
+    QVERIFY(baseModel.removeRow(2, baseModel.index(0, 0)));
+    QCOMPARE(proxyModel1.rowCount(), 2);
+    QCOMPARE(proxyModel2.rowCount(), 1);
+    QCOMPARE(proxy1RowsAboutToBeRemovedSpy.count(), 1);
+    QCOMPARE(proxy1RowsAboutToBeRemovedSpy.count(), 1);
+    QVERIFY(proxy1RowsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy1RowsInsertedSpy.isEmpty());
+    QVERIFY(proxy2RowsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy2RowsInsertedSpy.isEmpty());
+    QVERIFY(proxy2RowsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy2RowsRemovedSpy.isEmpty());
+    QVERIFY(proxy1rowsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy1rowsMovedSpy.isEmpty());
+    QVERIFY(proxy2rowsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy2rowsMovedSpy.isEmpty());
+    proxy1RowsAboutToBeRemovedSpy.clear();
+    proxy1RowsAboutToBeRemovedSpy.clear();
+#else
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
+#endif
+}
+
+void tst_RootIndexProxyModel::bug53Cols()
+{
+#ifdef COMPLEX_MODEL_SUPPORT
+    ComplexModel baseModel;
+    QVERIFY(baseModel.insertColumn(0));
+    QVERIFY(baseModel.insertRows(0, 2));
+    QVERIFY(baseModel.insertColumn(0, baseModel.index(0, 0)));
+    QVERIFY(baseModel.insertRows(0, 2, baseModel.index(0, 0)));
+    QVERIFY(baseModel.insertColumn(0, baseModel.index(1, 0)));
+    QVERIFY(baseModel.insertRows(0, 1, baseModel.index(1, 0)));
+    QVERIFY(baseModel.setData(baseModel.index(0, 0), QChar(QLatin1Char('A'))));
+    QVERIFY(baseModel.setData(baseModel.index(0, 0, baseModel.index(0, 0)), QChar(QLatin1Char('C'))));
+    QVERIFY(baseModel.setData(baseModel.index(1, 0, baseModel.index(0, 0)), QChar(QLatin1Char('D'))));
+    QVERIFY(baseModel.setData(baseModel.index(1, 0), QChar(QLatin1Char('B'))));
+    QVERIFY(baseModel.setData(baseModel.index(0, 0, baseModel.index(1, 0)), QChar(QLatin1Char('E'))));
+    RootIndexProxyModel proxyModel1;
+    new ModelTest(&proxyModel1, &baseModel);
+    proxyModel1.setSourceModel(&baseModel);
+    proxyModel1.setRootIndex(baseModel.index(0, 0));
+    RootIndexProxyModel proxyModel2;
+    new ModelTest(&proxyModel2, &baseModel);
+    proxyModel2.setSourceModel(&baseModel);
+    proxyModel2.setRootIndex(baseModel.index(1, 0));
+    QSignalSpy proxy1ColsAboutToBeInsertedSpy(&proxyModel1, SIGNAL(columnsAboutToBeInserted(QModelIndex, int, int)));
+    QVERIFY(proxy1ColsAboutToBeInsertedSpy.isValid());
+    QSignalSpy proxy1ColsInsertedSpy(&proxyModel1, SIGNAL(columnsInserted(QModelIndex, int, int)));
+    QVERIFY(proxy1ColsInsertedSpy.isValid());
+    QSignalSpy proxy2ColsAboutToBeInsertedSpy(&proxyModel2, SIGNAL(columnsAboutToBeInserted(QModelIndex, int, int)));
+    QVERIFY(proxy2ColsAboutToBeInsertedSpy.isValid());
+    QSignalSpy proxy2ColsInsertedSpy(&proxyModel2, SIGNAL(columnsInserted(QModelIndex, int, int)));
+    QVERIFY(proxy2ColsInsertedSpy.isValid());
+    QSignalSpy proxy1ColsAboutToBeRemovedSpy(&proxyModel1, SIGNAL(columnsAboutToBeRemoved(QModelIndex, int, int)));
+    QVERIFY(proxy1ColsAboutToBeRemovedSpy.isValid());
+    QSignalSpy proxy1ColsRemovedSpy(&proxyModel1, SIGNAL(columnsRemoved(QModelIndex, int, int)));
+    QVERIFY(proxy1ColsRemovedSpy.isValid());
+    QSignalSpy proxy2ColsAboutToBeRemovedSpy(&proxyModel2, SIGNAL(columnsAboutToBeRemoved(QModelIndex, int, int)));
+    QVERIFY(proxy2ColsAboutToBeRemovedSpy.isValid());
+    QSignalSpy proxy2ColsRemovedSpy(&proxyModel2, SIGNAL(columnsRemoved(QModelIndex, int, int)));
+    QVERIFY(proxy2ColsRemovedSpy.isValid());
+    QSignalSpy proxy1ColsMovedSpy(&proxyModel1, SIGNAL(columnsMoved(QModelIndex, int, int, QModelIndex, int)));
+    QVERIFY(proxy1ColsMovedSpy.isValid());
+    QSignalSpy proxy1ColsAboutToBeMovedSpy(&proxyModel1, SIGNAL(columnsAboutToBeMoved(QModelIndex, int, int, QModelIndex, int)));
+    QVERIFY(proxy1ColsAboutToBeMovedSpy.isValid());
+    QSignalSpy proxy2ColsMovedSpy(&proxyModel2, SIGNAL(columnsMoved(QModelIndex, int, int, QModelIndex, int)));
+    QVERIFY(proxy2ColsMovedSpy.isValid());
+    QSignalSpy proxy2ColsAboutToBeMovedSpy(&proxyModel2, SIGNAL(columnsAboutToBeMoved(QModelIndex, int, int, QModelIndex, int)));
+    QVERIFY(proxy2ColsAboutToBeMovedSpy.isValid());
+    QVERIFY(baseModel.insertColumn(1, baseModel.index(0, 0)));
+    QCOMPARE(proxyModel1.columnCount(), 2);
+    QCOMPARE(proxyModel2.columnCount(), 1);
+    QVERIFY(proxy2ColsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy2ColsInsertedSpy.isEmpty());
+    QVERIFY(proxy1ColsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy1ColsRemovedSpy.isEmpty());
+    QVERIFY(proxy2ColsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy2ColsRemovedSpy.isEmpty());
+    QVERIFY(proxy1ColsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy1ColsMovedSpy.isEmpty());
+    QVERIFY(proxy2ColsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy2ColsMovedSpy.isEmpty());
+    QCOMPARE(proxy1ColsAboutToBeInsertedSpy.count(), 1);
+    QCOMPARE(proxy1ColsInsertedSpy.count(), 1);
+    proxy1ColsAboutToBeInsertedSpy.clear();
+    proxy1ColsInsertedSpy.clear();
+
+    QVERIFY(baseModel.removeColumn(1, baseModel.index(0, 0)));
+    QCOMPARE(proxyModel1.columnCount(), 1);
+    QCOMPARE(proxyModel2.columnCount(), 1);
+    QCOMPARE(proxy1ColsAboutToBeRemovedSpy.count(), 1);
+    QCOMPARE(proxy1ColsAboutToBeRemovedSpy.count(), 1);
+    QVERIFY(proxy1ColsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy1ColsInsertedSpy.isEmpty());
+    QVERIFY(proxy2ColsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy2ColsInsertedSpy.isEmpty());
+    QVERIFY(proxy2ColsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy2ColsRemovedSpy.isEmpty());
+    QVERIFY(proxy1ColsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy1ColsMovedSpy.isEmpty());
+    QVERIFY(proxy2ColsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy2ColsMovedSpy.isEmpty());
+    proxy1ColsAboutToBeRemovedSpy.clear();
+    proxy1ColsAboutToBeRemovedSpy.clear();
+#else
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
+#endif
+}
+
+#ifdef QTMODELUTILITIES_GENERICMODEL
+#    include <genericmodel.h>
+#endif
+void tst_RootIndexProxyModel::bug53MoveCols()
+{
+#ifdef QTMODELUTILITIES_GENERICMODEL
+    GenericModel baseModel;
+    QVERIFY(baseModel.insertColumn(0));
+    QVERIFY(baseModel.insertRows(0, 2));
+    QVERIFY(baseModel.insertColumn(0, baseModel.index(0, 0)));
+    QVERIFY(baseModel.insertRows(0, 2, baseModel.index(0, 0)));
+    QVERIFY(baseModel.insertColumn(0, baseModel.index(1, 0)));
+    QVERIFY(baseModel.insertRows(0, 1, baseModel.index(1, 0)));
+    QVERIFY(baseModel.setData(baseModel.index(0, 0), QChar(QLatin1Char('A'))));
+    QVERIFY(baseModel.setData(baseModel.index(0, 0, baseModel.index(0, 0)), QChar(QLatin1Char('C'))));
+    QVERIFY(baseModel.setData(baseModel.index(1, 0, baseModel.index(0, 0)), QChar(QLatin1Char('D'))));
+    QVERIFY(baseModel.setData(baseModel.index(1, 0), QChar(QLatin1Char('B'))));
+    QVERIFY(baseModel.setData(baseModel.index(0, 0, baseModel.index(1, 0)), QChar(QLatin1Char('E'))));
+    RootIndexProxyModel proxyModel1;
+    new ModelTest(&proxyModel1, &baseModel);
+    proxyModel1.setSourceModel(&baseModel);
+    proxyModel1.setRootIndex(baseModel.index(0, 0));
+    RootIndexProxyModel proxyModel2;
+    new ModelTest(&proxyModel2, &baseModel);
+    proxyModel2.setSourceModel(&baseModel);
+    proxyModel2.setRootIndex(baseModel.index(1, 0));
+    QSignalSpy proxy1ColumnsAboutToBeInsertedSpy(&proxyModel1, SIGNAL(columnsAboutToBeInserted(QModelIndex, int, int)));
+    QVERIFY(proxy1ColumnsAboutToBeInsertedSpy.isValid());
+    QSignalSpy proxy1ColumnsInsertedSpy(&proxyModel1, SIGNAL(columnsInserted(QModelIndex, int, int)));
+    QVERIFY(proxy1ColumnsInsertedSpy.isValid());
+    QSignalSpy proxy2ColumnsAboutToBeInsertedSpy(&proxyModel2, SIGNAL(columnsAboutToBeInserted(QModelIndex, int, int)));
+    QVERIFY(proxy2ColumnsAboutToBeInsertedSpy.isValid());
+    QSignalSpy proxy2ColumnsInsertedSpy(&proxyModel2, SIGNAL(columnsInserted(QModelIndex, int, int)));
+    QVERIFY(proxy2ColumnsInsertedSpy.isValid());
+    QSignalSpy proxy1ColumnsAboutToBeRemovedSpy(&proxyModel1, SIGNAL(columnsAboutToBeRemoved(QModelIndex, int, int)));
+    QVERIFY(proxy1ColumnsAboutToBeRemovedSpy.isValid());
+    QSignalSpy proxy1ColumnsRemovedSpy(&proxyModel1, SIGNAL(columnsRemoved(QModelIndex, int, int)));
+    QVERIFY(proxy1ColumnsRemovedSpy.isValid());
+    QSignalSpy proxy2ColumnsAboutToBeRemovedSpy(&proxyModel2, SIGNAL(columnsAboutToBeRemoved(QModelIndex, int, int)));
+    QVERIFY(proxy2ColumnsAboutToBeRemovedSpy.isValid());
+    QSignalSpy proxy2ColumnsRemovedSpy(&proxyModel2, SIGNAL(columnsRemoved(QModelIndex, int, int)));
+    QVERIFY(proxy2ColumnsRemovedSpy.isValid());
+    QSignalSpy proxy1ColumnsMovedSpy(&proxyModel1, SIGNAL(columnsMoved(QModelIndex, int, int, QModelIndex, int)));
+    QVERIFY(proxy1ColumnsMovedSpy.isValid());
+    QSignalSpy proxy1ColumnsAboutToBeMovedSpy(&proxyModel1, SIGNAL(columnsAboutToBeMoved(QModelIndex, int, int, QModelIndex, int)));
+    QVERIFY(proxy1ColumnsAboutToBeMovedSpy.isValid());
+    QSignalSpy proxy2ColumnsMovedSpy(&proxyModel2, SIGNAL(columnsMoved(QModelIndex, int, int, QModelIndex, int)));
+    QVERIFY(proxy2ColumnsMovedSpy.isValid());
+    QSignalSpy proxy2ColumnsAboutToBeMovedSpy(&proxyModel2, SIGNAL(columnsAboutToBeMoved(QModelIndex, int, int, QModelIndex, int)));
+    QVERIFY(proxy2ColumnsAboutToBeMovedSpy.isValid());
+    QVERIFY(baseModel.insertColumn(1, baseModel.index(0, 0)));
+    QCOMPARE(proxyModel1.columnCount(), 2);
+    QCOMPARE(proxyModel2.columnCount(), 1);
+    QVERIFY(proxy2ColumnsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsInsertedSpy.isEmpty());
+    QVERIFY(proxy1ColumnsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy1ColumnsRemovedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsRemovedSpy.isEmpty());
+    QVERIFY(proxy1ColumnsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy1ColumnsMovedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsMovedSpy.isEmpty());
+    QCOMPARE(proxy1ColumnsAboutToBeInsertedSpy.count(), 1);
+    QCOMPARE(proxy1ColumnsInsertedSpy.count(), 1);
+    proxy1ColumnsAboutToBeInsertedSpy.clear();
+    proxy1ColumnsInsertedSpy.clear();
+
+    QVERIFY(baseModel.moveColumn(baseModel.index(0, 0), 1, baseModel.index(0, 0), 0));
+    QCOMPARE(proxyModel1.columnCount(), 2);
+    QCOMPARE(proxyModel2.columnCount(), 1);
+    QCOMPARE(proxy1ColumnsAboutToBeMovedSpy.count(), 1);
+    QCOMPARE(proxy1ColumnsMovedSpy.count(), 1);
+    QVERIFY(proxy2ColumnsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsMovedSpy.isEmpty());
+    QVERIFY(proxy1ColumnsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy1ColumnsInsertedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsInsertedSpy.isEmpty());
+    QVERIFY(proxy1ColumnsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy1ColumnsRemovedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsRemovedSpy.isEmpty());
+    proxy1ColumnsAboutToBeMovedSpy.clear();
+    proxy1ColumnsMovedSpy.clear();
+
+    QVERIFY(baseModel.moveColumn(baseModel.index(0, 0), 0, QModelIndex(), 0));
+    QCOMPARE(proxyModel1.columnCount(), 1);
+    QCOMPARE(proxyModel2.columnCount(), 1);
+    QCOMPARE(proxy1ColumnsAboutToBeRemovedSpy.count(), 1);
+    QCOMPARE(proxy1ColumnsRemovedSpy.count(), 1);
+    QVERIFY(proxy2ColumnsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsMovedSpy.isEmpty());
+    QVERIFY(proxy1ColumnsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy1ColumnsInsertedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsInsertedSpy.isEmpty());
+    QVERIFY(proxy1ColumnsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy1ColumnsMovedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsRemovedSpy.isEmpty());
+    proxy1ColumnsAboutToBeRemovedSpy.clear();
+    proxy1ColumnsRemovedSpy.clear();
+
+    QVERIFY(baseModel.moveColumn(QModelIndex(), 0, baseModel.index(0, 1), 0));
+    QCOMPARE(proxyModel1.columnCount(), 2);
+    QCOMPARE(proxyModel2.columnCount(), 1);
+    QVERIFY(proxy1ColumnsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy1ColumnsMovedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsMovedSpy.isEmpty());
+    QCOMPARE(proxy1ColumnsAboutToBeInsertedSpy.count(), 1);
+    QCOMPARE(proxy1ColumnsInsertedSpy.count(), 1);
+    QVERIFY(proxy2ColumnsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsInsertedSpy.isEmpty());
+    QVERIFY(proxy1ColumnsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy1ColumnsRemovedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy2ColumnsRemovedSpy.isEmpty());
+#else
+    QSKIP("This test requires the GenericModel module");
+#endif
+}
+void tst_RootIndexProxyModel::bug53MoveRows()
+{
+#ifdef QTMODELUTILITIES_GENERICMODEL
+    GenericModel baseModel;
+    QVERIFY(baseModel.insertColumn(0));
+    QVERIFY(baseModel.insertRows(0, 2));
+    QVERIFY(baseModel.insertColumn(0, baseModel.index(0, 0)));
+    QVERIFY(baseModel.insertRows(0, 2, baseModel.index(0, 0)));
+    QVERIFY(baseModel.insertColumn(0, baseModel.index(1, 0)));
+    QVERIFY(baseModel.insertRows(0, 1, baseModel.index(1, 0)));
+    QVERIFY(baseModel.setData(baseModel.index(0, 0), QChar(QLatin1Char('A'))));
+    QVERIFY(baseModel.setData(baseModel.index(0, 0, baseModel.index(0, 0)), QChar(QLatin1Char('C'))));
+    QVERIFY(baseModel.setData(baseModel.index(1, 0, baseModel.index(0, 0)), QChar(QLatin1Char('D'))));
+    QVERIFY(baseModel.setData(baseModel.index(1, 0), QChar(QLatin1Char('B'))));
+    QVERIFY(baseModel.setData(baseModel.index(0, 0, baseModel.index(1, 0)), QChar(QLatin1Char('E'))));
+    RootIndexProxyModel proxyModel1;
+    new ModelTest(&proxyModel1, &baseModel);
+    proxyModel1.setSourceModel(&baseModel);
+    proxyModel1.setRootIndex(baseModel.index(0, 0));
+    RootIndexProxyModel proxyModel2;
+    new ModelTest(&proxyModel2, &baseModel);
+    proxyModel2.setSourceModel(&baseModel);
+    proxyModel2.setRootIndex(baseModel.index(1, 0));
+    QSignalSpy proxy1RowsAboutToBeInsertedSpy(&proxyModel1, SIGNAL(rowsAboutToBeInserted(QModelIndex, int, int)));
+    QVERIFY(proxy1RowsAboutToBeInsertedSpy.isValid());
+    QSignalSpy proxy1RowsInsertedSpy(&proxyModel1, SIGNAL(rowsInserted(QModelIndex, int, int)));
+    QVERIFY(proxy1RowsInsertedSpy.isValid());
+    QSignalSpy proxy2RowsAboutToBeInsertedSpy(&proxyModel2, SIGNAL(rowsAboutToBeInserted(QModelIndex, int, int)));
+    QVERIFY(proxy2RowsAboutToBeInsertedSpy.isValid());
+    QSignalSpy proxy2RowsInsertedSpy(&proxyModel2, SIGNAL(rowsInserted(QModelIndex, int, int)));
+    QVERIFY(proxy2RowsInsertedSpy.isValid());
+    QSignalSpy proxy1RowsAboutToBeRemovedSpy(&proxyModel1, SIGNAL(rowsAboutToBeRemoved(QModelIndex, int, int)));
+    QVERIFY(proxy1RowsAboutToBeRemovedSpy.isValid());
+    QSignalSpy proxy1RowsRemovedSpy(&proxyModel1, SIGNAL(rowsRemoved(QModelIndex, int, int)));
+    QVERIFY(proxy1RowsRemovedSpy.isValid());
+    QSignalSpy proxy2RowsAboutToBeRemovedSpy(&proxyModel2, SIGNAL(rowsAboutToBeRemoved(QModelIndex, int, int)));
+    QVERIFY(proxy2RowsAboutToBeRemovedSpy.isValid());
+    QSignalSpy proxy2RowsRemovedSpy(&proxyModel2, SIGNAL(rowsRemoved(QModelIndex, int, int)));
+    QVERIFY(proxy2RowsRemovedSpy.isValid());
+    QSignalSpy proxy1rowsMovedSpy(&proxyModel1, SIGNAL(rowsMoved(QModelIndex, int, int, QModelIndex, int)));
+    QVERIFY(proxy1rowsMovedSpy.isValid());
+    QSignalSpy proxy1rowsAboutToBeMovedSpy(&proxyModel1, SIGNAL(rowsAboutToBeMoved(QModelIndex, int, int, QModelIndex, int)));
+    QVERIFY(proxy1rowsAboutToBeMovedSpy.isValid());
+    QSignalSpy proxy2rowsMovedSpy(&proxyModel2, SIGNAL(rowsMoved(QModelIndex, int, int, QModelIndex, int)));
+    QVERIFY(proxy2rowsMovedSpy.isValid());
+    QSignalSpy proxy2rowsAboutToBeMovedSpy(&proxyModel2, SIGNAL(rowsAboutToBeMoved(QModelIndex, int, int, QModelIndex, int)));
+    QVERIFY(proxy2rowsAboutToBeMovedSpy.isValid());
+    QVERIFY(baseModel.insertRow(2, baseModel.index(0, 0)));
+    QCOMPARE(proxyModel1.rowCount(), 3);
+    QCOMPARE(proxyModel2.rowCount(), 1);
+    QVERIFY(proxy2RowsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy2RowsInsertedSpy.isEmpty());
+    QVERIFY(proxy1RowsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy1RowsRemovedSpy.isEmpty());
+    QVERIFY(proxy2RowsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy2RowsRemovedSpy.isEmpty());
+    QVERIFY(proxy1rowsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy1rowsMovedSpy.isEmpty());
+    QVERIFY(proxy2rowsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy2rowsMovedSpy.isEmpty());
+    QCOMPARE(proxy1RowsAboutToBeInsertedSpy.count(), 1);
+    QCOMPARE(proxy1RowsInsertedSpy.count(), 1);
+    proxy1RowsAboutToBeInsertedSpy.clear();
+    proxy1RowsInsertedSpy.clear();
+
+    QVERIFY(baseModel.moveRow(baseModel.index(0, 0), 2, baseModel.index(0, 0), 0));
+    QCOMPARE(proxyModel1.rowCount(), 3);
+    QCOMPARE(proxyModel2.rowCount(), 1);
+    QCOMPARE(proxy1rowsAboutToBeMovedSpy.count(), 1);
+    QCOMPARE(proxy1rowsMovedSpy.count(), 1);
+    QVERIFY(proxy2rowsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy2rowsMovedSpy.isEmpty());
+    QVERIFY(proxy1RowsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy1RowsInsertedSpy.isEmpty());
+    QVERIFY(proxy2RowsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy2RowsInsertedSpy.isEmpty());
+    QVERIFY(proxy1RowsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy1RowsRemovedSpy.isEmpty());
+    QVERIFY(proxy2RowsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy2RowsRemovedSpy.isEmpty());
+    proxy1rowsAboutToBeMovedSpy.clear();
+    proxy1rowsMovedSpy.clear();
+
+    QVERIFY(baseModel.moveRow(baseModel.index(0, 0), 2, QModelIndex(), 0));
+    QCOMPARE(proxyModel1.rowCount(), 2);
+    QCOMPARE(proxyModel2.rowCount(), 1);
+    QCOMPARE(proxy1RowsAboutToBeRemovedSpy.count(), 1);
+    QCOMPARE(proxy1RowsRemovedSpy.count(), 1);
+    QVERIFY(proxy2rowsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy2rowsMovedSpy.isEmpty());
+    QVERIFY(proxy1RowsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy1RowsInsertedSpy.isEmpty());
+    QVERIFY(proxy2RowsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy2RowsInsertedSpy.isEmpty());
+    QVERIFY(proxy1rowsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy1rowsMovedSpy.isEmpty());
+    QVERIFY(proxy2RowsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy2RowsRemovedSpy.isEmpty());
+    proxy1RowsAboutToBeRemovedSpy.clear();
+    proxy1RowsRemovedSpy.clear();
+
+    QVERIFY(baseModel.moveRow(QModelIndex(), 0, baseModel.index(1, 0), 0));
+    QCOMPARE(proxyModel1.rowCount(), 3);
+    QCOMPARE(proxyModel2.rowCount(), 1);
+    QVERIFY(proxy1rowsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy1rowsMovedSpy.isEmpty());
+    QVERIFY(proxy2rowsAboutToBeMovedSpy.isEmpty());
+    QVERIFY(proxy2rowsMovedSpy.isEmpty());
+    QCOMPARE(proxy1RowsAboutToBeInsertedSpy.count(), 1);
+    QCOMPARE(proxy1RowsInsertedSpy.count(), 1);
+    QVERIFY(proxy2RowsAboutToBeInsertedSpy.isEmpty());
+    QVERIFY(proxy2RowsInsertedSpy.isEmpty());
+    QVERIFY(proxy1RowsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy1RowsRemovedSpy.isEmpty());
+    QVERIFY(proxy2RowsAboutToBeRemovedSpy.isEmpty());
+    QVERIFY(proxy2RowsRemovedSpy.isEmpty());
+#else
+    QSKIP("This test requires the GenericModel module");
+#endif
+}
+
 void tst_RootIndexProxyModel::switchRoot()
 {
 #ifdef COMPLEX_MODEL_SUPPORT

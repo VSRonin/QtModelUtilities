@@ -121,10 +121,10 @@ void tst_HtmlModelSerialiser::validateHtmlOutput()
 #    else
         QObject::connect(validateReply, &QNetworkReply::errorOccurred, &replyWaitLoop, &QEventLoop::quit);
 #    endif
-#if QT_CONFIG(ssl)
+#    if QT_CONFIG(ssl)
         QObject::connect(validateReply, &QNetworkReply::sslErrors, validateReply,
                          static_cast<void (QNetworkReply::*)()>(&QNetworkReply::ignoreSslErrors));
-#endif
+#    endif
         replyWaitLoop.exec();
         if (validateReply->error() == QNetworkReply::NoError)
             break;
