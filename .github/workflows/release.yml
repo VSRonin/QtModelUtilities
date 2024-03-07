@@ -7,6 +7,8 @@ jobs:
     release:
         name: ${{ matrix.platforms.friendly_name }} Qt ${{ matrix.qt_version.qt_ver }} Release
         runs-on: ${{ matrix.platforms.os }}
+        permissions:
+            contents: write
         strategy:
           max-parallel: 1
           matrix:
@@ -86,6 +88,8 @@ jobs:
     createdocs:
         name: Create docs package and publish to gh-pages
         runs-on: ubuntu-latest
+        permissions:
+            contents: write
         needs: release
         steps:
           - name: Install Qt
@@ -124,6 +128,8 @@ jobs:
     removedraft:
         name: Remove Draft from Release
         runs-on: ubuntu-latest
+        permissions:
+            contents: write
         needs: [release, createdocs]
         steps:
           - name: Publish Release
