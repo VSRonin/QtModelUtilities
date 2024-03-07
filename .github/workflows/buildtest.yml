@@ -4,16 +4,15 @@ on:
     branches:
       - master
       - dev
+      - bugfix
+      - ci_admin
     paths-ignore:
       - '.travis.yml'
       - 'docs/**'
       - '**.markdown'
       - '**.md'
       - 'LICENSE'
-  pull_request:
-    branches:
-      - master
-      - dev
+  pull_request_target:
     paths-ignore:
       - '.travis.yml'
       - 'docs/**'
@@ -22,12 +21,14 @@ on:
       - 'LICENSE'
 jobs:
     build:
-        name: Build and Test ${{ matrix.platforms.friendly_name }} Qt${{ matrix.qt_ver }} dll${{ matrix.shared_lib }} NoGui${{ matrix.no_gui }} NoWidgets${{ matrix.no_widgets }} ManyRoles${{ matrix.many_roles }}
+        name: Build and Test ${{ matrix.platforms.friendly_name }} Qt${{ matrix.qt_version.qt_ver }} dll${{ matrix.shared_lib }} NoGui${{ matrix.no_gui }} NoWidgets${{ matrix.no_widgets }} ManyRoles${{ matrix.many_roles }}
         runs-on: ${{ matrix.platforms.os }}
         strategy:
           fail-fast: false
           matrix:
-              qt_ver: [5.15.2,6.2.0]
+              qt_version:
+                - { qt_ver: 5.15.2, mingw_arch: win64_mingw81 }
+                - { qt_ver: 6.5.3, mingw_arch: win64_mingw }
               shared_lib: [ON,OFF]
               no_widgets: [OFF,ON]
               no_gui: [OFF,ON]
@@ -43,17 +44,17 @@ jobs:
         steps:
           - name: Install Qt
             if: ${{ matrix.platforms.friendly_name != 'MinGW' }}
-            uses: jurplel/install-qt-action@v2
+            uses: jurplel/install-qt-action@v3
             with:
-              version: ${{ matrix.qt_ver }}
+              version: ${{ matrix.qt_version.qt_ver }}
           - name: Install Qt MinGW
             if: ${{ matrix.platforms.friendly_name == 'MinGW' }}
-            uses: jurplel/install-qt-action@v2
+            uses: jurplel/install-qt-action@v3
             with:
-              version: ${{ matrix.qt_ver }}
-              arch: win64_mingw81
+              version: ${{ matrix.qt_version.qt_ver }}
+              arch: ${{ matrix.qt_version.mingw_arch }}
           - name: Git Checkout
-            uses: actions/checkout@v2
+            uses: actions/checkout@v4
             with:
               fetch-depth: 0
           - name: Create Build Directory
@@ -70,10 +71,10 @@ jobs:
             if: ${{ runner.os == 'Linux' }}
             run: |
               sudo apt-get update -y
-              sudo apt-get install libxcb-icccm4 libxcb-xkb1 libxcb-icccm4 libxcb-image0 libxcb-render-util0 libxcb-randr0 libxcb-keysyms1 libxcb-xinerama0 libxcb-xinput-dev
+              sudo apt-get install libxcb-*
               export PATH=$PATH:$PWD/build/installed/lib
               export PATH=$PATH:$PWD/build/installed/bin
-          - name: ${{ matrix.platforms.friendly_name }} Qt${{ matrix.qt_ver }} Static:${{ matrix.shared_lib }} No Gui:${{ matrix.no_gui }} No Widgets:${{ matrix.no_widgets }} Many Roles:${{ matrix.many_roles }}
+          - name: Build
             shell: pwsh
             run: |
               cd build/debug
@@ -84,29 +85,16 @@ jobs:
               cmake -G"${{ matrix.platforms.generator }}" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=${{ matrix.shared_lib }} -DCMAKE_INSTALL_PREFIX="../installed" -DNO_WIDGETS=${{ matrix.no_widgets }} -DNO_GUI=${{ matrix.no_gui }} -DOPTIMISE_FOR_MANY_ROLES=${{ matrix.many_roles }} ../../
               cmake --build .
               cmake --build . --target install
-          - name: Linux Debug Test
-            if: ${{ runner.os == 'Linux' }}
-            id: runlinuxdebugtests
-            continue-on-error: true
-            uses: GabrielBB/xvfb-action@v1
-            with:
-              working-directory: ./build/debug
-              run: cmake --build . --target test
-          - name: Linux Release Test
-            if: ${{ runner.os == 'Linux' }}
-            id: runlinuxreleasetests
-            uses: GabrielBB/xvfb-action@v1
-            with:
-              working-directory: ./build/release
-              run: cmake --build . --target test
           - name: Test
-            if: ${{ runner.os != 'Linux' }}
             id: runtests
             shell: pwsh
             run: |
               cd build
               $OldPath = [Environment]::GetEnvironmentVariable("PATH")
               [Environment]::SetEnvironmentVariable("PATH","$pwd/installed/lib;$pwd/installed/bin;$OldPath")
+              if([Environment]::GetEnvironmentVariable("RUNNER_OS") -eq "Linux"){
+                [Environment]::SetEnvironmentVariable("QT_QPA_PLATFORM","offscreen")
+              }
               cd debug
               cmake --build . --target test
               cd ../release
@@ -116,17 +104,17 @@ jobs:
               pip install html5validator
               html5validator --root build/TestResults/
           - name: Prepare Test Report
-            if: ${{ always() && (steps.runtests.outcome == 'failure' || steps.runlinuxdebugtests.outcome == 'failure' || steps.runlinuxreleasetests.outcome == 'failure') }}
+            if: ${{ always() && (steps.runtests.outcome == 'failure') }}
             uses: ./ci/processtestresults
             with:
                 qt-tests: build/TestResults
                 junit-output: build/TestResults/junitresult.xml
                 html-output: build/TestResults/testsreport.html
           - name: Publish Test Report
-            if: ${{ always() && (steps.runtests.outcome == 'failure' || steps.runlinuxdebugtests.outcome == 'failure' || steps.runlinuxreleasetests.outcome == 'failure') }}
-            uses: actions/upload-artifact@v2
+            if: ${{ always() && (steps.runtests.outcome == 'failure') }}
+            uses: actions/upload-artifact@v4
             with:
-                name: ${{ matrix.platforms.friendly_name }}-Qt${{ matrix.qt_ver }}-Shared${{ matrix.shared_lib }}-NoGui${{ matrix.no_gui }}-NoWidgets${{ matrix.no_widgets }}-ManyRoles${{ matrix.many_roles }}
+                name: ${{ matrix.platforms.friendly_name }}-Qt${{ matrix.qt_version.qt_ver }}-Shared${{ matrix.shared_lib }}-NoGui${{ matrix.no_gui }}-NoWidgets${{ matrix.no_widgets }}-ManyRoles${{ matrix.many_roles }}
                 path: |
                   build/TestResults/*.xml
                   build/TestResults/testsreport.html

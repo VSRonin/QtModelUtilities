@@ -4,6 +4,8 @@ on:
     branches:
       - master
       - dev
+      - bugfix
+      - ci_admin
     paths-ignore:
       - '.travis.yml'
       - '.appveyor.yml'
@@ -14,10 +16,7 @@ on:
       - 'LICENSE'
       - '**CMakeLists.txt'
       - 'cmake/**'
-  pull_request:
-    branches:
-      - master
-      - dev
+  pull_request_target:
     paths-ignore:
       - '.travis.yml'
       - '.appveyor.yml'
@@ -33,6 +32,6 @@ jobs:
     name: Formatting Check
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Run clang-format style check for C/C++ programs.
-      uses: jidicula/clang-format-action@v3.2.0
+      uses: jidicula/clang-format-action@v4.11.0
