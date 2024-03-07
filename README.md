@@ -4,7 +4,6 @@ This library is a collection of utilities for Qt's Model/View framework.
 
 ### Status
 [![Build Status](https://github.com/VSRonin/QtModelUtilities/actions/workflows/buildtest.yml/badge.svg?branch=master)](https://github.com/VSRonin/QtModelUtilities/actions)
-[![Qt 5.1 Build Status](https://travis-ci.com/VSRonin/QtModelUtilities.svg?branch=master)](https://travis-ci.com/github/VSRonin/QtModelUtilities)
 
 ### Contents
 
@@ -51,7 +50,6 @@ A reduced suite of tests, to ensure compatibility, is also run on:
 + Ubuntu g++ 64bit Qt 6.2
 + Ubuntu g++ 64bit Qt 5.12
 + Ubuntu g++ 64bit Qt 5.9
-+ Ubuntu Trusty g++ 6 64bit Qt 5.1
 
 ### Examples
 
