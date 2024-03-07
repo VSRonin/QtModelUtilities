@@ -5,12 +5,14 @@ on:
       - "*"
 jobs:
     release:
-        name: ${{ matrix.platforms.friendly_name }} Qt ${{ matrix.qt_ver }} Release
+        name: ${{ matrix.platforms.friendly_name }} Qt ${{ matrix.qt_version.qt_ver }} Release
         runs-on: ${{ matrix.platforms.os }}
         strategy:
           max-parallel: 1
           matrix:
-              qt_ver: [5.15.2,6.2.0]
+              qt_version:
+                - { qt_ver: 5.15.2, mingw_arch: win64_mingw81 }
+                - { qt_ver: 6.5.3, mingw_arch: win64_mingw }
               platforms:
                 - { os: windows-latest, generator: "NMake Makefiles", debug_postfix: d, compression: ZIP, friendly_name: MSVC }
                 - { os: windows-latest, generator: "MinGW Makefiles", debug_postfix: d, compression: ZIP, friendly_name: MinGW }
@@ -19,17 +21,17 @@ jobs:
         steps:
           - name: Install Qt
             if: ${{ matrix.platforms.friendly_name != 'MinGW' }}
-            uses: jurplel/install-qt-action@v2
+            uses: jurplel/install-qt-action@v3
             with:
-              version: ${{ matrix.qt_ver }}
+              version: ${{ matrix.qt_version.qt_ver }}
           - name: Install Qt MinGW
             if: ${{ matrix.platforms.friendly_name == 'MinGW' }}
-            uses: jurplel/install-qt-action@v2
+            uses: jurplel/install-qt-action@v3
             with:
-              version: ${{ matrix.qt_ver }}
-              arch: win64_mingw81
+              version: ${{ matrix.qt_version.qt_ver }}
+              arch: ${{ matrix.qt_version.mingw_arch }}
           - name: Git Checkout
-            uses: actions/checkout@v2
+            uses: actions/checkout@v4
             with:
               fetch-depth: 0
           - name: Create Build Directory
@@ -47,8 +49,8 @@ jobs:
             if: ${{ runner.os == 'Linux' }}
             run: |
               sudo apt-get update -y
-              sudo apt-get install libxcb-icccm4 libxcb-xkb1 libxcb-icccm4 libxcb-image0 libxcb-render-util0 libxcb-randr0 libxcb-keysyms1 libxcb-xinerama0 libxcb-xinput-dev
-          - name: Build Debug ${{ matrix.platforms.friendly_name }} Qt ${{ matrix.qt_ver }}
+              sudo apt-get install libxcb-*
+          - name: Build Debug ${{ matrix.platforms.friendly_name }} Qt ${{ matrix.qt_version.qt_ver }}
             if: ${{ runner.os != 'Linux' }}
             run: |
               cd build/shared-Debug
@@ -57,7 +59,7 @@ jobs:
               cd ../static-Debug
               cmake -G"${{ matrix.platforms.generator }}" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_STATIC_LIBRARY_SUFFIX=_static -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_DEBUG_POSTFIX=${{ matrix.platforms.debug_postfix }} -DCMAKE_INSTALL_PREFIX="../installed" ../../
               cmake --build .
-          - name: Build Release ${{ matrix.platforms.friendly_name }} Qt ${{ matrix.qt_ver }}
+          - name: Build Release ${{ matrix.platforms.friendly_name }} Qt ${{ matrix.qt_version.qt_ver }}
             run: |
               cd build/shared-Release
               cmake -G"${{ matrix.platforms.generator }}" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX="../installed" ../../
@@ -83,9 +85,9 @@ jobs:
         needs: release
         steps:
           - name: Install Qt
-            uses: jurplel/install-qt-action@v2
+            uses: jurplel/install-qt-action@v3
           - name: Git Checkout
-            uses: actions/checkout@v2
+            uses: actions/checkout@v4
             with:
               fetch-depth: 0
           - name: Create Build Directory

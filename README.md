@@ -38,16 +38,17 @@ Once you installed/unpacked your library in a directory (e.g. `path/to/QtModelUt
 The library should be compatible with all platform supported by Qt, the CI will build, test and deploy the following configurations:
 
 + Windows MSVC 2019 64bit Qt 5.15
-+ Windows MSVC 2019 64bit Qt 6.2
++ Windows MSVC 2019 64bit Qt 6.5
 + Windows MinGW 8.1 64bit Qt 5.15
-+ Windows MinGW 8.1 64bit Qt 6.2
++ Windows MinGW 8.1 64bit Qt 6.5
 + Ubuntu g++ 64bit Qt 5.15
-+ Ubuntu g++ 64bit Qt 6.2
++ Ubuntu g++ 64bit Qt 6.5
 + Mac OS X Clang 64bit Qt 5.15
-+ Mac OS X Clang 64bit Qt 6.2
++ Mac OS X Clang 64bit Qt 6.5
 
 A reduced suite of tests, to ensure compatibility, is also run on:
 
++ Ubuntu g++ 64bit Qt 6.2
 + Ubuntu g++ 64bit Qt 5.12
 + Ubuntu g++ 64bit Qt 5.9
 + Ubuntu Trusty g++ 6 64bit Qt 5.1
