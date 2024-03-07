@@ -67,6 +67,10 @@ jobs:
           - name: Set up MSVC environment
             if: ${{ matrix.platforms.friendly_name == 'MSVC' }}
             uses: ilammy/msvc-dev-cmd@v1
+          - name: Upgrade MinGW
+            if: ${{ matrix.platforms.friendly_name == 'MinGW' }}
+            run: |
+              choco upgrade mingw
           - name: Install Linux Dependencies
             if: ${{ runner.os == 'Linux' }}
             run: |
