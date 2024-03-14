@@ -115,8 +115,10 @@ if(BUILD_DOCS)
         COMMENT "Generating API documentation with Doxygen"
         VERBATIM
     )
-    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs/html DESTINATION docs COMPONENT documentation)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/docs/htmldocs.html DESTINATION docs COMPONENT documentation)
+    if(MODEL_UTILITIES_INSTALL)
+        install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs/html DESTINATION docs COMPONENT documentation)
+        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/docs/htmldocs.html DESTINATION docs COMPONENT documentation)
+    endif()
 endif()
 if(modelutilities_SRCS)
     set(modelutilities_SRCS ${modelutilities_SRCS} private/modelutilities_common_p.h)
@@ -164,48 +166,49 @@ if(modelutilities_SRCS)
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/lib"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${modelutilities_PlatformDir}/bin"
     )
-    install(FILES ${modelutilities_INSTALL_INCLUDE} "${CMAKE_CURRENT_BINARY_DIR}/globaldefs/modelutilities_global.h"
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-        COMPONENT QtModelUtilities_Development
-    )
-    install(TARGETS QtModelUtilities
-        EXPORT QtModelUtilitiesTargets
-        RUNTIME
-            DESTINATION ${CMAKE_INSTALL_BINDIR}
-            COMPONENT QtModelUtilities_Runtime
-        LIBRARY
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            COMPONENT QtModelUtilities_Runtime
-            NAMELINK_SKIP
-        INCLUDES
+    if(MODEL_UTILITIES_INSTALL)
+        install(FILES ${modelutilities_INSTALL_INCLUDE} "${CMAKE_CURRENT_BINARY_DIR}/globaldefs/modelutilities_global.h"
             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
             COMPONENT QtModelUtilities_Development
-        ARCHIVE
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            COMPONENT QtModelUtilities_Development
-    )
-    if(BUILD_SHARED_LIBS)
+        )
         install(TARGETS QtModelUtilities
             EXPORT QtModelUtilitiesTargets
+            RUNTIME
+                DESTINATION ${CMAKE_INSTALL_BINDIR}
+                COMPONENT QtModelUtilities_Runtime
             LIBRARY
                 DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                COMPONENT QtModelUtilities_Runtime
+                NAMELINK_SKIP
+            INCLUDES
+                DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+            ARCHIVE
+                DESTINATION ${CMAKE_INSTALL_LIBDIR}
                 COMPONENT QtModelUtilities_Development
-                NAMELINK_ONLY
         )
-    endif()
-    include(CMakePackageConfigHelpers)
-    write_basic_package_version_file("QtModelUtilitiesConfigVersion.cmake"
-        VERSION ${VERSION_SHORT}
-        COMPATIBILITY SameMajorVersion
-    )
-    install(EXPORT QtModelUtilitiesTargets
-            FILE QtModelUtilitiesTargets.cmake
-            NAMESPACE QtModelUtilities::
+        if(BUILD_SHARED_LIBS)
+            install(TARGETS QtModelUtilities
+                EXPORT QtModelUtilitiesTargets
+                LIBRARY
+                    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                    COMPONENT QtModelUtilities_Development
+                    NAMELINK_ONLY
+            )
+        endif()
+        include(CMakePackageConfigHelpers)
+        write_basic_package_version_file("QtModelUtilitiesConfigVersion.cmake"
+            VERSION ${VERSION_SHORT}
+            COMPATIBILITY SameMajorVersion
+        )
+        install(EXPORT QtModelUtilitiesTargets
+                FILE QtModelUtilitiesTargets.cmake
+                NAMESPACE QtModelUtilities::
+                DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/QtModelUtilities
+                COMPONENT QtModelUtilities_Development
+        )
+        install(FILES "QtModelUtilitiesConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/QtModelUtilitiesConfigVersion.cmake"
             DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/QtModelUtilities
             COMPONENT QtModelUtilities_Development
-    )
-    install(FILES "QtModelUtilitiesConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/QtModelUtilitiesConfigVersion.cmake"
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/QtModelUtilities
-        COMPONENT QtModelUtilities_Development
-    )
+        )
+    endif()
 endif()

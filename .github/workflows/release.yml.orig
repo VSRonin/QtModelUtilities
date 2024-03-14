@@ -12,9 +12,13 @@ jobs:
         strategy:
           max-parallel: 1
           matrix:
+<<<<<<< HEAD
+              qt_ver: [5.15.2,6.3.0]
+=======
               qt_version:
                 - { qt_ver: 5.15.2, mingw_arch: win64_mingw81 }
                 - { qt_ver: 6.5.3, mingw_arch: win64_mingw }
+>>>>>>> origin/master
               platforms:
                 - { os: windows-latest, generator: "NMake Makefiles", debug_postfix: d, compression: ZIP, friendly_name: MSVC }
                 - { os: windows-latest, generator: "MinGW Makefiles", debug_postfix: d, compression: ZIP, friendly_name: MinGW }

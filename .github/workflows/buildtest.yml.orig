@@ -21,14 +21,24 @@ on:
       - 'LICENSE'
 jobs:
     build:
+<<<<<<< HEAD
+        name: Build and Test ${{ matrix.platforms.friendly_name }} Qt${{ matrix.qt.qt_ver }} dll${{ matrix.shared_lib }} NoGui${{ matrix.no_gui }} NoWidgets${{ matrix.no_widgets }} ManyRoles${{ matrix.many_roles }}
+=======
         name: Build and Test ${{ matrix.platforms.friendly_name }} Qt${{ matrix.qt_version.qt_ver }} dll${{ matrix.shared_lib }} NoGui${{ matrix.no_gui }} NoWidgets${{ matrix.no_widgets }} ManyRoles${{ matrix.many_roles }}
+>>>>>>> origin/master
         runs-on: ${{ matrix.platforms.os }}
         strategy:
           fail-fast: false
           matrix:
+<<<<<<< HEAD
+              qt:
+                - { qt_ver: 5.15.2, mingw_arch: win64_mingw81 }
+                - { qt_ver: 6.3.0, mingw_arch: win64_mingw }
+=======
               qt_version:
                 - { qt_ver: 5.15.2, mingw_arch: win64_mingw81 }
                 - { qt_ver: 6.5.3, mingw_arch: win64_mingw }
+>>>>>>> origin/master
               shared_lib: [ON,OFF]
               no_widgets: [OFF,ON]
               no_gui: [OFF,ON]
@@ -46,17 +56,26 @@ jobs:
             if: ${{ matrix.platforms.friendly_name != 'MinGW' }}
             uses: jurplel/install-qt-action@v3
             with:
+<<<<<<< HEAD
+              version: ${{ matrix.qt.qt_ver }}
+=======
               version: ${{ matrix.qt_version.qt_ver }}
+>>>>>>> origin/master
           - name: Install Qt MinGW
             if: ${{ matrix.platforms.friendly_name == 'MinGW' }}
             uses: jurplel/install-qt-action@v3
             with:
-              version: ${{ matrix.qt_version.qt_ver }}
-              arch: ${{ matrix.qt_version.mingw_arch }}
+<<<<<<< HEAD
+              version: ${{ matrix.qt.qt_ver }}
+              arch: ${{ matrix.qt.mingw_arch }}
           - name: Upgrade MinGW
             if: ${{ matrix.platforms.friendly_name == 'MinGW' }}
             run: |
               choco upgrade mingw
+=======
+              version: ${{ matrix.qt_version.qt_ver }}
+              arch: ${{ matrix.qt_version.mingw_arch }}
+>>>>>>> origin/master
           - name: Git Checkout
             uses: actions/checkout@v4
             with:
@@ -82,7 +101,11 @@ jobs:
               sudo apt-get install libxcb-*
               export PATH=$PATH:$PWD/build/installed/lib
               export PATH=$PATH:$PWD/build/installed/bin
+<<<<<<< HEAD
+          - name: ${{ matrix.platforms.friendly_name }} Qt${{ matrix.qt.qt_ver }} Static:${{ matrix.shared_lib }} No Gui:${{ matrix.no_gui }} No Widgets:${{ matrix.no_widgets }} Many Roles:${{ matrix.many_roles }}
+=======
           - name: Build
+>>>>>>> origin/master
             shell: pwsh
             run: |
               cd build/debug
@@ -122,7 +145,11 @@ jobs:
             if: ${{ always() && (steps.runtests.outcome == 'failure') }}
             uses: actions/upload-artifact@v4
             with:
+<<<<<<< HEAD
+                name: ${{ matrix.platforms.friendly_name }}-Qt${{ matrix.qt.qt_ver }}-Shared${{ matrix.shared_lib }}-NoGui${{ matrix.no_gui }}-NoWidgets${{ matrix.no_widgets }}-ManyRoles${{ matrix.many_roles }}
+=======
                 name: ${{ matrix.platforms.friendly_name }}-Qt${{ matrix.qt_version.qt_ver }}-Shared${{ matrix.shared_lib }}-NoGui${{ matrix.no_gui }}-NoWidgets${{ matrix.no_widgets }}-ManyRoles${{ matrix.many_roles }}
+>>>>>>> origin/master
                 path: |
                   build/TestResults/*.xml
                   build/TestResults/testsreport.html
