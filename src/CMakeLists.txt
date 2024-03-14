@@ -191,7 +191,6 @@ if(modelutilities_SRCS)
                 NAMELINK_SKIP
             INCLUDES
                 DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-                COMPONENT QtModelUtilities_Development
             ARCHIVE
                 DESTINATION ${CMAKE_INSTALL_LIBDIR}
                 COMPONENT QtModelUtilities_Development

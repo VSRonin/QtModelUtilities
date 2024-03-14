@@ -253,6 +253,23 @@ using ComplexModel = GuardedModel<GenericModel>;
 #    endif
 #endif
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
+namespace ModelTestManager {
+inline int generateRandomNumber()
+{
+    return std::rand();
+}
+}
+#else
+#    include <QRandomGenerator>
+namespace ModelTestManager {
+inline int generateRandomNumber()
+{
+    return QRandomGenerator::global()->generate();
+}
+}
+#endif
+
 #ifndef SKIP_QTBUG_92220
 #    if (QT_VERSION < QT_VERSION_CHECK(5, 13, 0) || (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0) && QT_VERSION <= QT_VERSION_CHECK(6, 0, 3)))
 #        define SKIP_QTBUG_92220

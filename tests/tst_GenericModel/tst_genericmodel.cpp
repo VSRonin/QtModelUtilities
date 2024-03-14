@@ -3236,29 +3236,25 @@ void tst_GenericModel::bSort_data()
 
 void tst_GenericModel::bSort()
 {
+
     QFETCH(bool, useGenericModel);
     QFETCH(bool, useTable);
     QAbstractItemModel *model = nullptr;
     if (useGenericModel)
         model = new GenericModel;
-    else
 #ifdef QT_GUI_LIB
+    else
         model = new QStandardItemModel;
 #else
-        QSKIP("This benchmark requires the Qt GUI module");
+    QSKIP("This benchmark requires the Qt GUI module");
 #endif
+    if (!model)
+        return;
     model->insertColumns(0, useTable ? 5 : 1);
     model->insertRows(0, 50000);
-    QVector<int> numData;
-    numData.reserve(model->rowCount());
-    for (int ri = 0, maxR = model->rowCount(); ri < maxR; ++ri)
-        numData.append(ri);
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(numData.begin(), numData.end(), g);
     for (int ri = 0, maxR = model->rowCount(); ri < maxR; ++ri) {
         for (int ci = 0, maxC = model->columnCount(); ci < maxC; ++ci)
-            model->setData(model->index(ri, ci), numData.at(ri));
+            model->setData(model->index(ri, ci), ModelTestManager::generateRandomNumber());
     }
     QBENCHMARK_ONCE {
         model->sort(0);

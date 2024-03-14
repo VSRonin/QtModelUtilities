@@ -1,4 +1,4 @@
-name: Standalone Modules
+name: Old LTS Versions
 on: 
   push:
     branches:
@@ -20,20 +20,24 @@ on:
       - '**.md'
       - 'LICENSE'
 jobs:
-    build:
-        name: Build and Test ${{ matrix.modules.friendly_name }} Qt ${{ matrix.qt_ver }}
+    build512:
+        name: Qt Old LTS Builds
         runs-on: ubuntu-latest
         strategy:
           fail-fast: false
           matrix:
-              qt_ver: [5.15.2,6.5.3]
-              modules:
-                - { friendly_name: RoleMaskProxyModel, rolemaskproxy: ON, insertproxy: OFF, modelserialisation: OFF, rootindexproxy: OFF, genericmodel: OFF}
-                - { friendly_name: InsertProxyModel, rolemaskproxy: OFF, insertproxy: ON, modelserialisation: OFF, rootindexproxy: OFF, genericmodel: OFF}
-                - { friendly_name: ModelSerialisation, rolemaskproxy: OFF, insertproxy: OFF, modelserialisation: ON, rootindexproxy: OFF, genericmodel: OFF}
-                - { friendly_name: RootIndexProxyModel, rolemaskproxy: OFF, insertproxy: OFF, modelserialisation: OFF, rootindexproxy: ON, genericmodel: OFF}
-                - { friendly_name: GenericModel, rolemaskproxy: OFF, insertproxy: OFF, modelserialisation: OFF, rootindexproxy: OFF, genericmodel: ON}
+<<<<<<< HEAD
+            qt_ver: [5.12.10, 5.9.9, 6.2.4]
+=======
+              qt_ver: [5.12.10,5.9.9,6.2.4]
+>>>>>>> origin/master
         steps:
+          - name: Install Dependencies
+            run: |
+              sudo apt-get update -y
+              sudo apt-get install libxcb-*
+              export PATH=$PATH:$PWD/build/installed/lib
+              export PATH=$PATH:$PWD/build/installed/bin
           - name: Install Qt
             uses: jurplel/install-qt-action@v3
             with:
@@ -43,25 +47,23 @@ jobs:
             with:
               fetch-depth: 0
           - name: Create Build Directory
-            shell: pwsh
             run: |
               mkdir build
               cd build
               mkdir debug
               mkdir release
-          - name: Install Linux Dependencies
-            run: |
-              sudo apt-get update -y
-              sudo apt-get install libxcb-*
+<<<<<<< HEAD
+          - name: Build Qt ${{ matrix.qt_ver }}
+=======
           - name: Build
-            shell: pwsh
+>>>>>>> origin/master
             run: |
               cd build/debug
-              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_DEBUG_POSTFIX=d -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DCMAKE_INSTALL_PREFIX="../installed" -DBUILD_EXAMPLES=ON -DBUILD_GENERICMODEL=${{ matrix.modules.genericmodel }} -DBUILD_ROOTINDEXPROXY=${{ matrix.modules.rootindexproxy }} -DBUILD_ROLEMASKPROXY=${{ matrix.modules.rolemaskproxy }} -DBUILD_INSERTPROXY=${{ matrix.modules.insertproxy }} -DBUILD_MODELSERIALISATION=${{ matrix.modules.modelserialisation }} -DBUILD_SHARED_LIBS=ON ../../
+              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_DEBUG_POSTFIX=d -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="../installed" ../../
               cmake --build .
               cmake --build . --target install
               cd ../release
-              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DCMAKE_INSTALL_PREFIX="../installed" -DBUILD_EXAMPLES=ON -DBUILD_GENERICMODEL=${{ matrix.modules.genericmodel }} -DBUILD_ROOTINDEXPROXY=${{ matrix.modules.rootindexproxy }} -DBUILD_ROLEMASKPROXY=${{ matrix.modules.rolemaskproxy }} -DBUILD_INSERTPROXY=${{ matrix.modules.insertproxy }} -DBUILD_MODELSERIALISATION=${{ matrix.modules.modelserialisation }} -DBUILD_SHARED_LIBS=ON ../../
+              cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=ON -DTEST_OUTPUT_XML=ON -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="../installed" ../../
               cmake --build .
               cmake --build . --target install
           - name: Test
@@ -77,7 +79,6 @@ jobs:
               cd ../release
               cmake --build . --target test
           - name: HtmlModelSerialiser output validation
-            if: ${{ matrix.modules.friendly_name == 'ModelSerialisation' }}
             run: |
               pip install html5validator
               html5validator --root build/TestResults/
@@ -92,7 +93,7 @@ jobs:
             if: ${{ always() && (steps.runtests.outcome == 'failure') }}
             uses: actions/upload-artifact@v4
             with:
-                name: ${{ matrix.modules.friendly_name }}-Qt${{ matrix.qt_ver }}
+                name: Qt${{ matrix.qt_ver }}
                 path: |
                   build/TestResults/*.xml
                   build/TestResults/testsreport.html
