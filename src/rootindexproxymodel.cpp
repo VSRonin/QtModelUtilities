@@ -53,7 +53,7 @@ void RootIndexProxyModelPrivate::checkRootRowRemoved(const QModelIndex &parent, 
     if (m_rootIndex.row() >= first && m_rootIndex.row() <= last) {
         m_rootRowDeleted = true;
         q->beginResetModel();
-        m_rootIndex=QModelIndex();
+        m_rootIndex = QModelIndex();
     }
 }
 
@@ -68,7 +68,7 @@ void RootIndexProxyModelPrivate::checkRootColumnsRemoved(const QModelIndex &pare
     if (m_rootIndex.column() >= first && m_rootIndex.column() <= last) {
         m_rootColumnDeleted = true;
         q->beginResetModel();
-        m_rootIndex=QModelIndex();
+        m_rootIndex = QModelIndex();
     }
 }
 
@@ -125,12 +125,11 @@ void RootIndexProxyModelPrivate::onRowsRemoved(const QModelIndex &parent, int fi
         if (parent != m_rootIndex && !isDescendant(parent, m_rootIndex))
             return;
     }
-    if (m_rootRowDeleted){
+    if (m_rootRowDeleted) {
         q->endResetModel();
         Q_EMIT q->rootIndexChanged();
         m_rootRowDeleted = false;
-    }
-    else{
+    } else {
         q->endRemoveRows();
     }
 }
@@ -291,12 +290,11 @@ void RootIndexProxyModelPrivate::onColumnsRemoved(const QModelIndex &parent, int
         if (parent != m_rootIndex && !isDescendant(parent, m_rootIndex))
             return;
     }
-    if (m_rootColumnDeleted){
+    if (m_rootColumnDeleted) {
         q->endResetModel();
         Q_EMIT q->rootIndexChanged();
         m_rootColumnDeleted = false;
-    }
-    else{
+    } else {
         q->endRemoveColumns();
     }
 }

@@ -353,25 +353,25 @@ void tst_RootIndexProxyModel::bug60Row()
     QVERIFY(proxyAboutToBeResetSpy.isValid());
     QSignalSpy proxyRootChangedSpy(&proxyModel, SIGNAL(rootIndexChanged()));
     QVERIFY(proxyRootChangedSpy.isValid());
-    connect(baseModel,&QAbstractItemModel::rowsAboutToBeRemoved,[&](){
+    connect(baseModel, &QAbstractItemModel::rowsAboutToBeRemoved, [&]() {
         QCOMPARE(baseRowsAboutToBeRemovedSpy.count(), 1);
         QCOMPARE(baseRowsRemovedSpy.count(), 0);
         QCOMPARE(proxyResetSpy.count(), 0);
         QCOMPARE(proxyAboutToBeResetSpy.count(), 0);
     });
-    connect(&proxyModel,&QAbstractItemModel::modelAboutToBeReset,[&](){
+    connect(&proxyModel, &QAbstractItemModel::modelAboutToBeReset, [&]() {
         QCOMPARE(baseRowsAboutToBeRemovedSpy.count(), 1);
         QCOMPARE(baseRowsRemovedSpy.count(), 0);
         QCOMPARE(proxyResetSpy.count(), 0);
         QCOMPARE(proxyAboutToBeResetSpy.count(), 1);
     });
-    connect(baseModel,&QAbstractItemModel::rowsRemoved,[&](){
+    connect(baseModel, &QAbstractItemModel::rowsRemoved, [&]() {
         QCOMPARE(baseRowsAboutToBeRemovedSpy.count(), 1);
         QCOMPARE(baseRowsRemovedSpy.count(), 1);
         QCOMPARE(proxyResetSpy.count(), 0);
         QCOMPARE(proxyAboutToBeResetSpy.count(), 1);
     });
-    connect(&proxyModel,&QAbstractItemModel::modelReset,[&](){
+    connect(&proxyModel, &QAbstractItemModel::modelReset, [&]() {
         QCOMPARE(baseRowsAboutToBeRemovedSpy.count(), 1);
         QCOMPARE(baseRowsRemovedSpy.count(), 1);
         QCOMPARE(proxyResetSpy.count(), 1);
@@ -379,7 +379,7 @@ void tst_RootIndexProxyModel::bug60Row()
     });
     proxyModel.blockSignals(true);
     proxyModel.setSourceModel(baseModel);
-    proxyModel.setRootIndex(baseModel->index(0,0));
+    proxyModel.setRootIndex(baseModel->index(0, 0));
     proxyModel.blockSignals(false);
     QVERIFY(baseModel->removeRow(0));
     QCOMPARE(proxyModel.rootIndex(), QModelIndex());
@@ -409,25 +409,25 @@ void tst_RootIndexProxyModel::bug60Col()
     QVERIFY(proxyAboutToBeResetSpy.isValid());
     QSignalSpy proxyRootChangedSpy(&proxyModel, SIGNAL(rootIndexChanged()));
     QVERIFY(proxyRootChangedSpy.isValid());
-    connect(baseModel,&QAbstractItemModel::rowsAboutToBeRemoved,[&](){
+    connect(baseModel, &QAbstractItemModel::rowsAboutToBeRemoved, [&]() {
         QCOMPARE(baseColsAboutToBeRemovedSpy.count(), 1);
         QCOMPARE(baseColsRemovedSpy.count(), 0);
         QCOMPARE(proxyResetSpy.count(), 0);
         QCOMPARE(proxyAboutToBeResetSpy.count(), 0);
     });
-    connect(&proxyModel,&QAbstractItemModel::modelAboutToBeReset,[&](){
+    connect(&proxyModel, &QAbstractItemModel::modelAboutToBeReset, [&]() {
         QCOMPARE(baseColsAboutToBeRemovedSpy.count(), 1);
         QCOMPARE(baseColsRemovedSpy.count(), 0);
         QCOMPARE(proxyResetSpy.count(), 0);
         QCOMPARE(proxyAboutToBeResetSpy.count(), 1);
     });
-    connect(baseModel,&QAbstractItemModel::rowsRemoved,[&](){
+    connect(baseModel, &QAbstractItemModel::rowsRemoved, [&]() {
         QCOMPARE(baseColsAboutToBeRemovedSpy.count(), 1);
         QCOMPARE(baseColsRemovedSpy.count(), 1);
         QCOMPARE(proxyResetSpy.count(), 0);
         QCOMPARE(proxyAboutToBeResetSpy.count(), 1);
     });
-    connect(&proxyModel,&QAbstractItemModel::modelReset,[&](){
+    connect(&proxyModel, &QAbstractItemModel::modelReset, [&]() {
         QCOMPARE(baseColsAboutToBeRemovedSpy.count(), 1);
         QCOMPARE(baseColsRemovedSpy.count(), 1);
         QCOMPARE(proxyResetSpy.count(), 1);
@@ -435,7 +435,7 @@ void tst_RootIndexProxyModel::bug60Col()
     });
     proxyModel.blockSignals(true);
     proxyModel.setSourceModel(baseModel);
-    proxyModel.setRootIndex(baseModel->index(0,0));
+    proxyModel.setRootIndex(baseModel->index(0, 0));
     proxyModel.blockSignals(false);
     QVERIFY(baseModel->removeColumn(0));
     QCOMPARE(proxyModel.rootIndex(), QModelIndex());
@@ -747,7 +747,6 @@ void tst_RootIndexProxyModel::bug53MoveCols()
     QSKIP("This test requires the GenericModel module");
 #endif
 }
-
 
 void tst_RootIndexProxyModel::bug53MoveRows()
 {
