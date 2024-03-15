@@ -337,6 +337,119 @@ void tst_RootIndexProxyModel::removeColumn()
 #endif
 }
 
+void tst_RootIndexProxyModel::bug60Row()
+{
+#ifdef COMPLEX_MODEL_SUPPORT
+    QAbstractItemModel *baseModel = createTreeModel(this);
+    RootIndexProxyModel proxyModel;
+    new ModelTest(&proxyModel, baseModel);
+    QSignalSpy baseRowsAboutToBeRemovedSpy(baseModel, SIGNAL(rowsAboutToBeRemoved(QModelIndex, int, int)));
+    QVERIFY(baseRowsAboutToBeRemovedSpy.isValid());
+    QSignalSpy baseRowsRemovedSpy(baseModel, SIGNAL(rowsRemoved(QModelIndex, int, int)));
+    QVERIFY(baseRowsRemovedSpy.isValid());
+    QSignalSpy proxyResetSpy(&proxyModel, SIGNAL(modelReset()));
+    QVERIFY(proxyResetSpy.isValid());
+    QSignalSpy proxyAboutToBeResetSpy(&proxyModel, SIGNAL(modelAboutToBeReset()));
+    QVERIFY(proxyAboutToBeResetSpy.isValid());
+    QSignalSpy proxyRootChangedSpy(&proxyModel, SIGNAL(rootIndexChanged()));
+    QVERIFY(proxyRootChangedSpy.isValid());
+    connect(baseModel,&QAbstractItemModel::rowsAboutToBeRemoved,[&](){
+        QCOMPARE(baseRowsAboutToBeRemovedSpy.count(), 1);
+        QCOMPARE(baseRowsRemovedSpy.count(), 0);
+        QCOMPARE(proxyResetSpy.count(), 0);
+        QCOMPARE(proxyAboutToBeResetSpy.count(), 0);
+    });
+    connect(&proxyModel,&QAbstractItemModel::modelAboutToBeReset,[&](){
+        QCOMPARE(baseRowsAboutToBeRemovedSpy.count(), 1);
+        QCOMPARE(baseRowsRemovedSpy.count(), 0);
+        QCOMPARE(proxyResetSpy.count(), 0);
+        QCOMPARE(proxyAboutToBeResetSpy.count(), 1);
+    });
+    connect(baseModel,&QAbstractItemModel::rowsRemoved,[&](){
+        QCOMPARE(baseRowsAboutToBeRemovedSpy.count(), 1);
+        QCOMPARE(baseRowsRemovedSpy.count(), 1);
+        QCOMPARE(proxyResetSpy.count(), 0);
+        QCOMPARE(proxyAboutToBeResetSpy.count(), 1);
+    });
+    connect(&proxyModel,&QAbstractItemModel::modelReset,[&](){
+        QCOMPARE(baseRowsAboutToBeRemovedSpy.count(), 1);
+        QCOMPARE(baseRowsRemovedSpy.count(), 1);
+        QCOMPARE(proxyResetSpy.count(), 1);
+        QCOMPARE(proxyAboutToBeResetSpy.count(), 1);
+    });
+    proxyModel.blockSignals(true);
+    proxyModel.setSourceModel(baseModel);
+    proxyModel.setRootIndex(baseModel->index(0,0));
+    proxyModel.blockSignals(false);
+    QVERIFY(baseModel->removeRow(0));
+    QCOMPARE(proxyModel.rootIndex(), QModelIndex());
+    QCOMPARE(baseRowsAboutToBeRemovedSpy.count(), 1);
+    QCOMPARE(baseRowsRemovedSpy.count(), 1);
+    QCOMPARE(proxyResetSpy.count(), 1);
+    QCOMPARE(proxyAboutToBeResetSpy.count(), 1);
+    QCOMPARE(proxyRootChangedSpy.count(), 1);
+    baseModel->deleteLater();
+#else
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
+#endif
+}
+void tst_RootIndexProxyModel::bug60Col()
+{
+#ifdef COMPLEX_MODEL_SUPPORT
+    QAbstractItemModel *baseModel = createTreeModel(this);
+    RootIndexProxyModel proxyModel;
+    new ModelTest(&proxyModel, baseModel);
+    QSignalSpy baseColsAboutToBeRemovedSpy(baseModel, SIGNAL(columnsAboutToBeRemoved(QModelIndex, int, int)));
+    QVERIFY(baseColsAboutToBeRemovedSpy.isValid());
+    QSignalSpy baseColsRemovedSpy(baseModel, SIGNAL(columnsRemoved(QModelIndex, int, int)));
+    QVERIFY(baseColsRemovedSpy.isValid());
+    QSignalSpy proxyResetSpy(&proxyModel, SIGNAL(modelReset()));
+    QVERIFY(proxyResetSpy.isValid());
+    QSignalSpy proxyAboutToBeResetSpy(&proxyModel, SIGNAL(modelAboutToBeReset()));
+    QVERIFY(proxyAboutToBeResetSpy.isValid());
+    QSignalSpy proxyRootChangedSpy(&proxyModel, SIGNAL(rootIndexChanged()));
+    QVERIFY(proxyRootChangedSpy.isValid());
+    connect(baseModel,&QAbstractItemModel::rowsAboutToBeRemoved,[&](){
+        QCOMPARE(baseColsAboutToBeRemovedSpy.count(), 1);
+        QCOMPARE(baseColsRemovedSpy.count(), 0);
+        QCOMPARE(proxyResetSpy.count(), 0);
+        QCOMPARE(proxyAboutToBeResetSpy.count(), 0);
+    });
+    connect(&proxyModel,&QAbstractItemModel::modelAboutToBeReset,[&](){
+        QCOMPARE(baseColsAboutToBeRemovedSpy.count(), 1);
+        QCOMPARE(baseColsRemovedSpy.count(), 0);
+        QCOMPARE(proxyResetSpy.count(), 0);
+        QCOMPARE(proxyAboutToBeResetSpy.count(), 1);
+    });
+    connect(baseModel,&QAbstractItemModel::rowsRemoved,[&](){
+        QCOMPARE(baseColsAboutToBeRemovedSpy.count(), 1);
+        QCOMPARE(baseColsRemovedSpy.count(), 1);
+        QCOMPARE(proxyResetSpy.count(), 0);
+        QCOMPARE(proxyAboutToBeResetSpy.count(), 1);
+    });
+    connect(&proxyModel,&QAbstractItemModel::modelReset,[&](){
+        QCOMPARE(baseColsAboutToBeRemovedSpy.count(), 1);
+        QCOMPARE(baseColsRemovedSpy.count(), 1);
+        QCOMPARE(proxyResetSpy.count(), 1);
+        QCOMPARE(proxyAboutToBeResetSpy.count(), 1);
+    });
+    proxyModel.blockSignals(true);
+    proxyModel.setSourceModel(baseModel);
+    proxyModel.setRootIndex(baseModel->index(0,0));
+    proxyModel.blockSignals(false);
+    QVERIFY(baseModel->removeColumn(0));
+    QCOMPARE(proxyModel.rootIndex(), QModelIndex());
+    QCOMPARE(baseColsAboutToBeRemovedSpy.count(), 1);
+    QCOMPARE(baseColsRemovedSpy.count(), 1);
+    QCOMPARE(proxyResetSpy.count(), 1);
+    QCOMPARE(proxyAboutToBeResetSpy.count(), 1);
+    QCOMPARE(proxyRootChangedSpy.count(), 1);
+    baseModel->deleteLater();
+#else
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
+#endif
+}
+
 void tst_RootIndexProxyModel::bug53Rows()
 {
 #ifdef COMPLEX_MODEL_SUPPORT
@@ -634,6 +747,8 @@ void tst_RootIndexProxyModel::bug53MoveCols()
     QSKIP("This test requires the GenericModel module");
 #endif
 }
+
+
 void tst_RootIndexProxyModel::bug53MoveRows()
 {
 #ifdef QTMODELUTILITIES_GENERICMODEL
