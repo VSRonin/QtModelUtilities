@@ -2,8 +2,8 @@
 #define DEMOHIERARCHYLEVELPROXYMODEL_H
 
 #include <QWidget>
-#include <QStandardItemModel>
-#include <HierarchyLevelProxyModel>
+class QAbstractItemModel;
+class HierarchyLevelProxyModel;
 namespace Ui {
 class DemoHierarchylevelProxyModel;
 }
@@ -19,7 +19,7 @@ private:
     void fillModel(QAbstractItemModel *model);
     void onChangeHierarchylevel(int value);
     Ui::DemoHierarchylevelProxyModel *ui;
-    QStandardItemModel *sourceModel;
+    QAbstractItemModel *sourceModel;
     HierarchyLevelProxyModel *proxyModel;
 };
 

@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>5</number>
+      <number>4</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -46,6 +46,11 @@
       <attribute name="title">
        <string notr="true">RootIndexProxyModel</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="DemoRootIndexProxyModel" name="widget_2" native="true"/>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="HierarchylevelProxyModel">
       <attribute name="title">
@@ -66,6 +71,12 @@
    <class>DemoHierarchylevelProxyModel</class>
    <extends>QWidget</extends>
    <header>demohierarchylevelproxymodel.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DemoRootIndexProxyModel</class>
+   <extends>QWidget</extends>
+   <header>demorootindexproxymodel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -6,6 +6,23 @@
 #include <QAction>
 #include <QMenu>
 #include <QInputDialog>
+#include "roleseditdialog.h"
+#include <QStyledItemDelegate>
+
+enum ViewFeature{
+    ModifyMultipleRoles = 0x1
+    , InsertRows = 0x2
+    , InsertColumns = 0x2
+    , InsertChildRows = 0x4
+    , InsertChildColumns = 0x8
+    , RemoveRows = 0x10
+    , RemoveColumns = 0x20
+    , MoveRows = 0x40
+    , MoveColumns = 0x80
+};
+Q_DECLARE_FLAGS(ViewFeatures, ViewFeature)
+Q_DECLARE_OPERATORS_FOR_FLAGS(ViewFeatures)
+
 template<class BaseView>
 class DemoView : public BaseView
 {
@@ -15,12 +32,16 @@ class DemoView : public BaseView
 public:
     DemoView(QWidget *parent = nullptr)
         : BaseView(parent)
+        , m_features(ModifyMultipleRoles| InsertRows | InsertColumns | InsertChildRows  | InsertChildColumns | RemoveRows |RemoveColumns|MoveRows |MoveColumns )
     {
         this->setContextMenuPolicy(Qt::CustomContextMenu);
         this->setSelectionMode(QAbstractItemView::ExtendedSelection);
         this->setSelectionBehavior(QAbstractItemView::SelectItems);
         QObject::connect(this, &DemoView::customContextMenuRequested, this, &DemoView::onContextMenuRequested);
         contextMenu = new QMenu(this);
+        a_modifyDataRoles = new QAction(QObject::tr("Modify Data Roles"), this);
+        QObject::connect(a_modifyDataRoles, &QAction::triggered, this, &DemoView::onModifyDataRoles);
+        contextMenu->addAction(a_modifyDataRoles);
         a_insertRowEnd = new QAction(QObject::tr("Append Row(s)"), this);
         QObject::connect(a_insertRowEnd, &QAction::triggered, this, &DemoView::onInsertRowEnd);
         contextMenu->addAction(a_insertRowEnd);
@@ -39,14 +60,12 @@ public:
         a_insertColumnAfter = new QAction(QObject::tr("Insert Column(s) Right"), this);
         QObject::connect(a_insertColumnAfter, &QAction::triggered, this, &DemoView::onInsertColumnAfter);
         contextMenu->addAction(a_insertColumnAfter);
-        if constexpr (std::is_base_of<QTreeView, BaseView>::value) {
-            a_insertChildRowEnd = new QAction(QObject::tr("Append Child Row(s)"), this);
-            QObject::connect(a_insertChildRowEnd, &QAction::triggered, this, &DemoView::onInsertChildRowEnd);
-            contextMenu->addAction(a_insertChildRowEnd);
-            a_insertChildColumnEnd = new QAction(QObject::tr("Append Child Column(s)"), this);
-            QObject::connect(a_insertChildColumnEnd, &QAction::triggered, this, &DemoView::onInsertChildColumnEnd);
-            contextMenu->addAction(a_insertChildColumnEnd);
-        }
+        a_insertChildRowEnd = new QAction(QObject::tr("Append Child Row(s)"), this);
+        QObject::connect(a_insertChildRowEnd, &QAction::triggered, this, &DemoView::onInsertChildRowEnd);
+        contextMenu->addAction(a_insertChildRowEnd);
+        a_insertChildColumnEnd = new QAction(QObject::tr("Append Child Column(s)"), this);
+        QObject::connect(a_insertChildColumnEnd, &QAction::triggered, this, &DemoView::onInsertChildColumnEnd);
+        contextMenu->addAction(a_insertChildColumnEnd);
         a_RemoveRow = new QAction(QObject::tr("Remove Row(s)"), this);
         QObject::connect(a_RemoveRow, &QAction::triggered, this, &DemoView::onRemoveRow);
         contextMenu->addAction(a_RemoveRow);
@@ -55,23 +74,34 @@ public:
         contextMenu->addAction(a_RemoveCol);
     }
     ~DemoView() { }
-
+    ViewFeatures features() const {
+        return m_features;
+    }
+    void setFeatures(const ViewFeatures& vf){
+        m_features=vf;
+    }
+    void prependContextMenuAction(QAction* act){
+        if(act)
+            contextMenu->insertAction(contextMenu->actions().first(),act);
+    }
+    void appendContextMenuAction(QAction* act){
+        if(act)
+            contextMenu->addAction(act);
+    }
 private:
     void onContextMenuRequested(const QPoint &pos)
     {
         menuIndexes = this->selectionModel()->selectedIndexes();
-        a_insertRowEnd->setVisible(menuIndexes.isEmpty());
-        a_insertColumnEnd->setVisible(menuIndexes.isEmpty());
-        a_insertRowBefore->setVisible(!menuIndexes.isEmpty());
-        a_insertRowAfter->setVisible(!menuIndexes.isEmpty());
-        a_insertColumnBefore->setVisible(!menuIndexes.isEmpty());
-        a_insertColumnAfter->setVisible(!menuIndexes.isEmpty());
-        a_RemoveRow->setVisible(!menuIndexes.isEmpty());
-        a_RemoveCol->setVisible(!menuIndexes.isEmpty());
-        if constexpr (std::is_base_of<QTreeView, BaseView>::value) {
-            a_insertChildRowEnd->setVisible(!menuIndexes.isEmpty());
-            a_insertChildColumnEnd->setVisible(!menuIndexes.isEmpty());
-        }
+        a_insertRowEnd->setVisible((m_features & ViewFeature::InsertRows) && menuIndexes.isEmpty());
+        a_insertColumnEnd->setVisible((m_features & ViewFeature::InsertColumns) && menuIndexes.isEmpty());
+        a_insertRowBefore->setVisible((m_features & ViewFeature::InsertRows) && !menuIndexes.isEmpty());
+        a_insertRowAfter->setVisible((m_features & ViewFeature::InsertRows) && !menuIndexes.isEmpty());
+        a_insertColumnBefore->setVisible((m_features & ViewFeature::InsertColumns) && !menuIndexes.isEmpty());
+        a_insertColumnAfter->setVisible((m_features & ViewFeature::InsertColumns) && !menuIndexes.isEmpty());
+        a_RemoveRow->setVisible((m_features & ViewFeature::RemoveRows) && !menuIndexes.isEmpty());
+        a_RemoveCol->setVisible((m_features & ViewFeature::RemoveColumns) && !menuIndexes.isEmpty());
+        a_insertChildRowEnd->setVisible((m_features & ViewFeature::InsertChildRows) && !menuIndexes.isEmpty());
+        a_insertChildColumnEnd->setVisible((m_features & ViewFeature::InsertChildColumns) && !menuIndexes.isEmpty());
         contextMenu->popup(this->mapToGlobal(pos));
     }
     void onInsertRowEnd()
@@ -190,7 +220,23 @@ private:
         for (auto i = minMaxCols.cbegin(), iEnd = minMaxCols.cend(); i != iEnd; ++i)
             this->model()->removeColumns(i->first, i->second - i->first + 1, i.key());
     }
+    void onModifyDataRoles(){
+        Q_ASSERT(!menuIndexes.isEmpty());
+        const QModelIndex currIdx= menuIndexes.first();
+        Q_ASSERT(currIdx.model() == this->model());
+        const QStyledItemDelegate* const currDelegate = dynamic_cast<const QStyledItemDelegate*>(this->itemDelegateForIndex(currIdx));
+        Q_ASSERT(currDelegate);
+        RolesEditDialog rolesDialog(this);
+        rolesDialog.loadRoles(this->model()->itemData(currIdx));
+        if(rolesDialog.exec()){
+            this->model()->clearItemData(currIdx);
+            this->model()->setItemData(currIdx,rolesDialog.roles());
+        }
+    }
+
+    ViewFeatures m_features;
     QModelIndexList menuIndexes;
+    QAction *a_modifyDataRoles = nullptr;
     QAction *a_insertRowEnd = nullptr;
     QAction *a_insertColumnEnd = nullptr;
     QAction *a_insertRowBefore = nullptr;
@@ -204,5 +250,12 @@ private:
     QMenu *contextMenu = nullptr;
 };
 using DemoTreeView = DemoView<QTreeView>;
-using DemoTableView = DemoView<QTableView>;
+class DemoTableView : public DemoView<QTableView>{
+public:
+    DemoTableView(QWidget *parent = nullptr)
+        :DemoView<QTableView>(parent)
+    {
+        setFeatures(ModifyMultipleRoles| InsertRows | InsertColumns |  RemoveRows |RemoveColumns|MoveRows |MoveColumns);
+    }
+};
 #endif // TEMPLATEDEMOVIEW_H

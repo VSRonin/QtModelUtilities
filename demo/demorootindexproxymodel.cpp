@@ -1,29 +1,32 @@
-#include "demohierarchylevelproxymodel.h"
-#include "ui_demohierarchylevelproxymodel.h"
+#include "demorootindexproxymodel.h"
+#include "ui_demorootindexproxymodel.h"
 #include <random>
 #include <QStandardItemModel>
-#include <HierarchyLevelProxyModel>
+#include <RootIndexProxyModel>
+#include <QAction>
 #if defined(QT_TESTLIB_LIB)
 #include <QAbstractItemModelTester>
 #endif
-DemoHierarchylevelProxyModel::DemoHierarchylevelProxyModel(QWidget *parent)
+DemoRootIndexProxyModel::DemoRootIndexProxyModel(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::DemoHierarchylevelProxyModel)
+    , ui(new Ui::DemoRootIndexProxyModel)
 {
     ui->setupUi(this);
     sourceModel = new QStandardItemModel(this);
     fillModel(sourceModel);
-    proxyModel = new HierarchyLevelProxyModel(this);
+    proxyModel = new RootIndexProxyModel(this);
 #if defined(QT_TESTLIB_LIB)
     new QAbstractItemModelTester(proxyModel,this);
 #endif
     proxyModel->setSourceModel(sourceModel);
     ui->sourceView->setModel(sourceModel);
     ui->proxyView->setModel(proxyModel);
-    connect(ui->hierarchySpin, &QSpinBox::valueChanged, this, &DemoHierarchylevelProxyModel::onChangeHierarchylevel);
+    QAction *setRootAction=new QAction(tr("Set Proxy Root Index"),this);
+    connect(setRootAction,&QAction::triggered,this,&DemoRootIndexProxyModel::onChangeRoot);
+    ui->sourceView->prependContextMenuAction(setRootAction);
 }
 
-void DemoHierarchylevelProxyModel::fillModel(QAbstractItemModel *model)
+void DemoRootIndexProxyModel::fillModel(QAbstractItemModel *model)
 {
     std::default_random_engine generator;
     const std::uniform_int_distribution<int> quantityDistrib(0,100);
@@ -66,12 +69,12 @@ void DemoHierarchylevelProxyModel::fillModel(QAbstractItemModel *model)
     }
 }
 
-void DemoHierarchylevelProxyModel::onChangeHierarchylevel(int value)
+void DemoRootIndexProxyModel::onChangeRoot()
 {
-    proxyModel->setHierarchyLevel(value);
-};
+    proxyModel->setRootIndex(ui->sourceView->currentIndex());
+}
 
-DemoHierarchylevelProxyModel::~DemoHierarchylevelProxyModel()
+DemoRootIndexProxyModel::~DemoRootIndexProxyModel()
 {
     delete ui;
 }
