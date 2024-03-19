@@ -14,6 +14,7 @@ private Q_SLOTS:
     void testData_data();
     void testSetData();
     void testSetData_data();
+    void testSetDataIrrelevantIndex();
     void testInsertRowSource_data();
     void testInsertRowSource();
     void testInsertRowsSource_data();

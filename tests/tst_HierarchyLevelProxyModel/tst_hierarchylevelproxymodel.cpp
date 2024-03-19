@@ -279,6 +279,22 @@ void tst_HierarchyLevelProxyModel::testSetData_data()
     QTest::newRow("Tree") << createTreeModel(this);
 }
 
+void tst_HierarchyLevelProxyModel::testSetDataIrrelevantIndex()
+{
+    QAbstractItemModel* baseModel=createTreeModel(this);
+    if (!baseModel)
+        return;
+    HierarchyLevelProxyModel proxyModel;
+    new ModelTest(&proxyModel, baseModel);
+    proxyModel.setSourceModel(baseModel);
+    proxyModel.setHierarchyLevel(1);
+    QSignalSpy proxyDataChangeSpy(&proxyModel, &QAbstractItemModel::dataChanged);
+    QSignalSpy sourceDataChangeSpy(baseModel, &QAbstractItemModel::dataChanged);
+    QVERIFY(baseModel->setData(baseModel->index(0,0),1234));
+    QVERIFY(proxyDataChangeSpy.isEmpty());
+    QCOMPARE(sourceDataChangeSpy.count(),1);
+}
+
 void tst_HierarchyLevelProxyModel::testInsertRowSource_data()
 {
     QTest::addColumn<QAbstractItemModel *>("baseModel");
