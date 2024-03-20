@@ -30,6 +30,7 @@ private Q_SLOTS:
     void bug53MoveRows();
     void bug53Cols();
     void bug53MoveCols();
+    void resetOnAncestorRemoved();
     void bug60Row();
     void bug60Col();
 

@@ -28,6 +28,7 @@ class RootIndexProxyModelPrivate
     QModelIndexList proxyIndexes;
     bool isDescendant(QModelIndex childIdx, const QModelIndex &parentIdx) const;
     bool ignoreMove(const QModelIndex &sourceParent, const QModelIndex &destParent) const;
+    bool isRootRemoved(const QModelIndex &parent, int first, int last, const QModelIndex &target, int (QModelIndex::*rowCol)() const) const;
     void resetRootOnModelChange();
     void checkRootRowRemoved(const QModelIndex &parent, int first, int last);
     void checkRootColumnsRemoved(const QModelIndex &parent, int first, int last);

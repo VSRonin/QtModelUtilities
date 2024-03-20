@@ -748,6 +748,47 @@ void tst_RootIndexProxyModel::bug53MoveCols()
 #endif
 }
 
+void tst_RootIndexProxyModel::resetOnAncestorRemoved()
+{
+#ifdef COMPLEX_MODEL_SUPPORT
+    QAbstractItemModel *baseModel = createTreeModel(this);
+    RootIndexProxyModel proxyModel1;
+    new ModelTest(&proxyModel1, baseModel);
+    proxyModel1.setSourceModel(baseModel);
+    proxyModel1.setRootIndex(baseModel->index(1, 0, baseModel->index(1, 0))); // Set Root to 1,1,0
+    QSignalSpy proxyRootChangeSpy(&proxyModel1, SIGNAL(rootIndexChanged()));
+    QVERIFY(proxyRootChangeSpy.isValid());
+    QSignalSpy proxyResetSpy(&proxyModel1, SIGNAL(modelReset()));
+    QVERIFY(proxyResetSpy.isValid());
+    QSignalSpy proxyAboutToBeResetSpy(&proxyModel1, SIGNAL(modelAboutToBeReset()));
+    QVERIFY(proxyAboutToBeResetSpy.isValid());
+
+    QVERIFY(baseModel->removeRow(2, baseModel->index(1, 0, baseModel->index(1, 0)))); // Remove row 2 of parent 1,1,0
+    QVERIFY(proxyRootChangeSpy.isEmpty());
+    QVERIFY(proxyAboutToBeResetSpy.isEmpty());
+    QVERIFY(proxyResetSpy.isEmpty());
+    proxyModel1.setRootIndex(baseModel->index(1, 0, baseModel->index(2, 0))); // Set Root to 2,1,0
+    QCOMPARE(proxyRootChangeSpy.count(), 1);
+    QCOMPARE(proxyAboutToBeResetSpy.count(), 1);
+    QCOMPARE(proxyResetSpy.count(), 1);
+    QVERIFY(baseModel->removeRow(2)); // Remove root row 2
+    QCOMPARE(proxyRootChangeSpy.count(), 2);
+    QCOMPARE(proxyAboutToBeResetSpy.count(), 2);
+    QCOMPARE(proxyResetSpy.count(), 2);
+    proxyModel1.setRootIndex(baseModel->index(1, 0, baseModel->index(1, 0))); // Set Root to 1,1,0
+    QCOMPARE(proxyRootChangeSpy.count(), 3);
+    QCOMPARE(proxyAboutToBeResetSpy.count(), 3);
+    QCOMPARE(proxyResetSpy.count(), 3);
+    QVERIFY(baseModel->removeRow(0)); // Remove root row 0
+    QCOMPARE(proxyRootChangeSpy.count(), 3);
+    QCOMPARE(proxyAboutToBeResetSpy.count(), 3);
+    QCOMPARE(proxyResetSpy.count(), 3);
+    baseModel->deleteLater();
+#else
+    QSKIP("This test requires the Qt GUI or GenericModel modules");
+#endif
+}
+
 void tst_RootIndexProxyModel::bug53MoveRows()
 {
 #ifdef QTMODELUTILITIES_GENERICMODEL
