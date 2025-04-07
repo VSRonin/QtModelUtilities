@@ -129,7 +129,6 @@ runs:
         $xmlOut.save("${{ inputs.junit-output }}");
     - shell: pwsh
       run: |
-        $npmBinPath = npm bin
         npm install xunit-viewer
-        & $npmBinPath/xunit-viewer -r "${{ inputs.junit-output }}" -o "${{ inputs.html-output }}" -t "${{ github.repository }}"
+        & npx xunit-viewer -r "${{ inputs.junit-output }}" -o "${{ inputs.html-output }}" -t "${{ github.repository }}"
         Start-Sleep 10

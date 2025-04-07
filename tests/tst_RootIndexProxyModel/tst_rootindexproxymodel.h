@@ -26,6 +26,12 @@ private Q_SLOTS:
     void insertColumn();
     void removeRow();
     void removeColumn();
+    void bug53Rows();
+    void bug53MoveRows();
+    void bug53Cols();
+    void bug53MoveCols();
+    void bug60Row();
+    void bug60Col();
 
 protected:
     void compareModels(const QAbstractItemModel *source, const QAbstractItemModel *proxy, const QModelIndex &sourcePar, const QModelIndex &proxyPar);

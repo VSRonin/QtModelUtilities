@@ -4,6 +4,8 @@ branches:
   only:
   - master
   - dev
+  - bugfix
+  - ci_admin
   - travis
 
 jobs:
