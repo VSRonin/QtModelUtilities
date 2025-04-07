@@ -32,17 +32,19 @@ jobs:
           - name: Install Dependencies
             run: |
               sudo apt-get update -y
-              sudo apt-get install libxcb-icccm4 libxcb-xkb1 libxcb-icccm4 libxcb-image0 libxcb-render-util0 libxcb-randr0 libxcb-keysyms1 libxcb-xinerama0
+              sudo apt-get install libxcb-*
               export PATH=$PATH:$PWD/build/installed/lib
               export PATH=$PATH:$PWD/build/installed/bin
+              export QT_QPA_PLATFORM=offscreen
           - name: Install Qt
-            uses: jurplel/install-qt-action@v2
+            uses: jurplel/install-qt-action@v4
             with:
               version: ${{ matrix.qt_ver }}
           - name: Git Checkout
-            uses: actions/checkout@v2
+            uses: actions/checkout@v4
             with:
-              fetch-depth: 0
+              fetch-depth: 1
+              fetch-tags: true
           - name: Create Build Directory
             run: |
               mkdir build
@@ -60,37 +62,28 @@ jobs:
               cmake --build .
               cmake --build . --target install
           - name: Test Debug
-            id: rundebugtests
-            continue-on-error: true
-            uses: GabrielBB/xvfb-action@v1
-            with:
-              working-directory: ./build/debug
-              run: cmake --build . --target test
-          - name: Test Release
-            id: runreleasetests
-            uses: GabrielBB/xvfb-action@v1
-            with:
-              working-directory: ./build/release
-              run: cmake --build . --target test
+            id: runtests
+            run: |
+              cd build/debug
+              cmake --build . --target test
+              cd ../release
+              cmake --build . --target test
           - name: HtmlModelSerialiser output validation
             run: |
               pip install html5validator
               html5validator --root build/TestResults/
           - name: Prepare Test Report
-            if: ${{ always() && (steps.rundebugtests.outcome == 'failure' || steps.runreleasetests.outcome == 'failure') }}
+            if: ${{ always() && (steps.runtests.outcome == 'failure') }}
             uses: ./ci/processtestresults
             with:
                 qt-tests: build/TestResults
                 junit-output: build/TestResults/junitresult.xml
                 html-output: build/TestResults/testsreport.html
           - name: Publish Test Report
-            if: ${{ always() && (steps.rundebugtests.outcome == 'failure' || steps.runreleasetests.outcome == 'failure') }}
-            uses: actions/upload-artifact@v2
+            if: ${{ always() && (steps.runtests.outcome == 'failure') }}
+            uses: actions/upload-artifact@v4
             with:
                 name: Qt${{ matrix.qt_ver }}
                 path: |
                   build/TestResults/*.xml
                   build/TestResults/testsreport.html
-          
-                  build/TestResults/testsreport.html
-          
