@@ -27,7 +27,7 @@ jobs:
         strategy:
           fail-fast: false
           matrix:
-            qt_ver: [5.12.10, 5.9.9, 6.2.4]
+            qt_ver: [5.12.10, 5.9.9, 6.2.4, 6.5.3]
         steps:
           - name: Install Dependencies
             run: |

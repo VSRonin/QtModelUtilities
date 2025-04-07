@@ -4,7 +4,6 @@ This library is a collection of utilities for Qt's Model/View framework.
 
 ### Status
 [![Build Status](https://github.com/VSRonin/QtModelUtilities/actions/workflows/buildtest.yml/badge.svg?branch=master)](https://github.com/VSRonin/QtModelUtilities/actions)
-[![Qt 5.1 Build Status](https://travis-ci.com/VSRonin/QtModelUtilities.svg?branch=master)](https://travis-ci.com/github/VSRonin/QtModelUtilities)
 
 ### Contents
 
@@ -49,21 +48,21 @@ Once you installed/unpacked your library in a directory (e.g. `path/to/QtModelUt
 
 The library should be compatible with all platform supported by Qt, the CI will build, test and deploy the following configurations:
 
-+ Windows MSVC 2019 64bit Qt 5.15
-+ Windows MSVC 2019 64bit Qt 6.3
++ Windows MSVC 2022 64bit Qt 5.15
++ Windows MSVC 2022 64bit Qt 6.8
 + Windows MinGW 8.1 64bit Qt 5.15
-+ Windows MinGW 8.1 64bit Qt 6.3
++ Windows MinGW 8.1 64bit Qt 6.8
 + Ubuntu g++ 64bit Qt 5.15
-+ Ubuntu g++ 64bit Qt 6.3
++ Ubuntu g++ 64bit Qt 6.8
 + Mac OS X Clang 64bit Qt 5.15
-+ Mac OS X Clang 64bit Qt 6.3
++ Mac OS X Clang 64bit Qt 6.8
 
 A reduced suite of tests, to ensure compatibility, is also run on:
 
++ Ubuntu g++ 64bit Qt 6.5
 + Ubuntu g++ 64bit Qt 6.2
 + Ubuntu g++ 64bit Qt 5.12
 + Ubuntu g++ 64bit Qt 5.9
-+ Ubuntu Trusty g++ 6 64bit Qt 5.1
 
 ### Examples
 
@@ -85,5 +84,7 @@ Docs can, alternatively, be built using Doxygen and the DoxygenConfig.doxyfile f
 
 Contributions are welcome. 
 You can either [open a ticket](https://github.com/VSRonin/QtModelUtilities/issues) or submit a pull request on the [project's GitHub page](https://github.com/VSRonin/QtModelUtilities).
+
+Contributed code should adhere to the [Qt Coding Style Guide](https://wiki.qt.io/Qt_Coding_Style).
 
 Contributed code should adhere to the [Qt Coding Style Guide](https://wiki.qt.io/Qt_Coding_Style).
