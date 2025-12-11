@@ -11,6 +11,7 @@ private Q_SLOTS:
     void testDisconnectedModel();
     void testRowCount_data();
     void testRowCount();
+
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     // void testMultiData();
     // void testClearItemData();

@@ -20,6 +20,10 @@ public:
     QVariant m_startingVal;
     SubtotalProxyModel::AggregateFunction m_aggregateFunction;
     int m_role;
+    SubtotalAggregator();
+    SubtotalAggregator(SubtotalProxyModel::AggregateFunction aggr, const QVariant &start, int role);
+    SubtotalAggregator(const SubtotalAggregator &) = default;
+    SubtotalAggregator &operator=(const SubtotalAggregator &) = default;
 };
 
 class SubtotalProxyModelPrivate
@@ -33,11 +37,18 @@ class SubtotalProxyModelPrivate
     QVector<QMetaObject::Connection> m_sourceConnections;
     SubtotalProxyModel::SubtotalLocations totalLocations() const;
     bool isOnTotalRow(int row, const QModelIndex &parent) const;
+    enum TotalRowOrTotalParent { onNothing, onTotalRow, onTotalParent };
+    TotalRowOrTotalParent isOnTotalRowOrTotalParent(const QModelIndex &idx) const;
     QVariant calculateTotal(int column, const QModelIndex &parent, int role) const;
     void calculateTotal(int column, const QModelIndex &sourceParent, int role, QVariant &runningSum,
                         SubtotalProxyModel::AggregateFunction aggr) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QMap<int, QVariant> itemData(const QModelIndex &index) const;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    void multiData(const QModelIndex &index, QModelRoleDataSpan roleDataSpan) const;
+#endif
     void emitRecursiveDataChanged();
-    void emitRecursiveDataChanged(int column, const QModelIndex& parent = QModelIndex(), QList<int> *roles = nullptr);
+    void emitRecursiveDataChanged(int column, const QModelIndex &parent = QModelIndex(), QList<int> *roles = nullptr);
     void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
     void onRowsAboutToBeInserted(const QModelIndex &parent, int start, int end);
     void onColumnsAboutToBeInserted(const QModelIndex &parent, int start, int end);

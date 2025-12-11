@@ -15,6 +15,17 @@
 #include <functional>
 #include <QSize>
 
+SubtotalAggregator::SubtotalAggregator()
+    : m_aggregateFunction(nullptr)
+    , m_role(Qt::DisplayRole)
+{ }
+
+SubtotalAggregator::SubtotalAggregator(SubtotalProxyModel::AggregateFunction aggr, const QVariant &start, int role)
+    : m_startingVal(start)
+    , m_aggregateFunction(aggr)
+    , m_role(role)
+{ }
+
 SubtotalProxyModelPrivate::SubtotalProxyModelPrivate(SubtotalProxyModel *q)
     : q_ptr(q)
     , m_overwriteParentData(false)
@@ -35,6 +46,8 @@ bool SubtotalProxyModelPrivate::isOnTotalRow(int row, const QModelIndex &parent)
 {
     Q_Q(const SubtotalProxyModel);
     Q_ASSERT(!parent.isValid() || parent.model() == q);
+    if (parent.isValid() && !m_recursive)
+        return false;
     if (row == 0 && totalLocations() & SubtotalProxyModel::slTop)
         return true;
     if ((row == q->rowCount(parent) - 1) && totalLocations() & SubtotalProxyModel::slBottom)
@@ -42,42 +55,71 @@ bool SubtotalProxyModelPrivate::isOnTotalRow(int row, const QModelIndex &parent)
     return false;
 }
 
-void SubtotalProxyModelPrivate::emitRecursiveDataChanged(int col, const QModelIndex &parent, QList<int>* roles)
+SubtotalProxyModelPrivate::TotalRowOrTotalParent SubtotalProxyModelPrivate::isOnTotalRowOrTotalParent(const QModelIndex &idx) const
 {
-    auto mapIdx = m_subtotalMap.constFind(col);
-    if(mapIdx==m_subtotalMap.constEnd())
-        return;
-    QList<int>* rolesPtr = nullptr;
-    if(!roles){
-        rolesPtr= new QList<int>();
-        for (auto i=mapIdx,  mapEnd = m_subtotalMap.constEnd(); i != mapEnd && i.key() == col; ++i)
-            rolesPtr->append(i->m_role);
-        roles = rolesPtr;
-    }
+    Q_Q(const SubtotalProxyModel);
+    Q_ASSERT(idx.isValid() && idx.model() == q);
+    if (isOnTotalRow(idx.row(), idx.parent()))
+        return onTotalRow;
+    if ((totalLocations() & SubtotalProxyModel::slOnParent) && q->hasChildren(idx))
+        return onTotalParent;
+    return onNothing;
+}
+
+void SubtotalProxyModelPrivate::emitRecursiveDataChanged(int col, const QModelIndex &parent, QList<int> *roles)
+{
     Q_Q(SubtotalProxyModel);
+    if (!q->sourceModel())
+        return;
+    auto mapIdx = m_subtotalMap.constFind(col);
+    if (mapIdx == m_subtotalMap.constEnd())
+        return;
+    std::unique_ptr<QList<int>> rolesPtr(nullptr);
+    if (!roles) {
+        rolesPtr = std::make_unique<QList<int>>();
+        for (auto i = mapIdx, mapEnd = m_subtotalMap.constEnd(); i != mapEnd && i.key() == col; ++i)
+            rolesPtr->append(i->m_role);
+        roles = rolesPtr.get();
+    }
     const int rowCnt = q->rowCount(parent);
-    for(int j= totalLocations() & SubtotalProxyModel::slTop ? 1:0,jEnd=totalLocations() & SubtotalProxyModel::slBottom ? rowCnt-1 : rowCnt;j<jEnd;++j){
-        const QModelIndex idx=q->index(j,col,parent);
-        if(q->hasChildren(idx))
-            emitRecursiveDataChanged(col,idx,roles);
-        // #TODO emit if slOnParent
+    if (m_recursive) {
+        for (int j = totalLocations() & SubtotalProxyModel::slTop ? 1 : 0,
+                 jEnd = totalLocations() & SubtotalProxyModel::slBottom ? rowCnt - 1 : rowCnt;
+             j < jEnd; ++j) {
+            const QModelIndex idx = q->index(j, col, parent);
+            if (q->hasChildren(idx)) {
+                if (totalLocations() & SubtotalProxyModel::slOnParent) {
+                    if (m_overwriteParentData) {
+                        Q_EMIT q->dataChanged(idx, idx, *roles);
+                    } else {
+                        QList<int> rolesChanged;
+                        for (auto i = roles->constBegin(), iEnd = roles->constEnd(); i != iEnd; ++i) {
+                            if (!q->mapToSource(idx).data(*i).isValid())
+                                rolesChanged.append(*i);
+                        }
+                        if (!rolesChanged.isEmpty())
+                            Q_EMIT q->dataChanged(idx, idx, rolesChanged);
+                    }
+                }
+                emitRecursiveDataChanged(col, idx, roles);
+            }
+        }
     }
 
-    if (totalLocations() & SubtotalProxyModel::slTop){
-        const QModelIndex idx = q->index(0,col,parent);
-        Q_EMIT q->dataChanged(idx,idx,*roles);
+    if (totalLocations() & SubtotalProxyModel::slTop) {
+        const QModelIndex idx = q->index(0, col, parent);
+        Q_EMIT q->dataChanged(idx, idx, *roles);
     }
-    if (totalLocations() & SubtotalProxyModel::slBottom){
-        const QModelIndex idx = q->index(rowCnt-1,col,parent);
-        Q_EMIT q->dataChanged(idx,idx,*roles);
+    if (totalLocations() & SubtotalProxyModel::slBottom) {
+        const QModelIndex idx = q->index(rowCnt - 1, col, parent);
+        Q_EMIT q->dataChanged(idx, idx, *roles);
     }
-    delete rolesPtr;
 }
 
 void SubtotalProxyModelPrivate::emitRecursiveDataChanged()
 {
     const QList<int> allCols = m_subtotalMap.uniqueKeys();
-    for(int i : allCols)
+    for (int i : allCols)
         emitRecursiveDataChanged(i);
 }
 
@@ -175,7 +217,8 @@ void SubtotalProxyModelPrivate::onColumnsRemoved(const QModelIndex &parent, int 
 
 void SubtotalProxyModelPrivate::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
-    // #TODO
+    Q_Q(SubtotalProxyModel);
+    Q_EMIT q->dataChanged(q->mapFromSource(topLeft), q->mapFromSource(bottomRight), roles);
 }
 
 void SubtotalProxyModelPrivate::onLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &sourceParents, QAbstractItemModel::LayoutChangeHint hint)
@@ -215,10 +258,82 @@ SubtotalProxyModel::~SubtotalProxyModel()
     delete m_dptr;
 }
 
+void SubtotalProxyModel::setSubTotalColumn(int column, AggregateFunction aggregator, const QVariant &initialValue, int role)
+{
+    if (!aggregator)
+        return removeSubtotalColumn(column, role);
+    Q_D(SubtotalProxyModel);
+    int firstColumnInMap = sourceModel() && d->m_subtotalMap.isEmpty();
+    const auto doInsertion = [d, column, &aggregator, &initialValue, role]() {
+        auto columnIter = d->m_subtotalMap.find(column);
+        if (columnIter == d->m_subtotalMap.end()) {
+            d->m_subtotalMap.insert(column, SubtotalAggregator(aggregator, initialValue, role));
+        } else {
+            const auto iEnd = d->m_subtotalMap.end();
+            for (; columnIter != iEnd && columnIter.key() == column; ++columnIter) {
+                if (columnIter->m_role == role) {
+                    columnIter->m_startingVal = initialValue;
+                    columnIter->m_aggregateFunction = aggregator;
+                    break;
+                }
+            }
+            if (columnIter == iEnd || columnIter.key() != column) {
+                d->m_subtotalMap.insert(column, SubtotalAggregator(aggregator, initialValue, role));
+            }
+        }
+    };
+    if (firstColumnInMap) {
+        if (((d->m_totalLocations & slTop) && (d->m_totalLocations & slBottom))
+            || (d->m_recursive && ((d->m_totalLocations & slTop) || (d->m_totalLocations & slBottom)))) {
+            // top and bottom can't be added at the same time
+            // multiple rows in different parents can't be inserted at once
+            beginResetModel();
+            doInsertion();
+            endResetModel();
+        } else if (d->m_totalLocations & slTop) {
+            beginInsertRows(QModelIndex(), 0, 0);
+            doInsertion();
+            endInsertRows();
+        } else if (d->m_totalLocations & slBottom) {
+            const int rowCnt = rowCount();
+            beginInsertRows(QModelIndex(), rowCnt, rowCnt);
+            doInsertion();
+            endInsertRows();
+        } else {
+            doInsertion();
+            d->emitRecursiveDataChanged();
+        }
+    } else {
+        doInsertion();
+        d->emitRecursiveDataChanged();
+    }
+}
+
+void SubtotalProxyModel::removeSubtotalColumn(int column)
+{
+    Q_ASSERT_X(false, "SubtotalProxyModel::removeSubtotalColumn(int)", "TODO Implement");
+}
+
+void SubtotalProxyModel::removeSubtotalColumn(int column, int role)
+{
+    Q_ASSERT_X(false, "SubtotalProxyModel::removeSubtotalColumn(int,int)", "TODO Implement");
+}
+
 bool SubtotalProxyModel::overwriteParentData() const
 {
     Q_D(const SubtotalProxyModel);
     return d->m_overwriteParentData;
+}
+
+void SubtotalProxyModel::setOverwriteParentData(bool overwrite)
+{
+    Q_D(SubtotalProxyModel);
+    if (d->m_overwriteParentData == overwrite)
+        return;
+    d->m_overwriteParentData = overwrite;
+    Q_EMIT overwriteParentDataChanged(overwrite);
+    if (d->totalLocations() & slOnParent)
+        d->emitRecursiveDataChanged();
 }
 
 bool SubtotalProxyModel::recursive() const
@@ -230,11 +345,62 @@ bool SubtotalProxyModel::recursive() const
 void SubtotalProxyModel::setRecursive(bool recur)
 {
     Q_D(SubtotalProxyModel);
-    if(d->m_recursive == recur)
+    if (d->m_recursive == recur)
         return;
+    const bool needReset = ((d->m_totalLocations & slTop) || (d->m_totalLocations & slBottom));
+    if (sourceModel() && needReset)
+        beginResetModel();
     d->m_recursive = recur;
-    if(sourceModel())
+    if (sourceModel() && needReset)
+        endResetModel();
+    if (sourceModel() && !needReset)
         d->emitRecursiveDataChanged();
+    Q_EMIT recursiveChanged(recur);
+}
+
+void SubtotalProxyModel::setTotalLocations(const SubtotalLocations &locations)
+{
+    Q_D(SubtotalProxyModel);
+    if (d->m_totalLocations == locations)
+        return;
+    if (d->m_subtotalMap.isEmpty()) {
+        d->m_totalLocations = locations;
+    } else if (d->m_recursive
+               && ((d->m_totalLocations & slTop) != (locations & slTop) || (d->m_totalLocations & slBottom) != (locations & slBottom))) {
+        // d->m_totalLocations acts on all children but there is no way to use begin/end insert/remove rows on all of them at the same time
+        beginResetModel();
+        d->m_totalLocations = locations;
+        endResetModel();
+    } else {
+        if ((d->m_totalLocations & slTop) && !(locations & slTop)) {
+            beginRemoveRows(QModelIndex(), 0, 0);
+            d->m_totalLocations &= ~slTop;
+            endRemoveRows();
+        }
+        if ((d->m_totalLocations & slBottom) && !(locations & slBottom)) {
+            const int rowCnt = rowCount();
+            beginRemoveRows(QModelIndex(), rowCnt - 1, rowCnt - 1);
+            d->m_totalLocations &= ~slBottom;
+            endRemoveRows();
+        }
+        if ((locations & slTop) && !(d->m_totalLocations & slTop)) {
+            beginInsertRows(QModelIndex(), 0, 0);
+            d->m_totalLocations &= slTop;
+            endRemoveRows();
+        }
+        if ((locations & slBottom) && !(d->m_totalLocations & slBottom)) {
+            const int rowCnt = rowCount();
+            beginInsertRows(QModelIndex(), rowCnt, rowCnt);
+            d->m_totalLocations &= slBottom;
+            endRemoveRows();
+        }
+        if ((d->m_totalLocations & slOnParent) != (locations & slOnParent)) {
+            d->m_totalLocations = locations;
+            d->emitRecursiveDataChanged();
+        }
+    }
+    Q_ASSERT(d->m_totalLocations == locations);
+    Q_EMIT totalLocationsChanged(d->m_totalLocations);
 }
 
 const SubtotalProxyModel::SubtotalLocations &SubtotalProxyModel::totalLocations() const
@@ -304,8 +470,6 @@ QModelIndex SubtotalProxyModel::mapToSource(const QModelIndex &proxyIndex) const
     Q_D(const SubtotalProxyModel);
     if (proxyIndex.row() == 0 && (d->totalLocations() & slTop))
         return QModelIndex();
-    if (proxyIndex.row() == rowCount(proxyIndex.parent()) - 1 && (d->totalLocations() & slBottom))
-        return QModelIndex();
     const auto fetchSourceIndex = [this](int row, int col, void *internalPtr) -> QModelIndex {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
         return createSourceIndex(row, col, internalPtr);
@@ -313,7 +477,11 @@ QModelIndex SubtotalProxyModel::mapToSource(const QModelIndex &proxyIndex) const
         return QIdentityProxy::mapToSource(createIndex(row, col, internalPtr));
 #endif
     };
-    return fetchSourceIndex(proxyIndex.row() - (d->totalLocations() & slTop ? 1 : 0), proxyIndex.column(), proxyIndex.internalPointer());
+    const QModelIndex sourceIdx =
+            fetchSourceIndex(proxyIndex.row() - (d->totalLocations() & slTop ? 1 : 0), proxyIndex.column(), proxyIndex.internalPointer());
+    if (sourceIdx.row() >= sourceModel()->rowCount(sourceIdx.parent()))
+        return QModelIndex();
+    return sourceIdx;
 }
 
 /*!
@@ -345,7 +513,7 @@ QModelIndex SubtotalProxyModel::index(int row, int column, const QModelIndex &pa
     const int rowCnt = rowCount(parent);
     if (row == rowCnt - 1 && (d->totalLocations() & slBottom))
         return createIndex(row, column, mapToSource(index(row - 1, column, parent)).internalPointer());
-    return mapFromSource(sourceModel()->index(row, column, mapToSource(parent)));
+    return mapFromSource(sourceModel()->index(row - (d->totalLocations() & slTop ? 1 : 0), column, mapToSource(parent)));
 }
 
 /*!
@@ -379,20 +547,35 @@ int SubtotalProxyModel::columnCount(const QModelIndex &parent) const
 */
 QMap<int, QVariant> SubtotalProxyModel::itemData(const QModelIndex &index) const
 {
-    if (!sourceModel())
+    Q_D(const SubtotalProxyModel);
+    return d->itemData(index);
+}
+
+QMap<int, QVariant> SubtotalProxyModelPrivate::itemData(const QModelIndex &index) const
+{
+    Q_Q(const SubtotalProxyModel);
+    if (!q->sourceModel())
         return QMap<int, QVariant>();
     if (!index.isValid())
         return QMap<int, QVariant>();
-    Q_ASSERT(index.model() == this);
-    Q_D(const SubtotalProxyModel);
-    if (d->isOnTotalRow(index.row(), index.parent())) {
+    Q_ASSERT(index.model() == q);
+
+    const auto isOn = isOnTotalRowOrTotalParent(index);
+    if (isOn == onTotalRow || (isOn == onTotalParent && m_overwriteParentData)) {
         QMap<int, QVariant> result;
-        for (auto mapIdx = d->m_subtotalMap.constFind(index.column()), mapEnd = d->m_subtotalMap.constEnd();
+        for (auto mapIdx = m_subtotalMap.constFind(index.column()), mapEnd = m_subtotalMap.constEnd();
              mapIdx != mapEnd && mapIdx.key() == index.column(); ++mapIdx)
-            result.insert(mapIdx->m_role, d->calculateTotal(index.column(), index.parent(), mapIdx->m_role));
+            result.insert(mapIdx->m_role, calculateTotal(index.column(), index.parent(), mapIdx->m_role));
         return result;
     }
-    return sourceModel()->itemData(mapToSource(index));
+    QMap<int, QVariant> sourceData = q->sourceModel()->itemData(q->mapToSource(index));
+    if (isOn == onTotalParent) {
+        for (auto i = sourceData.begin(), iEnd = sourceData.end(); i != iEnd; ++i) {
+            if (!i.value().isValid())
+                i.value() = calculateTotal(index.column(), index.parent(), i.key());
+        }
+    }
+    return sourceData;
 }
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
@@ -417,34 +600,78 @@ bool SubtotalProxyModel::clearItemData(const QModelIndex &index)
 */
 void SubtotalProxyModel::multiData(const QModelIndex &index, QModelRoleDataSpan roleDataSpan) const
 {
-    if (!sourceModel())
+    Q_D(const SubtotalProxyModel);
+    return d->multiData(index, roleDataSpan);
+}
+
+void SubtotalProxyModelPrivate::multiData(const QModelIndex &index, QModelRoleDataSpan roleDataSpan) const
+{
+    Q_Q(const SubtotalProxyModel);
+    if (!q->sourceModel())
         return;
     if (!index.isValid())
         return;
-    Q_ASSERT(index.model() == this);
-    Q_D(const SubtotalProxyModel);
-    if (d->isOnTotalRow(index.row(), index.parent())) {
+    Q_ASSERT(index.model() == q);
+    const auto isOn = isOnTotalRowOrTotalParent(index);
+    if (isOn == onTotalRow || (isOn == onTotalParent && m_overwriteParentData)) {
         for (QModelRoleData &roleData : roleDataSpan)
-            roleData.setData(d->calculateTotal(index.column(), index.parent(), roleData.role()));
+            roleData.setData(calculateTotal(index.column(), index.parent(), roleData.role()));
+        return;
     }
-    return sourceModel()->multiData(mapToSource(index), roleDataSpan);
+    if (isOn == onTotalParent) {
+        q->sourceModel()->multiData(q->mapToSource(index), roleDataSpan);
+        for (QModelRoleData &roleData : roleDataSpan) {
+            if (!roleData.data().isValid())
+                roleData.setData(calculateTotal(index.column(), index.parent(), roleData.role()));
+        }
+        return;
+    }
+    return q->sourceModel()->multiData(q->mapToSource(index), roleDataSpan);
 }
 #endif
 
 /*!
 \reimp
 */
+Qt::ItemFlags SubtotalProxyModel::flags(const QModelIndex &index) const
+{
+    Q_ASSERT(!index.isValid() || index.model() == this);
+    if (!sourceModel())
+        return Qt::NoItemFlags;
+    if (!index.isValid())
+        return sourceModel()->flags(QModelIndex());
+    Q_D(const SubtotalProxyModel);
+    if (d->isOnTotalRow(index.row(), index.parent()))
+        return flagsForTotalRow(index);
+    return sourceModel()->flags(mapToSource(index));
+}
+
+/*!
+\reimp
+*/
 QVariant SubtotalProxyModel::data(const QModelIndex &index, int role) const
 {
-    if (!sourceModel())
+    Q_D(const SubtotalProxyModel);
+    return d->data(index, role);
+}
+
+QVariant SubtotalProxyModelPrivate::data(const QModelIndex &index, int role) const
+{
+    Q_Q(const SubtotalProxyModel);
+    if (!q->sourceModel())
         return QVariant();
     if (!index.isValid())
         return QVariant();
-    Q_ASSERT(index.model() == this);
-    Q_D(const SubtotalProxyModel);
-    if (d->isOnTotalRow(index.row(), index.parent()))
-        return d->calculateTotal(index.column(), index.parent(), role);
-    return sourceModel()->data(mapToSource(index), role);
+    Q_ASSERT(index.model() == q);
+    const auto isOn = isOnTotalRowOrTotalParent(index);
+    if (isOn == onTotalRow || (isOn == onTotalParent && m_overwriteParentData))
+        return calculateTotal(index.column(), index.parent(), role);
+    const QVariant sourceData = q->sourceModel()->data(q->mapToSource(index), role);
+    if (isOn == onTotalParent) {
+        if (!sourceData.isValid())
+            return calculateTotal(index.column(), index.parent(), role);
+    }
+    return sourceData;
 }
 
 /*!
@@ -480,8 +707,12 @@ int SubtotalProxyModel::rowCount(const QModelIndex &parent) const
     if (!sourceModel())
         return 0;
     Q_D(const SubtotalProxyModel);
-    int result = sourceModel()->rowCount(mapToSource(parent));
-    result += (d->totalLocations() & slTop ? 1 : 0) + (d->totalLocations() & slBottom ? 1 : 0);
+    const QModelIndex sourceParent = mapToSource(parent);
+    if (parent.isValid() && !sourceParent.isValid())
+        return 0;
+    int result = sourceModel()->rowCount(sourceParent);
+    if (result > 0)
+        result += (d->totalLocations() & slTop ? 1 : 0) + (d->totalLocations() & slBottom ? 1 : 0);
     return result;
 }
 
@@ -650,6 +881,12 @@ bool SubtotalProxyModel::moveRows(const QModelIndex &sourceParent, int sourceRow
     if (destinationParent.isValid() && d->isOnTotalRow(destinationParent.row(), destinationParent.parent()))
         return false;
     return sourceModel()->moveColumns(mapToSource(sourceParent), sourceRow, count, mapToSource(destinationParent), destinationChild);
+}
+
+Qt::ItemFlags SubtotalProxyModel::flagsForTotalRow(const QModelIndex &index) const
+{
+    Q_UNUSED(index)
+    return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 }
 
 /*!

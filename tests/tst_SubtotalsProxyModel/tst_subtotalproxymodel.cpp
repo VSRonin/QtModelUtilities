@@ -113,6 +113,8 @@ void tst_RoleMaskProxyModel::testItemDataTransParent()
 }
 */
 
+void tst_SubtotalProxyModel::initTestCase() { }
+
 void tst_SubtotalProxyModel::autoParent()
 {
     QObject *parentObj = new QObject;
@@ -156,47 +158,25 @@ void tst_SubtotalProxyModel::testRowCount_data()
     QTest::addColumn<int>("rootCount");
     QTest::addColumn<int>("childCount");
     QAbstractItemModel *baseModel = createFlatTestModel(this);
-    QTest::newRow("Flat top") << baseModel << SubtotalProxyModel::slRootTop << baseModel->rowCount() + 1 << 0;
+    QTest::newRow("Flat top") << baseModel << SubtotalProxyModel::SubtotalLocations(SubtotalProxyModel::slTop) << baseModel->rowCount() + 1 << 0;
     baseModel = createFlatTestModel(this);
-    QTest::newRow("Flat bottom") << baseModel << SubtotalProxyModel::slRootBottom << baseModel->rowCount() + 1 << 0;
+    QTest::newRow("Flat bottom") << baseModel << SubtotalProxyModel::SubtotalLocations(SubtotalProxyModel::slBottom) << baseModel->rowCount() + 1
+                                 << 0;
     baseModel = createFlatTestModel(this);
-    QTest::newRow("Flat both") << baseModel << (SubtotalProxyModel::slRootTop | SubtotalProxyModel::slRootBottom) << baseModel->rowCount() + 2 << 0;
+    QTest::newRow("Flat both") << baseModel << (SubtotalProxyModel::slTop | SubtotalProxyModel::slBottom) << baseModel->rowCount() + 2 << 0;
 
     baseModel = createTreeTestModel(this);
-    QTest::newRow("Tree top") << baseModel << SubtotalProxyModel::slRootTop << baseModel->rowCount() + 1
-                              << baseModel->rowCount(baseModel->index(0, 0));
+    QTest::newRow("Tree top") << baseModel << SubtotalProxyModel::SubtotalLocations(SubtotalProxyModel::slTop) << baseModel->rowCount() + 1
+                              << baseModel->rowCount(baseModel->index(0, 0)) + 1;
     baseModel = createTreeTestModel(this);
-    QTest::newRow("Tree bottom") << baseModel << SubtotalProxyModel::slRootBottom << baseModel->rowCount() + 1
-                                 << baseModel->rowCount(baseModel->index(0, 0));
+    QTest::newRow("Tree bottom") << baseModel << SubtotalProxyModel::SubtotalLocations(SubtotalProxyModel::slBottom) << baseModel->rowCount() + 1
+                                 << baseModel->rowCount(baseModel->index(1, 0)) + 1;
     baseModel = createTreeTestModel(this);
-    QTest::newRow("Tree both") << baseModel << (SubtotalProxyModel::slRootTop | SubtotalProxyModel::slRootBottom) << baseModel->rowCount() + 2
-                               << baseModel->rowCount(baseModel->index(0, 0));
-
+    QTest::newRow("Tree both") << baseModel << (SubtotalProxyModel::slTop | SubtotalProxyModel::slBottom) << baseModel->rowCount() + 2
+                               << baseModel->rowCount(baseModel->index(0, 0)) + 2;
     baseModel = createTreeTestModel(this);
-    QTest::newRow("Tree child on parent") << baseModel << SubtotalProxyModel::slChildOnParent << baseModel->rowCount()
-                                          << baseModel->rowCount(baseModel->index(0, 0));
-    baseModel = createTreeTestModel(this);
-    QTest::newRow("Tree child top") << baseModel << SubtotalProxyModel::slChildTop << baseModel->rowCount()
-                                    << baseModel->rowCount(baseModel->index(0, 0)) + 1;
-    baseModel = createTreeTestModel(this);
-    QTest::newRow("Tree child bottom") << baseModel << SubtotalProxyModel::slChildBottom << baseModel->rowCount()
-                                       << baseModel->rowCount(baseModel->index(0, 0)) + 1;
-    baseModel = createTreeTestModel(this);
-    QTest::newRow("Tree child both") << baseModel << (SubtotalProxyModel::slChildTop | SubtotalProxyModel::slChildBottom) << baseModel->rowCount()
-                                     << baseModel->rowCount(baseModel->index(0, 0)) + 2;
-    baseModel = createTreeTestModel(this);
-    QTest::newRow("Tree child all") << baseModel
-                                    << (SubtotalProxyModel::slChildTop | SubtotalProxyModel::slChildBottom | SubtotalProxyModel::slChildOnParent)
-                                    << baseModel->rowCount() << baseModel->rowCount(baseModel->index(0, 0)) + 2;
-
-    baseModel = createTreeTestModel(this);
-    QTest::newRow("Tree child and parent top") << baseModel << (SubtotalProxyModel::slRootTop | SubtotalProxyModel::slChildTop)
-                                               << baseModel->rowCount() + 1 << baseModel->rowCount(baseModel->index(0, 0)) + 1;
-    baseModel = createTreeTestModel(this);
-    QTest::newRow("Tree child and parent all") << baseModel
-                                               << (SubtotalProxyModel::slRootTop | SubtotalProxyModel::slRootBottom | SubtotalProxyModel::slChildTop
-                                                   | SubtotalProxyModel::slChildBottom | SubtotalProxyModel::slChildOnParent)
-                                               << baseModel->rowCount() + 2 << baseModel->rowCount(baseModel->index(0, 0)) + 2;
+    QTest::newRow("Tree all") << baseModel << (SubtotalProxyModel::slTop | SubtotalProxyModel::slBottom | SubtotalProxyModel::slOnParent)
+                              << baseModel->rowCount() + 2 << baseModel->rowCount(baseModel->index(0, 0)) + 2;
 }
 
 void tst_SubtotalProxyModel::testRowCount()
@@ -207,14 +187,13 @@ void tst_SubtotalProxyModel::testRowCount()
     QFETCH(int, rootCount);
     QFETCH(int, childCount);
     SubtotalProxyModel proxyModel;
-    ModelTest *const modelTest = new ModelTest(&proxyModel, this);
+    const QScopedPointer<ModelTest, QScopedPointerDeleteLater> modelTest(new ModelTest(&proxyModel, this)); // to make clazy happy
     proxyModel.setTotalLocations(locations);
     proxyModel.setSubTotalColumn(1, tst_SubtotalProxyModel::intSum);
     proxyModel.setSourceModel(baseModel);
     QCOMPARE(proxyModel.rowCount(), rootCount);
-    QCOMPARE(proxyModel.rowCount(proxyModel.index(0, 0)), childCount);
+    QCOMPARE(proxyModel.rowCount(proxyModel.index(1, 0)), childCount);
     baseModel->deleteLater();
-    modelTest->deleteLater();
 #else
     QSKIP("This test requires the Qt GUI or GenericModel modules");
 #endif

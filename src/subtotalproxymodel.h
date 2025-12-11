@@ -56,6 +56,7 @@ public:
     void multiData(const QModelIndex &index, QModelRoleDataSpan roleDataSpan) const override;
     bool clearItemData(const QModelIndex &index) override;
 #endif
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     QModelIndex buddy(const QModelIndex &index) const override;
@@ -77,6 +78,7 @@ Q_SIGNALS:
     void totalLocationsChanged(SubtotalProxyModel::SubtotalLocations locations);
 
 protected:
+    virtual Qt::ItemFlags flagsForTotalRow(const QModelIndex &index) const;
     SubtotalProxyModel(SubtotalProxyModelPrivate &dptr, QObject *parent);
     SubtotalProxyModelPrivate *m_dptr;
 };
